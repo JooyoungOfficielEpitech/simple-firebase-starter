@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "844595402934",
+    "project_id": "starter-82ab0",
+    "storage_bucket": "starter-82ab0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:844595402934:android:0f493a7041f8c90a81ae17",
+        "android_client_info": {
+          "package_name": "com.mmecoco.starter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "844595402934-9hj73f80fdbuieuqu9t4bbagiqs1285i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBAYU4qMXp0ciBP54oYvceukhVzbZEiJM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "844595402934-9hj73f80fdbuieuqu9t4bbagiqs1285i.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "844595402934-g16imkv8hc071q9m9ng4fd4ppcjipb8j.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mmecoco.starter"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

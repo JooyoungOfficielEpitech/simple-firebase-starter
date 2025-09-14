@@ -1,0 +1,69 @@
+{
+  "cli": {
+    "version": ">= 16.17.4"
+  },
+  "build": {
+    "development": {
+      "extends": "production",
+      "distribution": "internal",
+      "env": {
+        "GOOGLE_SERVICES_INFO_PLIST": "GOOGLE_SERVICES_INFO_PLIST",
+        "GOOGLE_SERVICES_JSON": "GOOGLE_SERVICES_JSON"
+      },
+      "android": {
+        "gradleCommand": ":app:assembleDebug"
+      },
+      "ios": {
+        "buildConfiguration": "Debug",
+        "simulator": true
+      }
+    },
+    "development:device": {
+      "extends": "development",
+      "distribution": "internal",
+      "env": {
+        "GOOGLE_SERVICES_INFO_PLIST": "GOOGLE_SERVICES_INFO_PLIST",
+        "GOOGLE_SERVICES_JSON": "GOOGLE_SERVICES_JSON"
+      },
+      "ios": {
+        "buildConfiguration": "Debug",
+        "simulator": false
+      }
+    },
+    "preview": {
+      "extends": "production",
+      "distribution": "internal",
+      "env": {
+        "GOOGLE_SERVICES_INFO_PLIST": "GOOGLE_SERVICES_INFO_PLIST",
+        "GOOGLE_SERVICES_JSON": "GOOGLE_SERVICES_JSON"
+      },
+      "ios": { "simulator": true },
+      "android": { "buildType": "apk" }
+    },
+    "preview:device": {
+      "extends": "preview",
+      "env": {
+        "GOOGLE_SERVICES_INFO_PLIST": "GOOGLE_SERVICES_INFO_PLIST",
+        "GOOGLE_SERVICES_JSON": "GOOGLE_SERVICES_JSON"
+      },
+      "ios": { "simulator": false }
+    },
+    "production": {
+      "distribution": "store",
+      "env": {
+        "GOOGLE_SERVICES_INFO_PLIST": "GOOGLE_SERVICES_INFO_PLIST",
+        "GOOGLE_SERVICES_JSON": "GOOGLE_SERVICES_JSON"
+      },
+      "ios": {
+        "simulator": false,
+        "buildConfiguration": "Release"
+      },
+      "android": {
+        "buildType": "app-bundle"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
