@@ -42,6 +42,7 @@ export const WelcomeScreen: FC = function WelcomeScreen() {
           tx="welcomeScreen:readyForLaunch"
           preset="heading"
         />
+
         <Text tx="welcomeScreen:exciting" preset="subheading" />
 
         <Image
@@ -58,7 +59,7 @@ export const WelcomeScreen: FC = function WelcomeScreen() {
         {/* 사용자 정보 표시 */}
         {user && (
           <Text
-            text={`안녕하세요, ${user.displayName || user.email || "사용자"}님!`}
+            text={`안녕하냐, ${user.displayName || user.email || "사용자"}님!`}
             style={themed($userInfo)}
           />
         )}

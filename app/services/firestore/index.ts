@@ -5,6 +5,7 @@ import firestore from "@react-native-firebase/firestore"
 import { UserService } from "./userService"
 
 export { UserService } from "./userService"
+export { SongService } from "./songService"
 
 // 각 서비스의 싱글톤 인스턴스 생성
 const db = firestore()

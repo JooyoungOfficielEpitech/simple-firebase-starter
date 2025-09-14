@@ -4,16 +4,17 @@ import { CompositeScreenProps } from "@react-navigation/native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { Icon } from "@/components/Icon"
-import { translate } from "@/i18n/translate"
 import { SettingsScreen } from "@/screens/SettingsScreen"
 import { WelcomeScreen } from "@/screens/WelcomeScreen"
 import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
 
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
+import { HomeStackNavigator } from "./HomeStackNavigator"
 
 export type MainTabParamList = {
-  Welcome: undefined
+  Home: undefined
+  MyRecords: undefined
   Settings: undefined
 }
 
@@ -56,12 +57,23 @@ export function MainNavigator() {
       }}
     >
       <Tab.Screen
-        name="Welcome"
-        component={WelcomeScreen}
+        name="Home"
+        component={HomeStackNavigator}
         options={{
-          tabBarLabel: translate("mainNavigator:welcomeTab"),
+          tabBarLabel: "홈",
           tabBarIcon: ({ focused }) => (
             <Icon icon="heart" color={focused ? colors.tint : colors.tintInactive} size={30} />
+          ),
+        }}
+      />
+
+      <Tab.Screen
+        name="MyRecords"
+        component={WelcomeScreen} // Temporary - will be replaced with MyRecordsScreen later
+        options={{
+          tabBarLabel: "내 기록",
+          tabBarIcon: ({ focused }) => (
+            <Icon icon="user" color={focused ? colors.tint : colors.tintInactive} size={30} />
           ),
         }}
       />
@@ -70,7 +82,7 @@ export function MainNavigator() {
         name="Settings"
         component={SettingsScreen}
         options={{
-          tabBarLabel: translate("mainNavigator:settingsTab"),
+          tabBarLabel: "설정",
           tabBarIcon: ({ focused }) => (
             <Icon icon="settings" color={focused ? colors.tint : colors.tintInactive} size={30} />
           ),
