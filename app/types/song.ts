@@ -4,8 +4,12 @@ export interface Song {
   id: string
   title: string
   musical: string
-  localMrFile?: string  // 로컬 오디오 파일명 (assets/audio/에서 참조)
-  mrUrl?: string        // Firebase Storage URL (추후 구현)
+  localMrFile?: string        // 로컬 오디오 파일명 (assets/audio/에서 참조)
+  mrUrl?: string              // Firebase Storage URL (추후 구현)
+  musicXMLFile?: string       // 로컬 MusicXML 파일명 (assets/musicXML/에서 참조)
+  musicXMLUrl?: string        // Firebase Storage URL (추후 구현)
+  estimatedBPM?: number       // 추정 BPM
+  audioDuration?: number      // 오디오 파일 길이 (초)
   createdAt?: FirebaseFirestoreTypes.Timestamp
   updatedAt?: FirebaseFirestoreTypes.Timestamp
 }
@@ -15,7 +19,10 @@ export const SAMPLE_SONGS: Song[] = [
     id: "1",
     title: "This is the Moment",
     musical: "지킬 앤 하이드",
-    localMrFile: "sample.mp3",  // 테스트용 샘플 파일
+    localMrFile: "sample.mp3",        // 테스트용 샘플 파일
+    musicXMLFile: "sample.musicxml",  // 테스트용 MusicXML 파일
+    estimatedBPM: 120,               // 추정 BPM
+    audioDuration: 180,              // 대략 3분 (실제로는 오디오에서 자동 감지)
   },
   {
     id: "2", 

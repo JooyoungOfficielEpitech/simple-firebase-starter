@@ -87,22 +87,66 @@ export class MusicXMLService {
    */
   private static async loadMusicXMLFile(fileName: string): Promise<string> {
     try {
-      // React Native에서 로컬 파일 로드 방법
-      // assets 폴더의 파일은 번들에 포함되므로 fetch로 로드 가능
-      
-      // 개발 환경에서는 Metro bundler의 asset resolver 사용
-      const response = await fetch(`/assets/musicXML/${fileName}`)
-      if (!response.ok) {
-        throw new Error(`파일을 찾을 수 없습니다: ${fileName}`)
+      // 🧪 임시: 테스트용 샘플 데이터
+      if (fileName === "sample.musicxml") {
+        console.log("🎼 샘플 MusicXML 데이터 로드")
+        return this.getSampleMusicXMLData()
       }
-      return await response.text()
+
+      // TODO: 실제 구현에서는 Firebase Storage나 다른 방법으로 로드
+      throw new Error(`지원하지 않는 파일: ${fileName}`)
     } catch (error) {
       console.error("파일 로드 오류:", error)
-      
-      // 대체 방법: require로 로드 (단, 파일이 .js로 export되어야 함)
-      // 또는 실제 프로덕션에서는 Firebase Storage에서 로드
       throw error
     }
+  }
+
+  /**
+   * 테스트용 샘플 MusicXML 데이터
+   */
+  private static getSampleMusicXMLData(): string {
+    return `<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE score-partwise  PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="4.0">
+  <movement-title>This is the Moment</movement-title>
+  <identification>
+    <creator type="composer">Frank Wildhorn</creator>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name>Voice</part-name>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1000</divisions>
+        <key><fifths>0</fifths></key>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+      </attributes>
+      <note><pitch><step>C</step><octave>4</octave></pitch><duration>500</duration><type>eighth</type><lyric><text>지금</text></lyric></note>
+      <note><pitch><step>D</step><octave>4</octave></pitch><duration>500</duration><type>eighth</type><lyric><text>이</text></lyric></note>
+      <note><pitch><step>E</step><octave>4</octave></pitch><duration>1000</duration><type>quarter</type><lyric><text>순간</text></lyric></note>
+      <note><pitch><step>F</step><octave>4</octave></pitch><duration>1000</duration><type>quarter</type><lyric><text>나의</text></lyric></note>
+    </measure>
+    <measure number="2">
+      <note><pitch><step>G</step><octave>4</octave></pitch><duration>500</duration><type>eighth</type><lyric><text>온</text></lyric></note>
+      <note><pitch><step>A</step><octave>4</octave></pitch><duration>500</duration><type>eighth</type><lyric><text>세상</text></lyric></note>
+      <note><pitch><step>B</step><octave>4</octave></pitch><duration>1000</duration><type>quarter</type><lyric><text>이</text></lyric></note>
+      <note><pitch><step>C</step><octave>5</octave></pitch><duration>1000</duration><type>quarter</type><lyric><text>달라져</text></lyric></note>
+    </measure>
+    <measure number="3">
+      <note><pitch><step>D</step><octave>5</octave></pitch><duration>500</duration><type>eighth</type><lyric><text>꿈꿔왔던</text></lyric></note>
+      <note><pitch><step>E</step><octave>5</octave></pitch><duration>500</duration><type>eighth</type><lyric><text>모든</text></lyric></note>
+      <note><pitch><step>F</step><octave>5</octave></pitch><duration>1000</duration><type>quarter</type><lyric><text>것들이</text></lyric></note>
+      <note><pitch><step>E</step><octave>5</octave></pitch><duration>1000</duration><type>quarter</type><lyric><text>이뤄져</text></lyric></note>
+    </measure>
+    <measure number="4">
+      <note><pitch><step>D</step><octave>5</octave></pitch><duration>2000</duration><type>half</type><lyric><text>가네</text></lyric></note>
+      <note><rest/><duration>2000</duration><type>half</type></note>
+    </measure>
+  </part>
+</score-partwise>`
   }
 
   /**
