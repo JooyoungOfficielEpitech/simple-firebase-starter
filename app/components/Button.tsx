@@ -15,7 +15,7 @@ import type { ThemedStyle, ThemedStyleArray } from "@/theme/types"
 
 import { Text, TextProps } from "./Text"
 
-type Presets = "default" | "filled" | "reversed" | "cta"
+type Presets = "default" | "filled" | "reversed" | "cta" | "accent"
 
 export interface ButtonAccessoryProps {
   style: StyleProp<any>
@@ -171,7 +171,7 @@ export function Button(props: ButtonProps) {
             <ActivityIndicator
               size="small"
               color={
-                preset === "reversed" || preset === "cta"
+                preset === "reversed" || preset === "cta" || preset === "accent"
                   ? theme.colors.palette.neutral100
                   : theme.colors.text
               }
@@ -259,6 +259,11 @@ const $viewPresets: Record<Presets, ThemedStyleArray<ViewStyle>> = {
     $baseViewStyle,
     ({ colors }) => ({ backgroundColor: colors.palette.primary500 }),
   ],
+  accent: [
+    $styles.row,
+    $baseViewStyle,
+    ({ colors }) => ({ backgroundColor: colors.palette.secondary500 }),
+  ],
 }
 
 const $textPresets: Record<Presets, ThemedStyleArray<TextStyle>> = {
@@ -266,6 +271,7 @@ const $textPresets: Record<Presets, ThemedStyleArray<TextStyle>> = {
   filled: [$baseTextStyle],
   reversed: [$baseTextStyle, ({ colors }) => ({ color: colors.palette.neutral100 })],
   cta: [$baseTextStyle, ({ colors }) => ({ color: colors.palette.neutral100 })],
+  accent: [$baseTextStyle, ({ colors }) => ({ color: colors.palette.neutral100 })],
 }
 
 const $pressedViewPresets: Record<Presets, ThemedStyle<ViewStyle>> = {
@@ -273,6 +279,7 @@ const $pressedViewPresets: Record<Presets, ThemedStyle<ViewStyle>> = {
   filled: ({ colors }) => ({ backgroundColor: colors.palette.neutral400 }),
   reversed: ({ colors }) => ({ backgroundColor: colors.palette.neutral700 }),
   cta: ({ colors }) => ({ backgroundColor: colors.palette.primary600 }),
+  accent: ({ colors }) => ({ backgroundColor: colors.palette.secondary400 }),
 }
 
 const $pressedTextPresets: Record<Presets, ThemedStyle<TextStyle>> = {
@@ -280,6 +287,7 @@ const $pressedTextPresets: Record<Presets, ThemedStyle<TextStyle>> = {
   filled: () => ({ opacity: 0.9 }),
   reversed: () => ({ opacity: 0.9 }),
   cta: () => ({ opacity: 0.9 }),
+  accent: () => ({ opacity: 0.9 }),
 }
 
 // Disabled state presets (applied in addition to any caller overrides)
@@ -297,6 +305,9 @@ const $disabledViewPresets: Record<Presets, ThemedStyle<ViewStyle>> = {
   cta: ({ colors }) => ({
     backgroundColor: colors.palette.primary300,
   }),
+  accent: ({ colors }) => ({
+    backgroundColor: colors.palette.secondary300,
+  }),
 }
 
 const $disabledTextPresets: Record<Presets, ThemedStyle<TextStyle>> = {
@@ -304,4 +315,5 @@ const $disabledTextPresets: Record<Presets, ThemedStyle<TextStyle>> = {
   filled: ({ colors }) => ({ color: colors.textDim }),
   reversed: ({ colors }) => ({ color: colors.palette.neutral300 }),
   cta: ({ colors }) => ({ color: colors.palette.neutral100, opacity: 0.7 }),
+  accent: ({ colors }) => ({ color: colors.palette.neutral100, opacity: 0.7 }),
 }

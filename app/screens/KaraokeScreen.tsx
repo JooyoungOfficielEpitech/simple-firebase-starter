@@ -3,9 +3,12 @@ import { View, ViewStyle, TextStyle } from "react-native"
 import { AVPlaybackStatus } from "expo-av"
 
 import { LyricsDisplay } from "@/components/LyricsDisplay"
+import { PitchAnalyzer } from "@/components/PitchAnalyzer"
+import { PitchVisualizer } from "@/components/PitchVisualizer"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { MusicXMLService, LyricsData } from "@/services/musicxml"
+import { PitchAnalysisResult } from "@/services/audio/pitchAnalysis"
 import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
 import type { HomeStackScreenProps } from "@/navigators/HomeStackNavigator"
@@ -28,6 +31,11 @@ export function KaraokeScreen({ route, navigation }: HomeStackScreenProps<"Karao
   const [currentTime, setCurrentTime] = useState<number>(0)
   const [isLyricsLoading, setIsLyricsLoading] = useState(false)
   const [lyricsError, setLyricsError] = useState<string | null>(null)
+  
+  // 음정 분석 상태
+  const [pitchAnalysisResult, setPitchAnalysisResult] = useState<PitchAnalysisResult | null>(null)
+  const [isPitchAnalyzing, setIsPitchAnalyzing] = useState(false)
+  const [pitchScore, setPitchScore] = useState<number>(0)
 
   console.log("🎯 KaraokeScreen - Test song:", testSong)
 
@@ -80,6 +88,31 @@ export function KaraokeScreen({ route, navigation }: HomeStackScreenProps<"Karao
     if (status.isLoaded && status.positionMillis) {
       const timeInSeconds = status.positionMillis / 1000
       setCurrentTime(timeInSeconds)
+    }
+  }, [])
+
+  // 음정 분석 결과 처리
+  const handlePitchAnalysisResult = useCallback((result: PitchAnalysisResult) => {
+    setPitchAnalysisResult(result)
+    
+    // 점수 업데이트 (정확도 기반)
+    if (result.targetPitch && result.accuracy > 0.5) {
+      setPitchScore(prev => prev + result.accuracy * 10) // 정확도에 따라 점수 추가
+    }
+
+    console.log('🎼 음정 분석:', {
+      accuracy: `${Math.round(result.accuracy * 100)}%`,
+      cents: `${Math.round(result.centsDifference)}¢`,
+      onPitch: result.isOnPitch,
+      lyric: result.lyricText
+    })
+  }, [])
+
+  // 음정 분석 상태 변경 처리
+  const handlePitchAnalysisStateChange = useCallback((isAnalyzing: boolean) => {
+    setIsPitchAnalyzing(isAnalyzing)
+    if (!isAnalyzing) {
+      setPitchAnalysisResult(null)
     }
   }, [])
 
@@ -151,25 +184,66 @@ export function KaraokeScreen({ route, navigation }: HomeStackScreenProps<"Karao
           )}
         </View>
 
-        {/* 음정 분석 영역 (추후 구현) */}
+        {/* 음정 분석 영역 */}
         <View style={themed($pitchContainer)}>
-          <Text
-            text="🎯 음정 분석"
-            preset="subheading"
-            style={themed($sectionTitle)}
-          />
-          <View style={themed($pitchPlaceholder)}>
+          <View style={themed($pitchHeaderContainer)}>
             <Text
-              text="실시간 음정 분석 기능을 준비 중입니다..."
-              style={themed($placeholderText)}
+              text="🎯 음정 분석"
+              preset="subheading"
+              style={themed($sectionTitle)}
             />
-            {lyricsData && (
+            {isPitchAnalyzing && (
               <Text
-                text={`현재 시간: ${currentTime.toFixed(1)}초`}
-                style={themed($debugText)}
+                text={`점수: ${Math.round(pitchScore)}`}
+                style={themed($scoreText)}
               />
             )}
           </View>
+
+          {lyricsData ? (
+            <View style={themed($pitchAnalysisContainer)}>
+              {/* 음정 분석 컴포넌트 */}
+              <PitchAnalyzer
+                lyricsData={lyricsData.lyrics}
+                currentTime={currentTime}
+                onAnalysisResult={handlePitchAnalysisResult}
+                onAnalysisStateChange={handlePitchAnalysisStateChange}
+                enabled={!!hasAudio}
+                style={themed($pitchAnalyzer)}
+              />
+
+              {/* 시각화 컴포넌트 */}
+              {isPitchAnalyzing && pitchAnalysisResult && (
+                <PitchVisualizer
+                  analysisResult={pitchAnalysisResult}
+                  height={150}
+                  animated={true}
+                  style={themed($pitchVisualizer)}
+                />
+              )}
+
+              {/* 디버그 정보 */}
+              <View style={themed($debugContainer)}>
+                <Text
+                  text={`시간: ${currentTime.toFixed(1)}초`}
+                  style={themed($debugText)}
+                />
+                {pitchAnalysisResult && (
+                  <Text
+                    text={`신뢰도: ${Math.round(pitchAnalysisResult.currentPitch.confidence * 100)}%`}
+                    style={themed($debugText)}
+                  />
+                )}
+              </View>
+            </View>
+          ) : (
+            <View style={themed($pitchPlaceholder)}>
+              <Text
+                text="가사 데이터를 먼저 로드해주세요"
+                style={themed($placeholderText)}
+              />
+            </View>
+          )}
         </View>
       </View>
     </Screen>
@@ -276,4 +350,40 @@ const $debugText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   fontFamily: typography.code?.normal || typography.primary.normal,
   textAlign: "center",
   marginTop: 8,
+})
+
+const $pitchHeaderContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: spacing.md,
+})
+
+const $scoreText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
+  fontSize: 18,
+  color: colors.tint,
+  fontFamily: typography.primary.bold,
+})
+
+const $pitchAnalysisContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  gap: spacing.md,
+})
+
+const $pitchAnalyzer: ThemedStyle<ViewStyle> = () => ({
+  // 추가적인 스타일이 필요하면 여기에
+})
+
+const $pitchVisualizer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  marginTop: spacing.sm,
+})
+
+const $debugContainer: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  paddingVertical: spacing.xs,
+  paddingHorizontal: spacing.sm,
+  backgroundColor: colors.palette.neutral100,
+  borderRadius: 6,
+  marginTop: spacing.sm,
 })

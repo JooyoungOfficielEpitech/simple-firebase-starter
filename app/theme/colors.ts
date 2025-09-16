@@ -1,38 +1,44 @@
 const palette = {
+  // Wicked-inspired neutrals (white to black)
   neutral100: "#FFFFFF",
-  neutral200: "#F4F2F1",
-  neutral300: "#D7CEC9",
-  neutral400: "#B6ACA6",
-  neutral500: "#978F8A",
-  neutral600: "#564E4A",
-  neutral700: "#3C3836",
-  neutral800: "#191015",
+  neutral200: "#F8F8F8",
+  neutral300: "#E5E5E5",
+  neutral400: "#B8B8B8",
+  neutral500: "#8A8A8A",
+  neutral600: "#5C5C5C",
+  neutral700: "#2E2E2E",
+  neutral800: "#1A1A1A",
   neutral900: "#000000",
 
-  primary100: "#F4E0D9",
-  primary200: "#E8C1B4",
-  primary300: "#DDA28E",
-  primary400: "#D28468",
-  primary500: "#C76542",
-  primary600: "#A54F31",
+  // Wicked Green (primary) - Emerald/Forest tones
+  primary100: "#E8F5E8",
+  primary200: "#C3E6C3",
+  primary300: "#9DD69D",
+  primary400: "#76C676",
+  primary500: "#4FB84F", // Main green
+  primary600: "#228B22", // Forest green
 
-  secondary100: "#DCDDE9",
-  secondary200: "#BCC0D6",
-  secondary300: "#9196B9",
-  secondary400: "#626894",
-  secondary500: "#41476E",
+  // Wicked Pink (secondary) - Hot pink/Magenta tones
+  secondary100: "#FFF0F5",
+  secondary200: "#FFCCE0",
+  secondary300: "#FF99CC",
+  secondary400: "#FF66B8",
+  secondary500: "#FF1493", // Hot pink
 
-  accent100: "#FFEED4",
-  accent200: "#FFE1B2",
-  accent300: "#FDD495",
-  accent400: "#FBC878",
-  accent500: "#FFBB50",
+  // Accent - Gold/Yellow highlights
+  accent100: "#FFFACD",
+  accent200: "#FFEAA7",
+  accent300: "#FDCB6E",
+  accent400: "#E17055",
+  accent500: "#D63031",
 
-  angry100: "#F2D6CD",
-  angry500: "#C03403",
+  // Error states
+  angry100: "#FFE5E5",
+  angry500: "#E74C3C",
 
-  overlay20: "rgba(25, 16, 21, 0.2)",
-  overlay50: "rgba(25, 16, 21, 0.5)",
+  // Overlays with green tint
+  overlay20: "rgba(34, 139, 34, 0.2)",
+  overlay50: "rgba(34, 139, 34, 0.5)",
 } as const
 
 export const colors = {

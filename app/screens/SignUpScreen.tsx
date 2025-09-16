@@ -138,7 +138,7 @@ export const SignUpScreen: FC<SignUpScreenProps> = function SignUpScreen({ navig
         {authError && <Text text={authError} style={themed($authErrorText)} />}
 
         <Button
-          preset="cta"
+          preset="accent"
           tx="signUpScreen:signUpButton"
           onPress={handleEmailSignUp}
           isLoading={isLoading || signUpForm.formState.isSubmitting}

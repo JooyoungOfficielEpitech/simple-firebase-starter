@@ -111,7 +111,7 @@ export const SignInScreen: FC<SignInScreenProps> = function SignInScreen({ navig
         />
 
         <Button
-          preset="cta"
+          preset="accent"
           tx="signInScreen:signInButton"
           onPress={handleEmailSignIn}
           isLoading={isLoading || signinForm.formState.isSubmitting}

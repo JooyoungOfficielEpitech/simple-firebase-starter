@@ -1,38 +1,44 @@
 const palette = {
+  // Dark theme neutrals (inverted for dark mode)
   neutral900: "#FFFFFF",
-  neutral800: "#F4F2F1",
-  neutral700: "#D7CEC9",
-  neutral600: "#B6ACA6",
-  neutral500: "#978F8A",
-  neutral400: "#564E4A",
-  neutral300: "#3C3836",
-  neutral200: "#191015",
+  neutral800: "#F8F8F8",
+  neutral700: "#E5E5E5",
+  neutral600: "#B8B8B8",
+  neutral500: "#8A8A8A",
+  neutral400: "#5C5C5C",
+  neutral300: "#2E2E2E",
+  neutral200: "#1A1A1A",
   neutral100: "#000000",
 
-  primary600: "#F4E0D9",
-  primary500: "#E8C1B4",
-  primary400: "#DDA28E",
-  primary300: "#D28468",
-  primary200: "#C76542",
-  primary100: "#A54F31",
+  // Wicked Green (darker variants for dark theme)
+  primary600: "#E8F5E8",
+  primary500: "#C3E6C3",
+  primary400: "#9DD69D",
+  primary300: "#76C676",
+  primary200: "#4FB84F", // Main green
+  primary100: "#228B22", // Forest green
 
-  secondary500: "#DCDDE9",
-  secondary400: "#BCC0D6",
-  secondary300: "#9196B9",
-  secondary200: "#626894",
-  secondary100: "#41476E",
+  // Wicked Pink (darker variants for dark theme)
+  secondary500: "#FFF0F5",
+  secondary400: "#FFCCE0",
+  secondary300: "#FF99CC",
+  secondary200: "#FF66B8",
+  secondary100: "#FF1493", // Hot pink
 
-  accent500: "#FFEED4",
-  accent400: "#FFE1B2",
-  accent300: "#FDD495",
-  accent200: "#FBC878",
-  accent100: "#FFBB50",
+  // Accent colors for dark theme
+  accent500: "#FFFACD",
+  accent400: "#FFEAA7",
+  accent300: "#FDCB6E",
+  accent200: "#E17055",
+  accent100: "#D63031",
 
-  angry100: "#F2D6CD",
-  angry500: "#C03403",
+  // Error states
+  angry100: "#FFE5E5",
+  angry500: "#E74C3C",
 
-  overlay20: "rgba(25, 16, 21, 0.2)",
-  overlay50: "rgba(25, 16, 21, 0.5)",
+  // Dark overlays with green tint
+  overlay20: "rgba(34, 139, 34, 0.3)",
+  overlay50: "rgba(34, 139, 34, 0.6)",
 } as const
 
 export const colors = {

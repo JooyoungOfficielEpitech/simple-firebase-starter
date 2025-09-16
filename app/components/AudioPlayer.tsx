@@ -274,7 +274,7 @@ function AudioButton({ icon, size = 24, ...props }: AudioButtonProps) {
       <Icon
         icon={icon as any}
         size={size}
-        color={props.disabled ? theme.colors.textDim : theme.colors.tint}
+        color={props.disabled ? theme.colors.textDim : theme.colors.palette.secondary500}
       />
     </TouchableOpacity>
   )
@@ -330,7 +330,7 @@ const $progressTrack: ThemedStyle<ViewStyle> = ({ colors }) => ({
 
 const $progressBar: ThemedStyle<ViewStyle> = ({ colors }) => ({
   height: "100%",
-  backgroundColor: colors.tint,
+  backgroundColor: colors.palette.secondary500,
   borderRadius: 3,
   minWidth: 6,
 })
