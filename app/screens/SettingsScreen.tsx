@@ -3,13 +3,13 @@ import { View, type TextStyle, type ViewStyle } from "react-native"
 
 import { $styles } from "@/theme/styles"
 
-import { Button } from "../components/Button"
-import { Screen } from "../components/Screen"
-import { Text } from "../components/Text"
-import { useAuth } from "../context/AuthContext"
-import type { MainTabScreenProps } from "../navigators/MainNavigator"
-import { useAppTheme } from "../theme/context"
-import { type ThemedStyle } from "../theme/types"
+import { Button } from "@/components/Button"
+import { Screen } from "@/components/Screen"
+import { Text } from "@/components/Text"
+import { useAuth } from "@/context/AuthContext"
+import type { MainTabScreenProps } from "@/navigators/MainNavigator"
+import { useAppTheme } from "@/theme/context"
+import { type ThemedStyle } from "@/theme/types"
 
 interface SettingsScreenProps extends MainTabScreenProps<"Settings"> {}
 

@@ -46,7 +46,6 @@ export function SongList({
   // Filter songs based on search query
   const filteredSongs = useMemo(() => {
     if (!searchQuery.trim()) {
-      console.log("🎵 SongList: No search query, returning all songs:", songs.length)
       return songs
     }
     
@@ -55,7 +54,6 @@ export function SongList({
       song.title.toLowerCase().includes(query) ||
       song.musical.toLowerCase().includes(query)
     )
-    console.log("🔍 SongList: Filtered songs:", filtered.length, "for query:", query)
     return filtered
   }, [songs, searchQuery])
 
@@ -83,7 +81,6 @@ export function SongList({
     />
   )
 
-  console.log("🎬 SongList render: filteredSongs.length =", filteredSongs.length)
 
   return (
     <FlatList

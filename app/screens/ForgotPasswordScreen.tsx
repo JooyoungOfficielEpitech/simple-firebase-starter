@@ -7,15 +7,16 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { $styles } from "@/theme/styles"
+import { $authHeaderContainer, $authTitle, $authSubtitle, $authFormContainer } from "@/theme/authStyles"
 
-import { Button } from "../components/Button"
-import { FormTextField } from "../components/FormTextField"
-import { Screen } from "../components/Screen"
-import { Text } from "../components/Text"
-import { translate } from "../i18n/translate"
-import type { AppStackScreenProps } from "../navigators/AppNavigator"
-import { useAppTheme } from "../theme/context"
-import { type ThemedStyle } from "../theme/types"
+import { Button } from "@/components/Button"
+import { FormTextField } from "@/components/FormTextField"
+import { Screen } from "@/components/Screen"
+import { Text } from "@/components/Text"
+import { translate } from "@/i18n/translate"
+import type { AppStackScreenProps } from "@/navigators/AppNavigator"
+import { useAppTheme } from "@/theme/context"
+import { type ThemedStyle } from "@/theme/types"
 
 // 비밀번호 재설정 스키마
 const forgotPasswordSchema = z.object({
@@ -101,15 +102,15 @@ export const ForgotPasswordScreen: FC<ForgotPasswordScreenProps> = function Forg
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top", "bottom"]} style={$styles.flex1}>
-      <View style={themed($headerContainer)}>
-        <Text tx="forgotPasswordScreen:title" style={themed($title)} />
+      <View style={themed($authHeaderContainer)}>
+        <Text tx="forgotPasswordScreen:title" style={themed($authTitle)} />
         <Text
           tx={isEmailSent ? "forgotPasswordScreen:subtitleSent" : "forgotPasswordScreen:subtitle"}
-          style={themed($subtitle)}
+          style={themed($authSubtitle)}
         />
       </View>
 
-      <View style={themed($formContainer)}>
+      <View style={themed($authFormContainer)}>
         {!isEmailSent ? (
           <>
             <FormTextField
@@ -152,27 +153,6 @@ export const ForgotPasswordScreen: FC<ForgotPasswordScreenProps> = function Forg
   )
 }
 
-const $headerContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  alignItems: "center",
-  paddingVertical: spacing.xl,
-})
-
-const $title: ThemedStyle<TextStyle> = ({ spacing }) => ({
-  fontSize: 24,
-  fontWeight: "bold",
-  marginBottom: spacing.xs,
-})
-
-const $subtitle: ThemedStyle<TextStyle> = ({ spacing }) => ({
-  fontSize: 16,
-  textAlign: "center",
-  paddingHorizontal: spacing.md,
-})
-
-const $formContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  paddingHorizontal: spacing.lg,
-  gap: spacing.md,
-})
 
 const $sentContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   alignItems: "center",

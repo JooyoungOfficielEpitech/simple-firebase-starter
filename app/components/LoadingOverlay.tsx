@@ -2,8 +2,8 @@ import { type FC } from "react"
 import { ActivityIndicator, Modal, type TextStyle, View, type ViewStyle } from "react-native"
 
 import { Text } from "./Text"
-import { useAppTheme } from "../theme/context"
-import { type ThemedStyle } from "../theme/types"
+import { useAppTheme } from "@/theme/context"
+import { type ThemedStyle } from "@/theme/types"
 
 export interface LoadingOverlayProps {
   /** Controls the visibility of the overlay */

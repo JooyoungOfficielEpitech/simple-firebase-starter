@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { View, ViewStyle, TouchableOpacity, TouchableOpacityProps } from "react-native"
+import { View, ViewStyle, TextStyle, TouchableOpacity, TouchableOpacityProps } from "react-native"
 import { Audio, AVPlaybackStatus } from "expo-av"
 
 import { Icon } from "@/components/Icon"
@@ -153,6 +153,26 @@ export function AudioPlayer({
     }
   }
 
+  const seekToPosition = async (progress: number) => {
+    if (!sound || duration === 0) return
+
+    try {
+      const seekPosition = progress * duration
+      await sound.setPositionAsync(seekPosition)
+    } catch (err) {
+      console.error("Seek error:", err)
+    }
+  }
+
+  const handleProgressPress = (event: any) => {
+    const { locationX } = event.nativeEvent
+    // 진행바 너비를 동적으로 계산하기 위해서는 layout 이벤트 사용 필요
+    // 임시로 고정 너비 사용
+    const progressBarWidth = 200
+    const progress = Math.max(0, Math.min(1, locationX / progressBarWidth))
+    seekToPosition(progress)
+  }
+
   const stopPlayback = async () => {
     if (!sound) return
 
@@ -185,32 +205,41 @@ export function AudioPlayer({
 
   return (
     <View style={themed([$container, style])}>
-      {/* 재생 컨트롤 */}
-      <View style={themed($controls)}>
-        <AudioButton
-          icon="caretLeft"
-          onPress={stopPlayback}
-          disabled={!sound || isLoading}
-        />
-        
-        <AudioButton
-          icon={isPlaying ? "pause" : "caretRight"}
-          onPress={togglePlayback}
-          disabled={!sound || isLoading}
-          size={32}
-        />
-      </View>
-
-      {/* 진행바 영역 */}
-      <View style={themed($progressContainer)}>
+      {/* 통합된 진행바 및 재생 컨트롤 영역 */}
+      <View style={themed($integratedContainer)}>
         <Text 
           text={formatTime(position)} 
           style={themed($timeText)} 
         />
         
-        <View style={themed($progressTrack)}>
-          <View 
-            style={themed([$progressBar, { width: `${getProgress() * 100}%` }])} 
+        <View style={themed($progressControlContainer)}>
+          {/* 정지 버튼 */}
+          <AudioButton
+            icon="check"
+            onPress={stopPlayback}
+            disabled={!sound || isLoading}
+            size={20}
+          />
+          
+          {/* 터치 가능한 진행바 */}
+          <View style={themed($touchableProgressTrack)}>
+            <TouchableOpacity 
+              style={themed($progressTrack)}
+              onPress={handleProgressPress}
+              activeOpacity={1}
+            >
+              <View 
+                style={themed([$progressBar, { width: `${getProgress() * 100}%` }])} 
+              />
+            </TouchableOpacity>
+          </View>
+          
+          {/* 재생/일시정지 버튼 */}
+          <AudioButton
+            icon={isPlaying ? "check" : "check"}
+            onPress={togglePlayback}
+            disabled={!sound || isLoading}
+            size={24}
           />
         </View>
         
@@ -259,22 +288,28 @@ const $container: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   borderColor: colors.separator,
 })
 
-const $controls: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "center",
-  marginBottom: spacing.md,
-})
-
-const $button: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  padding: spacing.sm,
-  marginHorizontal: spacing.sm,
-})
-
-const $progressContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+const $integratedContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   flexDirection: "row",
   alignItems: "center",
   marginBottom: spacing.sm,
+})
+
+const $progressControlContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flex: 1,
+  flexDirection: "row",
+  alignItems: "center",
+  marginHorizontal: spacing.sm,
+})
+
+const $button: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  padding: spacing.xs,
+  marginHorizontal: spacing.xs,
+})
+
+const $touchableProgressTrack: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flex: 1,
+  paddingVertical: spacing.sm,
+  marginHorizontal: spacing.sm,
 })
 
 const $timeText: ThemedStyle<ViewStyle> = ({ colors, typography }) => ({
@@ -285,28 +320,29 @@ const $timeText: ThemedStyle<ViewStyle> = ({ colors, typography }) => ({
   textAlign: "center",
 })
 
-const $progressTrack: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+const $progressTrack: ThemedStyle<ViewStyle> = ({ colors }) => ({
   flex: 1,
-  height: 4,
+  height: 6,
   backgroundColor: colors.separator,
-  borderRadius: 2,
-  marginHorizontal: spacing.sm,
+  borderRadius: 3,
+  justifyContent: "center",
 })
 
 const $progressBar: ThemedStyle<ViewStyle> = ({ colors }) => ({
   height: "100%",
   backgroundColor: colors.tint,
-  borderRadius: 2,
+  borderRadius: 3,
+  minWidth: 6,
 })
 
-const $statusText: ThemedStyle<ViewStyle> = ({ colors, typography }) => ({
+const $statusText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   fontSize: 12,
   color: colors.textDim,
   fontFamily: typography.primary.normal,
   textAlign: "center",
 })
 
-const $errorText: ThemedStyle<ViewStyle> = ({ colors, typography }) => ({
+const $errorText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   fontSize: 14,
   color: colors.error,
   fontFamily: typography.primary.normal,

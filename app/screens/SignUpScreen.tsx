@@ -5,16 +5,16 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { $styles } from "@/theme/styles"
+import { $authHeaderContainer, $authTitle, $authSubtitle, $authFormContainer, $authErrorText } from "@/theme/authStyles"
 
-import { Button } from "../components/Button"
-import { FormTextField } from "../components/FormTextField"
-import { Screen } from "../components/Screen"
-import { Text } from "../components/Text"
-import { useAuth } from "../context/AuthContext"
-import { translate } from "../i18n/translate"
-import type { AppStackScreenProps } from "../navigators/AppNavigator"
-import { useAppTheme } from "../theme/context"
-import { type ThemedStyle } from "../theme/types"
+import { Button } from "@/components/Button"
+import { FormTextField } from "@/components/FormTextField"
+import { Screen } from "@/components/Screen"
+import { Text } from "@/components/Text"
+import { useAuth } from "@/context/AuthContext"
+import { translate } from "@/i18n/translate"
+import type { AppStackScreenProps } from "@/navigators/AppNavigator"
+import { useAppTheme } from "@/theme/context"
 
 // 회원가입 스키마
 const signUpSchema = z
@@ -104,12 +104,12 @@ export const SignUpScreen: FC<SignUpScreenProps> = function SignUpScreen({ navig
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top", "bottom"]} style={$styles.flex1}>
-      <View style={themed($headerContainer)}>
-        <Text tx="signUpScreen:title" style={themed($title)} />
-        <Text tx="signUpScreen:subtitle" style={themed($subtitle)} />
+      <View style={themed($authHeaderContainer)}>
+        <Text tx="signUpScreen:title" style={themed($authTitle)} />
+        <Text tx="signUpScreen:subtitle" style={themed($authSubtitle)} />
       </View>
 
-      <View style={themed($formContainer)}>
+      <View style={themed($authFormContainer)}>
         <FormTextField
           control={signUpForm.control}
           name="email"
@@ -135,7 +135,7 @@ export const SignUpScreen: FC<SignUpScreenProps> = function SignUpScreen({ navig
           autoComplete="password"
         />
 
-        {authError && <Text text={authError} style={themed($errorText)} />}
+        {authError && <Text text={authError} style={themed($authErrorText)} />}
 
         <Button
           preset="cta"
@@ -153,28 +153,3 @@ export const SignUpScreen: FC<SignUpScreenProps> = function SignUpScreen({ navig
   )
 }
 
-const $headerContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  alignItems: "center",
-  paddingVertical: spacing.xl,
-})
-
-const $title: ThemedStyle<TextStyle> = ({ spacing }) => ({
-  fontSize: 24,
-  fontWeight: "bold",
-  marginBottom: spacing.xs,
-})
-
-const $subtitle: ThemedStyle<TextStyle> = () => ({
-  fontSize: 16,
-  textAlign: "center",
-})
-
-const $formContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  paddingHorizontal: spacing.lg,
-  gap: spacing.md,
-})
-
-const $errorText: ThemedStyle<TextStyle> = ({ colors }) => ({
-  color: colors.error,
-  textAlign: "center",
-})

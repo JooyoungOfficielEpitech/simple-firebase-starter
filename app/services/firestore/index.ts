@@ -3,6 +3,7 @@
 import firestore from "@react-native-firebase/firestore"
 
 import { UserService } from "./userService"
+import { SongService } from "./songService"
 
 export { UserService } from "./userService"
 export { SongService } from "./songService"
@@ -11,4 +12,5 @@ export { SongService } from "./songService"
 const db = firestore()
 const userService = new UserService(db)
 
-export { userService }
+// SongService는 static 메서드를 사용하므로 클래스 자체를 export
+export { userService, SongService as songService }

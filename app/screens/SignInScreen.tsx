@@ -7,16 +7,16 @@ import { z } from "zod"
 
 import { GoogleSignInButton } from "@/components/GoogleSignInButton"
 import { $styles } from "@/theme/styles"
+import { $authHeaderContainer, $authTitle, $authSubtitle, $authFormContainer } from "@/theme/authStyles"
 
-import { Button } from "../components/Button"
-import { FormTextField } from "../components/FormTextField"
-import { Screen } from "../components/Screen"
-import { Text } from "../components/Text"
-import { useAuth } from "../context/AuthContext"
-import { translate } from "../i18n/translate"
-import type { AppStackScreenProps } from "../navigators/AppNavigator"
-import { useAppTheme } from "../theme/context"
-import { type ThemedStyle } from "../theme/types"
+import { Button } from "@/components/Button"
+import { FormTextField } from "@/components/FormTextField"
+import { Screen } from "@/components/Screen"
+import { Text } from "@/components/Text"
+import { useAuth } from "@/context/AuthContext"
+import { translate } from "@/i18n/translate"
+import type { AppStackScreenProps } from "@/navigators/AppNavigator"
+import { useAppTheme } from "@/theme/context"
 
 // 로그인 스키마
 const signinSchema = z.object({
@@ -87,12 +87,12 @@ export const SignInScreen: FC<SignInScreenProps> = function SignInScreen({ navig
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top", "bottom"]} style={$styles.flex1}>
-      <View style={themed($headerContainer)}>
-        <Text tx="signInScreen:title" style={themed($title)} />
-        <Text tx="signInScreen:subtitle" style={themed($subtitle)} />
+      <View style={themed($authHeaderContainer)}>
+        <Text tx="signInScreen:title" style={themed($authTitle)} />
+        <Text tx="signInScreen:subtitle" style={themed($authSubtitle)} />
       </View>
 
-      <View style={themed($formContainer)}>
+      <View style={themed($authFormContainer)}>
         <FormTextField
           control={signinForm.control}
           name="email"
@@ -137,22 +137,3 @@ export const SignInScreen: FC<SignInScreenProps> = function SignInScreen({ navig
   )
 }
 
-const $headerContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  alignItems: "center",
-  paddingVertical: spacing.xl,
-})
-
-const $title: ThemedStyle<TextStyle> = ({ spacing }) => ({
-  fontSize: 24,
-  fontWeight: "bold",
-  marginBottom: spacing.xs,
-})
-const $subtitle: ThemedStyle<TextStyle> = () => ({
-  fontSize: 16,
-  textAlign: "center",
-})
-
-const $formContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  paddingHorizontal: spacing.lg,
-  gap: spacing.md,
-})

@@ -1,13 +1,13 @@
 import auth from "@react-native-firebase/auth"
 import firestore, { FirebaseFirestoreTypes } from "@react-native-firebase/firestore"
 
-import { translate } from "../../i18n/translate"
+import { translate } from "@/i18n/translate"
 import {
   UserProfile,
   CreateUserProfile,
   UpdateUserProfile,
   MIN_PROFILE_PHOTOS,
-} from "../../types/user"
+} from "@/types/user"
 
 /**
  * 사용자 관련 Firestore 서비스

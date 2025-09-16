@@ -33,7 +33,6 @@ export function SongListItem({
 }: SongListItemProps) {
   const { themed, theme } = useAppTheme()
   
-  console.log("🎤 SongListItem rendering:", song.title)
 
   return (
     <>

@@ -1,6 +1,8 @@
 import React, { useMemo } from "react"
-import { View, ViewStyle, TextStyle, ScrollView } from "react-native"
+import { View, ViewStyle, TextStyle, Animated } from "react-native"
+import { AVPlaybackStatus } from "expo-av"
 
+import { AudioPlayer } from "@/components/AudioPlayer"
 import { Text } from "@/components/Text"
 import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
@@ -31,6 +33,21 @@ export interface LyricsDisplayProps {
    * 미리보기 라인 수 (preview 모드에서)
    */
   previewLines?: number
+  
+  /**
+   * 로컬 오디오 파일명 (assets/audio/에서 참조)
+   */
+  audioFile?: string
+  
+  /**
+   * 오디오 URL (Firebase Storage 등)
+   */
+  audioUrl?: string
+  
+  /**
+   * 재생 상태 변경 콜백
+   */
+  onPlaybackStatusUpdate?: (status: AVPlaybackStatus) => void
 }
 
 /**
@@ -42,6 +59,9 @@ export function LyricsDisplay({
   style,
   displayMode = "karaoke",
   previewLines = 3,
+  audioFile,
+  audioUrl,
+  onPlaybackStatusUpdate,
 }: LyricsDisplayProps) {
   const { themed } = useAppTheme()
 
@@ -54,29 +74,20 @@ export function LyricsDisplay({
     )
   }, [lyricsData, currentTime])
 
-  // 표시할 가사들 결정
-  const displayLyrics = useMemo(() => {
-    if (!lyricsData) return []
+  // 현재 활성 가사 가져오기
+  const currentLyric = useMemo(() => {
+    if (!lyricsData || currentLyricIndex < 0) return null
+    return lyricsData.lyrics[currentLyricIndex]
+  }, [lyricsData, currentLyricIndex])
 
-    switch (displayMode) {
-      case "full":
-        return lyricsData.lyrics
+  // 다음 가사 가져오기 (미리보기용)
+  const nextLyric = useMemo(() => {
+    if (!lyricsData || currentLyricIndex < 0) return null
+    const nextIndex = currentLyricIndex + 1
+    return nextIndex < lyricsData.lyrics.length ? lyricsData.lyrics[nextIndex] : null
+  }, [lyricsData, currentLyricIndex])
 
-      case "preview":
-        const startIndex = Math.max(0, currentLyricIndex - 1)
-        return lyricsData.lyrics.slice(startIndex, startIndex + previewLines)
-
-      case "karaoke":
-      default:
-        // 현재 가사 + 앞뒤 2줄씩
-        const centerIndex = Math.max(0, currentLyricIndex)
-        const start = Math.max(0, centerIndex - 2)
-        const end = Math.min(lyricsData.lyrics.length, centerIndex + 3)
-        return lyricsData.lyrics.slice(start, end)
-    }
-  }, [lyricsData, currentLyricIndex, displayMode, previewLines])
-
-  if (!lyricsData || displayLyrics.length === 0) {
+  if (!lyricsData) {
     return (
       <View style={themed([$container, style])}>
         <Text 
@@ -89,48 +100,69 @@ export function LyricsDisplay({
 
   return (
     <View style={themed([$container, style])}>
-      <ScrollView 
-        contentContainerStyle={themed($scrollContent)}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* 제목 */}
-        <Text
-          text={lyricsData.title}
-          preset="subheading"
-          style={themed($title)}
-        />
+      {/* 제목 */}
+      <Text
+        text={lyricsData.title}
+        preset="subheading"
+        style={themed($title)}
+      />
 
-        {/* 가사 목록 */}
-        <View style={themed($lyricsContainer)}>
-          {displayLyrics.map((lyric, index) => {
-            const globalIndex = lyricsData.lyrics.indexOf(lyric)
-            const isActive = globalIndex === currentLyricIndex
-            const isPast = currentTime > lyric.endTime
-            const isFuture = currentTime < lyric.startTime
-
-            return (
-              <LyricLine
-                key={`${lyric.startTime}-${index}`}
-                lyric={lyric}
-                isActive={isActive}
-                isPast={isPast}
-                isFuture={isFuture}
-                currentTime={currentTime}
+      {/* 노래방 스타일 가사 표시 영역 */}
+      <View style={themed($karaokeContainer)}>
+        {/* 현재 가사 */}
+        <View style={themed($currentLyricContainer)}>
+          {currentLyric ? (
+            <LyricLine
+              lyric={currentLyric}
+              isActive={true}
+              isPast={false}
+              isFuture={false}
+              currentTime={currentTime}
+              isMainLyric={true}
+            />
+          ) : (
+            <View style={themed($noLyricContainer)}>
+              <Text 
+                text={currentLyricIndex < 0 ? "🎵 곧 시작됩니다..." : "🎉 완료!"} 
+                style={themed($waitingText)} 
               />
-            )
-          })}
+            </View>
+          )}
         </View>
 
-        {/* 진행도 표시 */}
-        {displayMode === "karaoke" && (
-          <View style={themed($progressInfo)}>
-            <Text
-              text={`${currentLyricIndex + 1} / ${lyricsData.lyrics.length}`}
-              style={themed($progressInfoText)}
+        {/* 다음 가사 미리보기 */}
+        {nextLyric && displayMode === "karaoke" && (
+          <View style={themed($nextLyricContainer)}>
+            <Text text="다음:" style={themed($nextLabel)} />
+            <Text 
+              text={nextLyric.text} 
+              style={themed($nextLyricText)} 
             />
           </View>
         )}
-      </ScrollView>
+      </View>
+
+      {/* 진행도 표시 */}
+      {displayMode === "karaoke" && (
+        <View style={themed($progressInfo)}>
+          <Text
+            text={`${Math.max(0, currentLyricIndex + 1)} / ${lyricsData.lyrics.length}`}
+            style={themed($progressInfoText)}
+          />
+        </View>
+      )}
+      
+      {/* 하단 오디오 플레이어 */}
+      {(audioFile || audioUrl) && (
+        <View style={themed($audioPlayerContainer)}>
+          <AudioPlayer
+            audioFile={audioFile}
+            audioUrl={audioUrl}
+            onPlaybackStatusUpdate={onPlaybackStatusUpdate}
+            style={themed($audioPlayer)}
+          />
+        </View>
+      )}
     </View>
   )
 }
@@ -141,9 +173,10 @@ interface LyricLineProps {
   isPast: boolean
   isFuture: boolean
   currentTime: number
+  isMainLyric?: boolean
 }
 
-function LyricLine({ lyric, isActive, isPast, isFuture, currentTime }: LyricLineProps) {
+function LyricLine({ lyric, isActive, isPast, isFuture, currentTime, isMainLyric = false }: LyricLineProps) {
   const { themed } = useAppTheme()
 
   // 활성 가사 내에서의 진행도 계산 (0-1)
@@ -174,7 +207,8 @@ function LyricLine({ lyric, isActive, isPast, isFuture, currentTime }: LyricLine
             $lyricText,
             isPast && $pastLyric,
             isActive && $activeLyric,
-            isFuture && $futureLyric
+            isFuture && $futureLyric,
+            isMainLyric && $mainLyricText
           ])}
         />
 
@@ -188,7 +222,7 @@ function LyricLine({ lyric, isActive, isPast, isFuture, currentTime }: LyricLine
           >
             <Text
               text={lyric.text}
-              style={themed([$lyricText, $progressText])}
+              style={themed([$lyricText, $progressText, isMainLyric && $mainLyricText])}
             />
           </View>
         )}
@@ -209,10 +243,7 @@ const $container: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   flex: 1,
   backgroundColor: colors.background,
   padding: spacing.md,
-})
-
-const $scrollContent: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  paddingVertical: spacing.lg,
+  justifyContent: "space-between",
 })
 
 const $title: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
@@ -221,8 +252,57 @@ const $title: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
   marginBottom: spacing.lg,
 })
 
-const $lyricsContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  paddingHorizontal: spacing.sm,
+const $karaokeContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flex: 1,
+  justifyContent: "center",
+  alignItems: "center",
+  paddingVertical: spacing.lg,
+  minHeight: 200,
+})
+
+const $currentLyricContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  minHeight: 80,
+  justifyContent: "center",
+  alignItems: "center",
+  paddingHorizontal: spacing.md,
+  marginBottom: spacing.lg,
+})
+
+const $noLyricContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  minHeight: 80,
+  justifyContent: "center",
+  alignItems: "center",
+  paddingHorizontal: spacing.md,
+})
+
+const $waitingText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
+  fontSize: 18,
+  color: colors.textDim,
+  fontFamily: typography.primary.normal,
+  textAlign: "center",
+})
+
+const $nextLyricContainer: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
+  paddingTop: spacing.md,
+  paddingHorizontal: spacing.md,
+  borderTopWidth: 1,
+  borderTopColor: colors.separator,
+  alignItems: "center",
+})
+
+const $nextLabel: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
+  fontSize: 12,
+  color: colors.textDim,
+  fontFamily: typography.primary.normal,
+  marginBottom: 4,
+})
+
+const $nextLyricText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
+  fontSize: 14,
+  color: colors.textDim,
+  fontFamily: typography.primary.normal,
+  textAlign: "center",
+  opacity: 0.7,
 })
 
 const $lyricLineContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
@@ -248,6 +328,14 @@ const $lyricText: ThemedStyle<TextStyle> = ({ colors, typography, spacing }) => 
   lineHeight: 28,
   paddingVertical: spacing.xs,
   textAlign: "center",
+})
+
+const $mainLyricText: ThemedStyle<TextStyle> = ({ colors, typography, spacing }) => ({
+  fontSize: 24,
+  fontFamily: typography.primary.bold,
+  lineHeight: 36,
+  paddingVertical: spacing.sm,
+  color: colors.text,
 })
 
 const $pastLyric: ThemedStyle<TextStyle> = ({ colors }) => ({
@@ -307,4 +395,15 @@ const $emptyText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   fontFamily: typography.primary.normal,
   textAlign: "center",
   marginTop: 40,
+})
+
+const $audioPlayerContainer: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
+  marginTop: spacing.md,
+  paddingTop: spacing.md,
+  borderTopWidth: 1,
+  borderTopColor: colors.separator,
+})
+
+const $audioPlayer: ThemedStyle<ViewStyle> = () => ({
+  backgroundColor: "transparent",
 })

@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from "react"
 import { View, ViewStyle, TextStyle } from "react-native"
 import { AVPlaybackStatus } from "expo-av"
 
-import { AudioPlayer } from "@/components/AudioPlayer"
 import { LyricsDisplay } from "@/components/LyricsDisplay"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
@@ -103,45 +102,9 @@ export function KaraokeScreen({ route, navigation }: HomeStackScreenProps<"Karao
           />
         </View>
 
-        {/* 오디오 플레이어 */}
-        <View style={themed($playerContainer)}>
-          {hasAudio ? (
-            <>
-              <Text
-                text="🎵 MR 재생"
-                preset="subheading"
-                style={themed($sectionTitle)}
-              />
-              <AudioPlayer
-                audioFile={testSong.localMrFile}
-                audioUrl={testSong.mrUrl}
-                style={themed($audioPlayer)}
-                onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
-              />
-            </>
-          ) : (
-            <View style={themed($noAudioContainer)}>
-              <Text
-                text="🎤 준비 중"
-                preset="subheading"
-                style={themed($sectionTitle)}
-              />
-              <Text
-                text="이 곡의 MR 파일이 아직 준비되지 않았습니다."
-                style={themed($noAudioText)}
-              />
-            </View>
-          )}
-        </View>
 
-        {/* 가사 동기화 영역 */}
+        {/* 통합 가사 및 오디오 플레이어 영역 */}
         <View style={themed($lyricsContainer)}>
-          <Text
-            text="🎼 가사"
-            preset="subheading"
-            style={themed($sectionTitle)}
-          />
-          
           {hasLyrics ? (
             <>
               {isLyricsLoading && (
@@ -163,15 +126,26 @@ export function KaraokeScreen({ route, navigation }: HomeStackScreenProps<"Karao
                   lyricsData={lyricsData}
                   currentTime={currentTime}
                   displayMode="karaoke"
+                  audioFile={hasAudio ? testSong.localMrFile : undefined}
+                  audioUrl={hasAudio ? testSong.mrUrl : undefined}
+                  onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
                   style={themed($lyricsDisplay)}
                 />
               )}
             </>
           ) : (
-            <View style={themed($noLyricsContainer)}>
+            <View style={themed($noContentContainer)}>
               <Text
-                text="이 곡의 가사 동기화 데이터가 아직 준비되지 않았습니다."
-                style={themed($noAudioText)}
+                text="🎤 준비 중"
+                preset="subheading" 
+                style={themed($sectionTitle)}
+              />
+              <Text
+                text={hasAudio 
+                  ? "이 곡의 가사 동기화 데이터가 아직 준비되지 않았습니다." 
+                  : "이 곡의 MR 파일과 가사 데이터가 아직 준비되지 않았습니다."
+                }
+                style={themed($noContentText)}
               />
             </View>
           )}
@@ -227,12 +201,9 @@ const $musicalName: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   textAlign: "center",
 })
 
-const $playerContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  padding: spacing.lg,
-})
-
 const $lyricsContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   padding: spacing.lg,
+  flex: 1,
 })
 
 const $sectionTitle: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
@@ -240,31 +211,23 @@ const $sectionTitle: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
   marginBottom: spacing.md,
 })
 
-const $audioPlayer: ThemedStyle<ViewStyle> = ({ colors }) => ({
-  backgroundColor: colors.palette.neutral100,
-})
-
 const $lyricsDisplay: ThemedStyle<ViewStyle> = ({ colors }) => ({
   backgroundColor: colors.palette.neutral100,
-  minHeight: 300,
+  minHeight: 400,
   borderRadius: 8,
+  flex: 1,
 })
 
-const $noAudioContainer: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
+const $noContentContainer: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
   padding: spacing.lg,
   borderRadius: 8,
   backgroundColor: colors.palette.neutral100,
   alignItems: "center",
+  minHeight: 400,
+  justifyContent: "center",
 })
 
-const $noLyricsContainer: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
-  padding: spacing.lg,
-  borderRadius: 8,
-  backgroundColor: colors.palette.neutral100,
-  alignItems: "center",
-})
-
-const $noAudioText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
+const $noContentText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   fontSize: 14,
   color: colors.textDim,
   fontFamily: typography.primary.normal,
