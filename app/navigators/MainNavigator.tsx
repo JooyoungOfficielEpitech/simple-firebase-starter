@@ -10,11 +10,12 @@ import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
 
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
+import { BulletinBoardStackNavigator } from "./BulletinBoardStackNavigator"
 import { HomeStackNavigator } from "./HomeStackNavigator"
 
 export type MainTabParamList = {
   Home: undefined
-  MyRecords: undefined
+  BulletinBoard: undefined
   Settings: undefined
 }
 
@@ -68,12 +69,12 @@ export function MainNavigator() {
       />
 
       <Tab.Screen
-        name="MyRecords"
-        component={WelcomeScreen} // Temporary - will be replaced with MyRecordsScreen later
+        name="BulletinBoard"
+        component={BulletinBoardStackNavigator}
         options={{
-          tabBarLabel: "내 기록",
+          tabBarLabel: "게시판",
           tabBarIcon: ({ focused }) => (
-            <Icon icon="user" color={focused ? colors.tint : colors.tintInactive} size={30} />
+            <Icon icon="community" color={focused ? colors.tint : colors.tintInactive} size={30} />
           ),
         }}
       />

@@ -58,6 +58,9 @@ export class UserService {
       heightCm: profileData.heightCm,
       media: [],
       requiredProfileComplete: false,
+      userType: profileData.userType || "general",
+      organizationId: profileData.userType === "organizer" ? userId : undefined,
+      organizationName: profileData.organizationName,
       createdAt: now,
       updatedAt: now,
     }
@@ -99,6 +102,7 @@ export class UserService {
       name: user.displayName || user.email?.split("@")[0] || "User",
       media: [],
       requiredProfileComplete: false,
+      userType: "general",
       createdAt: new Date() as unknown as FirebaseFirestoreTypes.Timestamp,
       updatedAt: new Date() as unknown as FirebaseFirestoreTypes.Timestamp,
     }
@@ -138,6 +142,9 @@ export class UserService {
         heightCm: updatedProfile.heightCm as UserProfile["heightCm"],
         media: Array.isArray(updatedProfile.media) ? (updatedProfile.media as string[]) : [],
         requiredProfileComplete,
+        userType: (updatedProfile.userType as UserProfile["userType"]) ?? "general",
+        organizationId: updatedProfile.organizationId as UserProfile["organizationId"],
+        organizationName: updatedProfile.organizationName as UserProfile["organizationName"],
         createdAt: now,
         updatedAt: now,
       }

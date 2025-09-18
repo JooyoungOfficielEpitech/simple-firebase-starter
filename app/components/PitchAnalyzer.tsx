@@ -9,7 +9,7 @@ import { Icon } from "@/components/Icon"
 import { Text } from "@/components/Text"
 import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
-import { PitchAnalysisService, PitchAnalysisResult, PitchAnalysisUtils } from "@/services/audio/pitchAnalysis"
+import { PitchAnalysisService, PitchAnalysisResult, PitchAnalysisUtils, RecordingState } from "@/services/audio/pitchAnalysis"
 import type { LyricItem } from "@/services/musicxml/musicXMLParser"
 
 export interface PitchAnalyzerProps {
@@ -60,6 +60,7 @@ export function PitchAnalyzer({
   const [currentResult, setCurrentResult] = useState<PitchAnalysisResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [permissionStatus, setPermissionStatus] = useState<'unknown' | 'granted' | 'denied'>('unknown')
+  const [recordingState, setRecordingState] = useState<RecordingState>(RecordingState.IDLE)
   
   const analysisServiceRef = useRef<PitchAnalysisService | null>(null)
   const currentTimeRef = useRef(currentTime)
@@ -122,15 +123,25 @@ export function PitchAnalyzer({
         }
       )
       
+      setIsAnalyzing(true)
+      setError(null)
       setPermissionStatus('granted')
+      
+      // 녹음 상태 업데이트
+      setRecordingState(analysisServiceRef.current.currentRecordingState)
+      
+      onAnalysisStateChange?.(true)
+      console.log('🎤 음정 분석 시작됨 - 모드:', analysisServiceRef.current.currentRecordingState)
     } catch (err) {
       console.error('❌ 음정 분석 시작 실패:', err)
       setError(err instanceof Error ? err.message : '음정 분석을 시작할 수 없습니다')
       setIsAnalyzing(false)
+      setRecordingState(RecordingState.ERROR)
       onAnalysisStateChange?.(false)
       
       if (err instanceof Error && err.message.includes('권한')) {
         setPermissionStatus('denied')
+        setError('마이크 권한이 필요합니다')
       }
     }
   }, [enabled, lyricsData, onAnalysisResult, onAnalysisStateChange])
@@ -145,10 +156,15 @@ export function PitchAnalyzer({
       await analysisServiceRef.current.stopAnalysis()
       setIsAnalyzing(false)
       setCurrentResult(null)
+      setError(null)
+      setRecordingState(RecordingState.IDLE)
       onAnalysisStateChange?.(false)
-      console.log('🛑 음정 분석 중단')
+      console.log('🛑 음정 분석 중단됨')
     } catch (err) {
-      console.error('음정 분석 중단 실패:', err)
+      console.error('❌ 음정 분석 중단 실패:', err)
+      // 중단 실패해도 상태는 리셋
+      setIsAnalyzing(false)
+      setRecordingState(RecordingState.ERROR)
     }
   }, [onAnalysisStateChange])
 
@@ -202,8 +218,34 @@ export function PitchAnalyzer({
     )
   }
 
+  // 녹음 상태 메시지
+  const getRecordingStatusText = () => {
+    switch (recordingState) {
+      case RecordingState.IDLE:
+        return '준비됨'
+      case RecordingState.PREPARING:
+        return '준비 중...'
+      case RecordingState.RECORDING:
+        return '실제 녹음 중'
+      case RecordingState.MOCK_MODE:
+        return '시뮬레이션 모드'
+      case RecordingState.ERROR:
+        return '오류'
+      default:
+        return '알 수 없음'
+    }
+  }
+
   return (
     <View style={themed([$container, style])}>
+      {/* 상태 표시 영역 */}
+      <View style={themed($statusContainer)}>
+        <Text text={`상태: ${getRecordingStatusText()}`} style={themed($statusText)} />
+        {recordingState === RecordingState.MOCK_MODE && (
+          <Text text="🎭 데모 모드로 동작 중" style={themed($mockModeText)} />
+        )}
+      </View>
+
       {/* 제어 버튼 영역 */}
       <View style={themed($controlsContainer)}>
         <TouchableOpacity
@@ -373,6 +415,26 @@ const $container: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   padding: spacing.md,
 })
 
+const $statusContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  marginBottom: spacing.sm,
+  alignItems: "center",
+})
+
+const $statusText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
+  fontSize: 12,
+  color: colors.textDim,
+  fontFamily: typography.primary.normal,
+  textAlign: "center",
+})
+
+const $mockModeText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
+  fontSize: 11,
+  color: colors.palette.secondary500,
+  fontFamily: typography.primary.normal,
+  textAlign: "center",
+  marginTop: 2,
+})
+
 const $controlsContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   marginBottom: spacing.md,
 })
@@ -457,24 +519,11 @@ const $resultValue: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   fontSize: 14,
 })
 
-const $statusContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "center",
-  marginTop: spacing.md,
-  paddingVertical: spacing.sm,
-})
-
 const $statusIndicator: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   width: 12,
   height: 12,
   borderRadius: 6,
   marginRight: spacing.xs,
-})
-
-const $statusText: ThemedStyle<TextStyle> = ({ typography }) => ({
-  fontFamily: typography.primary.medium,
-  fontSize: 16,
 })
 
 const $loadingContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({

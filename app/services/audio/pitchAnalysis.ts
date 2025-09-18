@@ -7,6 +7,15 @@ import { Audio } from "expo-av"
 import { PitchDetector, PitchDetectionResult, PitchUtils } from "./pitchDetection"
 import type { LyricItem } from "@/services/musicxml/musicXMLParser"
 
+export enum RecordingState {
+  IDLE = 'idle',
+  PREPARING = 'preparing', 
+  READY = 'ready',
+  RECORDING = 'recording',
+  ERROR = 'error',
+  MOCK_MODE = 'mock_mode'
+}
+
 export interface PitchAnalysisResult {
   currentPitch: PitchDetectionResult
   targetPitch: {
@@ -54,6 +63,7 @@ export class PitchAnalysisService {
   private analysisTimer: NodeJS.Timeout | null = null
   private config: PitchAnalysisConfig
   private isAnalyzing = false
+  private recordingState: RecordingState = RecordingState.IDLE
   private currentLyrics: LyricItem[] = []
   private analysisCallback: ((result: PitchAnalysisResult) => void) | null = null
   private analysisStartTime: number = 0
@@ -129,7 +139,10 @@ export class PitchAnalysisService {
       this.isAnalyzing = true
       this.analysisStartTime = Date.now()
 
-      // 실제 녹음은 나중에 구현하고, 현재는 mock 데이터로 테스트
+      // 녹음 상태를 PREPARING으로 설정
+      this.recordingState = RecordingState.PREPARING
+
+      // 실제 녹음 시도
       try {
         const recordingOptions = {
           ...this.config.recordingOptions,
@@ -139,6 +152,7 @@ export class PitchAnalysisService {
           }
         }
         
+        console.log('🔄 녹음 준비 중...')
         const { recording } = await Audio.Recording.createAsync(
           recordingOptions,
           undefined, // status update callback은 undefined로
@@ -146,11 +160,14 @@ export class PitchAnalysisService {
         )
         
         this.recording = recording
-        console.log('✅ 녹음 시작 성공')
+        this.recordingState = RecordingState.RECORDING
+        console.log('✅ 녹음 시작 성공 - 실제 녹음 모드')
       } catch (recordingError) {
         console.log('⚠️ 녹음 시작 실패, mock 모드로 진행:', recordingError)
-        // 녹음 실패해도 mock 데이터로 계속 진행
+        // 녹음 실패시 mock 모드로 전환
         this.recording = null
+        this.recordingState = RecordingState.MOCK_MODE
+        console.log('🎭 Mock 모드로 분석 진행')
       }
       
       // 주기적 분석 시작
@@ -159,6 +176,17 @@ export class PitchAnalysisService {
     } catch (error) {
       console.error('❌ 음정 분석 시작 실패:', error)
       this.isAnalyzing = false
+      this.recordingState = RecordingState.ERROR
+      
+      // 에러 정보 상세 로깅
+      if (error instanceof Error) {
+        console.error('❌ 에러 상세:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        })
+      }
+      
       throw error
     }
   }
@@ -171,21 +199,67 @@ export class PitchAnalysisService {
     
     this.isAnalyzing = false
     
+    // 분석 타이머 정리
     if (this.analysisTimer) {
       clearInterval(this.analysisTimer)
       this.analysisTimer = null
     }
 
-    if (this.recording) {
-      try {
-        await this.recording.stopAndUnloadAsync()
-      } catch (error) {
-        console.error('녹음 중단 오류:', error)
-      }
+    // 안전한 녹음 정리
+    await this.safeStopRecording()
+
+    // 콜백 정리
+    this.analysisCallback = null
+    
+    // 상태 초기화
+    this.recordingState = RecordingState.IDLE
+    console.log('✅ 음정 분석 완전히 중단됨')
+  }
+
+  /**
+   * 안전한 녹음 중단 메서드
+   */
+  private async safeStopRecording(): Promise<void> {
+    console.log(`🔍 녹음 상태 확인: ${this.recordingState}`)
+    
+    // Mock 모드이거나 녹음이 없는 경우 바로 리턴
+    if (this.recordingState === RecordingState.MOCK_MODE || !this.recording) {
+      console.log('📝 Mock 모드 또는 녹음 없음 - 안전하게 패스')
       this.recording = null
+      return
     }
 
-    this.analysisCallback = null
+    // 녹음이 실제로 존재하고 중단 가능한 상태인지 확인
+    if (this.recording && this.recordingState === RecordingState.RECORDING) {
+      try {
+        console.log('⏹️ 실제 녹음 중단 시도...')
+        
+        // 녹음 상태 확인
+        const status = await this.recording.getStatusAsync()
+        console.log('📊 녹음 상태:', {
+          canRecord: status.canRecord,
+          isRecording: status.isRecording,
+          isDoneRecording: status.isDoneRecording
+        })
+        
+        // 실제로 녹음 중인 경우에만 중단
+        if (status.canRecord || status.isRecording) {
+          await this.recording.stopAndUnloadAsync()
+          console.log('✅ 녹음 정상 중단됨')
+        } else {
+          console.log('⚠️ 녹음이 이미 중단된 상태')
+        }
+      } catch (error) {
+        console.error('❌ 녹음 중단 중 오류 (안전하게 처리됨):', error)
+        // 에러가 발생해도 계속 진행 - 이미 중단된 녹음일 가능성
+      }
+    } else {
+      console.log('⚠️ 녹음 상태가 중단 가능하지 않음')
+    }
+
+    // 녹음 객체 정리
+    this.recording = null
+    console.log('🧹 녹음 객체 정리 완료')
   }
 
   /**
@@ -193,12 +267,25 @@ export class PitchAnalysisService {
    */
   private startPeriodicAnalysis(): void {
     this.analysisTimer = setInterval(async () => {
-      if (!this.isAnalyzing || !this.recording) return
+      // 분석 중이 아니거나 유효하지 않은 상태면 중단
+      if (!this.isAnalyzing || 
+          (this.recordingState !== RecordingState.RECORDING && this.recordingState !== RecordingState.MOCK_MODE)) {
+        return
+      }
 
       try {
         await this.performAnalysis()
       } catch (error) {
-        console.error('분석 오류:', error)
+        console.error('🚨 분석 오류 (복구 가능):', error)
+        
+        // 녹음 관련 에러인 경우 Mock 모드로 전환
+        if (error instanceof Error && error.message.includes('Recorder') && this.recordingState === RecordingState.RECORDING) {
+          console.log('🎭 녹음 에러 감지 - Mock 모드로 자동 전환')
+          this.recordingState = RecordingState.MOCK_MODE
+          this.recording = null
+        }
+        
+        // 에러가 발생해도 계속 진행 (복구 로직)
       }
     }, this.config.analysisInterval)
   }
@@ -380,6 +467,27 @@ export class PitchAnalysisService {
    */
   get isRunning(): boolean {
     return this.isAnalyzing
+  }
+
+  /**
+   * 현재 녹음 상태 확인
+   */
+  get currentRecordingState(): RecordingState {
+    return this.recordingState
+  }
+
+  /**
+   * Mock 모드 여부 확인
+   */
+  get isInMockMode(): boolean {
+    return this.recordingState === RecordingState.MOCK_MODE
+  }
+
+  /**
+   * 실제 녹음 모드 여부 확인
+   */
+  get isRecording(): boolean {
+    return this.recordingState === RecordingState.RECORDING
   }
 
   /**

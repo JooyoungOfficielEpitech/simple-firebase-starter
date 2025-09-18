@@ -3,6 +3,9 @@ import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore"
 // Gender type
 export type UserGender = "male" | "female"
 
+// User type
+export type UserType = "general" | "organizer"
+
 // Firestore user document shape (only allowed fields)
 export interface UserProfile {
   uid: string
@@ -14,6 +17,9 @@ export interface UserProfile {
   heightCm?: number
   media: string[]
   requiredProfileComplete: boolean
+  userType: UserType          // 사용자 유형
+  organizationId?: string     // 소속 단체 (운영자만)
+  organizationName?: string   // 단체명 (운영자만)
   createdAt: FirebaseFirestoreTypes.Timestamp
   updatedAt: FirebaseFirestoreTypes.Timestamp
 }
@@ -24,13 +30,15 @@ export type CreateUserProfile = {
   gender?: UserGender
   birthday?: string
   heightCm?: number
+  userType?: UserType
+  organizationName?: string
 }
 
 // Payload for updating allowed fields only
 export type UpdateUserProfile = Partial<
   Pick<
     UserProfile,
-    "name" | "gender" | "birthday" | "heightCm" | "media" | "requiredProfileComplete"
+    "name" | "gender" | "birthday" | "heightCm" | "media" | "requiredProfileComplete" | "userType" | "organizationId" | "organizationName"
   >
 >
 
