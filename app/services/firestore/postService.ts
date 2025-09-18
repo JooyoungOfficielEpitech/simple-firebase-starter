@@ -244,6 +244,48 @@ export class PostService {
   }
 
   /**
+   * 특정 단체의 게시글 실시간 리스너
+   */
+  subscribeToOrganizationPosts(organizationId: string, callback: (posts: Post[]) => void): () => void {
+    console.log(`🏢 [PostService] 단체별 게시글 구독 시작: ${organizationId}`)
+    
+    return this.db
+      .collection("posts")
+      .where("organizationId", "==", organizationId)
+      .onSnapshot(
+        (snapshot) => {
+          console.log(`🏢 [PostService] 단체 ${organizationId} 게시글 snapshot 받음`)
+          console.log(`🏢 [PostService] 받은 문서 개수: ${snapshot.docs.length}`)
+          
+          const allPosts = snapshot.docs.map(doc => {
+            const data = doc.data()
+            return {
+              id: doc.id,
+              ...data,
+            } as Post
+          })
+          
+          // 클라이언트에서 active 상태만 필터링하고 정렬
+          const activePosts = allPosts
+            .filter(post => post.status === "active")
+            .sort((a, b) => {
+              // createdAt 기준으로 내림차순 정렬
+              const aTime = a.createdAt?.toDate?.() || new Date(0)
+              const bTime = b.createdAt?.toDate?.() || new Date(0)
+              return bTime.getTime() - aTime.getTime()
+            })
+          
+          console.log(`✅ [PostService] 단체별 전체 게시글: ${allPosts.length}개, 활성: ${activePosts.length}개`)
+          callback(activePosts)
+        },
+        (error) => {
+          console.error("❌ [PostService] 단체별 게시글 구독 오류:", error)
+          callback([])
+        },
+      )
+  }
+
+  /**
    * 게시글 실시간 리스너 (단일)
    */
   subscribeToPost(postId: string, callback: (post: Post | null) => void): () => void {

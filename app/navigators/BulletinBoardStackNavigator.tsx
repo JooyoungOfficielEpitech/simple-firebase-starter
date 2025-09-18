@@ -4,6 +4,7 @@ import { CompositeScreenProps } from "@react-navigation/native"
 import { BulletinBoardScreen } from "@/screens/BulletinBoardScreen"
 import { CreatePostScreen } from "@/screens/CreatePostScreen"
 import { PostDetailScreen } from "@/screens/PostDetailScreen"
+import { CreateOrganizationScreen } from "@/screens/CreateOrganizationScreen"
 import { useAppTheme } from "@/theme/context"
 
 import { MainTabParamList, MainTabScreenProps } from "./MainNavigator"
@@ -12,6 +13,7 @@ export type BulletinBoardStackParamList = {
   BulletinBoardMain: undefined
   PostDetail: { postId: string }
   CreatePost: { postId?: string; isEdit?: boolean }
+  CreateOrganization: { organizationId?: string; isEdit?: boolean }
 }
 
 /**
@@ -66,6 +68,14 @@ export function BulletinBoardStackNavigator() {
         component={CreatePostScreen}
         options={{
           headerShown: false, // 게시글 작성 화면은 커스텀 헤더 사용
+        }}
+      />
+
+      <Stack.Screen
+        name="CreateOrganization"
+        component={CreateOrganizationScreen}
+        options={{
+          headerShown: false, // 단체 등록 화면은 커스텀 헤더 사용
         }}
       />
     </Stack.Navigator>
