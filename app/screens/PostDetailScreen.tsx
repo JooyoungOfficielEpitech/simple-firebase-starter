@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { View, ScrollView, Alert, TouchableOpacity } from "react-native"
+import { View, ScrollView, Alert, TouchableOpacity, Share } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -32,22 +32,43 @@ export const PostDetailScreen = () => {
   const [post, setPost] = useState<Post | null>(null)
   const [loading, setLoading] = useState(true)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [isFavorite, setIsFavorite] = useState(false)
 
   useEffect(() => {
+    console.log('🎯 [PostDetailScreen] useEffect 시작, postId:', postId)
+    
     // 사용자 프로필 로드
     const loadUserProfile = async () => {
       try {
+        console.log('👤 [PostDetailScreen] 사용자 프로필 로드 시작')
         const profile = await userService.getUserProfile()
+        console.log('👤 [PostDetailScreen] 사용자 프로필 로드 완료:', profile)
         setUserProfile(profile)
       } catch (error) {
-        console.error("사용자 프로필 로드 오류:", error)
+        console.error("❌ [PostDetailScreen] 사용자 프로필 로드 오류:", error)
       }
     }
 
     loadUserProfile()
 
     // 게시글 실시간 구독
+    console.log('📱 [PostDetailScreen] 게시글 구독 시작')
     const unsubscribe = postService.subscribeToPost(postId, (post) => {
+      console.log('📱 [PostDetailScreen] 게시글 콜백 호출됨')
+      console.log('📱 [PostDetailScreen] 받은 게시글:', post)
+      
+      if (post) {
+        console.log('📱 [PostDetailScreen] 게시글 필드 확인:')
+        console.log('  - roles:', post.roles)
+        console.log('  - audition:', post.audition)
+        console.log('  - performance:', post.performance)
+        console.log('  - benefits:', post.benefits)
+        console.log('  - contact:', post.contact)
+        console.log('  - deadline:', post.deadline)
+        console.log('  - totalApplicants:', post.totalApplicants)
+        console.log('  - viewCount:', post.viewCount)
+      }
+      
       setPost(post)
       setLoading(false)
     })
@@ -112,7 +133,77 @@ export const PostDetailScreen = () => {
     )
   }
 
+  const handleToggleFavorite = () => {
+    setIsFavorite(!isFavorite)
+    // TODO: 실제 즐겨찾기 기능 구현 (Firebase에 저장)
+    Alert.alert(
+      isFavorite ? "즐겨찾기 해제" : "즐겨찾기 추가",
+      isFavorite ? "즐겨찾기에서 제거되었습니다." : "즐겨찾기에 추가되었습니다."
+    )
+  }
+
+  const handleShare = async () => {
+    if (!post) return
+
+    try {
+      const message = `${post.title}\n\n${post.production} - ${post.organizationName}\n연습: ${post.rehearsalSchedule}\n장소: ${post.location}\n\n${post.description}`
+      
+      await Share.share({
+        message,
+        title: post.title,
+      })
+    } catch (error) {
+      console.error("공유 오류:", error)
+    }
+  }
+
+  const handleContact = () => {
+    if (!post?.contact) return
+
+    Alert.alert(
+      "연락하기",
+      `담당자에게 연락하시겠습니까?\n\n이메일: ${post.contact.email}${post.contact.phone ? `\n전화: ${post.contact.phone}` : ''}`,
+      [
+        { text: "취소", style: "cancel" },
+        { 
+          text: "이메일", 
+          onPress: () => {
+            // TODO: 이메일 앱 연동
+            Alert.alert("안내", `${post.contact?.email}로 연락해주세요.`)
+          }
+        },
+        ...(post.contact.phone ? [{
+          text: "전화",
+          onPress: () => {
+            // TODO: 전화 앱 연동
+            Alert.alert("안내", `${post.contact.phone}로 연락해주세요.`)
+          }
+        }] : [])
+      ]
+    )
+  }
+
   const isMyPost = post && userProfile && post.authorId === userProfile.uid
+
+  // 렌더링 상태 디버그
+  console.log('🎨 [PostDetailScreen] 렌더링 상태:')
+  console.log('  - loading:', loading)
+  console.log('  - post:', post ? 'EXISTS' : 'NULL')
+  console.log('  - userProfile:', userProfile ? 'EXISTS' : 'NULL')
+  console.log('  - isMyPost:', isMyPost)
+  
+  if (post) {
+    console.log('🎨 [PostDetailScreen] 게시글 상세:')
+    console.log('  - ID:', post.id)
+    console.log('  - 제목:', post.title)
+    console.log('  - 새로운 필드들 존재 여부:')
+    console.log('    • roles:', !!post.roles, post.roles?.length || 0)
+    console.log('    • audition:', !!post.audition)
+    console.log('    • performance:', !!post.performance)
+    console.log('    • benefits:', !!post.benefits)
+    console.log('    • contact:', !!post.contact)
+    console.log('    • deadline:', !!post.deadline)
+  }
 
   if (loading) {
     return (
@@ -152,8 +243,10 @@ export const PostDetailScreen = () => {
     )
   }
 
+  console.log('🎨 [PostDetailScreen] 메인 렌더 시작')
+  
   return (
-    <Screen preset="fixed" safeAreaEdges={["top"]}>
+    <Screen preset="scroll" safeAreaEdges={["top"]}>
       <View style={themed([$container, { paddingTop: top + spacing.lg }])}>
         {/* 헤더 */}
         <View style={themed($header)}>
@@ -163,97 +256,49 @@ export const PostDetailScreen = () => {
           <Text preset="heading" text="게시글" style={themed($title)} />
           <View style={{ width: 24 }} />
         </View>
+        {/* 기본 정보 */}
+        <Text preset="heading" text={post.title} style={themed($postTitle)} />
+        <Text text={post.production} style={themed($productionText)} />
+        <Text text={post.organizationName} style={themed($organizationText)} />
+        
+        {/* 상세 설명 */}
+        <View style={themed($section)}>
+          <Text preset="subheading" text="상세 설명" style={themed($sectionTitle)} />
+          <Text text={post.description} style={themed($descriptionText)} />
+        </View>
 
-        <ScrollView style={themed($scrollView)} showsVerticalScrollIndicator={false}>
-          {/* 상태 배지 */}
-          <View style={themed($statusContainer)}>
-            <View style={themed([$statusBadge, post.status === "active" ? $activeBadge : $closedBadge])}>
-              <Text
-                text={post.status === "active" ? "모집중" : "마감"}
-                style={themed([$statusText, post.status === "active" ? $activeText : $closedText])}
-              />
-            </View>
-          </View>
-
-          {/* 제목 */}
-          <Text preset="heading" text={post.title} style={themed($postTitle)} />
-
-          {/* 작품 정보 */}
+        {/* 모집 역할 */}
+        {post.roles && post.roles.length > 0 && (
           <View style={themed($section)}>
-            <Text preset="subheading" text="작품 정보" style={themed($sectionTitle)} />
-            <Text text={post.production} style={themed($productionText)} />
-          </View>
-
-          {/* 단체 정보 */}
-          <View style={themed($section)}>
-            <Text preset="subheading" text="단체" style={themed($sectionTitle)} />
-            <Text text={post.organizationName} style={themed($organizationText)} />
-          </View>
-
-          {/* 연습 일정 */}
-          <View style={themed($section)}>
-            <Text preset="subheading" text="연습 일정" style={themed($sectionTitle)} />
-            <Text text={post.rehearsalSchedule} style={themed($infoText)} />
-          </View>
-
-          {/* 장소 */}
-          <View style={themed($section)}>
-            <Text preset="subheading" text="장소" style={themed($sectionTitle)} />
-            <Text text={post.location} style={themed($infoText)} />
-          </View>
-
-          {/* 상세 설명 */}
-          <View style={themed($section)}>
-            <Text preset="subheading" text="상세 설명" style={themed($sectionTitle)} />
-            <Text text={post.description} style={themed($descriptionText)} />
-          </View>
-
-          {/* 태그 */}
-          {post.tags.length > 0 && (
-            <View style={themed($section)}>
-              <Text preset="subheading" text="태그" style={themed($sectionTitle)} />
-              <View style={themed($tagsContainer)}>
-                {post.tags.map((tag, index) => (
-                  <View key={index} style={themed($tag)}>
-                    <Text text={tag} style={themed($tagText)} />
-                  </View>
-                ))}
+            <Text preset="subheading" text="모집 역할" style={themed($sectionTitle)} />
+            {post.roles.map((role, index) => (
+              <View key={index} style={themed($roleCard)}>
+                <Text text={`${role.name} (${role.count}명)`} style={themed($roleName)} />
+                <Text text={`${role.ageRange} / ${role.gender === 'male' ? '남성' : role.gender === 'female' ? '여성' : '무관'}`} style={themed($roleDetail)} />
+                <Text text={role.requirements} style={themed($roleRequirements)} />
               </View>
-            </View>
-          )}
-
-          {/* 작성자 정보 */}
-          <View style={themed($section)}>
-            <Text preset="subheading" text="작성자" style={themed($sectionTitle)} />
-            <Text text={post.authorName} style={themed($infoText)} />
+            ))}
           </View>
+        )}
 
-          {/* 내 게시글인 경우 액션 버튼들 */}
-          {isMyPost && (
-            <View style={themed($actionSection)}>
-              <Button
-                text={post.status === "active" ? "모집 마감" : "모집 재개"}
-                style={themed($actionButton)}
-                onPress={handleStatusToggle}
-              />
-              <View style={themed($buttonRow)}>
-                <Button
-                  text="수정"
-                  preset="default"
-                  style={themed([$halfButton, $editButton])}
-                  onPress={handleEdit}
-                />
-                <Button
-                  text="삭제"
-                  preset="default"
-                  style={themed([$halfButton, $deleteButton])}
-                  textStyle={themed($deleteButtonText)}
-                  onPress={handleDelete}
-                />
-              </View>
-            </View>
-          )}
-        </ScrollView>
+        {/* 오디션 정보 */}
+        {post.audition && (
+          <View style={themed($section)}>
+            <Text preset="subheading" text="오디션 정보" style={themed($sectionTitle)} />
+            <Text text={`일정: ${post.audition.date}`} style={themed($infoText)} />
+            <Text text={`장소: ${post.audition.location}`} style={themed($infoText)} />
+            <Text text={`방식: ${post.audition.method}`} style={themed($infoText)} />
+          </View>
+        )}
+
+        {/* 연락처 */}
+        {post.contact && (
+          <View style={themed($section)}>
+            <Text preset="subheading" text="연락처" style={themed($sectionTitle)} />
+            <Text text={post.contact.email} style={themed($contactText)} />
+            {post.contact.phone && <Text text={post.contact.phone} style={themed($infoText)} />}
+          </View>
+        )}
       </View>
     </Screen>
   )
@@ -403,4 +448,154 @@ const $deleteButton = ({ colors }) => ({
 
 const $deleteButtonText = ({ colors }) => ({
   color: colors.error,
+})
+
+// 새로운 스타일들
+const $roleCard = ({ colors, spacing }) => ({
+  backgroundColor: colors.palette.neutral100,
+  borderRadius: 8,
+  padding: spacing.md,
+  marginBottom: spacing.sm,
+})
+
+const $roleHeader = ({ spacing }) => ({
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: spacing.xs,
+})
+
+const $roleName = ({ colors }) => ({
+  color: colors.text,
+  fontSize: 16,
+  fontWeight: "600",
+})
+
+const $roleCount = ({ colors }) => ({
+  color: colors.tint,
+  fontSize: 14,
+  fontWeight: "500",
+})
+
+const $roleDetail = ({ colors, spacing }) => ({
+  color: colors.textDim,
+  fontSize: 14,
+  marginBottom: 2,
+})
+
+const $roleRequirements = ({ colors, spacing }) => ({
+  color: colors.text,
+  fontSize: 14,
+  marginTop: spacing.xs,
+})
+
+const $requirementsContainer = ({ spacing }) => ({
+  marginTop: spacing.sm,
+})
+
+const $requirementsTitle = ({ colors, spacing }) => ({
+  color: colors.text,
+  fontSize: 14,
+  fontWeight: "500",
+  marginBottom: spacing.xs,
+})
+
+const $requirementItem = ({ colors }) => ({
+  color: colors.textDim,
+  fontSize: 14,
+  marginBottom: 2,
+})
+
+const $datesContainer = ({ spacing }) => ({
+  marginTop: spacing.sm,
+})
+
+const $datesTitle = ({ colors, spacing }) => ({
+  color: colors.text,
+  fontSize: 14,
+  fontWeight: "500",
+  marginBottom: spacing.xs,
+})
+
+const $dateItem = ({ colors }) => ({
+  color: colors.textDim,
+  fontSize: 14,
+  marginBottom: 2,
+})
+
+const $benefitsGrid = ({ spacing }) => ({
+  marginTop: spacing.xs,
+})
+
+const $benefitItem = ({ colors }) => ({
+  color: colors.text,
+  fontSize: 14,
+  marginBottom: 2,
+})
+
+const $otherBenefits = ({ spacing }) => ({
+  marginTop: spacing.sm,
+})
+
+const $otherBenefitsTitle = ({ colors, spacing }) => ({
+  color: colors.text,
+  fontSize: 14,
+  fontWeight: "500",
+  marginBottom: spacing.xs,
+})
+
+const $otherBenefitItem = ({ colors }) => ({
+  color: colors.textDim,
+  fontSize: 14,
+  marginBottom: 2,
+})
+
+const $contactText = ({ colors }) => ({
+  color: colors.tint,
+  fontSize: 16,
+  fontWeight: "500",
+})
+
+const $documentsContainer = ({ spacing }) => ({
+  marginTop: spacing.sm,
+})
+
+const $documentsTitle = ({ colors, spacing }) => ({
+  color: colors.text,
+  fontSize: 14,
+  fontWeight: "500",
+  marginBottom: spacing.xs,
+})
+
+const $documentItem = ({ colors }) => ({
+  color: colors.textDim,
+  fontSize: 14,
+  marginBottom: 2,
+})
+
+const $deadlineText = ({ colors }) => ({
+  color: colors.error,
+  fontSize: 16,
+  fontWeight: "500",
+})
+
+const $viewCountText = ({ colors }) => ({
+  color: colors.textDim,
+  fontSize: 14,
+})
+
+// 상호작용 관련 스타일들
+const $headerActions = ({ spacing }) => ({
+  flexDirection: "row",
+  alignItems: "center",
+})
+
+const $actionIcon = ({ spacing }) => ({
+  marginLeft: spacing.sm,
+  padding: 4,
+})
+
+const $contactButton = ({ colors, spacing }) => ({
+  backgroundColor: colors.tint,
+  marginTop: spacing.md,
 })

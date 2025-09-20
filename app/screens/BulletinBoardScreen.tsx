@@ -16,6 +16,7 @@ import { Post } from "@/types/post"
 import { UserProfile } from "@/types/user"
 import { Organization } from "@/types/organization"
 import { BulletinBoardStackParamList } from "@/navigators/BulletinBoardStackNavigator"
+import { createComponentLogger } from "@/utils/logger"
 
 type NavigationProp = NativeStackNavigationProp<BulletinBoardStackParamList>
 
@@ -26,6 +27,9 @@ export const BulletinBoardScreen = () => {
     themed,
     theme: { colors, spacing },
   } = useAppTheme()
+  
+  // Create component-specific logger
+  const log = createComponentLogger('BulletinBoardScreen')
 
   const [posts, setPosts] = useState<Post[]>([])
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([])
@@ -38,18 +42,18 @@ export const BulletinBoardScreen = () => {
   
 
   useEffect(() => {
-    console.log('🎯 [BulletinBoardScreen] useEffect 시작')
+    log.debug('useEffect 시작')
     
     // Firebase 인증 상태 확인
     const currentUser = auth().currentUser
-    console.log('🔐 [BulletinBoardScreen] 현재 Firebase 인증 상태:', currentUser ? { uid: currentUser.uid, email: currentUser.email } : 'NOT_LOGGED_IN')
+    log.authInfo(currentUser)
     
     // 사용자 프로필 로드
     const loadUserProfile = async () => {
       try {
-        console.log('👤 [BulletinBoardScreen] 사용자 프로필 로드 시작')
+        log.debug('사용자 프로필 로드 시작')
         const profile = await userService.getUserProfile()
-        console.log('👤 [BulletinBoardScreen] 사용자 프로필 로드 완료:', profile)
+        log.info('사용자 프로필 로드 완료')
         setUserProfile(profile)
         
         // 프로필이 없으면 기본 프로필 생성 (게시글 보기에는 영향 없음)
@@ -227,12 +231,83 @@ export const BulletinBoardScreen = () => {
         authorName: '테스트 운영자',
         status: 'active',
         tags: ['연극', '셰익스피어', '주연'],
+        
+        // 새로운 필드들
+        roles: [
+          {
+            name: '햄릿',
+            gender: 'male',
+            ageRange: '25-35세',
+            requirements: '연기 경험 5년 이상, 셰익스피어 작품 경험자 우대',
+            count: 1
+          },
+          {
+            name: '오필리어',
+            gender: 'female',
+            ageRange: '20-30세',
+            requirements: '연기 경험 3년 이상, 노래 가능자',
+            count: 1
+          },
+          {
+            name: '클로디어스',
+            gender: 'male',
+            ageRange: '40-55세',
+            requirements: '중후한 연기력, 악역 연기 경험',
+            count: 1
+          }
+        ],
+        
+        audition: {
+          date: '2024년 10월 15일 (화) 오후 2시',
+          location: '대학로 연습실 (3호선 안국역 2번 출구)',
+          requirements: ['자기소개 3분', '자유 연기 5분', '셰익스피어 대사 암송'],
+          resultDate: '2024년 10월 18일 (금)',
+          method: '대면 오디션'
+        },
+        
+        performance: {
+          dates: ['2024년 12월 15일 (일) 19:30', '2024년 12월 16일 (월) 19:30', '2024년 12월 17일 (화) 19:30'],
+          venue: '대학로 소극장 블루',
+          ticketPrice: '일반 35,000원 / 학생 25,000원',
+          targetAudience: '중학생 이상',
+          genre: '클래식 연극'
+        },
+        
+        benefits: {
+          fee: '회차당 50,000원',
+          transportation: true,
+          costume: true,
+          portfolio: true,
+          photography: true,
+          meals: false,
+          other: ['공연 DVD 제공', '추천서 발급 가능']
+        },
+        
+        contact: {
+          email: 'casting@testcompany.com',
+          phone: '02-1234-5678',
+          applicationMethod: '이메일 또는 전화',
+          requiredDocuments: ['이력서', '프로필 사진', '연기 영상 (선택)']
+        },
+        
+        deadline: '2024년 10월 12일 (토) 18:00',
+        totalApplicants: 15,
+        viewCount: 234,
+        
         createdAt: firestore.FieldValue.serverTimestamp(),
         updatedAt: firestore.FieldValue.serverTimestamp(),
       }
 
       const postRef = await db.collection('posts').add(postData)
       console.log('✅ [AddTestData] 게시글 데이터 추가 완료, ID:', postRef.id)
+      console.log('📝 [AddTestData] 추가된 게시글 데이터:', {
+        title: postData.title,
+        rolesCount: postData.roles?.length || 0,
+        hasAudition: !!postData.audition,
+        hasPerformance: !!postData.performance,
+        hasBenefits: !!postData.benefits,
+        hasContact: !!postData.contact,
+      })
 
       // 3. 추가 게시글
       const postData2 = {
@@ -247,12 +322,76 @@ export const BulletinBoardScreen = () => {
         authorName: '테스트 운영자',
         status: 'active',
         tags: ['뮤지컬', '앙상블'],
+        
+        // 새로운 필드들
+        roles: [
+          {
+            name: '혁명군 앙상블',
+            gender: 'male',
+            ageRange: '20-40세',
+            requirements: '노래 실력 중급 이상, 군무 가능자',
+            count: 8
+          },
+          {
+            name: '시민 앙상블',
+            gender: 'any',
+            ageRange: '20-50세',
+            requirements: '기본적인 노래 실력, 연기 경험',
+            count: 12
+          }
+        ],
+        
+        audition: {
+          date: '2024년 10월 20일 (일) 오후 1시',
+          location: '대학로 뮤지컬 연습실 (4호선 혜화역 1번 출구)',
+          requirements: ['자기소개 2분', '자유곡 1곡 (2분 이내)', '간단한 안무'],
+          resultDate: '2024년 10월 22일 (화)',
+          method: '대면 오디션'
+        },
+        
+        performance: {
+          dates: ['2025년 1월 10일 (금) 20:00', '2025년 1월 11일 (토) 15:00, 19:00', '2025년 1월 12일 (일) 15:00'],
+          venue: '대학로 뮤지컬홀',
+          ticketPrice: 'R석 50,000원 / S석 40,000원 / A석 30,000원',
+          targetAudience: '전체 관람가',
+          genre: '뮤지컬'
+        },
+        
+        benefits: {
+          fee: '회차당 30,000원',
+          transportation: true,
+          costume: true,
+          portfolio: false,
+          photography: false,
+          meals: true,
+          other: ['뮤지컬 OST 앨범 제공']
+        },
+        
+        contact: {
+          email: 'musical@testcompany.com',
+          phone: '02-9876-5432',
+          applicationMethod: '이메일 지원',
+          requiredDocuments: ['이력서', '노래 영상 (필수)']
+        },
+        
+        deadline: '2024년 10월 18일 (금) 23:59',
+        totalApplicants: 42,
+        viewCount: 156,
+        
         createdAt: firestore.FieldValue.serverTimestamp(),
         updatedAt: firestore.FieldValue.serverTimestamp(),
       }
 
       const postRef2 = await db.collection('posts').add(postData2)
       console.log('✅ [AddTestData] 추가 게시글 데이터 추가 완료, ID:', postRef2.id)
+      console.log('📝 [AddTestData] 추가된 레미제라블 데이터:', {
+        title: postData2.title,
+        rolesCount: postData2.roles?.length || 0,
+        hasAudition: !!postData2.audition,
+        hasPerformance: !!postData2.performance,
+        hasBenefits: !!postData2.benefits,
+        hasContact: !!postData2.contact,
+      })
 
       // 활성 공고 수 업데이트
       console.log('🔄 [AddTestData] 활성 공고 수 업데이트 시작...')

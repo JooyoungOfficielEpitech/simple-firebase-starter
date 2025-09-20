@@ -18,7 +18,17 @@ import { useMMKVString } from "react-native-mmkv"
 import { storage } from "@/utils/storage"
 
 import { setImperativeTheming } from "./context.utils"
-import { darkTheme, lightTheme } from "./theme"
+import { 
+  darkTheme, 
+  lightTheme, 
+  lightElphabaTheme,
+  darkElphabaTheme,
+  lightGlindaTheme,
+  darkGlindaTheme,
+  lightGwynplaineTheme,
+  darkGwynplaineTheme,
+  getThemeColors
+} from "./theme"
 import type {
   AllowedStylesT,
   ImmutableThemeContextModeT,
@@ -26,13 +36,16 @@ import type {
   ThemeContextModeT,
   ThemedFnT,
   ThemedStyle,
+  WickedCharacterTheme,
 } from "./types"
 
 export type ThemeContextType = {
   navigationTheme: NavTheme
   setThemeContextOverride: (newTheme: ThemeContextModeT) => void
+  setWickedCharacterTheme: (character: WickedCharacterTheme) => void
   theme: Theme
   themeContext: ImmutableThemeContextModeT
+  wickedCharacterTheme: WickedCharacterTheme
   themed: ThemedFnT
 }
 
@@ -59,6 +72,8 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
   const systemColorScheme = useColorScheme()
   // Our saved theme context: can be "light", "dark", or undefined (system theme)
   const [themeScheme, setThemeScheme] = useMMKVString("ignite.themeScheme", storage)
+  // Our saved Wicked character theme: can be "elphaba" or "glinda"
+  const [wickedCharacterScheme, setWickedCharacterScheme] = useMMKVString("ignite.wickedCharacterScheme", storage)
 
   /**
    * This function is used to set the theme context and is exported from the useAppTheme() hook.
@@ -74,6 +89,16 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
   )
 
   /**
+   * This function is used to set the Wicked character theme.
+   */
+  const setWickedCharacterTheme = useCallback(
+    (character: WickedCharacterTheme) => {
+      setWickedCharacterScheme(character)
+    },
+    [setWickedCharacterScheme],
+  )
+
+  /**
    * initialContext is the theme context passed in from the app.tsx file and always takes precedence.
    * themeScheme is the value from MMKV. If undefined, we fall back to the system theme
    * systemColorScheme is the value from the device. If undefined, we fall back to "light"
@@ -82,6 +107,13 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
     const t = initialContext || themeScheme || (!!systemColorScheme ? systemColorScheme : "light")
     return t === "dark" ? "dark" : "light"
   }, [initialContext, themeScheme, systemColorScheme])
+
+  /**
+   * wickedCharacterTheme is the Wicked character preference. Defaults to "elphaba"
+   */
+  const wickedCharacterTheme: WickedCharacterTheme = useMemo(() => {
+    return (wickedCharacterScheme as WickedCharacterTheme) || "elphaba"
+  }, [wickedCharacterScheme])
 
   const navigationTheme: NavTheme = useMemo(() => {
     switch (themeContext) {
@@ -93,13 +125,25 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
   }, [themeContext])
 
   const theme: Theme = useMemo(() => {
-    switch (themeContext) {
-      case "dark":
-        return darkTheme
-      default:
-        return lightTheme
+    // Combine dark/light mode with Wicked character theme
+    if (themeContext === "dark") {
+      if (wickedCharacterTheme === "glinda") {
+        return darkGlindaTheme
+      } else if (wickedCharacterTheme === "gwynplaine") {
+        return darkGwynplaineTheme
+      } else {
+        return darkElphabaTheme
+      }
+    } else {
+      if (wickedCharacterTheme === "glinda") {
+        return lightGlindaTheme
+      } else if (wickedCharacterTheme === "gwynplaine") {
+        return lightGwynplaineTheme
+      } else {
+        return lightElphabaTheme
+      }
     }
-  }, [themeContext])
+  }, [themeContext, wickedCharacterTheme])
 
   useEffect(() => {
     setImperativeTheming(theme)
@@ -125,7 +169,9 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
     navigationTheme,
     theme,
     themeContext,
+    wickedCharacterTheme,
     setThemeContextOverride,
+    setWickedCharacterTheme,
     themed,
   }
 

@@ -2,6 +2,12 @@ import type { StyleProp } from "react-native"
 
 import { colors as colorsLight } from "./colors"
 import { colors as colorsDark } from "./colorsDark"
+import { colors as colorsElphaba } from "./colorsElphaba"
+import { colors as colorsElphabaDark } from "./colorsElphabaDark"
+import { colors as colorsGlinda } from "./colorsGlinda"
+import { colors as colorsGlindaDark } from "./colorsGlindaDark"
+import { colors as colorsGwynplaine } from "./colorsGwynplaine"
+import { colors as colorsGwynplaineDark } from "./colorsGwynplaineDark"
 import { spacing as spacingLight } from "./spacing"
 import { spacing as spacingDark } from "./spacingDark"
 import { timing } from "./timing"
@@ -11,9 +17,12 @@ import { typography } from "./typography"
 export type ImmutableThemeContextModeT = "light" | "dark"
 export type ThemeContextModeT = ImmutableThemeContextModeT | undefined
 
-// Because we have two themes, we need to define the types for each of them.
-// colorsLight and colorsDark should have the same keys, but different values.
-export type Colors = typeof colorsLight | typeof colorsDark
+// Wicked character themes
+export type WickedCharacterTheme = "elphaba" | "glinda" | "gwynplaine"
+
+// Because we have multiple themes, we need to define the types for each of them.
+// All color variants should have the same keys, but different values.
+export type Colors = typeof colorsLight | typeof colorsDark | typeof colorsElphaba | typeof colorsElphabaDark | typeof colorsGlinda | typeof colorsGlindaDark | typeof colorsGwynplaine | typeof colorsGwynplaineDark
 // The spacing type needs to take into account the different spacing values for light and dark themes.
 export type Spacing = typeof spacingLight | typeof spacingDark
 
@@ -28,6 +37,7 @@ export interface Theme {
   typography: Typography
   timing: Timing
   isDark: boolean
+  wickedCharacter: WickedCharacterTheme
 }
 
 /**
