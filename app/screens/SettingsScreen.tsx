@@ -1,5 +1,5 @@
-import { type FC } from "react"
-import { View, type TextStyle, type ViewStyle } from "react-native"
+import { type FC, useState, useEffect } from "react"
+import { View, type TextStyle, type ViewStyle, Alert } from "react-native"
 
 import { $styles } from "@/theme/styles"
 
@@ -7,7 +7,10 @@ import { Button } from "@/components/Button"
 import { Radio } from "@/components/Toggle/Radio"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
+import { TextField } from "@/components/TextField"
 import { useAuth } from "@/context/AuthContext"
+import { userService } from "@/services/firestore"
+import { UserProfile } from "@/types/user"
 import type { MainTabScreenProps } from "@/navigators/MainNavigator"
 import { useAppTheme } from "@/theme/context"
 import { type ThemedStyle, type WickedCharacterTheme } from "@/theme/types"
@@ -17,6 +20,28 @@ interface SettingsScreenProps extends MainTabScreenProps<"Settings"> {}
 export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen() {
   const { themed, wickedCharacterTheme, setWickedCharacterTheme } = useAppTheme()
   const { logout } = useAuth()
+  
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [converting, setConverting] = useState(false)
+  const [showOrgNameInput, setShowOrgNameInput] = useState(false)
+  const [organizationName, setOrganizationName] = useState("")
+
+  useEffect(() => {
+    loadUserProfile()
+  }, [])
+
+  const loadUserProfile = async () => {
+    try {
+      setLoading(true)
+      const profile = await userService.getUserProfile()
+      setUserProfile(profile)
+    } catch (error) {
+      console.error("사용자 프로필 로드 오류:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleLogout = async () => {
     try {
@@ -30,14 +55,151 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
     setWickedCharacterTheme(character)
   }
 
+  const handleConvertToOrganizer = () => {
+    Alert.alert(
+      "운영자로 전환",
+      "운영자로 전환하시겠습니까? 이후 단체 정보를 입력해야 합니다.",
+      [
+        { text: "취소", style: "cancel" },
+        { text: "확인", onPress: () => setShowOrgNameInput(true) }
+      ]
+    )
+  }
+
+  const handleConfirmConversion = async () => {
+    if (!organizationName.trim()) {
+      Alert.alert("오류", "단체명을 입력해주세요.")
+      return
+    }
+
+    try {
+      setConverting(true)
+      
+      // 사용자 타입을 운영자로 변환
+      await userService.updateUserProfile({
+        userType: "organizer",
+        organizationId: userProfile?.uid,
+        organizationName: organizationName.trim()
+      })
+
+      // 프로필 새로고침
+      await loadUserProfile()
+      
+      setShowOrgNameInput(false)
+      setOrganizationName("")
+      
+      Alert.alert("성공", "운영자로 전환되었습니다!")
+    } catch (error) {
+      console.error("운영자 전환 오류:", error)
+      Alert.alert("오류", "운영자 전환에 실패했습니다.")
+    } finally {
+      setConverting(false)
+    }
+  }
+
+  const handleRevertToGeneral = () => {
+    Alert.alert(
+      "일반 사용자로 전환",
+      "일반 사용자로 전환하시겠습니까? 운영자 권한이 사라집니다.",
+      [
+        { text: "취소", style: "cancel" },
+        { text: "확인", onPress: confirmRevertToGeneral }
+      ]
+    )
+  }
+
+  const confirmRevertToGeneral = async () => {
+    try {
+      setConverting(true)
+      
+      await userService.revertToGeneralUser()
+
+      await loadUserProfile()
+      
+      Alert.alert("성공", "일반 사용자로 전환되었습니다!")
+    } catch (error) {
+      console.error("일반 사용자 전환 오류:", error)
+      Alert.alert("오류", "일반 사용자 전환에 실패했습니다.")
+    } finally {
+      setConverting(false)
+    }
+  }
+
+  if (showOrgNameInput) {
+    return (
+      <Screen preset="fixed" contentContainerStyle={$styles.flex1}>
+        <View style={themed($container)}>
+          <Text style={themed($title)}>단체명 입력</Text>
+          
+          <View style={themed($orgNameInputSection)}>
+            <Text style={themed($sectionTitle)}>운영할 단체명을 입력해주세요</Text>
+            
+            <TextField
+              value={organizationName}
+              onChangeText={setOrganizationName}
+              placeholder="예: 극단 봄날"
+              style={themed($orgNameInput)}
+            />
+            
+            <View style={themed($buttonRow)}>
+              <Button
+                text="취소"
+                preset="default"
+                onPress={() => {
+                  setShowOrgNameInput(false)
+                  setOrganizationName("")
+                }}
+                style={themed($cancelButton)}
+              />
+              <Button
+                text="확인"
+                onPress={handleConfirmConversion}
+                isLoading={converting}
+                style={themed($confirmButton)}
+              />
+            </View>
+          </View>
+        </View>
+      </Screen>
+    )
+  }
+
   return (
     <Screen preset="fixed" contentContainerStyle={$styles.flex1}>
       <View style={themed($container)}>
         <Text style={themed($title)}>Settings</Text>
         
+        {/* User Type Section */}
+        {!loading && userProfile && (
+          <View style={themed($userTypeSection)}>
+            <Text style={themed($sectionTitle)}>사용자 유형</Text>
+            <Text style={themed($currentUserType)}>
+              현재: {userProfile.userType === "organizer" 
+                ? `운영자 (${userProfile.organizationName || "단체"})` 
+                : "일반 사용자"}
+            </Text>
+            
+            {userProfile.userType === "general" ? (
+              <Button
+                text="운영자로 전환"
+                onPress={handleConvertToOrganizer}
+                isLoading={converting}
+                style={themed($convertButton)}
+              />
+            ) : (
+              <Button
+                text="일반 사용자로 전환"
+                onPress={handleRevertToGeneral}
+                isLoading={converting}
+                style={themed($revertButton)}
+              />
+            )}
+          </View>
+        )}
+        
         {/* Wicked Character Theme Selection */}
         <View style={themed($themeSection)}>
-          <Text style={themed($sectionTitle)}>Wicked 테마 선택</Text>
+          <Text style={themed($sectionTitle)}>테마 선택</Text>
           <Text style={themed($sectionSubtitle)}>좋아하는 캐릭터의 테마를 선택해보세요</Text>
           
           <View style={themed($radioGroup)}>
@@ -46,11 +208,11 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
                 value={wickedCharacterTheme === "elphaba"}
                 onValueChange={() => handleCharacterThemeChange("elphaba")}
                 inputDetailStyle={$elphabaRadioDetail}
-                outerStyle={wickedCharacterTheme === "elphaba" ? $elphabaRadioOuterSelected : undefined}
+                inputOuterStyle={wickedCharacterTheme === "elphaba" ? $elphabaRadioOuterSelected : undefined}
               />
               <View style={themed($radioLabelContainer)}>
                 <Text style={themed($radioLabel)}>🟢 엘파바 (Elphaba)</Text>
-                <Text style={themed($radioDescription)}>초록색 기반의 강렬한 테마</Text>
+                <Text style={themed($radioDescription)}>누구나 세상을 날아오를 수 있어 (Defying Gravity)</Text>
               </View>
             </View>
             
@@ -59,11 +221,11 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
                 value={wickedCharacterTheme === "glinda"}
                 onValueChange={() => handleCharacterThemeChange("glinda")}
                 inputDetailStyle={$glindaRadioDetail}
-                outerStyle={wickedCharacterTheme === "glinda" ? $glindaRadioOuterSelected : undefined}
+                inputOuterStyle={wickedCharacterTheme === "glinda" ? $glindaRadioOuterSelected : undefined}
               />
               <View style={themed($radioLabelContainer)}>
                 <Text style={themed($radioLabel)}>🌸 글린다 (Glinda)</Text>
-                <Text style={themed($radioDescription)}>핑크색 기반의 우아한 테마</Text>
+                <Text style={themed($radioDescription)}>인기가 많아질거야! 넌 인기가 많아질 거라고! (Popular)</Text>
               </View>
             </View>
             
@@ -72,11 +234,11 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
                 value={wickedCharacterTheme === "gwynplaine"}
                 onValueChange={() => handleCharacterThemeChange("gwynplaine")}
                 inputDetailStyle={$gwynplaineRadioDetail}
-                outerStyle={wickedCharacterTheme === "gwynplaine" ? $gwynplaineRadioOuterSelected : undefined}
+                inputOuterStyle={wickedCharacterTheme === "gwynplaine" ? $gwynplaineRadioOuterSelected : undefined}
               />
               <View style={themed($radioLabelContainer)}>
                 <Text style={themed($radioLabel)}>🍷 그윈플렌 (Gwynplaine)</Text>
-                <Text style={themed($radioDescription)}>와인/브라운 기반의 우아한 테마</Text>
+                <Text style={themed($radioDescription)}>그래, 내가 바꿀수 있어 (모두의 세상)</Text>
               </View>
             </View>
           </View>
@@ -104,6 +266,61 @@ const $title: ThemedStyle<TextStyle> = () => ({
   fontSize: 24,
   fontWeight: "bold",
   marginBottom: 32,
+})
+
+const $userTypeSection: ThemedStyle<ViewStyle> = () => ({
+  width: "100%",
+  maxWidth: 400,
+  marginBottom: 24,
+  padding: 20,
+  borderRadius: 12,
+  backgroundColor: "rgba(0, 0, 0, 0.05)",
+})
+
+const $currentUserType: ThemedStyle<TextStyle> = (theme) => ({
+  fontSize: 16,
+  color: theme.colors.text,
+  marginBottom: 16,
+  textAlign: "center",
+  fontWeight: "500",
+})
+
+const $convertButton: ThemedStyle<ViewStyle> = (theme) => ({
+  backgroundColor: theme.colors.tint,
+  marginTop: 8,
+})
+
+const $revertButton: ThemedStyle<ViewStyle> = (theme) => ({
+  backgroundColor: theme.colors.error || "#FF4444",
+  marginTop: 8,
+})
+
+const $orgNameInputSection: ThemedStyle<ViewStyle> = () => ({
+  width: "100%",
+  maxWidth: 400,
+  padding: 20,
+  borderRadius: 12,
+  backgroundColor: "rgba(0, 0, 0, 0.05)",
+})
+
+const $orgNameInput: ThemedStyle<ViewStyle> = () => ({
+  marginVertical: 16,
+})
+
+const $buttonRow: ThemedStyle<ViewStyle> = () => ({
+  flexDirection: "row",
+  justifyContent: "space-between",
+  gap: 12,
+  marginTop: 16,
+})
+
+const $cancelButton: ThemedStyle<ViewStyle> = () => ({
+  flex: 1,
+})
+
+const $confirmButton: ThemedStyle<ViewStyle> = (theme) => ({
+  flex: 1,
+  backgroundColor: theme.colors.tint,
 })
 
 const $themeSection: ThemedStyle<ViewStyle> = () => ({

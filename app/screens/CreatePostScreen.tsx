@@ -11,7 +11,7 @@ import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { postService, userService } from "@/services/firestore"
 import { useAppTheme } from "@/theme/context"
-import { Post, CreatePost, UpdatePost } from "@/types/post"
+import { CreatePost, UpdatePost } from "@/types/post"
 import { UserProfile } from "@/types/user"
 import { BulletinBoardStackParamList } from "@/navigators/BulletinBoardStackNavigator"
 
@@ -183,15 +183,15 @@ export const CreatePostScreen = () => {
   if (!userProfile || userProfile.userType !== "organizer") {
     return (
       <Screen preset="fixed" safeAreaEdges={["top"]}>
-        <View style={themed([$container, { paddingTop: top + spacing.lg }])}>
-          <View style={themed($header)}>
+        <View style={[themed($container), { paddingTop: top + spacing.lg }]}>
+          <View style={themed($header) as any}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <Icon icon="caretLeft" size={24} color={colors.text} />
             </TouchableOpacity>
             <Text preset="heading" text="게시글 작성" style={themed($title)} />
             <View style={{ width: 24 }} />
           </View>
-          <View style={themed($centerContainer)}>
+          <View style={themed($centerContainer) as any}>
             <Text text="단체 운영자만 게시글을 작성할 수 있습니다." />
           </View>
         </View>
@@ -201,9 +201,9 @@ export const CreatePostScreen = () => {
 
   return (
     <Screen preset="fixed" safeAreaEdges={["top"]}>
-      <View style={themed([$container, { paddingTop: top + spacing.lg }])}>
+      <View style={[themed($container), { paddingTop: top + spacing.lg }]}>
         {/* 헤더 */}
-        <View style={themed($header)}>
+        <View style={themed($header) as any}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Icon icon="caretLeft" size={24} color={colors.text} />
           </TouchableOpacity>
@@ -214,7 +214,7 @@ export const CreatePostScreen = () => {
         <ScrollView style={themed($scrollView)} showsVerticalScrollIndicator={false}>
           {/* 제목 */}
           <View style={themed($inputSection)}>
-            <Text text="제목 *" style={themed($label)} />
+            <Text text="제목 *" style={themed($label) as any} />
             <TextInput
               style={themed($textInput)}
               value={formData.title}
@@ -226,7 +226,7 @@ export const CreatePostScreen = () => {
 
           {/* 작품명 */}
           <View style={themed($inputSection)}>
-            <Text text="작품명 *" style={themed($label)} />
+            <Text text="작품명 *" style={themed($label) as any} />
             <TextInput
               style={themed($textInput)}
               value={formData.production}
@@ -238,7 +238,7 @@ export const CreatePostScreen = () => {
 
           {/* 단체명 */}
           <View style={themed($inputSection)}>
-            <Text text="단체명 *" style={themed($label)} />
+            <Text text="단체명 *" style={themed($label) as any} />
             <TextInput
               style={themed($textInput)}
               value={formData.organizationName}
@@ -250,7 +250,7 @@ export const CreatePostScreen = () => {
 
           {/* 연습 일정 */}
           <View style={themed($inputSection)}>
-            <Text text="연습 일정 *" style={themed($label)} />
+            <Text text="연습 일정 *" style={themed($label) as any} />
             <TextInput
               style={themed($textInput)}
               value={formData.rehearsalSchedule}
@@ -262,7 +262,7 @@ export const CreatePostScreen = () => {
 
           {/* 장소 */}
           <View style={themed($inputSection)}>
-            <Text text="장소 *" style={themed($label)} />
+            <Text text="장소 *" style={themed($label) as any} />
             <TextInput
               style={themed($textInput)}
               value={formData.location}
@@ -274,9 +274,9 @@ export const CreatePostScreen = () => {
 
           {/* 상세 설명 */}
           <View style={themed($inputSection)}>
-            <Text text="상세 설명 *" style={themed($label)} />
+            <Text text="상세 설명 *" style={themed($label) as any} />
             <TextInput
-              style={themed([$textInput, $textArea])}
+              style={[themed($textInput), themed($textArea)]}
               value={formData.description}
               onChangeText={(text) => updateFormData("description", text)}
               placeholder="모집하는 역할, 요구사항, 연락처 등을 자세히 입력하세요"
@@ -289,7 +289,7 @@ export const CreatePostScreen = () => {
 
           {/* 태그 */}
           <View style={themed($inputSection)}>
-            <Text text="태그" style={themed($label)} />
+            <Text text="태그" style={themed($label) as any} />
             <TextInput
               style={themed($textInput)}
               value={formData.tags}
@@ -301,24 +301,24 @@ export const CreatePostScreen = () => {
 
           {/* 상태 */}
           <View style={themed($inputSection)}>
-            <Text text="모집 상태" style={themed($label)} />
-            <View style={themed($statusContainer)}>
+            <Text text="모집 상태" style={themed($label) as any} />
+            <View style={themed($statusContainer) as any}>
               <TouchableOpacity
-                style={themed([$statusButton, formData.status === "active" && $activeStatusButton])}
+                style={[themed($statusButton) as any, formData.status === "active" && (themed($activeStatusButton) as any)]}
                 onPress={() => updateFormData("status", "active")}
               >
                 <Text
                   text="모집중"
-                  style={themed([$statusButtonText, formData.status === "active" && $activeStatusButtonText])}
+                  style={[themed($statusButtonText) as any, formData.status === "active" && (themed($activeStatusButtonText) as any)]}
                 />
               </TouchableOpacity>
               <TouchableOpacity
-                style={themed([$statusButton, formData.status === "closed" && $closedStatusButton])}
+                style={[themed($statusButton) as any, formData.status === "closed" && (themed($closedStatusButton) as any)]}
                 onPress={() => updateFormData("status", "closed")}
               >
                 <Text
                   text="마감"
-                  style={themed([$statusButtonText, formData.status === "closed" && $closedStatusButtonText])}
+                  style={[themed($statusButtonText) as any, formData.status === "closed" && (themed($closedStatusButtonText) as any)]}
                 />
               </TouchableOpacity>
             </View>
@@ -329,7 +329,7 @@ export const CreatePostScreen = () => {
             <Button
               text={isEdit ? "수정 완료" : "게시글 작성"}
               onPress={handleSave}
-              loading={loading}
+              isLoading={loading}
               style={themed($saveButton)}
             />
           </View>
@@ -345,9 +345,9 @@ const $container = ({ spacing }) => ({
 })
 
 const $header = ({ spacing }) => ({
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
+  flexDirection: "row" as const,
+  justifyContent: "space-between" as const,
+  alignItems: "center" as const,
   marginBottom: spacing.lg,
 })
 
@@ -361,8 +361,8 @@ const $scrollView = {
 
 const $centerContainer = {
   flex: 1,
-  justifyContent: "center",
-  alignItems: "center",
+  justifyContent: "center" as const,
+  alignItems: "center" as const,
 }
 
 const $inputSection = ({ spacing }) => ({
@@ -372,7 +372,7 @@ const $inputSection = ({ spacing }) => ({
 const $label = ({ colors, spacing }) => ({
   color: colors.text,
   fontSize: 16,
-  fontWeight: "600",
+  fontWeight: "600" as const,
   marginBottom: spacing.xs,
 })
 
@@ -391,7 +391,7 @@ const $textArea = {
 }
 
 const $statusContainer = ({ spacing }) => ({
-  flexDirection: "row",
+  flexDirection: "row" as const,
   gap: spacing.sm,
 })
 
@@ -401,7 +401,7 @@ const $statusButton = ({ colors, spacing }) => ({
   borderColor: colors.border,
   borderRadius: 8,
   padding: spacing.md,
-  alignItems: "center",
+  alignItems: "center" as const,
   backgroundColor: colors.background,
 })
 
@@ -422,12 +422,12 @@ const $statusButtonText = ({ colors }) => ({
 
 const $activeStatusButtonText = ({ colors }) => ({
   color: colors.tint,
-  fontWeight: "600",
+  fontWeight: "600" as const,
 })
 
 const $closedStatusButtonText = ({ colors }) => ({
   color: colors.textDim,
-  fontWeight: "600",
+  fontWeight: "600" as const,
 })
 
 const $saveSection = ({ spacing }) => ({

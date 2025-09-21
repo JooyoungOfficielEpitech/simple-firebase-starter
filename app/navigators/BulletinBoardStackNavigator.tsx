@@ -37,6 +37,7 @@ export function BulletinBoardStackNavigator() {
 
   return (
     <Stack.Navigator
+      id={undefined}
       screenOptions={{
         headerStyle: {
           backgroundColor: colors.background,

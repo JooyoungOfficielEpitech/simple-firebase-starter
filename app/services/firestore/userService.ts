@@ -49,20 +49,32 @@ export class UserService {
     }
 
     const now = new Date() as unknown as FirebaseFirestoreTypes.Timestamp
-    const profile: UserProfile = {
+    const profile: any = {
       uid: userId,
       email: user.email,
       name: profileData.name,
-      gender: profileData.gender,
-      birthday: profileData.birthday,
-      heightCm: profileData.heightCm,
       media: [],
       requiredProfileComplete: false,
       userType: profileData.userType || "general",
-      organizationId: profileData.userType === "organizer" ? userId : undefined,
-      organizationName: profileData.organizationName,
       createdAt: now,
       updatedAt: now,
+    }
+
+    // 선택적 필드들은 undefined가 아닐 때만 포함
+    if (profileData.gender) {
+      profile.gender = profileData.gender
+    }
+    if (profileData.birthday) {
+      profile.birthday = profileData.birthday
+    }
+    if (profileData.heightCm) {
+      profile.heightCm = profileData.heightCm
+    }
+    if (profileData.userType === "organizer") {
+      profile.organizationId = userId
+      if (profileData.organizationName) {
+        profile.organizationName = profileData.organizationName
+      }
     }
 
     await this.db.collection("users").doc(userId).set(profile)
@@ -119,11 +131,16 @@ export class UserService {
         minPhotosDone,
     )
 
-    const commonPayload: UpdateUserProfile & {
-      updatedAt: FirebaseFirestoreTypes.FieldValue
-      requiredProfileComplete: boolean
-    } = {
-      ...updateData,
+    // Filter out undefined values to avoid Firestore errors
+    const filteredUpdateData = Object.entries(updateData).reduce((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = value
+      }
+      return acc
+    }, {} as any)
+
+    const commonPayload: any = {
+      ...filteredUpdateData,
       requiredProfileComplete,
       updatedAt: this.getServerTimestamp(),
     }
@@ -153,6 +170,21 @@ export class UserService {
     }
 
     await docRef.update(commonPayload)
+  }
+
+  /**
+   * 운영자를 일반 사용자로 전환 (조직 필드 삭제)
+   */
+  async revertToGeneralUser(): Promise<void> {
+    const userId = this.getCurrentUserId()
+    const docRef = this.db.collection("users").doc(userId)
+
+    await docRef.update({
+      userType: "general",
+      organizationId: firestore.FieldValue.delete(),
+      organizationName: firestore.FieldValue.delete(),
+      updatedAt: this.getServerTimestamp(),
+    })
   }
 
   /**

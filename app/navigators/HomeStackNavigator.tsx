@@ -34,6 +34,7 @@ export function HomeStackNavigator() {
 
   return (
     <Stack.Navigator
+      id={undefined}
       screenOptions={{
         headerStyle: {
           backgroundColor: colors.background,

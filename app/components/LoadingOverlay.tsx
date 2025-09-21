@@ -57,7 +57,7 @@ export const LoadingOverlay: FC<LoadingOverlayProps> = function LoadingOverlay({
         <View style={themed($container)}>
           <ActivityIndicator
             size={spinnerSize}
-            color={spinnerColor ?? theme.colors.palette.primary500}
+            color={spinnerColor ?? theme.colors.tint}
             style={themed($spinner)}
             accessibilityLabel="Loading spinner"
           />

@@ -127,9 +127,9 @@ export function PitchVisualizer({
             {/* 상단 구역 (높음) */}
             <View style={themed([$gridSection, { backgroundColor: theme.colors.palette.angry100 }])} />
             {/* 중앙 구역 (정확) */}
-            <View style={themed([$gridSection, { backgroundColor: theme.colors.palette.overlay20 }])} />
+            <View style={themed([$gridSection, { backgroundColor: theme.colors.palette.neutral300 }])} />
             {/* 하단 구역 (낮음) */}
-            <View style={themed([$gridSection, { backgroundColor: theme.colors.palette.primary100 }])} />
+            <View style={themed([$gridSection, { backgroundColor: theme.colors.palette.neutral200 }])} />
           </View>
 
           {/* 목표 음정 기준선 */}
@@ -183,7 +183,7 @@ export function PitchVisualizer({
           <Text
             text={analysisResult.targetPitch ? 
               PitchAnalysisUtils.formatMusicXMLKorean(
-                analysisResult.targetPitch.note as any,
+                analysisResult.targetPitch.note,
                 analysisResult.targetPitch.octave
               ) : '목표 음정 없음'
             }

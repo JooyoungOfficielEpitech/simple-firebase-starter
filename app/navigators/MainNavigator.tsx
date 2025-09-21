@@ -47,6 +47,7 @@ export function MainNavigator() {
 
   return (
     <Tab.Navigator
+      id={undefined}
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: true,
@@ -74,7 +75,7 @@ export function MainNavigator() {
         options={{
           tabBarLabel: "게시판",
           tabBarIcon: ({ focused }) => (
-            <Icon icon="community" color={focused ? colors.tint : colors.tintInactive} size={30} />
+            <Icon icon="menu" color={focused ? colors.tint : colors.tintInactive} size={30} />
           ),
         }}
       />

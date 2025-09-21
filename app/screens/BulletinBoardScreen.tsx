@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { View, ScrollView, Alert, TouchableOpacity } from "react-native"
+import { View, Alert, TouchableOpacity } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useNavigation } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -432,17 +432,11 @@ export const BulletinBoardScreen = () => {
     console.log('⏳ [BulletinBoardScreen] 로딩 화면 렌더링')
     return (
       <Screen preset="fixed" safeAreaEdges={["top"]}>
-        <View style={themed([$container, { paddingTop: top + (spacing?.lg || 16) }])}>
+        <View style={[themed($container), { paddingTop: top + (spacing?.lg || 16) }]}>
           {/* 헤더 */}
           <View style={themed($header)}>
             <Text preset="heading" text="게시판" style={themed($title)} />
             <View style={themed($headerButtons)}>
-              <TouchableOpacity
-                style={themed($testDataButton)}
-                onPress={addTestData}
-              >
-                <Text text="📊" style={themed($buttonText)} />
-              </TouchableOpacity>
             </View>
           </View>
           
@@ -459,7 +453,7 @@ export const BulletinBoardScreen = () => {
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top"]}>
-      <View style={themed([$container, { paddingTop: top + (spacing?.lg || 16) }])}>
+      <View style={[themed($container), { paddingTop: top + (spacing?.lg || 16) }]}>
         {/* 헤더 */}
         <View style={themed($header)}>
           <View style={themed($headerLeft)}>
@@ -488,7 +482,6 @@ export const BulletinBoardScreen = () => {
                 style={themed($createButton)}
                 onPress={handleCreatePost}
               >
-                <Icon icon="plus" size={24} color={colors.tint} />
               </TouchableOpacity>
             )}
           </View>
@@ -498,16 +491,16 @@ export const BulletinBoardScreen = () => {
         {!selectedOrganizationId && (
           <View style={themed($tabContainer)}>
             <TouchableOpacity
-              style={themed([$tabButton, activeTab === 'announcements' && $activeTabButton])}
+              style={themed(activeTab === 'announcements' ? $activeTabButton : $tabButton)}
               onPress={() => setActiveTab('announcements')}
             >
               <Text 
                 text="공고" 
-                style={themed([$tabText, activeTab === 'announcements' && $activeTabText])} 
+                style={themed(activeTab === 'announcements' ? $activeTabText : $tabText)} 
               />
             </TouchableOpacity>
             <TouchableOpacity
-              style={themed([$tabButton, activeTab === 'organizations' && $activeTabButton])}
+              style={themed(activeTab === 'organizations' ? $activeTabButton : $tabButton)}
               onPress={() => {
                 setActiveTab('organizations')
                 // 단체 탭으로 전환할 때마다 활성 공고 수 갱신
@@ -516,7 +509,7 @@ export const BulletinBoardScreen = () => {
             >
               <Text 
                 text="단체" 
-                style={themed([$tabText, activeTab === 'organizations' && $activeTabText])} 
+                style={themed(activeTab === 'organizations' ? $activeTabText : $tabText)} 
               />
             </TouchableOpacity>
           </View>
@@ -572,10 +565,10 @@ export const BulletinBoardScreen = () => {
                       >
                         <View style={themed($postHeader)}>
                           <Text preset="subheading" text={post.title} style={themed($postTitle)} />
-                          <View style={themed([$statusBadge, post.status === "active" ? $activeBadge : $closedBadge])}>
+                          <View style={themed(post.status === "active" ? $activeBadge : $closedBadge)}>
                             <Text
                               text={post.status === "active" ? "모집중" : "마감"}
-                              style={themed([$statusText, post.status === "active" ? $activeText : $closedText])}
+                              style={themed(post.status === "active" ? $activeText : $closedText)}
                             />
                           </View>
                         </View>
@@ -616,7 +609,7 @@ export const BulletinBoardScreen = () => {
                     onPress={handleCreateOrganization}
                     style={themed($createOrgButton)}
                     LeftAccessory={(props) => (
-                      <Icon icon="plus" size={20} color={props.style.color} />
+                      <Icon icon="check" size={20} color={props.style.color} />
                     )}
                   />
                 </View>
@@ -631,7 +624,7 @@ export const BulletinBoardScreen = () => {
                   <Text text="단체가 등록되면\n여기에 표시됩니다" style={themed($emptyDescription)} />
                 </View>
               ) : (
-                organizations.map((organization, index) => (
+                organizations.map((organization) => (
                 <TouchableOpacity
                   key={organization.id}
                   style={themed($organizationCard)}
@@ -683,9 +676,9 @@ const $container = ({ spacing }) => ({
 })
 
 const $header = ({ spacing }) => ({
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
+  flexDirection: "row" as const,
+  justifyContent: "space-between" as const,
+  alignItems: "center" as const,
   marginBottom: spacing?.lg || 16,
 })
 
@@ -697,34 +690,25 @@ const $contentContainer = {
   // 게시글 목록 컨테이너
 }
 
-const $createButton = ({ colors, spacing }) => ({
+const $createButton = ({ colors }) => ({
   width: 40,
   height: 40,
   borderRadius: 20,
   backgroundColor: colors.background,
   borderWidth: 1,
   borderColor: colors.tint,
-  justifyContent: "center",
-  alignItems: "center",
+  justifyContent: "center" as const,
+  alignItems: "center" as const,
 })
 
 
-const $centerContainer = {
-  flex: 1,
-  justifyContent: "center",
-  alignItems: "center",
-}
 
-const $emptyText = ({ colors }) => ({
-  color: colors.textDim,
-  textAlign: "center",
-})
 
 // 새로운 빈 상태 스타일들
 const $emptyStateContainer = ({ spacing }) => ({
   flex: 1,
-  justifyContent: "center",
-  alignItems: "center",
+  justifyContent: "center" as const,
+  alignItems: "center" as const,
   paddingHorizontal: spacing?.xl || 24,
   paddingTop: spacing?.xl || 24,
 })
@@ -734,8 +718,8 @@ const $emptyIconContainer = ({ colors, spacing }) => ({
   height: 80,
   borderRadius: 40,
   backgroundColor: colors.palette.neutral100,
-  justifyContent: "center",
-  alignItems: "center",
+  justifyContent: "center" as const,
+  alignItems: "center" as const,
   marginBottom: spacing?.lg || 16,
 })
 
@@ -746,15 +730,15 @@ const $emptyIcon = {
 const $emptyTitle = ({ colors, spacing }) => ({
   color: colors.text,
   fontSize: 18,
-  fontWeight: "600",
-  textAlign: "center",
+  fontWeight: "600" as const,
+  textAlign: "center" as const,
   marginBottom: spacing?.sm || 8,
 })
 
 const $emptyDescription = ({ colors, spacing }) => ({
   color: colors.textDim,
   fontSize: 14,
-  textAlign: "center",
+  textAlign: "center" as const,
   lineHeight: 20,
   marginBottom: spacing?.xl || 24,
 })
@@ -778,8 +762,8 @@ const $sampleDataButtonText = ({ colors }) => ({
 // 로딩 상태 스타일들
 const $loadingContainer = ({ spacing }) => ({
   flex: 1,
-  justifyContent: "center",
-  alignItems: "center",
+  justifyContent: "center" as const,
+  alignItems: "center" as const,
   paddingHorizontal: spacing?.xl || 24,
 })
 
@@ -788,8 +772,8 @@ const $loadingIconContainer = ({ colors, spacing }) => ({
   height: 60,
   borderRadius: 30,
   backgroundColor: colors.palette.neutral100,
-  justifyContent: "center",
-  alignItems: "center",
+  justifyContent: "center" as const,
+  alignItems: "center" as const,
   marginBottom: spacing?.md || 12,
 })
 
@@ -800,7 +784,7 @@ const $loadingIcon = {
 const $loadingText = ({ colors }) => ({
   color: colors.textDim,
   fontSize: 16,
-  textAlign: "center",
+  textAlign: "center" as const,
 })
 
 const $postCard = ({ colors, spacing }) => ({
@@ -813,9 +797,9 @@ const $postCard = ({ colors, spacing }) => ({
 })
 
 const $postHeader = ({ spacing }) => ({
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "flex-start",
+  flexDirection: "row" as const,
+  justifyContent: "space-between" as const,
+  alignItems: "flex-start" as const,
   marginBottom: spacing?.xs || 4,
 })
 
@@ -825,37 +809,38 @@ const $postTitle = ({ colors, spacing }) => ({
   marginRight: spacing?.xs || 4,
 })
 
-const $statusBadge = ({ spacing }) => ({
+
+const $activeBadge = ({ colors, spacing }) => ({
   paddingHorizontal: spacing?.xs || 4,
   paddingVertical: 4,
   borderRadius: 6,
-})
-
-const $activeBadge = ({ colors }) => ({
   backgroundColor: colors.tint + "20",
 })
 
-const $closedBadge = ({ colors }) => ({
+const $closedBadge = ({ colors, spacing }) => ({
+  paddingHorizontal: spacing?.xs || 4,
+  paddingVertical: 4,
+  borderRadius: 6,
   backgroundColor: colors.textDim + "20",
 })
 
-const $statusText = {
-  fontSize: 12,
-  fontWeight: "bold",
-}
 
 const $activeText = ({ colors }) => ({
+  fontSize: 12,
+  fontWeight: "bold" as const,
   color: colors.tint,
 })
 
 const $closedText = ({ colors }) => ({
+  fontSize: 12,
+  fontWeight: "bold" as const,
   color: colors.textDim,
 })
 
 const $production = ({ colors, spacing }) => ({
   color: colors.text,
   fontSize: 16,
-  fontWeight: "600",
+  fontWeight: "600" as const,
   marginBottom: spacing?.xs || 4,
 })
 
@@ -869,7 +854,7 @@ const $postFooter = ({ spacing }) => ({
   marginBottom: spacing?.sm || 8,
 })
 
-const $location = ({ colors, spacing }) => ({
+const $location = ({ colors }) => ({
   color: colors.textDim,
   fontSize: 14,
   marginBottom: 2,
@@ -881,8 +866,8 @@ const $schedule = ({ colors }) => ({
 })
 
 const $tagsContainer = ({ spacing }) => ({
-  flexDirection: "row",
-  flexWrap: "wrap",
+  flexDirection: "row" as const,
+  flexWrap: "wrap" as const,
   marginTop: spacing?.xs || 4,
 })
 
@@ -900,14 +885,10 @@ const $tagText = ({ colors }) => ({
   fontSize: 12,
 })
 
-const $testButton = ({ spacing }) => ({
-  marginTop: spacing?.lg || 16,
-  width: 200,
-})
 
 const $headerButtons = () => ({
-  flexDirection: "row",
-  alignItems: "center",
+  flexDirection: "row" as const,
+  alignItems: "center" as const,
 })
 
 const $testDataButton = ({ colors, spacing }) => ({
@@ -915,8 +896,8 @@ const $testDataButton = ({ colors, spacing }) => ({
   height: 40,
   borderRadius: 20,
   backgroundColor: colors.palette.orange500,
-  justifyContent: "center",
-  alignItems: "center",
+  justifyContent: "center" as const,
+  alignItems: "center" as const,
   marginRight: spacing?.sm || 8,
 })
 
@@ -927,8 +908,8 @@ const $buttonText = ({ colors }) => ({
 
 // 새로운 스타일들
 const $headerLeft = () => ({
-  flexDirection: "row",
-  alignItems: "center",
+  flexDirection: "row" as const,
+  alignItems: "center" as const,
   flex: 1,
 })
 
@@ -938,33 +919,40 @@ const $backButton = ({ spacing }) => ({
 })
 
 const $tabContainer = ({ colors, spacing }) => ({
-  flexDirection: "row",
+  flexDirection: "row" as const,
   backgroundColor: colors.palette.neutral100,
   borderRadius: 8,
   padding: 4,
   marginBottom: spacing?.lg || 16,
 })
 
-const $tabButton = ({ colors, spacing }) => ({
+const $tabButton = ({ spacing }) => ({
   flex: 1,
   paddingVertical: spacing?.sm || 8,
   paddingHorizontal: spacing?.md || 12,
   borderRadius: 4,
-  alignItems: "center",
+  alignItems: "center" as const,
 })
 
-const $activeTabButton = ({ colors }) => ({
+const $activeTabButton = ({ colors, spacing }) => ({
+  flex: 1,
+  paddingVertical: spacing?.sm || 8,
+  paddingHorizontal: spacing?.md || 12,
+  borderRadius: 4,
+  alignItems: "center" as const,
   backgroundColor: colors.background,
 })
 
 const $tabText = ({ colors }) => ({
   color: colors.textDim,
   fontSize: 14,
-  fontWeight: "500",
+  fontWeight: "500" as const,
 })
 
 const $activeTabText = ({ colors }) => ({
   color: colors.text,
+  fontSize: 14,
+  fontWeight: "500" as const,
 })
 
 // 단체 카드 스타일들
@@ -978,9 +966,9 @@ const $organizationCard = ({ colors, spacing }) => ({
 })
 
 const $organizationHeader = ({ spacing }) => ({
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "flex-start",
+  flexDirection: "row" as const,
+  justifyContent: "space-between" as const,
+  alignItems: "flex-start" as const,
   marginBottom: spacing?.xs || 4,
 })
 
@@ -1000,7 +988,7 @@ const $verifiedBadge = ({ colors, spacing }) => ({
 const $verifiedText = ({ colors }) => ({
   color: colors.tint,
   fontSize: 12,
-  fontWeight: "bold",
+  fontWeight: "bold" as const,
 })
 
 const $organizationDescription = ({ colors, spacing }) => ({
@@ -1011,9 +999,9 @@ const $organizationDescription = ({ colors, spacing }) => ({
 })
 
 const $organizationFooter = ({ spacing }) => ({
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
+  flexDirection: "row" as const,
+  justifyContent: "space-between" as const,
+  alignItems: "center" as const,
   marginBottom: spacing?.sm || 8,
 })
 
@@ -1025,7 +1013,7 @@ const $organizationLocation = ({ colors }) => ({
 const $organizationStats = ({ colors }) => ({
   color: colors.tint,
   fontSize: 14,
-  fontWeight: "500",
+  fontWeight: "500" as const,
 })
 
 const $createOrgButtonContainer = ({ spacing }) => ({

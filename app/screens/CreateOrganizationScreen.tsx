@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { View, ScrollView, Alert } from "react-native"
+import { View, Alert } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -9,10 +9,9 @@ import { Icon } from "@/components/Icon"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { TextField } from "@/components/TextField"
-import { Toggle } from "@/components/Toggle"
 import { organizationService, userService } from "@/services/firestore"
 import { useAppTheme } from "@/theme/context"
-import { Organization, CreateOrganization } from "@/types/organization"
+import { CreateOrganization } from "@/types/organization"
 import { UserProfile } from "@/types/user"
 import { BulletinBoardStackParamList } from "@/navigators/BulletinBoardStackNavigator"
 
@@ -32,7 +31,7 @@ export const CreateOrganizationScreen = () => {
 
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
+  // const [submitting, setSubmitting] = useState(false)  // TODO: Button 컴포넌트에 loading 기능 추가 후 사용
 
   // 폼 데이터
   const [formData, setFormData] = useState<CreateOrganization>({
@@ -47,7 +46,7 @@ export const CreateOrganizationScreen = () => {
   })
 
   const [tagInput, setTagInput] = useState("")
-  const [errors, setErrors] = useState<Partial<CreateOrganization>>({})
+  // const [errors, setErrors] = useState<Partial<CreateOrganization>>({})  // TODO: TextField 컴포넌트에 error prop 추가 후 사용
 
   useEffect(() => {
     loadUserProfile()
@@ -117,7 +116,7 @@ export const CreateOrganizationScreen = () => {
       newErrors.location = "소재지를 입력해주세요"
     }
 
-    setErrors(newErrors)
+    // setErrors(newErrors)  // TODO: 에러 표시 기능 추가 후 사용
     return Object.keys(newErrors).length === 0
   }
 
@@ -132,7 +131,7 @@ export const CreateOrganizationScreen = () => {
     }
 
     try {
-      setSubmitting(true)
+      // setSubmitting(true)  // TODO: 로딩 상태 표시 기능 추가 후 사용
 
       if (isEdit && organizationId) {
         await organizationService.updateOrganization(organizationId, formData)
@@ -147,7 +146,7 @@ export const CreateOrganizationScreen = () => {
       console.error("단체 등록/수정 오류:", error)
       Alert.alert("오류", isEdit ? "단체 수정에 실패했습니다." : "단체 등록에 실패했습니다.")
     } finally {
-      setSubmitting(false)
+      // setSubmitting(false)  // TODO: 로딩 상태 표시 기능 추가 후 사용
     }
   }
 
@@ -176,7 +175,7 @@ export const CreateOrganizationScreen = () => {
   if (loading) {
     return (
       <Screen preset="fixed" safeAreaEdges={["top"]}>
-        <View style={themed([$container, { paddingTop: top + (spacing?.lg || 16) }])}>
+        <View style={[themed($container), { paddingTop: top + (spacing?.lg || 16) }]}>
           <View style={themed($loadingContainer)}>
             <Text text="단체 정보를 불러오는 중..." style={themed($loadingText)} />
           </View>
@@ -187,7 +186,7 @@ export const CreateOrganizationScreen = () => {
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top"]}>
-      <View style={themed([$container, { paddingTop: top + (spacing?.lg || 16) }])}>
+      <View style={[themed($container), { paddingTop: top + (spacing?.lg || 16) }]}>
         {/* 헤더 */}
         <View style={themed($header)}>
           <View style={themed($headerLeft)}>
@@ -209,7 +208,7 @@ export const CreateOrganizationScreen = () => {
             value={formData.name}
             onChangeText={(text) => setFormData(prev => ({ ...prev, name: text }))}
             placeholder="극단명을 입력해주세요"
-            error={errors.name}
+            // error={errors.name}  // TODO: TextField 컴포넌트에 error prop 추가 필요
           />
 
           <TextField
@@ -219,7 +218,7 @@ export const CreateOrganizationScreen = () => {
             placeholder="단체에 대한 간단한 소개를 입력해주세요"
             multiline
             numberOfLines={4}
-            error={errors.description}
+            // error={errors.description}  // TODO: TextField 컴포넌트에 error prop 추가 필요
           />
 
           <TextField
@@ -229,7 +228,7 @@ export const CreateOrganizationScreen = () => {
             placeholder="contact@example.com"
             keyboardType="email-address"
             autoCapitalize="none"
-            error={errors.contactEmail}
+            // error={errors.contactEmail}  // TODO: TextField 컴포넌트에 error prop 추가 필요
           />
 
           <TextField
@@ -254,7 +253,7 @@ export const CreateOrganizationScreen = () => {
             value={formData.location}
             onChangeText={(text) => setFormData(prev => ({ ...prev, location: text }))}
             placeholder="서울특별시 강남구"
-            error={errors.location}
+            // error={errors.location}  // TODO: TextField 컴포넌트에 error prop 추가 필요
           />
 
           <TextField
@@ -304,7 +303,7 @@ export const CreateOrganizationScreen = () => {
           <Button
             text={isEdit ? "수정하기" : "등록하기"}
             onPress={handleSubmit}
-            loading={submitting}
+            // loading={submitting}  // TODO: Button 컴포넌트에 loading prop 추가 또는 isLoading 사용
             style={themed($submitButton)}
           />
         </View>
@@ -318,15 +317,15 @@ const $container = ({ spacing }) => ({
 })
 
 const $header = ({ spacing }) => ({
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
+  flexDirection: "row" as const,
+  justifyContent: "space-between" as const,
+  alignItems: "center" as const,
   marginBottom: spacing?.lg || 16,
 })
 
 const $headerLeft = () => ({
-  flexDirection: "row",
-  alignItems: "center",
+  flexDirection: "row" as const,
+  alignItems: "center" as const,
   flex: 1,
 })
 
@@ -347,15 +346,15 @@ const $form = ({ spacing }) => ({
 
 const $loadingContainer = ({ spacing }) => ({
   flex: 1,
-  justifyContent: "center",
-  alignItems: "center",
+  justifyContent: "center" as const,
+  alignItems: "center" as const,
   paddingHorizontal: spacing?.xl || 24,
 })
 
 const $loadingText = ({ colors }) => ({
   color: colors.textDim,
   fontSize: 16,
-  textAlign: "center",
+  textAlign: "center" as const,
 })
 
 const $tagSection = ({ spacing }) => ({
@@ -365,13 +364,13 @@ const $tagSection = ({ spacing }) => ({
 const $tagLabel = ({ colors, spacing }) => ({
   color: colors.text,
   fontSize: 16,
-  fontWeight: "500",
+  fontWeight: "500" as const,
   marginBottom: spacing?.xs || 4,
 })
 
 const $tagInputContainer = ({ spacing }) => ({
-  flexDirection: "row",
-  alignItems: "flex-end",
+  flexDirection: "row" as const,
+  alignItems: "flex-end" as const,
   gap: spacing?.sm || 8,
 })
 
@@ -392,15 +391,15 @@ const $addTagButtonText = ({ colors }) => ({
 })
 
 const $tagsContainer = ({ spacing }) => ({
-  flexDirection: "row",
-  flexWrap: "wrap",
+  flexDirection: "row" as const,
+  flexWrap: "wrap" as const,
   marginTop: spacing?.sm || 8,
   gap: spacing?.xs || 4,
 })
 
 const $tag = ({ colors, spacing }) => ({
-  flexDirection: "row",
-  alignItems: "center",
+  flexDirection: "row" as const,
+  alignItems: "center" as const,
   backgroundColor: colors.palette.neutral200,
   paddingHorizontal: spacing?.sm || 8,
   paddingVertical: 4,
@@ -418,14 +417,14 @@ const $removeTagButton = () => ({
   minHeight: 0,
   width: 16,
   height: 16,
-  justifyContent: "center",
-  alignItems: "center",
+  justifyContent: "center" as const,
+  alignItems: "center" as const,
 })
 
 const $removeTagText = ({ colors }) => ({
   color: colors.palette.neutral600,
   fontSize: 14,
-  fontWeight: "bold",
+  fontWeight: "bold" as const,
 })
 
 const $submitButton = ({ colors, spacing }) => ({
