@@ -7,6 +7,7 @@ import { z } from "zod"
 import { $styles } from "@/theme/styles"
 import { $authHeaderContainer, $authTitle, $authSubtitle, $authFormContainer, $authErrorText } from "@/theme/authStyles"
 
+import { BackButton } from "@/components/BackButton"
 import { Button } from "@/components/Button"
 import { FormTextField } from "@/components/FormTextField"
 import { Screen } from "@/components/Screen"
@@ -96,11 +97,10 @@ export const SignUpScreen: FC<SignUpScreenProps> = function SignUpScreen({ navig
     }
   }, [signInWithGoogle])
 
-  const handleBackToSignIn = useCallback(() => {
+  const handleBeforeGoBack = useCallback(() => {
     signUpForm.reset()
     clearAuthError()
-    navigation.goBack()
-  }, [signUpForm, clearAuthError, navigation])
+  }, [signUpForm, clearAuthError])
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top", "bottom"]} style={$styles.flex1}>
@@ -147,7 +147,12 @@ export const SignUpScreen: FC<SignUpScreenProps> = function SignUpScreen({ navig
 
         <Button tx="signUpScreen:googleButton" onPress={handleGoogleAuth} disabled={isLoading} />
 
-        <Button tx="signUpScreen:backToSignIn" onPress={handleBackToSignIn} disabled={isLoading} />
+        <BackButton 
+          variant="text"
+          tx="signUpScreen:backToSignIn"
+          onBeforeGoBack={handleBeforeGoBack}
+          disabled={isLoading}
+        />
       </View>
     </Screen>
   )

@@ -9,9 +9,11 @@ import { Post, CreatePost, UpdatePost } from "@/types/post"
  */
 export class PostService {
   private db: FirebaseFirestoreTypes.Module
+  private organizationService: any // OrganizationService 순환 참조 방지
 
-  constructor(db: FirebaseFirestoreTypes.Module) {
+  constructor(db: FirebaseFirestoreTypes.Module, organizationService?: any) {
     this.db = db
+    this.organizationService = organizationService
   }
 
   /**
@@ -37,7 +39,7 @@ export class PostService {
   /**
    * 게시글 생성
    */
-  async createPost(postData: CreatePost, authorName: string): Promise<string> {
+  async createPost(postData: CreatePost, authorName: string, userOrganizationId?: string): Promise<string> {
     const userId = this.getCurrentUserId()
     const docRef = this.db.collection("posts").doc()
     
@@ -47,7 +49,7 @@ export class PostService {
       production: postData.production,
       rehearsalSchedule: postData.rehearsalSchedule,
       location: postData.location,
-      organizationId: userId, // 작성자의 단체 ID
+      organizationId: userOrganizationId || userId, // 사용자의 실제 단체 ID 또는 사용자 ID
       organizationName: postData.organizationName,
       authorId: userId,
       authorName,
@@ -57,7 +59,38 @@ export class PostService {
       updatedAt: this.getServerTimestamp(),
     }
 
+    console.log('📝 [PostService] 게시글 생성:', {
+      organizationId: post.organizationId,
+      organizationName: post.organizationName,
+      authorId: post.authorId,
+      userOrganizationId
+    })
+
     await docRef.set(post)
+    
+    // 단체의 활성 공고 수 업데이트
+    if (this.organizationService && post.organizationId) {
+      console.log('📊 [PostService] createPost - 단체 활성 공고 수 업데이트 시작:', {
+        organizationId: post.organizationId,
+        hasOrganizationService: !!this.organizationService
+      })
+      try {
+        await this.organizationService.updateActivePostCount(post.organizationId)
+        console.log('✅ [PostService] createPost - 단체 활성 공고 수 업데이트 완료')
+      } catch (error) {
+        console.error('❌ [PostService] createPost - 단체 활성 공고 수 업데이트 실패:', {
+          organizationId: post.organizationId,
+          error: error.message,
+          code: error.code
+        })
+      }
+    } else {
+      console.log('⚠️ [PostService] createPost - 활성 공고 수 업데이트 건너뜀:', {
+        hasOrganizationService: !!this.organizationService,
+        organizationId: post.organizationId
+      })
+    }
+    
     return docRef.id
   }
 
@@ -133,6 +166,17 @@ export class PostService {
       ...updateData,
       updatedAt: this.getServerTimestamp(),
     })
+
+    // 상태가 변경된 경우 단체의 활성 공고 수 업데이트
+    if (this.organizationService && updateData.status && post.organizationId) {
+      console.log('📊 [PostService] 게시글 상태 변경으로 인한 단체 활성 공고 수 업데이트 시작:', post.organizationId)
+      try {
+        await this.organizationService.updateActivePostCount(post.organizationId)
+        console.log('✅ [PostService] 단체 활성 공고 수 업데이트 완료')
+      } catch (error) {
+        console.error('❌ [PostService] 단체 활성 공고 수 업데이트 실패:', error)
+      }
+    }
   }
 
   /**
@@ -148,6 +192,17 @@ export class PostService {
     }
 
     await this.db.collection("posts").doc(postId).delete()
+
+    // 게시글 삭제 후 단체의 활성 공고 수 업데이트
+    if (this.organizationService && post.organizationId) {
+      console.log('📊 [PostService] 게시글 삭제로 인한 단체 활성 공고 수 업데이트 시작:', post.organizationId)
+      try {
+        await this.organizationService.updateActivePostCount(post.organizationId)
+        console.log('✅ [PostService] 단체 활성 공고 수 업데이트 완료')
+      } catch (error) {
+        console.error('❌ [PostService] 단체 활성 공고 수 업데이트 실패:', error)
+      }
+    }
   }
 
   /**
@@ -166,6 +221,17 @@ export class PostService {
       status,
       updatedAt: this.getServerTimestamp(),
     })
+
+    // 상태 변경 후 단체의 활성 공고 수 업데이트
+    if (this.organizationService && post.organizationId) {
+      console.log('📊 [PostService] 게시글 상태 변경으로 인한 단체 활성 공고 수 업데이트 시작:', post.organizationId)
+      try {
+        await this.organizationService.updateActivePostCount(post.organizationId)
+        console.log('✅ [PostService] 단체 활성 공고 수 업데이트 완료')
+      } catch (error) {
+        console.error('❌ [PostService] 단체 활성 공고 수 업데이트 실패:', error)
+      }
+    }
   }
 
   /**

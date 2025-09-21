@@ -9,6 +9,7 @@ import { z } from "zod"
 import { $styles } from "@/theme/styles"
 import { $authHeaderContainer, $authTitle, $authSubtitle, $authFormContainer } from "@/theme/authStyles"
 
+import { BackButton } from "@/components/BackButton"
 import { Button } from "@/components/Button"
 import { FormTextField } from "@/components/FormTextField"
 import { Screen } from "@/components/Screen"
@@ -90,11 +91,10 @@ export const ForgotPasswordScreen: FC<ForgotPasswordScreenProps> = function Forg
     }
   }, [forgotPasswordForm, validateEmailForPasswordReset])
 
-  const handleBackToSignIn = useCallback(() => {
+  const handleBeforeGoBack = useCallback(() => {
     forgotPasswordForm.reset()
     setIsEmailSent(false)
-    navigation.goBack()
-  }, [forgotPasswordForm, navigation])
+  }, [forgotPasswordForm])
 
   const handleResendEmail = useCallback(async () => {
     await handleSendResetEmail()
@@ -142,11 +142,12 @@ export const ForgotPasswordScreen: FC<ForgotPasswordScreenProps> = function Forg
           </View>
         )}
 
-        <Button
+        <BackButton
+          variant="text"
           tx="forgotPasswordScreen:backToSignIn"
-          onPress={handleBackToSignIn}
+          onBeforeGoBack={handleBeforeGoBack}
           disabled={isLoading}
-          preset="default"
+          buttonProps={{ preset: "default" }}
         />
       </View>
     </Screen>

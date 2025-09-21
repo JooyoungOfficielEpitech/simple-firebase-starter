@@ -20,11 +20,11 @@ console.log('🔥 [Firestore Index] Firestore DB 인스턴스 생성:', db ? 'OK
 const userService = new UserService(db)
 console.log('🔥 [Firestore Index] UserService 생성:', userService ? 'OK' : 'ERROR')
 
-const postService = new PostService(db)
-console.log('🔥 [Firestore Index] PostService 생성:', postService ? 'OK' : 'ERROR')
-
 const organizationService = new OrganizationService(db)
 console.log('🔥 [Firestore Index] OrganizationService 생성:', organizationService ? 'OK' : 'ERROR')
+
+const postService = new PostService(db, organizationService)
+console.log('🔥 [Firestore Index] PostService 생성:', postService ? 'OK' : 'ERROR')
 
 // SongService는 static 메서드를 사용하므로 클래스 자체를 export
 export { userService, postService, organizationService, SongService as songService }

@@ -5,9 +5,8 @@ import { useNavigation, useRoute } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import type { RouteProp } from "@react-navigation/native"
 
-// import { Button } from "@/components/Button" // Unused
-import { Icon } from "@/components/Icon"
 import { Screen } from "@/components/Screen"
+import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
 import { postService, userService } from "@/services/firestore"
 import { useAppTheme } from "@/theme/context"
@@ -112,14 +111,8 @@ export const PostDetailScreen = () => {
   if (loading) {
     return (
       <Screen preset="fixed" safeAreaEdges={["top"]}>
-        <View style={[themed($container), { paddingTop: top + spacing.lg }]}>
-          <View style={themed($header) as any}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon icon="caretLeft" size={24} color={colors.text} />
-            </TouchableOpacity>
-            <Text preset="heading" text="게시글" style={themed($title)} />
-            <View style={{ width: 24 }} />
-          </View>
+        <ScreenHeader title="게시글" />
+        <View style={themed($container)}>
           <View style={themed($centerContainer) as any}>
             <Text text="로딩 중..." />
           </View>
@@ -131,14 +124,8 @@ export const PostDetailScreen = () => {
   if (!post) {
     return (
       <Screen preset="fixed" safeAreaEdges={["top"]}>
-        <View style={[themed($container), { paddingTop: top + spacing.lg }]}>
-          <View style={themed($header) as any}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon icon="caretLeft" size={24} color={colors.text} />
-            </TouchableOpacity>
-            <Text preset="heading" text="게시글" style={themed($title)} />
-            <View style={{ width: 24 }} />
-          </View>
+        <ScreenHeader title="게시글" />
+        <View style={themed($container)}>
           <View style={themed($centerContainer) as any}>
             <Text text="게시글을 찾을 수 없습니다." />
           </View>
@@ -151,15 +138,8 @@ export const PostDetailScreen = () => {
   
   return (
     <Screen preset="scroll" safeAreaEdges={["top"]}>
-      <View style={[themed($container), { paddingTop: top + spacing.lg }]}>
-        {/* 헤더 */}
-        <View style={themed($header) as any}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Icon icon="caretLeft" size={24} color={colors.text} />
-          </TouchableOpacity>
-          <Text preset="heading" text="게시글" style={themed($title)} />
-          <View style={{ width: 24 }} />
-        </View>
+      <ScreenHeader title="게시글" />
+      <View style={themed($container)}>
         {/* 기본 정보 */}
         <Text preset="heading" text={post.title} style={themed($postTitle)} />
         <Text text={post.production} style={themed($productionText) as any} />
@@ -211,17 +191,6 @@ export const PostDetailScreen = () => {
 const $container = ({ spacing }) => ({
   flex: 1,
   paddingHorizontal: spacing.lg,
-})
-
-const $header = ({ spacing }) => ({
-  flexDirection: "row" as const,
-  justifyContent: "space-between" as const,
-  alignItems: "center" as const,
-  marginBottom: spacing.lg,
-})
-
-const $title = ({ colors }) => ({
-  color: colors.text,
 })
 
 const $centerContainer = {

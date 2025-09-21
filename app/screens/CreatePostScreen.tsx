@@ -6,10 +6,10 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import type { RouteProp } from "@react-navigation/native"
 
 import { Button } from "@/components/Button"
-import { Icon } from "@/components/Icon"
 import { Screen } from "@/components/Screen"
+import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
-import { postService, userService } from "@/services/firestore"
+import { postService, userService, organizationService } from "@/services/firestore"
 import { useAppTheme } from "@/theme/context"
 import { CreatePost, UpdatePost } from "@/types/post"
 import { UserProfile } from "@/types/user"
@@ -19,10 +19,14 @@ type NavigationProp = NativeStackNavigationProp<BulletinBoardStackParamList>
 type RoutePropType = RouteProp<BulletinBoardStackParamList, "CreatePost">
 
 export const CreatePostScreen = () => {
+  console.log('🎬 [CreatePostScreen] 컴포넌트 렌더링 시작')
+  
   const { top } = useSafeAreaInsets()
   const navigation = useNavigation<NavigationProp>()
   const route = useRoute<RoutePropType>()
-  const { postId, isEdit } = route.params
+  const { postId, isEdit } = route.params || {}
+  
+  console.log('🎬 [CreatePostScreen] 라우트 파라미터:', { postId, isEdit, params: route.params })
   
   const {
     themed,
@@ -43,11 +47,71 @@ export const CreatePostScreen = () => {
   })
 
   useEffect(() => {
-    // 사용자 프로필 로드
+    // 사용자 프로필 로드 및 organizationId 검증
     const loadUserProfile = async () => {
       try {
         const profile = await userService.getUserProfile()
-        setUserProfile(profile)
+        
+        console.log('🔍 [CreatePostScreen] 사용자 프로필 전체 데이터:', {
+          uid: profile?.uid,
+          userType: profile?.userType,
+          organizationId: profile?.organizationId,
+          organizationName: profile?.organizationName,
+          hasBeenOrganizer: profile?.hasBeenOrganizer,
+          previousOrganizationName: profile?.previousOrganizationName
+        })
+
+        // organizationId 검증 및 수정
+        if (profile?.userType === "organizer" && profile?.organizationId) {
+          console.log('🔍 [CreatePostScreen] organizationId 검증 시작:', profile.organizationId)
+          
+          // 먼저 모든 단체 목록을 조회해서 실제 어떤 단체들이 있는지 확인
+          try {
+            const allOrgs = await organizationService.getOrganizations(50)
+            console.log('📋 [CreatePostScreen] 전체 단체 목록:', allOrgs.map(org => ({
+              id: org.id,
+              name: org.name,
+              ownerId: org.ownerId
+            })))
+            
+            // 현재 사용자가 소유한 단체 찾기
+            const myOrgs = allOrgs.filter(org => org.ownerId === profile.uid)
+            console.log('🏢 [CreatePostScreen] 내가 소유한 단체:', myOrgs.map(org => ({
+              id: org.id,
+              name: org.name
+            })))
+            
+            if (myOrgs.length > 0) {
+              const correctOrg = myOrgs[0] // 첫 번째 단체 사용
+              console.log('✅ [CreatePostScreen] 올바른 단체 발견:', correctOrg.id)
+              
+              if (profile.organizationId !== correctOrg.id) {
+                console.log('🔧 [CreatePostScreen] organizationId 수정:', {
+                  from: profile.organizationId,
+                  to: correctOrg.id
+                })
+                
+                await userService.updateUserProfile({
+                  organizationId: correctOrg.id
+                })
+                
+                const updatedProfile = await userService.getUserProfile()
+                setUserProfile(updatedProfile)
+              } else {
+                setUserProfile(profile)
+              }
+            } else {
+              console.warn('⚠️ [CreatePostScreen] 소유한 단체가 없음. 기본 설정 유지')
+              setUserProfile(profile)
+            }
+            
+          } catch (error) {
+            console.error('❌ [CreatePostScreen] 단체 조회 실패:', error)
+            setUserProfile(profile)
+          }
+        } else {
+          setUserProfile(profile)
+        }
         
         if (profile?.organizationName) {
           setFormData(prev => ({
@@ -65,7 +129,7 @@ export const CreatePostScreen = () => {
     loadUserProfile()
 
     // 수정 모드인 경우 기존 게시글 데이터 로드
-    if (isEdit && postId) {
+    if (isEdit === true && postId) {
       const loadPost = async () => {
         try {
           const post = await postService.getPost(postId)
@@ -132,7 +196,7 @@ export const CreatePostScreen = () => {
         .map(tag => tag.trim())
         .filter(tag => tag.length > 0)
 
-      if (isEdit && postId) {
+      if (isEdit === true && postId) {
         // 수정 모드
         const updateData: UpdatePost = {
           title: formData.title.trim(),
@@ -160,7 +224,50 @@ export const CreatePostScreen = () => {
           status: formData.status,
         }
 
-        await postService.createPost(createData, userProfile.name)
+        console.log('📝 [CreatePostScreen] 게시글 생성 시작:', {
+          userProfile: {
+            organizationId: userProfile.organizationId,
+            organizationName: userProfile.organizationName,
+            name: userProfile.name,
+            uid: userProfile.uid
+          },
+          createData
+        })
+        
+        // 게시글 생성 직전에 한 번 더 상태 확인
+        console.log('🔍 [CreatePostScreen] 게시글 생성 직전 최종 상태:', {
+          userId: userProfile.uid,
+          organizationId: userProfile.organizationId,
+          organizationName: userProfile.organizationName
+        })
+        
+        // 실제 존재하는 단체 중에서 내가 소유한 것 찾기
+        let validOrganizationId = userProfile.organizationId
+        
+        try {
+          const allOrgs = await organizationService.getOrganizations(50)
+          const myOrgs = allOrgs.filter(org => org.ownerId === userProfile.uid)
+          
+          console.log('📋 [CreatePostScreen] 게시글 생성 시 내 단체 목록:', myOrgs.map(org => ({
+            id: org.id,
+            name: org.name,
+            activePostCount: org.activePostCount
+          })))
+          
+          if (myOrgs.length > 0) {
+            validOrganizationId = myOrgs[0].id
+            console.log('✅ [CreatePostScreen] 유효한 단체 ID 사용:', validOrganizationId)
+          } else {
+            validOrganizationId = userProfile.uid
+            console.warn('⚠️ [CreatePostScreen] 소유한 단체가 없어서 사용자 ID 사용:', validOrganizationId)
+          }
+        } catch (error) {
+          console.error('❌ [CreatePostScreen] 단체 조회 실패. 프로필의 organizationId 사용:', error)
+          validOrganizationId = userProfile.organizationId || userProfile.uid
+        }
+
+        console.log('📝 [CreatePostScreen] 최종 사용할 organizationId:', validOrganizationId)
+        await postService.createPost(createData, userProfile.name, validOrganizationId)
         Alert.alert("성공", "게시글이 작성되었습니다.")
       }
 
@@ -180,49 +287,70 @@ export const CreatePostScreen = () => {
     }))
   }
 
-  if (!userProfile || userProfile.userType !== "organizer") {
+  console.log('🎬 [CreatePostScreen] 사용자 프로필 상태:', {
+    userProfile: userProfile ? {
+      userType: userProfile.userType,
+      name: userProfile.name,
+      organizationName: userProfile.organizationName
+    } : null,
+    loading
+  })
+
+  // 로딩 중일 때
+  if (!userProfile) {
+    console.log('🎬 [CreatePostScreen] 로딩 상태 렌더링')
     return (
       <Screen preset="fixed" safeAreaEdges={["top"]}>
-        <View style={[themed($container), { paddingTop: top + spacing.lg }]}>
-          <View style={themed($header) as any}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon icon="caretLeft" size={24} color={colors.text} />
-            </TouchableOpacity>
-            <Text preset="heading" text="게시글 작성" style={themed($title)} />
-            <View style={{ width: 24 }} />
-          </View>
+        <ScreenHeader title="게시글 작성" />
+        <View style={themed($container)}>
           <View style={themed($centerContainer) as any}>
-            <Text text="단체 운영자만 게시글을 작성할 수 있습니다." />
+            <Text text="사용자 정보를 불러오는 중..." style={themed($messageText) as any} />
           </View>
         </View>
       </Screen>
     )
   }
 
-  return (
-    <Screen preset="fixed" safeAreaEdges={["top"]}>
-      <View style={[themed($container), { paddingTop: top + spacing.lg }]}>
-        {/* 헤더 */}
-        <View style={themed($header) as any}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Icon icon="caretLeft" size={24} color={colors.text} />
-          </TouchableOpacity>
-          <Text preset="heading" text={isEdit ? "게시글 수정" : "게시글 작성"} style={themed($title)} />
-          <View style={{ width: 24 }} />
-        </View>
-
-        <ScrollView style={themed($scrollView)} showsVerticalScrollIndicator={false}>
-          {/* 제목 */}
-          <View style={themed($inputSection)}>
-            <Text text="제목 *" style={themed($label) as any} />
-            <TextInput
-              style={themed($textInput)}
-              value={formData.title}
-              onChangeText={(text) => updateFormData("title", text)}
-              placeholder="모집 공고 제목을 입력하세요"
-              placeholderTextColor={colors.textDim}
+  // 운영자가 아닐 때
+  if (userProfile.userType !== "organizer") {
+    console.log('🎬 [CreatePostScreen] 권한 없음 상태 렌더링')
+    return (
+      <Screen preset="fixed" safeAreaEdges={["top"]}>
+        <ScreenHeader title="게시글 작성" />
+        <View style={themed($container)}>
+          <View style={themed($centerContainer) as any}>
+            <Text text="단체 운영자만 게시글을 작성할 수 있습니다." style={themed($messageText) as any} />
+            <Text text={`현재 사용자 타입: ${userProfile.userType}`} style={themed($debugText) as any} />
+            <Button
+              text="설정에서 운영자로 전환"
+              onPress={() => navigation.navigate("Settings" as any)}
+              style={themed($convertButton)}
             />
           </View>
+        </View>
+      </Screen>
+    )
+  }
+
+  console.log('🎬 [CreatePostScreen] 메인 폼 렌더링 시작')
+  console.log('🎬 [CreatePostScreen] formData:', formData)
+
+  return (
+    <Screen preset="scroll" safeAreaEdges={["top"]}>
+      <ScreenHeader title={isEdit ? "게시글 수정" : "게시글 작성"} />
+      <View style={themed($container)}>
+        
+        {/* 제목 */}
+        <View style={themed($inputSection)}>
+          <Text text="제목 *" style={themed($label) as any} />
+          <TextInput
+            style={themed($textInput)}
+            value={formData.title}
+            onChangeText={(text) => updateFormData("title", text)}
+            placeholder="모집 공고 제목을 입력하세요"
+            placeholderTextColor={colors.textDim}
+          />
+        </View>
 
           {/* 작품명 */}
           <View style={themed($inputSection)}>
@@ -239,13 +367,10 @@ export const CreatePostScreen = () => {
           {/* 단체명 */}
           <View style={themed($inputSection)}>
             <Text text="단체명 *" style={themed($label) as any} />
-            <TextInput
-              style={themed($textInput)}
-              value={formData.organizationName}
-              onChangeText={(text) => updateFormData("organizationName", text)}
-              placeholder="극단 또는 단체명을 입력하세요"
-              placeholderTextColor={colors.textDim}
-            />
+            <View style={themed($readOnlyContainer)}>
+              <Text text={formData.organizationName || "단체명 없음"} style={themed($readOnlyText) as any} />
+              <Text text="(소속 단체로 자동 설정됩니다)" style={themed($helpText) as any} />
+            </View>
           </View>
 
           {/* 연습 일정 */}
@@ -332,8 +457,7 @@ export const CreatePostScreen = () => {
               isLoading={loading}
               style={themed($saveButton)}
             />
-          </View>
-        </ScrollView>
+        </View>
       </View>
     </Screen>
   )
@@ -342,22 +466,13 @@ export const CreatePostScreen = () => {
 const $container = ({ spacing }) => ({
   flex: 1,
   paddingHorizontal: spacing.lg,
+  paddingTop: spacing.md,
 })
 
-const $header = ({ spacing }) => ({
-  flexDirection: "row" as const,
-  justifyContent: "space-between" as const,
-  alignItems: "center" as const,
-  marginBottom: spacing.lg,
-})
-
-const $title = ({ colors }) => ({
-  color: colors.text,
-})
-
-const $scrollView = {
+const $scrollView = ({ spacing }) => ({
   flex: 1,
-}
+  paddingTop: spacing.sm,
+})
 
 const $centerContainer = {
   flex: 1,
@@ -367,6 +482,7 @@ const $centerContainer = {
 
 const $inputSection = ({ spacing }) => ({
   marginBottom: spacing.lg,
+  marginTop: spacing.xs,
 })
 
 const $label = ({ colors, spacing }) => ({
@@ -438,3 +554,44 @@ const $saveSection = ({ spacing }) => ({
 const $saveButton = {
   // 추가 스타일링 필요시 여기에
 }
+
+const $messageText = ({ colors }) => ({
+  fontSize: 16,
+  color: colors.text,
+  textAlign: "center" as const,
+  marginBottom: 16,
+})
+
+const $debugText = ({ colors }) => ({
+  fontSize: 14,
+  color: colors.textDim,
+  textAlign: "center" as const,
+  marginBottom: 20,
+})
+
+const $convertButton = ({ colors, spacing }) => ({
+  backgroundColor: colors.tint,
+  marginTop: spacing.md,
+})
+
+const $readOnlyContainer = ({ colors, spacing }) => ({
+  borderWidth: 1,
+  borderColor: colors.border,
+  borderRadius: 8,
+  padding: spacing.md,
+  backgroundColor: colors.background,
+  opacity: 0.7,
+})
+
+const $readOnlyText = ({ colors }) => ({
+  fontSize: 16,
+  color: colors.text,
+  fontWeight: "500" as const,
+})
+
+const $helpText = ({ colors }) => ({
+  fontSize: 12,
+  color: colors.textDim,
+  marginTop: 4,
+  fontStyle: "italic" as const,
+})

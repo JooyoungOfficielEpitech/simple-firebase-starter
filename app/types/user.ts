@@ -20,6 +20,8 @@ export interface UserProfile {
   userType: UserType          // 사용자 유형
   organizationId?: string     // 소속 단체 (운영자만)
   organizationName?: string   // 단체명 (운영자만)
+  previousOrganizationName?: string  // 이전에 소속했던 단체명
+  hasBeenOrganizer?: boolean         // 운영자 경험 여부
   createdAt: FirebaseFirestoreTypes.Timestamp
   updatedAt: FirebaseFirestoreTypes.Timestamp
 }
@@ -32,13 +34,15 @@ export type CreateUserProfile = {
   heightCm?: number
   userType?: UserType
   organizationName?: string
+  previousOrganizationName?: string
+  hasBeenOrganizer?: boolean
 }
 
 // Payload for updating allowed fields only
 export type UpdateUserProfile = Partial<
   Pick<
     UserProfile,
-    "name" | "gender" | "birthday" | "heightCm" | "media" | "requiredProfileComplete" | "userType" | "organizationId" | "organizationName"
+    "name" | "gender" | "birthday" | "heightCm" | "media" | "requiredProfileComplete" | "userType" | "organizationId" | "organizationName" | "previousOrganizationName" | "hasBeenOrganizer"
   >
 >
 

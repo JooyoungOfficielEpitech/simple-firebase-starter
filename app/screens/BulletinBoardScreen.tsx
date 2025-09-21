@@ -48,25 +48,19 @@ export const BulletinBoardScreen = () => {
     const currentUser = auth().currentUser
     log.authInfo(currentUser)
     
-    // 사용자 프로필 로드
-    const loadUserProfile = async () => {
-      try {
-        log.debug('사용자 프로필 로드 시작')
-        const profile = await userService.getUserProfile()
-        log.info('사용자 프로필 로드 완료')
+    // 사용자 프로필 실시간 구독
+    let unsubscribeUserProfile = () => {}
+    
+    if (currentUser) {
+      console.log('👤 [BulletinBoardScreen] 사용자 프로필 실시간 구독 시작')
+      unsubscribeUserProfile = userService.subscribeToUserProfile(currentUser.uid, (profile) => {
+        console.log('👤 [BulletinBoardScreen] 사용자 프로필 업데이트됨:', profile ? { userType: profile.userType, uid: profile.uid, email: profile.email } : null)
         setUserProfile(profile)
-        
-        // 프로필이 없으면 기본 프로필 생성 (게시글 보기에는 영향 없음)
-        if (!profile && currentUser) {
-          console.log('👤 [BulletinBoardScreen] 프로필이 없어서 기본 프로필 생성 스킵 (게시글 보기에는 문제없음)')
-        }
-      } catch (error) {
-        console.error("❌ [BulletinBoardScreen] 사용자 프로필 로드 오류:", error)
-        console.log('👤 [BulletinBoardScreen] 프로필 로드 실패해도 게시글은 볼 수 있음')
-      }
+      })
+    } else {
+      console.log('👤 [BulletinBoardScreen] 로그인되지 않아 프로필 구독 스킵')
+      setUserProfile(null)
     }
-
-    loadUserProfile()
 
     // 게시글 실시간 구독 (모든 게시글)
     console.log('📱 [BulletinBoardScreen] 게시글 구독 시작')
@@ -92,6 +86,7 @@ export const BulletinBoardScreen = () => {
     return () => {
       unsubscribePosts()
       unsubscribeOrganizations()
+      unsubscribeUserProfile()
     }
   }, [])
 
@@ -116,10 +111,28 @@ export const BulletinBoardScreen = () => {
   }
 
   const handleCreatePost = () => {
-    navigation.navigate("CreatePost", {})
+    // 관리자 권한 체크 디버깅
+    console.log('🔐 [CreatePost] 권한 체크 시작')
+    console.log('🔐 [CreatePost] userProfile:', userProfile)
+    console.log('🔐 [CreatePost] userProfile?.userType:', userProfile?.userType)
+    console.log('🔐 [CreatePost] isOrganizer:', isOrganizer)
+    
+    if (!isOrganizer) {
+      console.log('❌ [CreatePost] 권한 없음 - 알림 표시')
+      Alert.alert("권한 없음", "게시글 작성은 관리자만 가능합니다.")
+      return
+    }
+    
+    console.log('✅ [CreatePost] 권한 확인됨 - 게시글 작성 페이지로 이동')
+    navigation.navigate("CreatePost", { isEdit: false })
   }
 
   const handleOrganizationPress = (organizationId: string) => {
+    console.log('🏢 [BulletinBoardScreen] 단체 선택:', {
+      organizationId,
+      currentUserId: userProfile?.uid
+    })
+    
     setSelectedOrganizationId(organizationId)
     setActiveTab('announcements') // 단체 선택 후 공고 탭으로 이동
   }
@@ -416,9 +429,18 @@ export const BulletinBoardScreen = () => {
   console.log('🎨 [BulletinBoardScreen] 렌더링 상태:', {
     loading,
     postsLength: posts.length,
-    userProfile: userProfile ? { userType: userProfile.userType } : null,
+    userProfile: userProfile ? { userType: userProfile.userType, uid: userProfile.uid, email: userProfile.email } : null,
     isOrganizer,
     error
+  })
+  
+  // 권한 상태 상세 디버그
+  console.log('🔐 [BulletinBoardScreen] 권한 상태 상세:', {
+    userProfileExists: !!userProfile,
+    userType: userProfile?.userType,
+    userTypeCheck: userProfile?.userType === "organizer",
+    isOrganizerResult: isOrganizer,
+    currentUser: auth().currentUser ? { uid: auth().currentUser?.uid, email: auth().currentUser?.email } : null
   })
   
   console.log('📏 [BulletinBoardScreen] 스타일 디버그:', {
@@ -470,20 +492,18 @@ export const BulletinBoardScreen = () => {
               "게시판"} style={themed($title)} />
           </View>
           <View style={themed($headerButtons)}>
-            {/* 테스트 데이터 추가 버튼 (임시) */}
             <TouchableOpacity
               style={themed($testDataButton)}
               onPress={addTestData}
             >
               <Text text="📊" style={themed($buttonText)} />
             </TouchableOpacity>
-            {isOrganizer && (
-              <TouchableOpacity
-                style={themed($createButton)}
-                onPress={handleCreatePost}
-              >
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              style={themed($createButton)}
+              onPress={handleCreatePost}
+            >
+              <Text text="+" style={themed($createButtonText)} />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -904,6 +924,12 @@ const $testDataButton = ({ colors, spacing }) => ({
 const $buttonText = ({ colors }) => ({
   fontSize: 18,
   color: colors.palette.neutral100,
+})
+
+const $createButtonText = ({ colors }) => ({
+  fontSize: 24,
+  fontWeight: "bold" as const,
+  color: colors.tint,
 })
 
 // 새로운 스타일들

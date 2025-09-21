@@ -133,7 +133,7 @@ export class UserService {
 
     // Filter out undefined values to avoid Firestore errors
     const filteredUpdateData = Object.entries(updateData).reduce((acc, [key, value]) => {
-      if (value !== undefined) {
+      if (value !== undefined && value !== null) {
         acc[key] = value
       }
       return acc
@@ -162,6 +162,8 @@ export class UserService {
         userType: (updatedProfile.userType as UserProfile["userType"]) ?? "general",
         organizationId: updatedProfile.organizationId as UserProfile["organizationId"],
         organizationName: updatedProfile.organizationName as UserProfile["organizationName"],
+        previousOrganizationName: updatedProfile.previousOrganizationName as UserProfile["previousOrganizationName"],
+        hasBeenOrganizer: updatedProfile.hasBeenOrganizer as UserProfile["hasBeenOrganizer"],
         createdAt: now,
         updatedAt: now,
       }
@@ -179,12 +181,90 @@ export class UserService {
     const userId = this.getCurrentUserId()
     const docRef = this.db.collection("users").doc(userId)
 
-    await docRef.update({
+    // 현재 단체 정보를 이전 단체 정보로 저장
+    const currentProfile = await this.getUserProfile(userId)
+    
+    const updateData: any = {
       userType: "general",
       organizationId: firestore.FieldValue.delete(),
       organizationName: firestore.FieldValue.delete(),
       updatedAt: this.getServerTimestamp(),
-    })
+    }
+
+    // 현재 단체명을 이전 단체명으로 저장
+    if (currentProfile?.organizationName) {
+      updateData.previousOrganizationName = currentProfile.organizationName
+      updateData.hasBeenOrganizer = true
+    }
+
+    await docRef.update(updateData)
+  }
+
+  /**
+   * 사용자가 특정 단체의 소유자인지 확인
+   */
+  async isUserOwnerOfOrganization(userId: string, organizationName: string): Promise<boolean> {
+    try {
+      // Organizations 컬렉션에서 해당 단체 조회
+      const organizationsSnapshot = await this.db
+        .collection("organizations")
+        .where("name", "==", organizationName)
+        .where("ownerId", "==", userId)
+        .get()
+
+      return !organizationsSnapshot.empty
+    } catch (error) {
+      console.error("단체 소유자 확인 오류:", error)
+      return false
+    }
+  }
+
+  /**
+   * 이전 단체로 자동 운영자 전환 시도
+   */
+  async attemptAutoOrganizerConversion(): Promise<{ success: boolean; organizationName?: string; error?: string }> {
+    const userId = this.getCurrentUserId()
+    
+    try {
+      const userProfile = await this.getUserProfile(userId)
+      
+      if (!userProfile?.hasBeenOrganizer || !userProfile?.previousOrganizationName) {
+        return {
+          success: false,
+          error: "이전 운영자 경험이 없습니다."
+        }
+      }
+
+      const previousOrgName = userProfile.previousOrganizationName
+
+      // 해당 단체가 여전히 존재하고 본인이 소유자인지 확인
+      const isOwner = await this.isUserOwnerOfOrganization(userId, previousOrgName)
+      
+      if (!isOwner) {
+        return {
+          success: false,
+          error: "이전 단체를 찾을 수 없거나 소유자가 아닙니다."
+        }
+      }
+
+      // 자동 운영자 전환 실행
+      await this.updateUserProfile({
+        userType: "organizer",
+        organizationId: userId,
+        organizationName: previousOrgName
+      })
+
+      return {
+        success: true,
+        organizationName: previousOrgName
+      }
+    } catch (error) {
+      console.error("자동 운영자 전환 오류:", error)
+      return {
+        success: false,
+        error: "자동 전환 중 오류가 발생했습니다."
+      }
+    }
   }
 
   /**

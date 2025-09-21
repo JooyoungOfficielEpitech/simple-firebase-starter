@@ -9,7 +9,7 @@ import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { TextField } from "@/components/TextField"
 import { useAuth } from "@/context/AuthContext"
-import { userService } from "@/services/firestore"
+import { userService, organizationService } from "@/services/firestore"
 import { UserProfile } from "@/types/user"
 import type { MainTabScreenProps } from "@/navigators/MainNavigator"
 import { useAppTheme } from "@/theme/context"
@@ -31,6 +31,8 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
   const screenWidth = Dimensions.get('window').width
   const leftCurtainAnim = useRef(new Animated.Value(-screenWidth / 2)).current
   const rightCurtainAnim = useRef(new Animated.Value(screenWidth / 2)).current
+  const curtainOpacityAnim = useRef(new Animated.Value(0)).current
+  const curtainScaleAnim = useRef(new Animated.Value(0.8)).current
   const [isThemeChanging, setIsThemeChanging] = useState(false)
 
   useEffect(() => {
@@ -62,51 +64,112 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
     
     setIsThemeChanging(true)
     
-    // 커튼 닫히는 애니메이션
+    // 커튼 나타나기 + 닫히는 애니메이션
     Animated.parallel([
-      Animated.timing(leftCurtainAnim, {
-        toValue: 0,
-        duration: 300,
+      Animated.timing(curtainOpacityAnim, {
+        toValue: 1,
+        duration: 200,
         useNativeDriver: true,
       }),
-      Animated.timing(rightCurtainAnim, {
-        toValue: 0,
-        duration: 300,
+      Animated.timing(curtainScaleAnim, {
+        toValue: 1,
+        duration: 200,
         useNativeDriver: true,
       }),
     ]).start(() => {
-      // 테마 변경
-      setWickedCharacterTheme(character)
-      
-      // 잠시 대기 후 커튼 열리는 애니메이션
-      setTimeout(() => {
-        Animated.parallel([
-          Animated.timing(leftCurtainAnim, {
-            toValue: -screenWidth / 2,
-            duration: 300,
-            useNativeDriver: true,
-          }),
-          Animated.timing(rightCurtainAnim, {
-            toValue: screenWidth / 2,
-            duration: 300,
-            useNativeDriver: true,
-          }),
-        ]).start(() => {
-          setIsThemeChanging(false)
-        })
-      }, 100)
+      // 커튼이 중앙으로 닫히기
+      Animated.parallel([
+        Animated.timing(leftCurtainAnim, {
+          toValue: 0,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+        Animated.timing(rightCurtainAnim, {
+          toValue: 0,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        // 테마 변경
+        setWickedCharacterTheme(character)
+        
+        // 잠시 대기 후 커튼 열리는 애니메이션
+        setTimeout(() => {
+          Animated.parallel([
+            Animated.timing(leftCurtainAnim, {
+              toValue: -screenWidth / 2,
+              duration: 400,
+              useNativeDriver: true,
+            }),
+            Animated.timing(rightCurtainAnim, {
+              toValue: screenWidth / 2,
+              duration: 400,
+              useNativeDriver: true,
+            }),
+          ]).start(() => {
+            // 커튼이 열린 후 바로 상태 변경
+            setIsThemeChanging(false)
+          })
+        }, 200)
+      })
     })
   }
 
-  const handleConvertToOrganizer = () => {
-    Alert.alert(
-      "운영자로 전환",
-      "운영자로 전환하시겠습니까? 이후 단체 정보를 입력해야 합니다.",
-      [
-        { text: "취소", style: "cancel" },
-        { text: "확인", onPress: () => setShowOrgNameInput(true) }
-      ]
-    )
+  const handleConvertToOrganizer = async () => {
+    // 이전 운영자 경험이 있는지 확인
+    if (userProfile?.hasBeenOrganizer && userProfile?.previousOrganizationName) {
+      Alert.alert(
+        "운영자로 전환",
+        `이전에 운영했던 "${userProfile.previousOrganizationName}" 단체로 복귀하시겠습니까?`,
+        [
+          { text: "취소", style: "cancel" },
+          { 
+            text: "새 단체 만들기", 
+            onPress: () => setShowOrgNameInput(true)
+          },
+          { 
+            text: "이전 단체로 복귀", 
+            onPress: handleAutoConversion 
+          }
+        ]
+      )
+    } else {
+      Alert.alert(
+        "운영자로 전환",
+        "운영자로 전환하시겠습니까? 단체 정보를 입력해야 합니다.",
+        [
+          { text: "취소", style: "cancel" },
+          { text: "확인", onPress: () => setShowOrgNameInput(true) }
+        ]
+      )
+    }
+  }
+
+  const handleAutoConversion = async () => {
+    try {
+      setConverting(true)
+      
+      const result = await userService.attemptAutoOrganizerConversion()
+      
+      if (result.success) {
+        await loadUserProfile()
+        Alert.alert("성공", `"${result.organizationName}" 단체의 운영자로 복귀했습니다!`)
+      } else {
+        Alert.alert(
+          "복귀 실패", 
+          result.error + "\n새로운 단체를 만드시겠습니까?",
+          [
+            { text: "취소", style: "cancel" },
+            { text: "새 단체 만들기", onPress: () => setShowOrgNameInput(true) }
+          ]
+        )
+      }
+    } catch (error) {
+      console.error("자동 운영자 전환 오류:", error)
+      Alert.alert("오류", "자동 전환에 실패했습니다.")
+    } finally {
+      setConverting(false)
+    }
   }
 
   const handleConfirmConversion = async () => {
@@ -118,12 +181,59 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
     try {
       setConverting(true)
       
-      // 사용자 타입을 운영자로 변환
-      await userService.updateUserProfile({
-        userType: "organizer",
-        organizationId: userProfile?.uid,
+      // 단체명 중복 검증
+      await organizationService.validateUniqueOrganizationName(organizationName.trim())
+      
+      // Organizations 컬렉션에 새 단체 생성
+      console.log('🏢 [SettingsScreen] 단체 생성 시작:', {
+        name: organizationName.trim(),
+        userId: userProfile?.uid
+      })
+      
+      const organizationId = await organizationService.createOrganization({
+        name: organizationName.trim(),
+        description: `${organizationName.trim()} 공식 단체입니다.`,
+        contactEmail: userProfile?.email || "",
+        contactPhone: "", // 빈 문자열로 명시적 설정
+        website: "", // 빈 문자열로 명시적 설정
+        location: "",
+        establishedDate: "", // 빈 문자열로 명시적 설정
+        tags: []
+      }, userProfile?.name || "")
+      
+      console.log('✅ [SettingsScreen] 단체 생성 완료:', {
+        organizationId,
         organizationName: organizationName.trim()
       })
+      
+      // 생성된 단체가 실제로 존재하는지 확인
+      try {
+        const createdOrg = await organizationService.getOrganization(organizationId)
+        console.log('🔍 [SettingsScreen] 생성된 단체 확인:', createdOrg ? {
+          id: createdOrg.id,
+          name: createdOrg.name,
+          ownerId: createdOrg.ownerId
+        } : 'NULL')
+      } catch (error) {
+        console.error('❌ [SettingsScreen] 생성된 단체 확인 실패:', error)
+      }
+
+      // 사용자 타입을 운영자로 변환
+      const updateProfileData: any = {
+        userType: "organizer",
+        organizationId: organizationId,
+        organizationName: organizationName.trim(),
+        hasBeenOrganizer: true
+      }
+
+      // undefined 필드 제거
+      Object.keys(updateProfileData).forEach(key => {
+        if (updateProfileData[key] === undefined) {
+          delete updateProfileData[key]
+        }
+      })
+
+      await userService.updateUserProfile(updateProfileData)
 
       // 프로필 새로고침
       await loadUserProfile()
@@ -134,7 +244,8 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
       Alert.alert("성공", "운영자로 전환되었습니다!")
     } catch (error) {
       console.error("운영자 전환 오류:", error)
-      Alert.alert("오류", "운영자 전환에 실패했습니다.")
+      const errorMessage = error instanceof Error ? error.message : "운영자 전환에 실패했습니다."
+      Alert.alert("오류", errorMessage)
     } finally {
       setConverting(false)
     }
@@ -234,7 +345,7 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
                 text="일반 사용자로 전환"
                 onPress={handleRevertToGeneral}
                 isLoading={converting}
-                style={themed($revertButton)}
+                style={$revertButton(wickedCharacterTheme)}
               />
             )}
           </View>
@@ -299,30 +410,70 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
       </View>
       
       {/* 커튼 효과 */}
-      {isThemeChanging && (
-        <>
+      <Animated.View 
+        style={[
+          $curtainContainer,
+          {
+            opacity: isThemeChanging ? curtainOpacityAnim : 0,
+            transform: [{ scale: curtainScaleAnim }],
+          }
+        ]}
+      >
+          {/* 왼쪽 커튼 */}
           <Animated.View 
             style={[
               themed($curtain),
+              $leftCurtain,
               {
-                left: 0,
                 transform: [{ translateX: leftCurtainAnim }],
                 backgroundColor: getCurtainColor(wickedCharacterTheme),
               }
             ]} 
-          />
+          >
+            {/* 커튼 주름 효과 */}
+            <View style={[$curtainFold, { backgroundColor: getCurtainFoldColor(wickedCharacterTheme) }]} />
+            <View style={[$curtainFold, { backgroundColor: getCurtainFoldColor(wickedCharacterTheme), left: '20%' }]} />
+            <View style={[$curtainFold, { backgroundColor: getCurtainFoldColor(wickedCharacterTheme), left: '40%' }]} />
+            <View style={[$curtainFold, { backgroundColor: getCurtainFoldColor(wickedCharacterTheme), left: '60%' }]} />
+            <View style={[$curtainFold, { backgroundColor: getCurtainFoldColor(wickedCharacterTheme), left: '80%' }]} />
+            
+            {/* 커튼 상단 고리 */}
+            <View style={themed($curtainRings)}>
+              {[...Array(8)].map((_, i) => (
+                <View key={i} style={themed($curtainRing)} />
+              ))}
+            </View>
+          </Animated.View>
+          
+          {/* 오른쪽 커튼 */}
           <Animated.View 
             style={[
               themed($curtain),
+              $rightCurtain,
               {
-                right: 0,
                 transform: [{ translateX: rightCurtainAnim }],
                 backgroundColor: getCurtainColor(wickedCharacterTheme),
               }
             ]} 
-          />
-        </>
-      )}
+          >
+            {/* 커튼 주름 효과 */}
+            <View style={[$curtainFold, { backgroundColor: getCurtainFoldColor(wickedCharacterTheme) }]} />
+            <View style={[$curtainFold, { backgroundColor: getCurtainFoldColor(wickedCharacterTheme), left: '20%' }]} />
+            <View style={[$curtainFold, { backgroundColor: getCurtainFoldColor(wickedCharacterTheme), left: '40%' }]} />
+            <View style={[$curtainFold, { backgroundColor: getCurtainFoldColor(wickedCharacterTheme), left: '60%' }]} />
+            <View style={[$curtainFold, { backgroundColor: getCurtainFoldColor(wickedCharacterTheme), left: '80%' }]} />
+            
+            {/* 커튼 상단 고리 */}
+            <View style={themed($curtainRings)}>
+              {[...Array(8)].map((_, i) => (
+                <View key={i} style={themed($curtainRing)} />
+              ))}
+            </View>
+          </Animated.View>
+          
+        {/* 커튼 봉 */}
+        <View style={themed($curtainRod)} />
+      </Animated.View>
     </Screen>
   )
 }
@@ -335,9 +486,37 @@ const getCurtainColor = (theme: WickedCharacterTheme): string => {
     case "glinda":
       return "#C2185B" // 짙은 핑크
     case "gwynplaine":
-      return "#7B1FA2" // 짙은 보라
+      return "#8D6E63" // 짙은 갈색
     default:
       return "#424242" // 기본 회색
+  }
+}
+
+// 커튼 주름 색상 (좀 더 어두운 색상)
+const getCurtainFoldColor = (theme: WickedCharacterTheme): string => {
+  switch (theme) {
+    case "elphaba":
+      return "#1B5E20" // 더 짙은 녹색
+    case "glinda":
+      return "#880E4F" // 더 짙은 핑크
+    case "gwynplaine":
+      return "#5D4037" // 더 짙은 갈색
+    default:
+      return "#212121" // 더 짙은 회색
+  }
+}
+
+// "일반 사용자로 전환" 버튼 색상 (테마별)
+const getRevertButtonColor = (characterTheme: WickedCharacterTheme): string => {
+  switch (characterTheme) {
+    case "elphaba":
+      return "#558B2F" // 엘파바 테마: 어두운 녹색 (엘파바의 자연스러운 색감)
+    case "glinda":
+      return "#F06292" // 글린다 테마: 부드러운 핑크 (우아한 전환)
+    case "gwynplaine":
+      return "#8D6E63" // 그윈플렌 테마: 갈색 (어두운 느낌)
+    default:
+      return "#FF5722" // 기본: 주황빛 빨강
   }
 }
 
@@ -376,8 +555,8 @@ const $convertButton: ThemedStyle<ViewStyle> = (theme) => ({
   marginTop: 8,
 })
 
-const $revertButton: ThemedStyle<ViewStyle> = (theme) => ({
-  backgroundColor: theme.colors.error || "#FF4444",
+const $revertButton = (wickedCharacterTheme: WickedCharacterTheme): ViewStyle => ({
+  backgroundColor: getRevertButtonColor(wickedCharacterTheme),
   marginTop: 8,
 })
 
@@ -490,12 +669,101 @@ const $gwynplaineRadioOuterSelected: ViewStyle = {
   borderColor: "#AD1457", // Gwynplaine wine/burgundy border when selected
 }
 
-// 커튼 스타일
+// 커튼 컨테이너
+const $curtainContainer: ViewStyle = {
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  zIndex: 1000,
+  elevation: 1000,
+}
+
+// 기본 커튼 스타일
 const $curtain: ThemedStyle<ViewStyle> = () => ({
+  position: "absolute",
+  top: 50,
+  bottom: 0,
+  width: "50%",
+  shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 4,
+  },
+  shadowOpacity: 0.3,
+  shadowRadius: 8,
+  elevation: 10,
+})
+
+// 왼쪽 커튼
+const $leftCurtain: ViewStyle = {
+  left: 0,
+  borderTopRightRadius: 8,
+  borderBottomRightRadius: 8,
+}
+
+// 오른쪽 커튼
+const $rightCurtain: ViewStyle = {
+  right: 0,
+  borderTopLeftRadius: 8,
+  borderBottomLeftRadius: 8,
+}
+
+// 커튼 주름 효과
+const $curtainFold: ViewStyle = {
   position: "absolute",
   top: 0,
   bottom: 0,
-  width: "50%",
-  zIndex: 1000,
-  elevation: 1000, // Android에서 최상단 표시
+  width: 3,
+  opacity: 0.6,
+}
+
+// 커튼 봉
+const $curtainRod: ThemedStyle<ViewStyle> = (theme) => ({
+  position: "absolute",
+  top: 30,
+  left: 0,
+  right: 0,
+  height: 20,
+  backgroundColor: theme.colors.border || "#8B4513",
+  borderRadius: 10,
+  shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 2,
+  },
+  shadowOpacity: 0.3,
+  shadowRadius: 4,
+  elevation: 5,
+})
+
+// 커튼 고리들
+const $curtainRings: ThemedStyle<ViewStyle> = () => ({
+  position: "absolute",
+  top: -20,
+  left: 0,
+  right: 0,
+  height: 20,
+  flexDirection: "row",
+  justifyContent: "space-evenly",
+  alignItems: "center",
+})
+
+// 개별 커튼 고리
+const $curtainRing: ThemedStyle<ViewStyle> = (theme) => ({
+  width: 12,
+  height: 12,
+  borderRadius: 6,
+  backgroundColor: theme.colors.border || "#CD853F",
+  borderWidth: 1,
+  borderColor: "#8B4513",
+  shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 1,
+  },
+  shadowOpacity: 0.2,
+  shadowRadius: 2,
+  elevation: 3,
 })
