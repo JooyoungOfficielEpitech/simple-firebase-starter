@@ -30,6 +30,27 @@ export class PostService {
   }
 
   /**
+   * 현재 사용자가 운영자 모드인지 확인
+   */
+  private async checkUserIsOrganizer(userId: string): Promise<boolean> {
+    try {
+      const userDoc = await this.db.collection("users").doc(userId).get()
+      if (!userDoc.exists) {
+        console.error(`❌ [PostService] 사용자 문서를 찾을 수 없음: ${userId}`)
+        return false
+      }
+      
+      const userData = userDoc.data()
+      const isOrganizer = userData?.userType === "organizer"
+      console.log(`🔍 [PostService] 사용자 ${userId} 운영자 여부: ${isOrganizer}`)
+      return isOrganizer
+    } catch (error) {
+      console.error(`❌ [PostService] 사용자 권한 확인 실패:`, error)
+      return false
+    }
+  }
+
+  /**
    * 서버 타임스탬프 생성
    */
   private getServerTimestamp(): FirebaseFirestoreTypes.FieldValue {
@@ -156,10 +177,16 @@ export class PostService {
   async updatePost(postId: string, updateData: UpdatePost): Promise<void> {
     const userId = this.getCurrentUserId()
     
+    // 운영자 모드 확인
+    const isOrganizer = await this.checkUserIsOrganizer(userId)
+    if (!isOrganizer) {
+      throw new Error("운영자 모드에서만 게시글을 수정할 수 있습니다.")
+    }
+    
     // 권한 확인 - 작성자만 수정 가능
     const post = await this.getPost(postId)
     if (!post || post.authorId !== userId) {
-      throw new Error("수정 권한이 없습니다.")
+      throw new Error("본인이 작성한 게시글만 수정할 수 있습니다.")
     }
 
     await this.db.collection("posts").doc(postId).update({
@@ -185,12 +212,19 @@ export class PostService {
   async deletePost(postId: string): Promise<void> {
     const userId = this.getCurrentUserId()
     
+    // 운영자 모드 확인
+    const isOrganizer = await this.checkUserIsOrganizer(userId)
+    if (!isOrganizer) {
+      throw new Error("운영자 모드에서만 게시글을 삭제할 수 있습니다.")
+    }
+    
     // 권한 확인 - 작성자만 삭제 가능
     const post = await this.getPost(postId)
     if (!post || post.authorId !== userId) {
-      throw new Error("삭제 권한이 없습니다.")
+      throw new Error("본인이 작성한 게시글만 삭제할 수 있습니다.")
     }
 
+    console.log(`🗑️ [PostService] 게시글 삭제 시작: ${postId} by ${userId}`)
     await this.db.collection("posts").doc(postId).delete()
 
     // 게시글 삭제 후 단체의 활성 공고 수 업데이트
@@ -211,10 +245,16 @@ export class PostService {
   async updatePostStatus(postId: string, status: "active" | "closed"): Promise<void> {
     const userId = this.getCurrentUserId()
     
+    // 운영자 모드 확인
+    const isOrganizer = await this.checkUserIsOrganizer(userId)
+    if (!isOrganizer) {
+      throw new Error("운영자 모드에서만 게시글 상태를 변경할 수 있습니다.")
+    }
+    
     // 권한 확인 - 작성자만 상태 변경 가능
     const post = await this.getPost(postId)
     if (!post || post.authorId !== userId) {
-      throw new Error("상태 변경 권한이 없습니다.")
+      throw new Error("본인이 작성한 게시글만 상태를 변경할 수 있습니다.")
     }
 
     await this.db.collection("posts").doc(postId).update({

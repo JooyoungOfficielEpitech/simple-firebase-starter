@@ -44,7 +44,7 @@ export const createDarkOverlays = (r: number, g: number, b: number) => ({
 /**
  * Helper function to merge base dark colors with theme-specific colors
  */
-export const createDarkThemeColors = (themeSpecific: Record<string, string>) => ({
+export const createDarkThemeColors = <T extends Record<string, string>>(themeSpecific: T) => ({
   ...baseDarkColors,
   ...themeSpecific,
-})
+} as typeof baseDarkColors & T)

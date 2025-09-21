@@ -75,25 +75,75 @@ export const PostDetailScreen = () => {
     return unsubscribe
   }, [postId])
 
-  // TODO: Implement these handlers when needed
-  // const handleEdit = () => {
-  //   navigation.navigate("CreatePost", { postId, isEdit: true })
-  // }
+  const handleDelete = () => {
+    Alert.alert(
+      "게시글 삭제",
+      "정말로 이 게시글을 삭제하시겠습니까?",
+      [
+        {
+          text: "취소",
+          style: "cancel",
+        },
+        {
+          text: "삭제",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await postService.deletePost(postId)
+              Alert.alert("삭제 완료", "게시글이 삭제되었습니다.", [
+                {
+                  text: "확인",
+                  onPress: () => navigation.goBack(),
+                },
+              ])
+            } catch (error) {
+              const errorMessage = error.message || "게시글 삭제에 실패했습니다."
+              Alert.alert("삭제 실패", errorMessage)
+            }
+          },
+        },
+      ],
+    )
+  }
 
-  // const handleDelete = () => { ... }
-  // const handleStatusToggle = async () => { ... }
-  // const handleToggleFavorite = () => { ... }
-  // const handleShare = async () => { ... }
-  // const handleContact = () => { ... }
+  const handleStatusToggle = async () => {
+    if (!post) return
+    
+    const newStatus = post.status === "active" ? "closed" : "active"
+    const statusText = newStatus === "active" ? "모집 재개" : "모집 중지"
+    
+    Alert.alert(
+      `게시글 ${statusText}`,
+      `이 게시글을 ${statusText}하시겠습니까?`,
+      [
+        {
+          text: "취소",
+          style: "cancel",
+        },
+        {
+          text: statusText,
+          onPress: async () => {
+            try {
+              await postService.updatePostStatus(postId, newStatus)
+              Alert.alert("완료", `게시글이 ${statusText}되었습니다.`)
+            } catch (error) {
+              const errorMessage = error.message || `${statusText}에 실패했습니다.`
+              Alert.alert(`${statusText} 실패`, errorMessage)
+            }
+          },
+        },
+      ],
+    )
+  }
 
-  // const isMyPost = post && userProfile && post.authorId === userProfile.uid // Unused for now
+  const isMyPost = post && userProfile && post.authorId === userProfile.uid && userProfile.userType === "organizer"
 
   // 렌더링 상태 디버그
   console.log('🎨 [PostDetailScreen] 렌더링 상태:')
   console.log('  - loading:', loading)
   console.log('  - post:', post ? 'EXISTS' : 'NULL')
   console.log('  - userProfile:', userProfile ? 'EXISTS' : 'NULL')
-  // console.log('  - isMyPost:', isMyPost) // Unused for now
+  console.log('  - isMyPost:', isMyPost)
   
   if (post) {
     console.log('🎨 [PostDetailScreen] 게시글 상세:')
@@ -183,6 +233,28 @@ export const PostDetailScreen = () => {
             {post.contact.phone && <Text text={post.contact.phone} style={themed($infoText)} />}
           </View>
         )}
+
+        {/* 운영자 버튼 */}
+        {isMyPost && (
+          <View style={themed($actionButtonsContainer)}>
+            <TouchableOpacity
+              style={themed($statusButton)}
+              onPress={handleStatusToggle}
+            >
+              <Text
+                text={post.status === "active" ? "모집 중지" : "모집 재개"}
+                style={themed($statusButtonText)}
+              />
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={themed($deleteButton)}
+              onPress={handleDelete}
+            >
+              <Text text="삭제" style={themed($deleteButtonText)} />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </Screen>
   )
@@ -267,4 +339,42 @@ const $contactText = ({ colors }) => ({
   color: colors.tint,
   fontSize: 16,
   fontWeight: "500" as const,
+})
+
+// Action button styles
+const $actionButtonsContainer = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  justifyContent: "space-between" as const,
+  marginTop: spacing.lg,
+  gap: spacing.md,
+})
+
+const $statusButton = ({ colors, spacing }) => ({
+  flex: 1,
+  backgroundColor: colors.tint,
+  paddingVertical: spacing.md,
+  paddingHorizontal: spacing.lg,
+  borderRadius: 8,
+  alignItems: "center" as const,
+})
+
+const $statusButtonText = ({ colors }) => ({
+  color: colors.palette.neutral100,
+  fontSize: 16,
+  fontWeight: "600" as const,
+})
+
+const $deleteButton = ({ colors, spacing }) => ({
+  flex: 1,
+  backgroundColor: colors.palette.angry500,
+  paddingVertical: spacing.md,
+  paddingHorizontal: spacing.lg,
+  borderRadius: 8,
+  alignItems: "center" as const,
+})
+
+const $deleteButtonText = ({ colors }) => ({
+  color: colors.palette.neutral100,
+  fontSize: 16,
+  fontWeight: "600" as const,
 })

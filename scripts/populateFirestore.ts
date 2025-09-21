@@ -9,7 +9,7 @@
 
 import firestore from "@react-native-firebase/firestore"
 import { UserProfile, UserType } from "@/types/user"
-import { Post } from "@/types/post"
+import { Post, CreatePost } from "@/types/post"
 
 // 실제 Firebase Auth UID로 교체해야 함
 const SAMPLE_USER_IDS = {
@@ -133,7 +133,7 @@ export async function populateFirestoreData() {
     // 2. 게시글 데이터 추가
     console.log("📝 게시글 추가 중...")
     
-    const posts: Array<Omit<Post, "id">> = [
+    const posts: Array<Omit<CreatePost, "organizationId" | "authorId" | "authorName">> = [
       // 서울뮤지컬단 - 지킬앤 하이드
       {
         title: "[7월 공연] 지킬앤 하이드 남/여 주연 모집",

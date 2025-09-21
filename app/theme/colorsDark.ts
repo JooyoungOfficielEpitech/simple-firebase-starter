@@ -10,27 +10,27 @@ const palette = {
   neutral200: "#1A1A1A",
   neutral100: "#000000",
 
-  // Wicked Green (darker variants for dark theme)
-  primary600: "#E8F5E8",
-  primary500: "#C3E6C3",
-  primary400: "#9DD69D",
-  primary300: "#76C676",
-  primary200: "#4FB84F", // Main green
-  primary100: "#228B22", // Forest green
+  // Wicked Green (adapted for dark theme - maintaining semantic meaning)
+  primary100: "#E8F5E8", // Lightest green
+  primary200: "#C3E6C3",
+  primary300: "#9DD69D",
+  primary400: "#76C676",
+  primary500: "#4FB84F", // Main green
+  primary600: "#228B22", // Darker green
 
-  // Wicked Pink (darker variants for dark theme)
-  secondary500: "#FFF0F5",
-  secondary400: "#FFCCE0",
+  // Wicked Pink (adapted for dark theme - maintaining semantic meaning)
+  secondary100: "#FFF0F5", // Lightest pink
+  secondary200: "#FFCCE0",
   secondary300: "#FF99CC",
-  secondary200: "#FF66B8",
-  secondary100: "#FF1493", // Hot pink
+  secondary400: "#FF66B8",
+  secondary500: "#FF1493", // Main hot pink
 
   // Accent colors for dark theme
-  accent500: "#FFFACD",
-  accent400: "#FFEAA7",
+  accent100: "#FFFACD",
+  accent200: "#FFEAA7",
   accent300: "#FDCB6E",
-  accent200: "#E17055",
-  accent100: "#D63031",
+  accent400: "#E17055",
+  accent500: "#D63031",
 
   // Error states
   angry100: "#FFE5E5",

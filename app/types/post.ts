@@ -78,7 +78,7 @@ export interface Post {
   updatedAt: FirebaseFirestoreTypes.Timestamp
 }
 
-// 게시글 생성 페이로드
+// 게시글 생성 페이로드 (timestamps는 FieldValue)
 export type CreatePost = {
   title: string
   description: string
@@ -98,13 +98,19 @@ export type CreatePost = {
   deadline?: string
   totalApplicants?: number
   viewCount?: number
+  
+  // Firestore timestamp fields
+  createdAt: FirebaseFirestoreTypes.FieldValue
+  updatedAt: FirebaseFirestoreTypes.FieldValue
 }
 
-// 게시글 업데이트 페이로드
+// 게시글 업데이트 페이로드 (updatedAt은 FieldValue)
 export type UpdatePost = Partial<
   Pick<
     Post,
     "title" | "description" | "production" | "rehearsalSchedule" | "location" | "organizationName" | "status" | "tags" |
     "roles" | "audition" | "performance" | "benefits" | "contact" | "deadline" | "totalApplicants" | "viewCount"
   >
->
+> & {
+  updatedAt: FirebaseFirestoreTypes.FieldValue
+}
