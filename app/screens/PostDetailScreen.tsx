@@ -34,14 +34,11 @@ export const PostDetailScreen = () => {
   // const [isFavorite, setIsFavorite] = useState(false) // Unused for now
 
   useEffect(() => {
-    console.log('🎯 [PostDetailScreen] useEffect 시작, postId:', postId)
     
     // 사용자 프로필 로드
     const loadUserProfile = async () => {
       try {
-        console.log('👤 [PostDetailScreen] 사용자 프로필 로드 시작')
         const profile = await userService.getUserProfile()
-        console.log('👤 [PostDetailScreen] 사용자 프로필 로드 완료:', profile)
         setUserProfile(profile)
       } catch (error) {
         console.error("❌ [PostDetailScreen] 사용자 프로필 로드 오류:", error)
@@ -51,22 +48,7 @@ export const PostDetailScreen = () => {
     loadUserProfile()
 
     // 게시글 실시간 구독
-    console.log('📱 [PostDetailScreen] 게시글 구독 시작')
     const unsubscribe = postService.subscribeToPost(postId, (post) => {
-      console.log('📱 [PostDetailScreen] 게시글 콜백 호출됨')
-      console.log('📱 [PostDetailScreen] 받은 게시글:', post)
-      
-      if (post) {
-        console.log('📱 [PostDetailScreen] 게시글 필드 확인:')
-        console.log('  - roles:', post.roles)
-        console.log('  - audition:', post.audition)
-        console.log('  - performance:', post.performance)
-        console.log('  - benefits:', post.benefits)
-        console.log('  - contact:', post.contact)
-        console.log('  - deadline:', post.deadline)
-        console.log('  - totalApplicants:', post.totalApplicants)
-        console.log('  - viewCount:', post.viewCount)
-      }
       
       setPost(post)
       setLoading(false)
