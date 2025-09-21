@@ -1,5 +1,5 @@
-import { type FC, useState, useEffect } from "react"
-import { View, type TextStyle, type ViewStyle, Alert } from "react-native"
+import { type FC, useState, useEffect, useRef } from "react"
+import { View, type TextStyle, type ViewStyle, Alert, Animated, Dimensions } from "react-native"
 
 import { $styles } from "@/theme/styles"
 
@@ -26,6 +26,12 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
   const [converting, setConverting] = useState(false)
   const [showOrgNameInput, setShowOrgNameInput] = useState(false)
   const [organizationName, setOrganizationName] = useState("")
+  
+  // 커튼 효과를 위한 애니메이션 상태
+  const screenWidth = Dimensions.get('window').width
+  const leftCurtainAnim = useRef(new Animated.Value(-screenWidth / 2)).current
+  const rightCurtainAnim = useRef(new Animated.Value(screenWidth / 2)).current
+  const [isThemeChanging, setIsThemeChanging] = useState(false)
 
   useEffect(() => {
     loadUserProfile()
@@ -51,8 +57,45 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
     }
   }
 
-  const handleCharacterThemeChange = (character: WickedCharacterTheme) => {
-    setWickedCharacterTheme(character)
+  const handleCharacterThemeChange = async (character: WickedCharacterTheme) => {
+    if (character === wickedCharacterTheme) return
+    
+    setIsThemeChanging(true)
+    
+    // 커튼 닫히는 애니메이션
+    Animated.parallel([
+      Animated.timing(leftCurtainAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(rightCurtainAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      // 테마 변경
+      setWickedCharacterTheme(character)
+      
+      // 잠시 대기 후 커튼 열리는 애니메이션
+      setTimeout(() => {
+        Animated.parallel([
+          Animated.timing(leftCurtainAnim, {
+            toValue: -screenWidth / 2,
+            duration: 300,
+            useNativeDriver: true,
+          }),
+          Animated.timing(rightCurtainAnim, {
+            toValue: screenWidth / 2,
+            duration: 300,
+            useNativeDriver: true,
+          }),
+        ]).start(() => {
+          setIsThemeChanging(false)
+        })
+      }, 100)
+    })
   }
 
   const handleConvertToOrganizer = () => {
@@ -206,9 +249,10 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
             <View style={themed($radioOption)}>
               <Radio
                 value={wickedCharacterTheme === "elphaba"}
-                onValueChange={() => handleCharacterThemeChange("elphaba")}
+                onValueChange={() => !isThemeChanging && handleCharacterThemeChange("elphaba")}
                 inputDetailStyle={$elphabaRadioDetail}
                 inputOuterStyle={wickedCharacterTheme === "elphaba" ? $elphabaRadioOuterSelected : undefined}
+                disabled={isThemeChanging}
               />
               <View style={themed($radioLabelContainer)}>
                 <Text style={themed($radioLabel)}>🟢 엘파바 (Elphaba)</Text>
@@ -219,9 +263,10 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
             <View style={themed($radioOption)}>
               <Radio
                 value={wickedCharacterTheme === "glinda"}
-                onValueChange={() => handleCharacterThemeChange("glinda")}
+                onValueChange={() => !isThemeChanging && handleCharacterThemeChange("glinda")}
                 inputDetailStyle={$glindaRadioDetail}
                 inputOuterStyle={wickedCharacterTheme === "glinda" ? $glindaRadioOuterSelected : undefined}
+                disabled={isThemeChanging}
               />
               <View style={themed($radioLabelContainer)}>
                 <Text style={themed($radioLabel)}>🌸 글린다 (Glinda)</Text>
@@ -232,9 +277,10 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
             <View style={themed($radioOption)}>
               <Radio
                 value={wickedCharacterTheme === "gwynplaine"}
-                onValueChange={() => handleCharacterThemeChange("gwynplaine")}
+                onValueChange={() => !isThemeChanging && handleCharacterThemeChange("gwynplaine")}
                 inputDetailStyle={$gwynplaineRadioDetail}
                 inputOuterStyle={wickedCharacterTheme === "gwynplaine" ? $gwynplaineRadioOuterSelected : undefined}
+                disabled={isThemeChanging}
               />
               <View style={themed($radioLabelContainer)}>
                 <Text style={themed($radioLabel)}>🍷 그윈플렌 (Gwynplaine)</Text>
@@ -251,8 +297,48 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
           style={themed($logoutButton)}
         />
       </View>
+      
+      {/* 커튼 효과 */}
+      {isThemeChanging && (
+        <>
+          <Animated.View 
+            style={[
+              themed($curtain),
+              {
+                left: 0,
+                transform: [{ translateX: leftCurtainAnim }],
+                backgroundColor: getCurtainColor(wickedCharacterTheme),
+              }
+            ]} 
+          />
+          <Animated.View 
+            style={[
+              themed($curtain),
+              {
+                right: 0,
+                transform: [{ translateX: rightCurtainAnim }],
+                backgroundColor: getCurtainColor(wickedCharacterTheme),
+              }
+            ]} 
+          />
+        </>
+      )}
     </Screen>
   )
+}
+
+// 테마에 따른 커튼 색상 결정
+const getCurtainColor = (theme: WickedCharacterTheme): string => {
+  switch (theme) {
+    case "elphaba":
+      return "#2E7D32" // 짙은 녹색
+    case "glinda":
+      return "#C2185B" // 짙은 핑크
+    case "gwynplaine":
+      return "#7B1FA2" // 짙은 보라
+    default:
+      return "#424242" // 기본 회색
+  }
 }
 
 const $container: ThemedStyle<ViewStyle> = () => ({
@@ -403,3 +489,13 @@ const $gwynplaineRadioDetail: ViewStyle = {
 const $gwynplaineRadioOuterSelected: ViewStyle = {
   borderColor: "#AD1457", // Gwynplaine wine/burgundy border when selected
 }
+
+// 커튼 스타일
+const $curtain: ThemedStyle<ViewStyle> = () => ({
+  position: "absolute",
+  top: 0,
+  bottom: 0,
+  width: "50%",
+  zIndex: 1000,
+  elevation: 1000, // Android에서 최상단 표시
+})
