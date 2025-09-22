@@ -4,6 +4,7 @@ import { AVPlaybackStatus } from "expo-av"
 
 import { AudioPlayer } from "@/components/AudioPlayer"
 import { Text } from "@/components/Text"
+import { SimplePitchAnalyzer } from "@/components/SimplePitchAnalyzer"
 import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
 import type { LyricsData, LyricItem, SyllableGroup } from "@/services/musicxml"
@@ -341,6 +342,11 @@ export interface LyricsDisplayProps {
    * 재생 상태 변경 콜백
    */
   onPlaybackStatusUpdate?: (status: AVPlaybackStatus) => void
+  
+  /**
+   * 음정 분석 활성화 여부
+   */
+  pitchAnalysisEnabled?: boolean
 }
 
 /**
@@ -355,6 +361,7 @@ export function LyricsDisplay({
   audioFile,
   audioUrl,
   onPlaybackStatusUpdate,
+  pitchAnalysisEnabled = false,
 }: LyricsDisplayProps) {
   const { themed } = useAppTheme()
   
@@ -411,6 +418,16 @@ export function LyricsDisplay({
         preset="subheading"
         style={themed($title)}
       />
+      
+      {/* 실시간 음정 분석기 */}
+      {pitchAnalysisEnabled && lyricsData && (
+        <SimplePitchAnalyzer
+          lyricsData={lyricsData.lyrics}
+          currentTime={currentTime}
+          enabled={pitchAnalysisEnabled}
+          style={themed($pitchAnalyzer)}
+        />
+      )}
 
       {/* 노래방 스타일 2줄 고정 가사 표시 영역 */}
       <View style={themed($karaokeContainer)}>
@@ -483,6 +500,10 @@ const $title: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
   textAlign: "center",
   color: colors.text,
   marginBottom: spacing.lg,
+})
+
+const $pitchAnalyzer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  marginBottom: spacing.md,
 })
 
 const $karaokeContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
