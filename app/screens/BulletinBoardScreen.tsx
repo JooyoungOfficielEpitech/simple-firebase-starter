@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { Button } from "@/components/Button"
+import { BackButton } from "@/components/BackButton"
 import { Icon } from "@/components/Icon"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
@@ -480,12 +481,7 @@ export const BulletinBoardScreen = () => {
         <View style={themed($header)}>
           <View style={themed($headerLeft)}>
             {selectedOrganizationId ? (
-              <TouchableOpacity
-                style={themed($backButton)}
-                onPress={handleBackToAllPosts}
-              >
-                <Icon icon="back" size={24} color={colors.text} />
-              </TouchableOpacity>
+              <BackButton onPress={handleBackToAllPosts} />
             ) : null}
             <Text preset="heading" text={selectedOrganizationId ? 
               organizations.find(org => org.id === selectedOrganizationId)?.name || "단체" : 

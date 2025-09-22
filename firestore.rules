@@ -1,0 +1,112 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 인증된 사용자인지 확인하는 헬퍼 함수
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // 사용자가 자신의 데이터에 접근하는지 확인하는 헬퍼 함수
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+    
+    // 유효한 게시글 데이터인지 확인하는 헬퍼 함수
+    function isValidPost(post) {
+      return post.keys().hasAll(['title', 'description', 'production', 'location', 'organizationName', 'authorId', 'status', 'tags', 'createdAt', 'updatedAt']) &&
+             post.title is string &&
+             post.title.size() > 0 &&
+             post.title.size() <= 200 &&
+             post.description is string &&
+             post.description.size() > 0 &&
+             post.description.size() <= 5000 &&
+             post.production is string &&
+             post.production.size() > 0 &&
+             post.production.size() <= 100 &&
+             post.location is string &&
+             post.location.size() > 0 &&
+             post.location.size() <= 200 &&
+             post.organizationName is string &&
+             post.organizationName.size() > 0 &&
+             post.organizationName.size() <= 100 &&
+             post.authorId is string &&
+             post.authorId == request.auth.uid &&
+             post.status in ['active', 'closed'] &&
+             post.tags is list &&
+             post.tags.size() <= 10;
+    }
+
+    // Users 컬렉션 - 사용자 프로필 데이터
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // Organizations 컬렉션 - 단체 정보
+    match /organizations/{organizationId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && 
+                      resource == null &&
+                      request.resource.data.keys().hasAll(['name', 'description', 'createdBy', 'createdAt', 'updatedAt']) &&
+                      request.resource.data.createdBy == request.auth.uid;
+      allow update: if isAuthenticated() && 
+                      isOwner(resource.data.createdBy) &&
+                      request.resource.data.createdBy == resource.data.createdBy;
+      allow delete: if isAuthenticated() && isOwner(resource.data.createdBy);
+    }
+
+    // Posts 컬렉션 - 게시글 데이터
+    match /posts/{postId} {
+      // 읽기: 인증된 모든 사용자
+      allow read: if isAuthenticated();
+      
+      // 생성: 인증된 사용자, 유효한 데이터 구조
+      allow create: if isAuthenticated() && 
+                      resource == null &&
+                      isValidPost(request.resource.data);
+      
+      // 수정: 게시글 작성자만, authorId 변경 불가
+      allow update: if isAuthenticated() && 
+                      isOwner(resource.data.authorId) &&
+                      request.resource.data.authorId == resource.data.authorId &&
+                      // updatedAt 필드가 있는지 확인
+                      request.resource.data.keys().hasAny(['updatedAt']);
+      
+      // 삭제: 게시글 작성자만
+      allow delete: if isAuthenticated() && isOwner(resource.data.authorId);
+    }
+
+    // Applications 컬렉션 - 지원서 데이터
+    match /applications/{applicationId} {
+      // 읽기: 지원자 본인 또는 게시글 작성자
+      allow read: if isAuthenticated() && 
+                    (isOwner(resource.data.applicantId) || 
+                     isOwner(get(/databases/$(database)/documents/posts/$(resource.data.postId)).data.authorId));
+      
+      // 생성: 인증된 사용자, 자신의 지원서만
+      allow create: if isAuthenticated() && 
+                      resource == null &&
+                      request.resource.data.applicantId == request.auth.uid &&
+                      request.resource.data.keys().hasAll(['postId', 'applicantId', 'status', 'createdAt', 'updatedAt']);
+      
+      // 수정: 지원자 본인 또는 게시글 작성자 (상태 변경)
+      allow update: if isAuthenticated() && 
+                      (isOwner(resource.data.applicantId) || 
+                       isOwner(get(/databases/$(database)/documents/posts/$(resource.data.postId)).data.authorId)) &&
+                      request.resource.data.applicantId == resource.data.applicantId &&
+                      request.resource.data.postId == resource.data.postId;
+      
+      // 삭제: 지원자 본인만
+      allow delete: if isAuthenticated() && isOwner(resource.data.applicantId);
+    }
+
+    // Messages/Notifications 컬렉션 - 메시지/알림 데이터
+    match /notifications/{notificationId} {
+      allow read, write: if isAuthenticated() && isOwner(resource.data.userId);
+    }
+
+    // 기타 모든 경로는 기본적으로 거부
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

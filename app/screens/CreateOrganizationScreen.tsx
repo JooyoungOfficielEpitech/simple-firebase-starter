@@ -5,6 +5,7 @@ import { useNavigation, useRoute } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { Button } from "@/components/Button"
+import { BackButton } from "@/components/BackButton"
 import { Icon } from "@/components/Icon"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
@@ -168,9 +169,6 @@ export const CreateOrganizationScreen = () => {
     }))
   }
 
-  const handleBack = () => {
-    navigation.goBack()
-  }
 
   if (loading) {
     return (
@@ -190,13 +188,7 @@ export const CreateOrganizationScreen = () => {
         {/* 헤더 */}
         <View style={themed($header)}>
           <View style={themed($headerLeft)}>
-            <Button
-              preset="default"
-              onPress={handleBack}
-              style={themed($backButton)}
-            >
-              <Icon icon="back" size={24} color={colors.text} />
-            </Button>
+            <BackButton />
             <Text preset="heading" text={isEdit ? "단체 수정" : "단체 등록"} style={themed($title)} />
           </View>
         </View>
