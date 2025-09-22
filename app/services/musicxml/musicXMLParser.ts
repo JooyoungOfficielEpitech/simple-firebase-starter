@@ -13,10 +13,20 @@ export interface LyricItem {
   }
 }
 
+// 음절 그룹 (하나의 라인을 구성하는 음절들)
+export interface SyllableGroup {
+  startTime: number      // 그룹 시작 시간
+  endTime: number        // 그룹 종료 시간
+  fullText: string       // 전체 텍스트 "사랑해"
+  syllables: LyricItem[] // 개별 음절들 [사, 랑, 해]
+  characterPositions: number[] // 각 음절의 글자 위치 [0, 1, 2]
+}
+
 export interface LyricsData {
   title: string
   totalDuration: number  // 총 길이 (초)
-  lyrics: LyricItem[]
+  lyrics: LyricItem[]    // 개별 음절 데이터 (기존 호환성)
+  syllableGroups?: SyllableGroup[] // 음절 그룹 (새로운 글자별 애니메이션용) - 옵셔널
   bpm?: number          // BPM (추정값)
 }
 
@@ -176,10 +186,14 @@ export class MusicXMLParser {
       currentTime += noteDuration
     }
 
+    // 음절 그룹핑
+    const syllableGroups = this.groupSyllablesIntoLines(lyrics)
+
     return {
       title,
       totalDuration: totalAudioDuration,
       lyrics,
+      syllableGroups,
       bpm: estimatedBPM
     }
   }
@@ -194,5 +208,68 @@ export class MusicXMLParser {
   ): Promise<LyricsData> {
     const parsed = await this.parseMusicXML(xmlContent)
     return this.convertToLyricsData(parsed, totalAudioDuration, estimatedBPM)
+  }
+
+  /**
+   * 개별 음절들을 라인(그룹)으로 그룹화합니다
+   * syllabic 속성을 활용하여 연속된 음절들을 하나의 단어/구문으로 묶습니다
+   */
+  private groupSyllablesIntoLines(lyrics: LyricItem[]): SyllableGroup[] {
+    const groups: SyllableGroup[] = []
+    let currentGroup: LyricItem[] = []
+    
+    for (let i = 0; i < lyrics.length; i++) {
+      const currentLyric = lyrics[i]
+      currentGroup.push(currentLyric)
+      
+      // 그룹을 마무리하는 조건들:
+      // 1. syllabic이 'single' 또는 'end'인 경우 (단어의 마지막)
+      // 2. 다음 음절과의 시간 간격이 큰 경우 (0.5초 이상)
+      // 3. 마지막 음절인 경우
+      const shouldEndGroup = 
+        currentLyric.syllabic === 'single' || 
+        currentLyric.syllabic === 'end' ||
+        i === lyrics.length - 1 ||
+        (i < lyrics.length - 1 && lyrics[i + 1].startTime - currentLyric.endTime > 0.5)
+      
+      if (shouldEndGroup && currentGroup.length > 0) {
+        // 그룹 생성
+        const fullText = currentGroup.map(item => item.text).join('')
+        const startTime = currentGroup[0].startTime
+        const endTime = currentGroup[currentGroup.length - 1].endTime
+        
+        // 각 음절의 글자 위치 계산
+        const characterPositions: number[] = []
+        let charIndex = 0
+        for (const syllable of currentGroup) {
+          characterPositions.push(charIndex)
+          charIndex += syllable.text.length
+        }
+        
+        groups.push({
+          startTime,
+          endTime,
+          fullText,
+          syllables: [...currentGroup],
+          characterPositions
+        })
+        
+        // 다음 그룹을 위해 초기화
+        currentGroup = []
+      }
+    }
+    
+    console.log("🎼 음절 그룹핑 완료:", {
+      총음절: lyrics.length,
+      그룹수: groups.length,
+      그룹상세: groups.map(g => ({
+        텍스트: g.fullText,
+        음절수: g.syllables.length,
+        시작시간: g.startTime.toFixed(1),
+        종료시간: g.endTime.toFixed(1)
+      }))
+    })
+    
+    return groups
   }
 }
