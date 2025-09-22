@@ -57,9 +57,7 @@ export function HomeStackNavigator() {
         name="KaraokeScreen"
         component={KaraokeScreen}
         options={{
-          headerShown: true,
-          headerTitle: "노래방", // 기본 제목 (실제로는 곡 제목으로 대체됨)
-          headerBackTitle: "뒤로",
+          headerShown: false, // header 완전히 숨김 - ScreenHeader 컴포넌트 사용
         }}
       />
     </Stack.Navigator>

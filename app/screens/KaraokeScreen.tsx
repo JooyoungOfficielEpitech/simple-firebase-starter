@@ -6,6 +6,7 @@ import { LyricsDisplay } from "@/components/LyricsDisplay"
 import { PitchAnalyzer } from "@/components/PitchAnalyzer"
 import { PitchVisualizer } from "@/components/PitchVisualizer"
 import { Screen } from "@/components/Screen"
+import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
 import { MusicXMLService, LyricsData } from "@/services/musicxml"
 import { PitchAnalysisResult } from "@/services/audio/pitchAnalysis"
@@ -38,13 +39,6 @@ export function KaraokeScreen({ route, navigation }: HomeStackScreenProps<"Karao
   const [pitchScore, setPitchScore] = useState<number>(0)
 
   console.log("🎯 KaraokeScreen - Test song:", testSong)
-
-  useEffect(() => {
-    // 네비게이션 헤더 제목 설정
-    navigation.setOptions({
-      title: song.title,
-    })
-  }, [song.title, navigation])
 
   // MusicXML 가사 데이터 로드
   useEffect(() => {
@@ -121,14 +115,10 @@ export function KaraokeScreen({ route, navigation }: HomeStackScreenProps<"Karao
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top"]}>
+      <ScreenHeader title={song.title} />
       <View style={themed($container)}>
         {/* 곡 정보 헤더 */}
         <View style={themed($songInfoContainer)}>
-          <Text
-            text={song.title}
-            preset="heading"
-            style={themed($songTitle)}
-          />
           <Text
             text={`뮤지컬: ${song.musical}`}
             style={themed($musicalName)}
@@ -260,12 +250,6 @@ const $songInfoContainer: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
   borderBottomWidth: 1,
   borderBottomColor: colors.separator,
   alignItems: "center",
-})
-
-const $songTitle: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
-  color: colors.text,
-  textAlign: "center",
-  marginBottom: spacing.xs,
 })
 
 const $musicalName: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
