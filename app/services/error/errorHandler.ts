@@ -2,7 +2,10 @@
  * Centralized error handling and monitoring service
  */
 
-import { FirebaseError } from "@react-native-firebase/app"
+// Define FirebaseError as a generic error type since RN Firebase doesn't export it
+interface FirebaseError extends Error {
+  code?: string
+}
 
 export enum ErrorSeverity {
   LOW = "low",
@@ -58,7 +61,7 @@ export class ErrorHandler {
       shouldRetry: false,
     }
 
-    if (error instanceof FirebaseError) {
+    if (error && typeof error === 'object' && 'code' in error) {
       parsedError = this.parseFirebaseError(error)
     } else if (error instanceof Error) {
       parsedError = this.parseJavaScriptError(error)
@@ -82,7 +85,7 @@ export class ErrorHandler {
   /**
    * Parse Firebase-specific errors
    */
-  private parseFirebaseError(error: FirebaseError): ParsedError {
+  private parseFirebaseError(error: any): ParsedError {
     const { code, message } = error
 
     switch (code) {

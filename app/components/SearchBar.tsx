@@ -38,6 +38,9 @@ export const SearchBar = forwardRef<TextInput, SearchBarProps>(function SearchBa
         style={themed([$input, inputStyle])}
         placeholder={placeholder}
         placeholderTextColor={theme.colors.textDim}
+        accessibilityLabel="검색어 입력"
+        accessibilityHint="검색하고 싶은 내용을 입력하세요"
+        accessibilityRole="search"
         {...inputProps}
       />
     </View>
@@ -48,11 +51,12 @@ const $container: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   flexDirection: "row",
   alignItems: "center",
   backgroundColor: colors.palette.neutral100,
-  borderRadius: 12,
+  borderRadius: 8, // Match other components
   paddingHorizontal: spacing.md,
-  paddingVertical: spacing.sm,
+  paddingVertical: spacing.md, // Consistent padding for better touch targets
   borderWidth: 1,
   borderColor: colors.border,
+  minHeight: 56, // Match button and textfield height
 })
 
 const $searchIcon: ThemedStyle<ViewStyle> = ({ spacing }) => ({

@@ -157,4 +157,4 @@ export class MusicXMLService {
   }
 }
 
-export { MusicXMLParser, type LyricsData, type LyricItem } from "./musicXMLParser"
+export { MusicXMLParser, type LyricsData, type LyricItem, type SyllableGroup } from "./musicXMLParser"

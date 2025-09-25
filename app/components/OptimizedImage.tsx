@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react"
-import { View, Image, ImageProps, ImageErrorEventData, NativeSyntheticEvent } from "react-native"
+import { View, Image, ImageProps, ImageErrorEventData, NativeSyntheticEvent, DimensionValue } from "react-native"
 import { useAppTheme } from "@/theme/context"
 import { LoadingSpinner } from "./LoadingSpinner"
 import { Text } from "./Text"
@@ -62,7 +62,6 @@ export const OptimizedImage = React.memo(({
         onLoad={handleLoad}
         onError={handleError}
         // Performance optimizations
-        removeClippedSubviews={true}
         progressiveRenderingEnabled={true}
         fadeDuration={200}
         {...rest}
@@ -132,8 +131,8 @@ const $container = {
 }
 
 const $image = {
-  width: "100%",
-  height: "100%",
+  width: "100%" as DimensionValue,
+  height: "100%" as DimensionValue,
 }
 
 const $loadingOverlay = ({ colors }) => ({

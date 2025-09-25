@@ -1,5 +1,5 @@
 import React from "react"
-import { View, ActivityIndicator } from "react-native"
+import { View, ActivityIndicator, DimensionValue } from "react-native"
 import { useAppTheme } from "@/theme/context"
 import { Text } from "./Text"
 
@@ -41,7 +41,7 @@ export const SkeletonLoader = React.memo(({
   height = 20, 
   borderRadius = 4 
 }: { 
-  width?: string | number
+  width?: DimensionValue
   height?: number
   borderRadius?: number 
 }) => {

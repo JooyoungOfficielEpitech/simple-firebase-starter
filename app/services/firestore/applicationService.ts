@@ -170,11 +170,11 @@ export class ApplicationService {
       })
       
       if (error.code === 'permission-denied') {
-        throw new Error(translate("matching:errors.permissionDenied"))
+        throw new Error("Permission denied")
       } else if (error.code === 'not-found') {
-        throw new Error(translate("matching:errors.applicationNotFound"))
+        throw new Error("Application not found")
       } else if (error.code === 'unavailable') {
-        throw new Error(translate("matching:errors.serviceUnavailable"))
+        throw new Error("Service unavailable")
       }
       
       throw error
@@ -519,7 +519,7 @@ export class ApplicationService {
     }
 
     return this.executeWithErrorHandling(async () => {
-      let query = this.db.collection("applications")
+      let query: any = this.db.collection("applications")
       
       if (postId) {
         query = query.where("postId", "==", postId)

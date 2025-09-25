@@ -67,6 +67,7 @@ const AppStack = () => {
 
   return (
     <Stack.Navigator
+      id={undefined}
       screenOptions={{
         headerShown: false,
         navigationBarColor: colors.background,

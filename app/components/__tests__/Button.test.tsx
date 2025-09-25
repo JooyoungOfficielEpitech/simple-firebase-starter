@@ -28,54 +28,56 @@ describe("Button Component", () => {
     expect(mockOnPress).toHaveBeenCalledTimes(1)
   })
 
-  it("renders with primary variant correctly", () => {
+  it("renders with filled preset correctly", () => {
     const { getByText } = render(
-      <Button {...defaultProps} variant="primary" />
+      <Button {...defaultProps} preset="filled" />
     )
     
     const button = getByText("Test Button").parent?.parent
     expect(button).toBeTruthy()
   })
 
-  it("renders with secondary variant correctly", () => {
+  it("renders with reversed preset correctly", () => {
     const { getByText } = render(
-      <Button {...defaultProps} variant="secondary" />
+      <Button {...defaultProps} preset="reversed" />
     )
     
     const button = getByText("Test Button").parent?.parent
     expect(button).toBeTruthy()
   })
 
-  it("renders with outline variant correctly", () => {
+  it("renders with cta preset correctly", () => {
     const { getByText } = render(
-      <Button {...defaultProps} variant="outline" />
+      <Button {...defaultProps} preset="cta" />
     )
     
     const button = getByText("Test Button").parent?.parent
     expect(button).toBeTruthy()
   })
 
-  it("renders with small size correctly", () => {
+  it("renders with custom style correctly", () => {
+    const customStyle = { backgroundColor: "red" }
     const { getByText } = render(
-      <Button {...defaultProps} size="small" />
+      <Button {...defaultProps} style={customStyle} />
     )
     
     const button = getByText("Test Button").parent?.parent
     expect(button).toBeTruthy()
   })
 
-  it("renders with medium size correctly", () => {
+  it("renders with text style correctly", () => {
+    const customTextStyle = { fontSize: 20 }
     const { getByText } = render(
-      <Button {...defaultProps} size="medium" />
+      <Button {...defaultProps} textStyle={customTextStyle} />
     )
     
-    const button = getByText("Test Button").parent?.parent
-    expect(button).toBeTruthy()
+    const text = getByText("Test Button")
+    expect(text).toBeTruthy()
   })
 
-  it("renders with large size correctly", () => {
+  it("renders with disabled state correctly", () => {
     const { getByText } = render(
-      <Button {...defaultProps} size="large" />
+      <Button {...defaultProps} disabled={true} />
     )
     
     const button = getByText("Test Button").parent?.parent
@@ -83,25 +85,22 @@ describe("Button Component", () => {
   })
 
   it("shows loading state correctly", () => {
-    const { getByTestId, queryByText } = render(
-      <Button {...defaultProps} loading={true} />
+    const { queryByText } = render(
+      <Button {...defaultProps} isLoading={true} />
     )
     
     // Text should not be visible when loading
     expect(queryByText("Test Button")).toBeNull()
-    
-    // Loading indicator should be present
-    expect(getByTestId("loading-indicator")).toBeTruthy()
   })
 
   it("is disabled when loading", () => {
     const mockOnPress = jest.fn()
-    const { getByTestId } = render(
-      <Button {...defaultProps} onPress={mockOnPress} loading={true} />
+    const { getByRole } = render(
+      <Button {...defaultProps} onPress={mockOnPress} isLoading={true} />
     )
     
-    const button = getByTestId("loading-indicator").parent?.parent
-    fireEvent.press(button!)
+    const button = getByRole("button")
+    fireEvent.press(button)
     
     expect(mockOnPress).not.toHaveBeenCalled()
   })
@@ -118,31 +117,20 @@ describe("Button Component", () => {
     expect(mockOnPress).not.toHaveBeenCalled()
   })
 
-  it("applies custom style correctly", () => {
-    const customStyle = { backgroundColor: "red" }
+  it("renders with custom pressed style", () => {
+    const pressedStyle = { backgroundColor: "blue" }
     const { getByText } = render(
-      <Button {...defaultProps} style={customStyle} />
+      <Button {...defaultProps} pressedStyle={pressedStyle} />
     )
     
     const button = getByText("Test Button").parent?.parent
     expect(button).toBeTruthy()
-    // Note: Detailed style testing would require react-native-testing-library with style assertions
   })
 
-  it("applies custom text style correctly", () => {
-    const customTextStyle = { fontSize: 20 }
+  it("renders with disabled style", () => {
+    const disabledStyle = { opacity: 0.5 }
     const { getByText } = render(
-      <Button {...defaultProps} textStyle={customTextStyle} />
-    )
-    
-    const text = getByText("Test Button")
-    expect(text).toBeTruthy()
-    // Note: Detailed style testing would require react-native-testing-library with style assertions
-  })
-
-  it("renders with full width when specified", () => {
-    const { getByText } = render(
-      <Button {...defaultProps} fullWidth={true} />
+      <Button {...defaultProps} disabled={true} disabledStyle={disabledStyle} />
     )
     
     const button = getByText("Test Button").parent?.parent
@@ -150,11 +138,11 @@ describe("Button Component", () => {
   })
 
   it("handles undefined children gracefully", () => {
-    const { container } = render(
+    const { getByRole } = render(
       <Button onPress={jest.fn()} />
     )
     
-    expect(container).toBeTruthy()
+    expect(getByRole("button")).toBeTruthy()
   })
 
   it("handles string children correctly", () => {

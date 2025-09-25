@@ -1,35 +1,23 @@
 import { ForwardedRef, forwardRef, PropsWithoutRef, ReactElement, RefObject } from "react"
-import { FlatList } from "react-native"
-import { FlashList, FlashListProps } from "@shopify/flash-list"
+import { FlatList, FlatListProps } from "react-native"
 
 import { isRTL } from "@/i18n"
 
-export type ListViewRef<T> = FlashList<T> | FlatList<T>
+export type ListViewRef<T> = FlatList<T>
 
-export type ListViewProps<T> = PropsWithoutRef<FlashListProps<T>>
+export type ListViewProps<T> = PropsWithoutRef<FlatListProps<T>>
 
 /**
- * This is a Higher Order Component meant to ease the pain of using @shopify/flash-list
- * when there is a chance that a user would have their device language set to an
- * RTL language like Arabic or Persian. This component will use react-native's
- * FlatList if the user's language is RTL or FlashList if the user's language is LTR.
+ * This is a Higher Order Component that wraps React Native's FlatList with RTL support.
+ * This component can be extended to support @shopify/flash-list in the future.
  *
- * Because FlashList's props are a superset of FlatList's, you must pass estimatedItemSize
- * to this component if you want to use it.
- *
- * This is a temporary workaround until the FlashList component supports RTL at
- * which point this component can be removed and we will default to using FlashList everywhere.
- * @see {@link https://github.com/Shopify/flash-list/issues/544|RTL Bug Android}
- * @see {@link https://github.com/Shopify/flash-list/issues/840|Flashlist Not Support RTL}
- * @param {FlashListProps | FlatListProps} props - The props for the `ListView` component.
+ * @param {FlatListProps} props - The props for the `ListView` component.
  * @param {RefObject<ListViewRef>} forwardRef - An optional forwarded ref.
  * @returns {JSX.Element} The rendered `ListView` component.
  */
 const ListViewComponent = forwardRef(
   <T,>(props: ListViewProps<T>, ref: ForwardedRef<ListViewRef<T>>) => {
-    const ListComponentWrapper = isRTL ? FlatList : FlashList
-
-    return <ListComponentWrapper {...props} ref={ref} />
+    return <FlatList {...props} ref={ref} />
   },
 )
 

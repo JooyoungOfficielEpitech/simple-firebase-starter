@@ -10,20 +10,20 @@ const palette = {
   neutral800: "#1A1A1A",
   neutral900: "#000000",
 
-  // Wicked Green (primary) - Emerald/Forest tones
-  primary100: "#E8F5E8",
-  primary200: "#C3E6C3",
-  primary300: "#9DD69D",
-  primary400: "#76C676",
-  primary500: "#4FB84F", // Main green
-  primary600: "#228B22", // Forest green
+  // Korean Karaoke Primary - Modern neon-inspired tones  
+  primary100: "#E8F3FF", // Light blue-tint
+  primary200: "#B3D9FF", // Sky blue
+  primary300: "#66B8FF", // Bright blue
+  primary400: "#1A90FF", // Karaoke blue
+  primary500: "#0066CC", // Main karaoke blue
+  primary600: "#004499", // Dark karaoke blue
 
-  // Wicked Pink (secondary) - Hot pink/Magenta tones
-  secondary100: "#FFF0F5",
-  secondary200: "#FFCCE0",
-  secondary300: "#FF99CC",
-  secondary400: "#FF66B8",
-  secondary500: "#FF1493", // Hot pink
+  // Korean Karaoke Secondary - Warm accent tones
+  secondary100: "#FFF9E6", // Light gold
+  secondary200: "#FFE6B3", // Soft gold  
+  secondary300: "#FFCC66", // Medium gold
+  secondary400: "#FFB31A", // Bright gold
+  secondary500: "#FF9900", // Korean karaoke gold
 
   // Accent - Gold/Yellow highlights
   accent100: "#FFFACD",

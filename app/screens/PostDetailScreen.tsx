@@ -143,8 +143,24 @@ export const PostDetailScreen = () => {
   if (loading) {
     return (
       <Screen preset="fixed" safeAreaEdges={["top"]}>
-        <ScreenHeader title="게시글" />
         <View style={themed($container)}>
+          {/* Header */}
+          <View style={themed($header)}>
+            <TouchableOpacity
+              style={themed($backButton)}
+              onPress={() => navigation.goBack()}
+              accessibilityRole="button"
+              accessibilityLabel="뒤로가기"
+            >
+              <Text text="←" style={themed($backButtonText)} />
+            </TouchableOpacity>
+            <Text
+              text="게시글"
+              preset="heading"
+              style={themed($appTitle)}
+            />
+            <View style={themed($headerButtons)} />
+          </View>
           <View style={themed($centerContainer) as any}>
             <Text text="로딩 중..." />
           </View>
@@ -156,8 +172,24 @@ export const PostDetailScreen = () => {
   if (!post) {
     return (
       <Screen preset="fixed" safeAreaEdges={["top"]}>
-        <ScreenHeader title="게시글" />
         <View style={themed($container)}>
+          {/* Header */}
+          <View style={themed($header)}>
+            <TouchableOpacity
+              style={themed($backButton)}
+              onPress={() => navigation.goBack()}
+              accessibilityRole="button"
+              accessibilityLabel="뒤로가기"
+            >
+              <Text text="←" style={themed($backButtonText)} />
+            </TouchableOpacity>
+            <Text
+              text="게시글"
+              preset="heading"
+              style={themed($appTitle)}
+            />
+            <View style={themed($headerButtons)} />
+          </View>
           <View style={themed($centerContainer) as any}>
             <Text text="게시글을 찾을 수 없습니다." />
           </View>
@@ -170,12 +202,64 @@ export const PostDetailScreen = () => {
   
   return (
     <Screen preset="scroll" safeAreaEdges={["top"]}>
-      <ScreenHeader title="게시글" />
       <View style={themed($container)}>
-        {/* 기본 정보 */}
-        <Text preset="heading" text={post.title} style={themed($postTitle)} />
-        <Text text={post.production} style={themed($productionText) as any} />
-        <Text text={post.organizationName} style={themed($organizationText) as any} />
+        {/* Header */}
+        <View style={themed($header)}>
+          <TouchableOpacity
+            style={themed($backButton)}
+            onPress={() => navigation.goBack()}
+            accessibilityRole="button"
+            accessibilityLabel="뒤로가기"
+          >
+            <Text text="←" style={themed($backButtonText)} />
+          </TouchableOpacity>
+          <Text
+            text="모집 공고"
+            preset="heading"
+            style={themed($appTitle)}
+          />
+          <View style={themed($headerButtons)}>
+            {/* Action buttons can go here */}
+          </View>
+        </View>
+        {/* Hero section with key info */}
+        <View style={themed($heroCard)}>
+          <View style={themed($statusHeader)}>
+            <View style={themed(post.status === "active" ? $activeBadge : $closedBadge)}>
+              <Text
+                text={post.status === "active" ? "모집중" : "마감"}
+                style={themed(post.status === "active" ? $activeText : $closedText)}
+              />
+            </View>
+            {post.deadline && (
+              <Text text={`마감일 ${post.deadline}`} style={themed($deadlineText)} />
+            )}
+          </View>
+          
+          <Text preset="heading" text={post.title} style={themed($postTitle)} />
+          <Text text={post.production} style={themed($productionText) as any} />
+          <Text text={post.organizationName} style={themed($organizationText) as any} />
+          
+          <View style={themed($keyInfoRow)}>
+            <View style={themed($infoItem)}>
+              <Text text="📍" style={themed($infoIcon)} />
+              <Text text={post.location} style={themed($infoText)} />
+            </View>
+            <View style={themed($infoItem)}>
+              <Text text="📅" style={themed($infoIcon)} />
+              <Text text={post.rehearsalSchedule} style={themed($infoText)} />
+            </View>
+          </View>
+          
+          {post.contact && (
+            <TouchableOpacity 
+              style={themed($quickContactButton)}
+              onPress={() => console.log("Quick contact", post.contact)} // 연락 기능 구현 예정
+            >
+              <Text text="빠른 문의하기" style={themed($quickContactText)} />
+            </TouchableOpacity>
+          )}
+        </View>
         
         {/* 상세 설명 */}
         <View style={themed($section)}>
@@ -183,14 +267,28 @@ export const PostDetailScreen = () => {
           <Text text={post.description} style={themed($descriptionText)} />
         </View>
 
-        {/* 모집 역할 */}
+        {/* Role cards with improved layout */}
         {post.roles && post.roles.length > 0 && (
           <View style={themed($section)}>
             <Text preset="subheading" text="모집 역할" style={themed($sectionTitle)} />
             {post.roles.map((role, index) => (
               <View key={index} style={themed($roleCard)}>
-                <Text text={`${role.name} (${role.count}명)`} style={themed($roleName) as any} />
-                <Text text={`${role.ageRange} / ${role.gender === 'male' ? '남성' : role.gender === 'female' ? '여성' : '무관'}`} style={themed($roleDetail)} />
+                <View style={themed($roleHeader)}>
+                  <Text text={role.name} style={themed($roleName) as any} />
+                  <View style={themed($roleCountBadge)}>
+                    <Text text={`${role.count}명`} style={themed($roleCountText)} />
+                  </View>
+                </View>
+                <View style={themed($roleDetails)}>
+                  <View style={themed($roleDetailItem)}>
+                    <Text text="👤" style={themed($roleIcon)} />
+                    <Text text={role.ageRange} style={themed($roleDetailText)} />
+                  </View>
+                  <View style={themed($roleDetailItem)}>
+                    <Text text={role.gender === 'male' ? '♂️' : role.gender === 'female' ? '♀️' : '👥'} style={themed($roleIcon)} />
+                    <Text text={role.gender === 'male' ? '남성' : role.gender === 'female' ? '여성' : '성별무관'} style={themed($roleDetailText)} />
+                  </View>
+                </View>
                 <Text text={role.requirements} style={themed($roleRequirements)} />
               </View>
             ))}
@@ -216,24 +314,40 @@ export const PostDetailScreen = () => {
           </View>
         )}
 
-        {/* 운영자 버튼 */}
+        {/* 운영자 액션 버튼들 */}
         {isMyPost && (
           <View style={themed($actionButtonsContainer)}>
             <TouchableOpacity
-              style={themed($statusButton)}
-              onPress={handleStatusToggle}
+              style={themed($primaryActionButton)}
+              onPress={() => console.log("Navigate to edit")} // 수정 기능 구현 예정
+              accessibilityLabel="공고 수정"
             >
+              <Text text="✏️" style={themed($buttonIcon)} />
+              <Text text="수정하기" style={themed($primaryActionText)} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={themed($secondaryActionButton)}
+              onPress={handleStatusToggle}
+              accessibilityLabel={post.status === "active" ? "모집 중지" : "모집 재개"}
+            >
+              <Text 
+                text={post.status === "active" ? "⏸️" : "▶️"} 
+                style={themed($buttonIcon)} 
+              />
               <Text
-                text={post.status === "active" ? "모집 중지" : "모집 재개"}
-                style={themed($statusButtonText)}
+                text={post.status === "active" ? "모집중지" : "모집재개"}
+                style={themed($secondaryActionText)}
               />
             </TouchableOpacity>
             
             <TouchableOpacity
-              style={themed($deleteButton)}
+              style={themed($dangerActionButton)}
               onPress={handleDelete}
+              accessibilityLabel="공고 삭제"
             >
-              <Text text="삭제" style={themed($deleteButtonText)} />
+              <Text text="🗑️" style={themed($buttonIcon)} />
+              <Text text="삭제하기" style={themed($dangerActionText)} />
             </TouchableOpacity>
           </View>
         )}
@@ -243,8 +357,48 @@ export const PostDetailScreen = () => {
 }
 
 const $container = ({ spacing }) => ({
-  flex: 1,
+  flexGrow: 1,
+  backgroundColor: "transparent",
   paddingHorizontal: spacing.lg,
+})
+
+const $header = ({ spacing, colors }) => ({
+  paddingHorizontal: 0,
+  paddingVertical: spacing.md,
+  backgroundColor: colors.background,
+  borderBottomWidth: 1,
+  borderBottomColor: colors.separator,
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-between",
+})
+
+const $appTitle = ({ colors, typography, spacing }) => ({
+  textAlign: "center",
+  color: colors.palette.primary500,
+  fontFamily: typography.primary.bold,
+  flex: 1,
+})
+
+const $backButton = ({ spacing }) => ({
+  paddingHorizontal: spacing.sm,
+  paddingVertical: spacing.xs,
+  minWidth: 44,
+  minHeight: 44,
+  justifyContent: "center",
+  alignItems: "center",
+})
+
+const $backButtonText = ({ colors, typography }) => ({
+  fontSize: 24,
+  color: colors.palette.primary500,
+  fontFamily: typography.primary.bold,
+})
+
+const $headerButtons = () => ({
+  flexDirection: "row",
+  alignItems: "center",
+  minWidth: 44, // 균형을 위한 최소 너비
 })
 
 const $centerContainer = {
@@ -359,4 +513,206 @@ const $deleteButtonText = ({ colors }) => ({
   color: colors.palette.neutral100,
   fontSize: 16,
   fontWeight: "600" as const,
+})
+
+// 새로운 PostDetail 스타일들
+const $heroCard = ({ colors, spacing }) => ({
+  backgroundColor: colors.palette.neutral100,
+  borderRadius: 12,
+  padding: spacing?.md || 12,
+  marginBottom: spacing?.lg || 16,
+  borderWidth: 1,
+  borderColor: colors.border,
+  shadowColor: colors.palette.neutral500,
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+  elevation: 3,
+})
+
+const $statusHeader = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  justifyContent: "space-between" as const,
+  alignItems: "center" as const,
+  marginBottom: spacing?.sm || 8,
+})
+
+const $deadlineText = ({ colors, typography }) => ({
+  fontSize: 12,
+  lineHeight: 18,
+  color: colors.textDim,
+  fontFamily: typography.primary.medium,
+})
+
+const $keyInfoRow = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  gap: spacing?.lg || 16,
+  marginTop: spacing?.sm || 8,
+  marginBottom: spacing?.md || 12,
+})
+
+const $infoItem = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  alignItems: "center" as const,
+  flex: 1,
+})
+
+const $infoIcon = {
+  fontSize: 16,
+  marginRight: 8,
+}
+
+const $quickContactButton = ({ colors, spacing }) => ({
+  backgroundColor: colors.palette.primary500,
+  paddingVertical: spacing?.sm || 8,
+  paddingHorizontal: spacing?.md || 12,
+  borderRadius: 8,
+  alignItems: "center" as const,
+  marginTop: spacing?.sm || 8,
+})
+
+const $quickContactText = ({ colors, typography }) => ({
+  color: colors.palette.neutral100,
+  fontSize: 14,
+  lineHeight: 20,
+  fontFamily: typography.primary.medium,
+})
+
+const $roleHeader = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  justifyContent: "space-between" as const,
+  alignItems: "center" as const,
+  marginBottom: spacing?.xs || 4,
+})
+
+const $roleCountBadge = ({ colors, spacing }) => ({
+  backgroundColor: colors.palette.primary500,
+  paddingHorizontal: spacing?.xs || 4,
+  paddingVertical: 2,
+  borderRadius: 12,
+})
+
+const $roleCountText = ({ colors, typography }) => ({
+  color: colors.palette.neutral100,
+  fontSize: 12,
+  lineHeight: 16,
+  fontFamily: typography.primary.medium,
+})
+
+const $roleDetails = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  gap: spacing?.md || 12,
+  marginBottom: spacing?.xs || 4,
+})
+
+const $roleDetailItem = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  alignItems: "center" as const,
+})
+
+const $roleIcon = {
+  fontSize: 14,
+  marginRight: 4,
+}
+
+const $roleDetailText = ({ colors, typography }) => ({
+  fontSize: 13,
+  lineHeight: 20,
+  color: colors.textDim,
+  fontFamily: typography.primary.normal,
+})
+
+// 개선된 액션 버튼 스타일들
+const $primaryActionButton = ({ colors, spacing }) => ({
+  flexDirection: "row" as const,
+  alignItems: "center" as const,
+  justifyContent: "center" as const,
+  backgroundColor: colors.palette.primary500,
+  paddingVertical: spacing?.md || 12,
+  paddingHorizontal: spacing?.lg || 16,
+  borderRadius: 8,
+  marginBottom: spacing?.sm || 8,
+  minHeight: 48,
+})
+
+const $primaryActionText = ({ colors, typography }) => ({
+  color: colors.palette.neutral100,
+  fontSize: 16,
+  lineHeight: 24,
+  fontFamily: typography.primary.medium,
+  marginLeft: 8,
+})
+
+const $secondaryActionButton = ({ colors, spacing }) => ({
+  flexDirection: "row" as const,
+  alignItems: "center" as const,
+  justifyContent: "center" as const,
+  backgroundColor: colors.palette.neutral100,
+  borderWidth: 1,
+  borderColor: colors.border,
+  paddingVertical: spacing?.md || 12,
+  paddingHorizontal: spacing?.lg || 16,
+  borderRadius: 8,
+  marginBottom: spacing?.sm || 8,
+  minHeight: 48,
+})
+
+const $secondaryActionText = ({ colors, typography }) => ({
+  color: colors.text,
+  fontSize: 16,
+  lineHeight: 24,
+  fontFamily: typography.primary.medium,
+  marginLeft: 8,
+})
+
+const $dangerActionButton = ({ colors, spacing }) => ({
+  flexDirection: "row" as const,
+  alignItems: "center" as const,
+  justifyContent: "center" as const,
+  backgroundColor: colors.palette.angry500,
+  paddingVertical: spacing?.md || 12,
+  paddingHorizontal: spacing?.lg || 16,
+  borderRadius: 8,
+  minHeight: 48,
+})
+
+const $dangerActionText = ({ colors, typography }) => ({
+  color: colors.palette.neutral100,
+  fontSize: 16,
+  lineHeight: 24,
+  fontFamily: typography.primary.medium,
+  marginLeft: 8,
+})
+
+const $buttonIcon = {
+  fontSize: 16,
+}
+
+// Badge 스타일들 (BulletinBoardScreen에서 가져옴)
+const $activeBadge = ({ colors, spacing }) => ({
+  paddingHorizontal: spacing?.xs || 4,
+  paddingVertical: 4,
+  borderRadius: 6,
+  backgroundColor: colors.palette.primary500 + "20",
+})
+
+const $closedBadge = ({ colors, spacing }) => ({
+  paddingHorizontal: spacing?.xs || 4,
+  paddingVertical: 4,
+  borderRadius: 6,
+  backgroundColor: colors.textDim + "20",
+})
+
+const $activeText = ({ colors, typography }) => ({
+  fontSize: 12,
+  lineHeight: 16,
+  fontFamily: typography.primary.medium,
+  color: colors.palette.primary500,
+})
+
+const $closedText = ({ colors, typography }) => ({
+  fontSize: 12,
+  lineHeight: 16,
+  fontFamily: typography.primary.medium,
+  color: colors.textDim,
 })

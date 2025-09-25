@@ -6,6 +6,7 @@ import { $styles } from "@/theme/styles"
 import { Button } from "@/components/Button"
 import { Radio } from "@/components/Toggle/Radio"
 import { Screen } from "@/components/Screen"
+import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
 import { TextField } from "@/components/TextField"
 import { useAuth } from "@/context/AuthContext"
@@ -281,11 +282,19 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
 
   if (showOrgNameInput) {
     return (
-      <Screen preset="fixed" contentContainerStyle={$styles.flex1}>
+      <Screen preset="scroll" safeAreaEdges={["top"]}>
         <View style={themed($container)}>
-          <Text style={themed($title)}>단체명 입력</Text>
+          {/* Header */}
+          <View style={themed($header)}>
+            <Text
+              text="단체명 입력"
+              preset="heading"
+              style={themed($appTitle)}
+            />
+          </View>
           
-          <View style={themed($orgNameInputSection)}>
+          <View style={themed($contentContainer)}>
+            <View style={themed($orgNameInputSection)}>
             <Text style={themed($sectionTitle)}>운영할 단체명을 입력해주세요</Text>
             
             <TextField
@@ -314,18 +323,27 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
             </View>
           </View>
         </View>
+        </View>
       </Screen>
     )
   }
 
   return (
-    <Screen preset="fixed" contentContainerStyle={$styles.flex1}>
+    <Screen preset="scroll" safeAreaEdges={["top"]}>
       <View style={themed($container)}>
-        <Text style={themed($title)}>Settings</Text>
+        {/* Header */}
+        <View style={themed($header)}>
+          <Text
+            text="Settings"
+            preset="heading"
+            style={themed($appTitle)}
+          />
+        </View>
         
-        {/* User Type Section */}
-        {!loading && userProfile && (
-          <View style={themed($userTypeSection)}>
+        <View style={themed($contentContainer)}>
+          {/* User Type Section */}
+          {!loading && userProfile && (
+            <View style={themed($userTypeSection)}>
             <Text style={themed($sectionTitle)}>사용자 유형</Text>
             <Text style={themed($currentUserType)}>
               현재: {userProfile.userType === "organizer" 
@@ -407,6 +425,7 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
           onPress={handleLogout}
           style={themed($logoutButton)}
         />
+        </View>
       </View>
       
       {/* 커튼 효과 */}
@@ -520,17 +539,31 @@ const getRevertButtonColor = (characterTheme: WickedCharacterTheme): string => {
   }
 }
 
-const $container: ThemedStyle<ViewStyle> = () => ({
-  flex: 1,
-  padding: 20,
-  justifyContent: "center",
-  alignItems: "center",
+const $container: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flexGrow: 1,
+  backgroundColor: "transparent",
+  paddingHorizontal: spacing.lg,
 })
 
-const $title: ThemedStyle<TextStyle> = () => ({
-  fontSize: 24,
-  fontWeight: "bold",
-  marginBottom: 32,
+const $header: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
+  paddingHorizontal: 0,
+  paddingVertical: spacing.md,
+  backgroundColor: colors.background,
+  borderBottomWidth: 1,
+  borderBottomColor: colors.separator,
+})
+
+const $appTitle: ThemedStyle<TextStyle> = ({ colors, typography, spacing }) => ({
+  textAlign: "center",
+  color: colors.palette.primary500,
+  fontFamily: typography.primary.bold,
+  marginBottom: spacing.xs,
+})
+
+
+const $contentContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  alignItems: "center",
+  paddingVertical: spacing.md,
 })
 
 const $userTypeSection: ThemedStyle<ViewStyle> = () => ({

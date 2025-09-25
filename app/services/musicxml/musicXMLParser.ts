@@ -62,7 +62,6 @@ export class MusicXMLParser {
       attributeNamePrefix: "@_",
       textNodeName: "#text",
       parseAttributeValue: true,
-      parseNodeValue: true,
     })
   }
 

@@ -39,14 +39,19 @@ export function SongListItem({
       <TouchableOpacity
         style={themed([$container, containerStyle])}
         activeOpacity={0.7}
+        accessibilityRole="button"
+        accessibilityLabel={`${song.title} - ${song.musical} 노래 재생`}
+        accessibilityHint="터치하여 노래방으로 이동합니다"
         {...touchableProps}
       >
         <View style={themed($playIconContainer)}>
-          <Icon
-            icon="caretRight"
-            size={24}
-            color={theme.colors.tint}
-          />
+          <View style={themed($playIconBackground)}>
+            <Icon
+              icon="caretRight"
+              size={20}
+              color={theme.colors.palette.neutral100}
+            />
+          </View>
         </View>
         
         <View style={themed($contentContainer)}>
@@ -80,15 +85,41 @@ export function SongListItem({
 const $container: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   flexDirection: "row",
   alignItems: "center",
-  paddingVertical: spacing.md,
+  paddingVertical: spacing.lg, // Increased for better touch target
   paddingHorizontal: spacing.lg,
-  backgroundColor: colors.background,
+  backgroundColor: colors.palette.neutral100,
+  minHeight: 72, // Minimum touch target for Korean UX patterns
+  borderRadius: 12, // More rounded for Korean app aesthetics
+  marginHorizontal: spacing.sm,
+  marginVertical: spacing.xxxs,
+  borderWidth: 1,
+  borderColor: colors.palette.neutral300,
+  // Subtle shadow for depth (Korean UX likes layered design)
+  shadowColor: colors.palette.neutral500,
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.1,
+  shadowRadius: 2,
+  elevation: 2, // Android shadow
 })
 
 const $playIconContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   marginRight: spacing.md,
-  width: 32,
+  width: 40, // Increased for better visual presence
   alignItems: "center",
+})
+
+const $playIconBackground: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  width: 36,
+  height: 36,
+  borderRadius: 18,
+  backgroundColor: colors.palette.primary500, // Korean karaoke blue
+  justifyContent: "center",
+  alignItems: "center",
+  shadowColor: colors.palette.primary600,
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.3,
+  shadowRadius: 4,
+  elevation: 4, // Android shadow
 })
 
 const $contentContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
@@ -96,15 +127,21 @@ const $contentContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   marginRight: spacing.sm,
 })
 
-const $songTitle: ThemedStyle<TextStyle> = ({ colors }) => ({
+const $songTitle: ThemedStyle<TextStyle> = ({ colors, typography, spacing }) => ({
   color: colors.text,
-  marginBottom: 2,
+  marginBottom: spacing.xxxs,
+  fontSize: 18, // Slightly larger for Korean text readability
+  lineHeight: 28, // Better line height for Korean characters
+  fontFamily: typography.primary.medium,
+  letterSpacing: -0.3, // Subtle letter spacing for Korean text
 })
 
-const $musicalName: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
+const $musicalName: ThemedStyle<TextStyle> = ({ colors, typography, spacing }) => ({
   fontSize: 14,
+  lineHeight: 22, // Better line height for Korean text
   color: colors.textDim,
   fontFamily: typography.primary.normal,
+  marginTop: spacing.xxxs, // Subtle spacing for better hierarchy
 })
 
 const $arrowContainer: ThemedStyle<ViewStyle> = () => ({
@@ -113,7 +150,7 @@ const $arrowContainer: ThemedStyle<ViewStyle> = () => ({
 })
 
 const $separator: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-  height: 1,
-  backgroundColor: colors.separator,
-  marginLeft: spacing.lg + 32 + spacing.md, // Align with content
+  height: 8, // More spacing between items for Korean UX
+  backgroundColor: colors.background, // Match screen background
+  marginHorizontal: spacing.sm, // Consistent with container margins
 })

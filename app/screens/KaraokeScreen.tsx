@@ -4,8 +4,8 @@ import { AVPlaybackStatus } from "expo-av"
 
 import { LyricsDisplay } from "@/components/LyricsDisplay"
 import { Screen } from "@/components/Screen"
+import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
-import { Icon } from "@/components/Icon"
 import { TouchableOpacity } from "react-native"
 import { MusicXMLService, LyricsData } from "@/services/musicxml"
 import { useAppTheme } from "@/theme/context"
@@ -86,15 +86,20 @@ export function KaraokeScreen({ route, navigation }: HomeStackScreenProps<"Karao
   return (
     <Screen preset="scroll" safeAreaEdges={["top"]}>
       <View style={themed($container)}>
+        {/* Header */}
+        <View style={themed($header)}>
+          <TouchableOpacity
+            style={themed($backButton)}
+            onPress={() => navigation.goBack()}
+            accessibilityRole="button"
+            accessibilityLabel="뒤로가기"
+          >
+            <Text text="←" style={themed($backButtonText)} />
+          </TouchableOpacity>
+          <View style={themed($headerButtons)} />
+        </View>
         {/* 통합 가사 및 오디오 플레이어 영역 */}
         <View style={themed($lyricsContainer)}>
-          {/* 뒤로가기 아이콘 */}
-          <TouchableOpacity
-            style={themed($backIcon)}
-            onPress={() => navigation.goBack()}
-          >
-            <Icon icon="caretLeft" size={24} color={theme.colors.text} />
-          </TouchableOpacity>
           {hasLyrics ? (
             <>
               {isLyricsLoading && (
@@ -148,25 +153,65 @@ export function KaraokeScreen({ route, navigation }: HomeStackScreenProps<"Karao
 }
 
 const $container: ThemedStyle<ViewStyle> = ({ colors }) => ({
-  flex: 1,
+  flexGrow: 1,
   backgroundColor: colors.background,
 })
 
-const $backIcon: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  alignSelf: "flex-start",
-  padding: spacing.sm,
-  marginBottom: spacing.md,
+const $header: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
+  paddingHorizontal: spacing.lg,
+  paddingVertical: spacing.md,
+  backgroundColor: colors.background,
+  borderBottomWidth: 1,
+  borderBottomColor: colors.separator,
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-between",
 })
+
+const $appTitle: ThemedStyle<TextStyle> = ({ colors, typography, spacing }) => ({
+  textAlign: "center",
+  color: colors.palette.primary500,
+  fontFamily: typography.primary.bold,
+  flex: 1,
+  marginBottom: spacing.xs,
+})
+
+const $backButton: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  paddingHorizontal: spacing.sm,
+  paddingVertical: spacing.xs,
+  minWidth: 44,
+  minHeight: 44,
+  justifyContent: "center",
+  alignItems: "center",
+})
+
+const $backButtonText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
+  fontSize: 24,
+  color: colors.palette.primary500,
+  fontFamily: typography.primary.bold,
+})
+
+const $headerButtons: ThemedStyle<ViewStyle> = () => ({
+  flexDirection: "row",
+  alignItems: "center",
+  minWidth: 44, // 균형을 위한 최소 너비
+})
+
 
 
 const $lyricsContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  padding: spacing.lg,
+  paddingHorizontal: spacing.lg,
+  paddingTop: spacing.md,
   flex: 1,
 })
 
-const $sectionTitle: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
+const $sectionTitle: ThemedStyle<TextStyle> = ({ colors, spacing, typography }) => ({
   color: colors.text,
   marginBottom: spacing.md,
+  fontSize: 20, // Use consistent lg size
+  lineHeight: 32,
+  fontFamily: typography.primary.medium,
+  textAlign: "center",
 })
 
 const $lyricsDisplay: ThemedStyle<ViewStyle> = ({ colors }) => ({
@@ -185,27 +230,33 @@ const $noContentContainer: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
   justifyContent: "center",
 })
 
-const $noContentText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
-  fontSize: 14,
+const $noContentText: ThemedStyle<TextStyle> = ({ colors, typography, spacing }) => ({
+  fontSize: 16, // Improved readability
+  lineHeight: 26, // Better Korean text spacing
   color: colors.textDim,
   fontFamily: typography.primary.normal,
   textAlign: "center",
+  paddingHorizontal: spacing.lg, // Better content spacing
 })
 
-const $statusText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
-  fontSize: 14,
+const $statusText: ThemedStyle<TextStyle> = ({ colors, typography, spacing }) => ({
+  fontSize: 16,
+  lineHeight: 26,
   color: colors.textDim,
   fontFamily: typography.primary.normal,
   textAlign: "center",
-  marginVertical: 20,
+  marginVertical: spacing.lg,
+  paddingHorizontal: spacing.md,
 })
 
-const $errorText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
-  fontSize: 14,
+const $errorText: ThemedStyle<TextStyle> = ({ colors, typography, spacing }) => ({
+  fontSize: 16, // Consistent sizing
+  lineHeight: 26,
   color: colors.error,
-  fontFamily: typography.primary.normal,
+  fontFamily: typography.primary.medium, // Slightly stronger for errors
   textAlign: "center",
-  marginVertical: 20,
+  marginVertical: spacing.lg, // Consistent spacing
+  paddingHorizontal: spacing.md,
 })
 
 

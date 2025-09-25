@@ -80,13 +80,13 @@ export const Text = forwardRef(function Text(props: TextProps, ref: ForwardedRef
 })
 
 const $sizeStyles = {
-  xxl: { fontSize: 36, lineHeight: 44 } satisfies TextStyle,
-  xl: { fontSize: 24, lineHeight: 34 } satisfies TextStyle,
+  xxl: { fontSize: 36, lineHeight: 46 } satisfies TextStyle, // Increased line height for Korean text
+  xl: { fontSize: 24, lineHeight: 36 } satisfies TextStyle,  // Better readability
   lg: { fontSize: 20, lineHeight: 32 } satisfies TextStyle,
-  md: { fontSize: 18, lineHeight: 26 } satisfies TextStyle,
-  sm: { fontSize: 16, lineHeight: 24 } satisfies TextStyle,
-  xs: { fontSize: 14, lineHeight: 21 } satisfies TextStyle,
-  xxs: { fontSize: 12, lineHeight: 18 } satisfies TextStyle,
+  md: { fontSize: 18, lineHeight: 28 } satisfies TextStyle,  // Improved spacing
+  sm: { fontSize: 16, lineHeight: 26 } satisfies TextStyle,  // Better for Korean characters
+  xs: { fontSize: 14, lineHeight: 22 } satisfies TextStyle,  // Improved readability
+  xxs: { fontSize: 12, lineHeight: 20 } satisfies TextStyle, // Better small text spacing
 }
 
 const $fontWeightStyles = Object.entries(typography.primary).reduce((acc, [weight, fontFamily]) => {

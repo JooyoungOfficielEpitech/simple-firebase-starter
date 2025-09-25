@@ -84,9 +84,17 @@ export function MusicalKaraokeHomeScreen({ navigation }: HomeStackScreenProps<"H
         {/* Header */}
         <View style={themed($header)}>
           <Text
-            text="오르피 Orphy"
+            text="🎤 오르피 Orphy"
             preset="heading"
             style={themed($appTitle)}
+          />
+        </View>
+        
+        {/* Welcome message */}
+        <View style={themed($welcomeContainer)}>
+          <Text
+            text="뮤지컬 노래방에 오신 것을 환영합니다"
+            style={themed($appSubtitle)}
           />
         </View>
 
@@ -137,9 +145,25 @@ const $header: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
   borderBottomColor: colors.separator,
 })
 
-const $appTitle: ThemedStyle<TextStyle> = ({ colors }) => ({
+const $welcomeContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  paddingHorizontal: spacing.lg,
+  paddingTop: spacing.sm,
+  paddingBottom: spacing.xs,
+})
+
+const $appTitle: ThemedStyle<TextStyle> = ({ colors, typography, spacing }) => ({
   textAlign: "center",
-  color: colors.text,
+  color: colors.palette.primary500, // Use Korean karaoke blue
+  fontFamily: typography.primary.bold, // Consistent with heading preset
+  marginBottom: spacing.xs,
+})
+
+const $appSubtitle: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
+  textAlign: "center",
+  color: colors.textDim,
+  fontSize: 14,
+  lineHeight: 22,
+  fontFamily: typography.primary.normal,
 })
 
 const $searchContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
@@ -156,8 +180,9 @@ const $sectionHeader: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
   borderColor: colors.separator,
 })
 
-const $sectionTitle: ThemedStyle<TextStyle> = ({ colors }) => ({
+const $sectionTitle: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   color: colors.text,
+  fontFamily: typography.primary.medium, // Consistent with subheading preset
 })
 
 const $songListContainer: ThemedStyle<ViewStyle> = ({ colors }) => ({
@@ -178,26 +203,37 @@ const $errorContainer: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   backgroundColor: colors.background,
 })
 
-const $errorTitle: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
+const $errorTitle: ThemedStyle<TextStyle> = ({ colors, spacing, typography }) => ({
   color: colors.error,
   textAlign: "center",
   marginBottom: spacing.md,
+  fontSize: 24, // Use xl size
+  lineHeight: 36,
+  fontFamily: typography.primary.bold,
 })
 
-const $errorMessage: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
-  color: colors.text,
+const $errorMessage: ThemedStyle<TextStyle> = ({ colors, spacing, typography }) => ({
+  color: colors.textDim,
   textAlign: "center",
   marginBottom: spacing.xl,
+  fontSize: 16, // Use sm size
+  lineHeight: 26,
+  fontFamily: typography.primary.normal,
+  paddingHorizontal: spacing.lg,
 })
 
-const $retryButton: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
+const $retryButton: ThemedStyle<TextStyle> = ({ colors, spacing, typography }) => ({
   color: colors.tint,
   textAlign: "center",
   fontSize: 16,
-  fontWeight: "bold",
-  padding: spacing.md,
+  lineHeight: 26,
+  fontFamily: typography.primary.medium,
+  paddingVertical: spacing.md,
+  paddingHorizontal: spacing.lg,
   borderWidth: 1,
   borderColor: colors.tint,
-  borderRadius: 8,
+  borderRadius: 8, // Match other components
   backgroundColor: colors.palette.neutral100,
+  minWidth: 44, // Better touch target
+  minHeight: 56, // Match button height
 })

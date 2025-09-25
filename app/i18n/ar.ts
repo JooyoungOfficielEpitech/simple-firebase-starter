@@ -13,9 +13,11 @@ const ar: Translations = {
     exciting: "اوه هذا مثير",
   },
   mainNavigator: {
-    matchingTab: "Matching",
-    profileTab: "Profile",
-    settingsTab: "Settings",
+    welcomeTab: "الرئيسية",
+    settingsTab: "الإعدادات",
+  },
+  matchingScreen: {
+    matchingButton: "بدء المطابقة",
   },
   signInScreen: {
     title: "Welcome to Amie",
@@ -81,6 +83,8 @@ const ar: Translations = {
       signInFailed: "فشل تسجيل الدخول",
       signUpFailed: "فشل التسجيل",
       googleSignInFailed: "فشل تسجيل الدخول بجوجل",
+      signInInProgress: "عملية تسجيل الدخول قيد التنفيذ بالفعل",
+      playServicesNotAvailable: "خدمات جوجل غير متوفرة أو قديمة",
       logoutFailed: "فشل تسجيل الخروج",
       userNotFound: "لم يتم العثور على المستخدم",
       emailVerificationFailed: "فشل في إرسال بريد التحقق",

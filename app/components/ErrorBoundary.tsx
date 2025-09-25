@@ -5,7 +5,7 @@
 import React, { Component, ErrorInfo, ReactNode } from "react"
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
 import { errorHandler, ErrorSeverity } from "../services/error/errorHandler"
-import { useTheme } from "../theme/context"
+import { useAppTheme } from "../theme/context"
 
 interface Props {
   children: ReactNode
@@ -130,7 +130,7 @@ interface ErrorFallbackUIProps {
 }
 
 function ErrorFallbackUI({ error, onRetry, onReset, canRetry, retryCount }: ErrorFallbackUIProps) {
-  const theme = useTheme()
+  const { theme } = useAppTheme()
 
   const styles = StyleSheet.create({
     container: {
@@ -138,7 +138,7 @@ function ErrorFallbackUI({ error, onRetry, onReset, canRetry, retryCount }: Erro
       justifyContent: "center",
       alignItems: "center",
       padding: 20,
-      backgroundColor: theme.colors.surface,
+      backgroundColor: theme.colors.background,
     },
     title: {
       fontSize: 24,
@@ -156,11 +156,11 @@ function ErrorFallbackUI({ error, onRetry, onReset, canRetry, retryCount }: Erro
     },
     errorDetails: {
       fontSize: 14,
-      color: theme.colors.textSecondary,
+      color: theme.colors.textDim,
       textAlign: "center",
       marginBottom: 24,
       fontFamily: "monospace",
-      backgroundColor: theme.colors.surfaceVariant,
+      backgroundColor: theme.colors.palette.neutral200,
       padding: 12,
       borderRadius: 8,
     },
@@ -175,15 +175,15 @@ function ErrorFallbackUI({ error, onRetry, onReset, canRetry, retryCount }: Erro
       minWidth: 100,
     },
     primaryButton: {
-      backgroundColor: theme.colors.primary,
+      backgroundColor: theme.colors.tint,
     },
     secondaryButton: {
-      backgroundColor: theme.colors.surfaceVariant,
+      backgroundColor: theme.colors.palette.neutral200,
       borderWidth: 1,
-      borderColor: theme.colors.outline,
+      borderColor: theme.colors.border,
     },
     disabledButton: {
-      backgroundColor: theme.colors.surfaceDisabled,
+      backgroundColor: theme.colors.palette.neutral300,
     },
     buttonText: {
       fontSize: 16,
@@ -191,17 +191,17 @@ function ErrorFallbackUI({ error, onRetry, onReset, canRetry, retryCount }: Erro
       textAlign: "center",
     },
     primaryButtonText: {
-      color: theme.colors.onPrimary,
+      color: theme.colors.palette.neutral100,
     },
     secondaryButtonText: {
-      color: theme.colors.onSurface,
+      color: theme.colors.text,
     },
     disabledButtonText: {
-      color: theme.colors.onSurfaceDisabled,
+      color: theme.colors.textDim,
     },
     retryInfo: {
       fontSize: 12,
-      color: theme.colors.textSecondary,
+      color: theme.colors.textDim,
       textAlign: "center",
       marginTop: 8,
     },

@@ -152,11 +152,10 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
     $styles.row,
     $inputWrapperStyle,
     status === "error" && { borderColor: colors.error },
-    disabled &&
-      (({ colors }) => ({
-        backgroundColor: colors.palette.neutral300,
-        borderColor: colors.palette.neutral300,
-      })),
+    disabled && {
+      backgroundColor: colors.palette.neutral300,
+      borderColor: colors.palette.neutral300,
+    },
     TextInputProps.multiline && { minHeight: 112 },
     LeftAccessory && { paddingStart: 0 },
     RightAccessory && { paddingEnd: 0 },
@@ -255,13 +254,15 @@ const $labelStyle: ThemedStyle<TextStyle> = ({ spacing }) => ({
   marginBottom: spacing.xs,
 })
 
-const $inputWrapperStyle: ThemedStyle<ViewStyle> = ({ colors }) => ({
+const $inputWrapperStyle: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   alignItems: "flex-start",
   borderWidth: 1,
-  borderRadius: 4,
+  borderRadius: 8, // Match button border radius
   backgroundColor: colors.palette.neutral200,
   borderColor: colors.palette.neutral400,
   overflow: "hidden",
+  minHeight: 56, // Match button height for consistency
+  paddingVertical: spacing.sm, // Consistent vertical padding
 })
 
 const $inputStyle: ThemedStyle<TextStyle> = ({ colors, typography, spacing }) => ({
@@ -270,12 +271,12 @@ const $inputStyle: ThemedStyle<TextStyle> = ({ colors, typography, spacing }) =>
   fontFamily: typography.primary.normal,
   color: colors.text,
   fontSize: 16,
-  height: 24,
+  minHeight: 24, // Changed from fixed height to minHeight
   // https://github.com/facebook/react-native/issues/21720#issuecomment-532642093
   paddingVertical: 0,
   paddingHorizontal: 0,
-  marginVertical: spacing.xs,
-  marginHorizontal: spacing.sm,
+  marginVertical: spacing.sm, // Increased for better touch target
+  marginHorizontal: spacing.md, // Match button padding
 })
 
 const $helperStyle: ThemedStyle<TextStyle> = ({ spacing }) => ({
@@ -283,15 +284,17 @@ const $helperStyle: ThemedStyle<TextStyle> = ({ spacing }) => ({
 })
 
 const $rightAccessoryStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  marginEnd: spacing.xs,
-  height: 40,
+  marginEnd: spacing.sm,
+  minHeight: 44, // Improved touch target
+  minWidth: 44,
   justifyContent: "center",
   alignItems: "center",
 })
 
 const $leftAccessoryStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  marginStart: spacing.xs,
-  height: 40,
+  marginStart: spacing.sm,
+  minHeight: 44, // Improved touch target
+  minWidth: 44,
   justifyContent: "center",
   alignItems: "center",
 })

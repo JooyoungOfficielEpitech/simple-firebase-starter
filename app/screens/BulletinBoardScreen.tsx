@@ -5,10 +5,10 @@ import { useNavigation } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { Button } from "@/components/Button"
-import { BackButton } from "@/components/BackButton"
 import { Icon } from "@/components/Icon"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
+import { ScreenHeader } from "@/components/ScreenHeader"
 import { postService, userService, organizationService } from "@/services/firestore"
 import firestore from "@react-native-firebase/firestore"
 import auth from "@react-native-firebase/auth"
@@ -455,12 +455,14 @@ export const BulletinBoardScreen = () => {
     console.log('⏳ [BulletinBoardScreen] 로딩 화면 렌더링')
     return (
       <Screen preset="fixed" safeAreaEdges={["top"]}>
-        <View style={[themed($container), { paddingTop: top + (spacing?.lg || 16) }]}>
-          {/* 헤더 */}
+        <View style={themed($container)}>
+          {/* Header */}
           <View style={themed($header)}>
-            <Text preset="heading" text="게시판" style={themed($title)} />
-            <View style={themed($headerButtons)}>
-            </View>
+            <Text
+              text="게시판"
+              preset="heading"
+              style={themed($appTitle)}
+            />
           </View>
           
           <View style={themed($loadingContainer)}>
@@ -476,30 +478,41 @@ export const BulletinBoardScreen = () => {
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top"]}>
-      <View style={[themed($container), { paddingTop: top + (spacing?.lg || 16) }]}>
-        {/* 헤더 */}
+      <View style={themed($container)}>
+        {/* Header */}
         <View style={themed($header)}>
-          <View style={themed($headerLeft)}>
-            {selectedOrganizationId ? (
-              <BackButton onPress={handleBackToAllPosts} />
-            ) : null}
-            <Text preset="heading" text={selectedOrganizationId ? 
+          {!!selectedOrganizationId && (
+            <TouchableOpacity
+              style={themed($backButton)}
+              onPress={handleBackToAllPosts}
+              accessibilityRole="button"
+              accessibilityLabel="뒤로가기"
+            >
+              <Text text="←" style={themed($backButtonText)} />
+            </TouchableOpacity>
+          )}
+          <Text
+            text={selectedOrganizationId ? 
               organizations.find(org => org.id === selectedOrganizationId)?.name || "단체" : 
-              "게시판"} style={themed($title)} />
-          </View>
+              "게시판 📊"}
+            preset="heading"
+            style={themed($appTitle)}
+          />
           <View style={themed($headerButtons)}>
-            <TouchableOpacity
-              style={themed($testDataButton)}
+            <Button
+              text="📊"
+              preset="filled"
               onPress={addTestData}
-            >
-              <Text text="📊" style={themed($buttonText)} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={themed($createButton)}
+              style={themed($testDataButton)}
+              textStyle={themed($buttonText)}
+            />
+            <Button
+              text="+"
+              preset="default"
               onPress={handleCreatePost}
-            >
-              <Text text="+" style={themed($createButtonText)} />
-            </TouchableOpacity>
+              style={themed($createButton)}
+              textStyle={themed($createButtonText)}
+            />
           </View>
         </View>
 
@@ -542,17 +555,43 @@ export const BulletinBoardScreen = () => {
                     <View style={themed($emptyIconContainer)}>
                       <Text text="🎭" style={themed($emptyIcon)} />
                     </View>
-                    <Text text="아직 게시된 모집 공고가 없습니다" style={themed($emptyTitle)} />
-                    <Text text="극단에서 배우 모집 공고를 올리면\n여기에 표시됩니다" style={themed($emptyDescription)} />
+                    <Text text="아직 모집 공고가 없어요" style={themed($emptyTitle)} />
+                    <Text 
+                      text={selectedOrganizationId 
+                        ? "이 단체의 모집 공고가 아직 없습니다.\n단체 운영자가 공고를 올리면 여기에 나타납니다."
+                        : "연극, 뮤지컬 배우 모집 공고가\n여기에 표시됩니다."} 
+                      style={themed($emptyDescription)} 
+                    />
                     
-                    {/* 개발용 테스트 버튼 */}
+                    {/* Show different CTAs based on user type and context */}
                     <View style={themed($emptyActions)}>
-                      <Button
-                        text="샘플 데이터 추가"
-                        style={themed($sampleDataButton)}
-                        textStyle={themed($sampleDataButtonText)}
-                        onPress={addTestData}
-                      />
+                      {isOrganizer && !selectedOrganizationId ? (
+                        <Button
+                          text="첫 모집 공고 작성하기"
+                          style={themed($primaryEmptyButton)}
+                          textStyle={themed($primaryEmptyButtonText)}
+                          onPress={handleCreatePost}
+                        />
+                      ) : null}
+                      
+                      {!selectedOrganizationId && (
+                        <Button
+                          text="다른 단체 둘러보기"
+                          style={themed($secondaryEmptyButton)}
+                          textStyle={themed($secondaryEmptyButtonText)}
+                          onPress={() => setActiveTab('organizations')}
+                        />
+                      )}
+                      
+                      {/* 개발용 테스트 버튼 - 개발 모드에서만 */}
+                      {__DEV__ && (
+                        <Button
+                          text="샘플 데이터 추가"
+                          style={themed($sampleDataButton)}
+                          textStyle={themed($sampleDataButtonText)}
+                          onPress={addTestData}
+                        />
+                      )}
                     </View>
                   </View>
                 )
@@ -578,32 +617,63 @@ export const BulletinBoardScreen = () => {
                         key={post.id}
                         style={themed($postCard)}
                         onPress={() => handlePostPress(post.id)}
+                        accessibilityRole="button"
+                        accessibilityLabel={`${post.title} - ${post.production} 모집공고`}
+                        accessibilityHint="터치하여 상세정보 보기"
                       >
-                        <View style={themed($postHeader)}>
-                          <Text preset="subheading" text={post.title} style={themed($postTitle)} />
-                          <View style={themed(post.status === "active" ? $activeBadge : $closedBadge)}>
-                            <Text
-                              text={post.status === "active" ? "모집중" : "마감"}
-                              style={themed(post.status === "active" ? $activeText : $closedText)}
-                            />
+                        <View style={themed($postCardHeader)}>
+                          <View style={themed($postStatusRow)}>
+                            <View style={themed(post.status === "active" ? $activeBadge : $closedBadge)}>
+                              <Text
+                                text={post.status === "active" ? "모집중" : "마감"}
+                                style={themed(post.status === "active" ? $activeText : $closedText)}
+                              />
+                            </View>
+                            {post.deadline && (
+                              <Text text={`마감 ${post.deadline}`} style={themed($deadlineText)} />
+                            )}
                           </View>
+                          <Text preset="subheading" text={post.title} style={themed($postTitle)} />
+                          <Text text={post.production} style={themed($production)} />
                         </View>
                         
-                        <Text text={post.production} style={themed($production)} />
-                        <Text text={post.organizationName} style={themed($organization)} />
-                        
-                        <View style={themed($postFooter)}>
+                        <View style={themed($postMeta)}>
+                          <View style={themed($organizationRow)}>
+                            <Text text={post.organizationName} style={themed($organization)} />
+                            {post.totalApplicants && (
+                              <Text text={`지원자 ${post.totalApplicants}명`} style={themed($applicantCount)} />
+                            )}
+                          </View>
                           <Text text={post.location} style={themed($location)} />
                           <Text text={post.rehearsalSchedule} style={themed($schedule)} />
                         </View>
 
+                        {/* Role summary for quick scanning */}
+                        {post.roles && post.roles.length > 0 && (
+                          <View style={themed($rolesPreview)}>
+                            <Text 
+                              text={post.roles.slice(0, 2).map(role => `${role.name}(${role.count}명)`).join(", ")}
+                              style={themed($rolesPreviewText)}
+                              numberOfLines={1}
+                            />
+                            {post.roles.length > 2 && (
+                              <Text text={`외 ${post.roles.length - 2}개 역할`} style={themed($moreRoles)} />
+                            )}
+                          </View>
+                        )}
+
                         {post.tags && post.tags.length > 0 && (
                           <View style={themed($tagsContainer)}>
-                            {post.tags.map((tag, tagIndex) => (
+                            {post.tags.slice(0, 3).map((tag, tagIndex) => (
                               <View key={tagIndex} style={themed($tag)}>
                                 <Text text={tag} style={themed($tagText)} />
                               </View>
                             ))}
+                            {post.tags.length > 3 && (
+                              <View style={themed($tag)}>
+                                <Text text={`+${post.tags.length - 3}`} style={themed($tagText)} />
+                              </View>
+                            )}
                           </View>
                         )}
                       </TouchableOpacity>
@@ -688,19 +758,44 @@ export const BulletinBoardScreen = () => {
 }
 
 const $container = ({ spacing }) => ({
-  paddingHorizontal: spacing?.lg || 16,
+  flexGrow: 1,
+  backgroundColor: "transparent",
+  paddingHorizontal: spacing.lg,
 })
 
-const $header = ({ spacing }) => ({
-  flexDirection: "row" as const,
-  justifyContent: "space-between" as const,
-  alignItems: "center" as const,
-  marginBottom: spacing?.lg || 16,
+const $header = ({ spacing, colors }) => ({
+  paddingHorizontal: 0,
+  paddingVertical: spacing.md,
+  backgroundColor: colors.background,
+  borderBottomWidth: 1,
+  borderBottomColor: colors.separator,
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-between",
 })
 
-const $title = ({ colors }) => ({
-  color: colors.text,
+const $appTitle = ({ colors, typography, spacing }) => ({
+  textAlign: "center",
+  color: colors.palette.primary500,
+  fontFamily: typography.primary.bold,
+  flex: 1,
 })
+
+const $backButton = ({ spacing }) => ({
+  paddingHorizontal: spacing.sm,
+  paddingVertical: spacing.xs,
+  minWidth: 44,
+  minHeight: 44,
+  justifyContent: "center",
+  alignItems: "center",
+})
+
+const $backButtonText = ({ colors, typography }) => ({
+  fontSize: 24,
+  color: colors.palette.primary500,
+  fontFamily: typography.primary.bold,
+})
+
 
 const $contentContainer = {
   // 게시글 목록 컨테이너
@@ -710,11 +805,12 @@ const $createButton = ({ colors }) => ({
   width: 40,
   height: 40,
   borderRadius: 20,
+  paddingHorizontal: 0,
+  paddingVertical: 0,
+  minHeight: 40,
   backgroundColor: colors.background,
   borderWidth: 1,
   borderColor: colors.tint,
-  justifyContent: "center" as const,
-  alignItems: "center" as const,
 })
 
 
@@ -725,8 +821,8 @@ const $emptyStateContainer = ({ spacing }) => ({
   flex: 1,
   justifyContent: "center" as const,
   alignItems: "center" as const,
-  paddingHorizontal: spacing?.xl || 24,
-  paddingTop: spacing?.xl || 24,
+  paddingHorizontal: spacing.xl,
+  paddingTop: spacing.xl,
 })
 
 const $emptyIconContainer = ({ colors, spacing }) => ({
@@ -736,7 +832,7 @@ const $emptyIconContainer = ({ colors, spacing }) => ({
   backgroundColor: colors.palette.neutral100,
   justifyContent: "center" as const,
   alignItems: "center" as const,
-  marginBottom: spacing?.lg || 16,
+  marginBottom: spacing.lg,
 })
 
 const $emptyIcon = {
@@ -748,7 +844,7 @@ const $emptyTitle = ({ colors, spacing }) => ({
   fontSize: 18,
   fontWeight: "600" as const,
   textAlign: "center" as const,
-  marginBottom: spacing?.sm || 8,
+  marginBottom: spacing.sm,
 })
 
 const $emptyDescription = ({ colors, spacing }) => ({
@@ -756,11 +852,11 @@ const $emptyDescription = ({ colors, spacing }) => ({
   fontSize: 14,
   textAlign: "center" as const,
   lineHeight: 20,
-  marginBottom: spacing?.xl || 24,
+  marginBottom: spacing.xl,
 })
 
 const $emptyActions = ({ spacing }) => ({
-  marginTop: spacing?.lg || 16,
+  marginTop: spacing.lg,
 })
 
 const $sampleDataButton = ({ colors, spacing }) => ({
@@ -911,10 +1007,11 @@ const $testDataButton = ({ colors, spacing }) => ({
   width: 40,
   height: 40,
   borderRadius: 20,
+  paddingHorizontal: 0,
+  paddingVertical: 0,
+  marginRight: spacing.sm,
+  minHeight: 40,
   backgroundColor: colors.palette.orange500,
-  justifyContent: "center" as const,
-  alignItems: "center" as const,
-  marginRight: spacing?.sm || 8,
 })
 
 const $buttonText = ({ colors }) => ({
@@ -928,17 +1025,6 @@ const $createButtonText = ({ colors }) => ({
   color: colors.tint,
 })
 
-// 새로운 스타일들
-const $headerLeft = () => ({
-  flexDirection: "row" as const,
-  alignItems: "center" as const,
-  flex: 1,
-})
-
-const $backButton = ({ spacing }) => ({
-  marginRight: spacing?.sm || 8,
-  padding: 4,
-})
 
 const $tabContainer = ({ colors, spacing }) => ({
   flexDirection: "row" as const,
@@ -1046,4 +1132,101 @@ const $createOrgButton = ({ colors, spacing }) => ({
   backgroundColor: colors.tint,
   paddingHorizontal: spacing?.md || 12,
   paddingVertical: spacing?.sm || 8,
+})
+
+// 새로운 Post Card 스타일들
+const $postCardHeader = ({ spacing }) => ({
+  marginBottom: spacing?.sm || 8,
+})
+
+const $postStatusRow = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  justifyContent: "space-between" as const,
+  alignItems: "center" as const,
+  marginBottom: spacing?.xs || 4,
+})
+
+const $deadlineText = ({ colors, typography }) => ({
+  fontSize: 12,
+  lineHeight: 18,
+  color: colors.textDim,
+  fontFamily: typography.primary.medium,
+})
+
+const $postMeta = ({ spacing }) => ({
+  marginBottom: spacing?.sm || 8,
+})
+
+const $organizationRow = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  justifyContent: "space-between" as const,
+  alignItems: "center" as const,
+  marginBottom: spacing?.xs || 4,
+})
+
+const $applicantCount = ({ colors, typography }) => ({
+  fontSize: 12,
+  lineHeight: 18,
+  color: colors.palette.primary500,
+  fontFamily: typography.primary.medium,
+})
+
+const $rolesPreview = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  justifyContent: "space-between" as const,
+  alignItems: "center" as const,
+  marginBottom: spacing?.xs || 4,
+  paddingVertical: spacing?.xxxs || 2,
+})
+
+const $rolesPreviewText = ({ colors, typography }) => ({
+  flex: 1,
+  fontSize: 13,
+  lineHeight: 20,
+  color: colors.text,
+  fontFamily: typography.primary.normal,
+})
+
+const $moreRoles = ({ colors, typography }) => ({
+  fontSize: 12,
+  lineHeight: 18,
+  color: colors.textDim,
+  fontFamily: typography.primary.normal,
+})
+
+// Empty State 버튼 스타일들
+const $primaryEmptyButton = ({ colors, spacing }) => ({
+  backgroundColor: colors.palette.primary500,
+  paddingVertical: spacing?.md || 12,
+  paddingHorizontal: spacing?.lg || 16,
+  borderRadius: 8,
+  marginBottom: spacing?.sm || 8,
+  minHeight: 56,
+})
+
+const $primaryEmptyButtonText = ({ colors, typography }) => ({
+  color: colors.palette.neutral100,
+  fontSize: 16,
+  lineHeight: 24,
+  fontFamily: typography.primary.medium,
+  textAlign: "center" as const,
+})
+
+const $secondaryEmptyButton = ({ colors, spacing }) => ({
+  backgroundColor: colors.palette.neutral100,
+  borderWidth: 1,
+  borderColor: colors.palette.primary500,
+  paddingVertical: spacing?.md || 12,
+  paddingHorizontal: spacing?.lg || 16,
+  borderRadius: 8,
+  marginBottom: spacing?.sm || 8,
+  minHeight: 56,
+})
+
+const $secondaryEmptyButtonText = ({ colors, typography }) => ({
+  color: colors.palette.primary500,
+  fontSize: 16,
+  lineHeight: 24,
+  fontFamily: typography.primary.medium,
+  textAlign: "center" as const,
 })

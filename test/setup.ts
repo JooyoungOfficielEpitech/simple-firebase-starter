@@ -61,7 +61,7 @@ jest.mock("@react-native-firebase/firestore", () => ({
       delete: jest.fn(),
       commit: jest.fn(() => Promise.resolve()),
     })),
-    runTransaction: jest.fn((callback) => callback({
+    runTransaction: jest.fn((callback: any) => callback({
       get: jest.fn(() => Promise.resolve({ exists: true, data: () => ({}) })),
       set: jest.fn(),
       update: jest.fn(),
@@ -76,7 +76,7 @@ jest.mock("@react-native-firebase/firestore", () => ({
   },
   Timestamp: {
     now: jest.fn(() => ({ seconds: Date.now() / 1000, nanoseconds: 0 })),
-    fromDate: jest.fn((date) => ({ seconds: date.getTime() / 1000, nanoseconds: 0 })),
+    fromDate: jest.fn((date: Date) => ({ seconds: date.getTime() / 1000, nanoseconds: 0 })),
   },
 }))
 

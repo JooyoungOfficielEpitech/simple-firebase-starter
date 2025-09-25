@@ -78,6 +78,13 @@ export class PostService {
       tags: postData.tags,
       createdAt: this.getServerTimestamp(),
       updatedAt: this.getServerTimestamp(),
+      // 확장 필드들 추가
+      ...(postData.deadline && { deadline: postData.deadline }),
+      ...(postData.roles && { roles: postData.roles }),
+      ...(postData.audition && { audition: postData.audition }),
+      ...(postData.performance && { performance: postData.performance }),
+      ...(postData.benefits && { benefits: postData.benefits }),
+      ...(postData.contact && { contact: postData.contact }),
     }
 
     console.log('📝 [PostService] 게시글 생성:', {
@@ -337,7 +344,7 @@ export class PostService {
           
           callback(activePosts)
         },
-        (error) => {
+        (error: any) => {
           console.error("❌ [PostService] 게시글 구독 오류:", error)
           console.error("❌ [PostService] 에러 상세:", {
             code: error.code,
