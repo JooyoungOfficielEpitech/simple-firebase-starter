@@ -120,26 +120,6 @@ export const PostDetailScreen = () => {
 
   const isMyPost = post && userProfile && post.authorId === userProfile.uid && userProfile.userType === "organizer"
 
-  // 렌더링 상태 디버그
-  console.log('🎨 [PostDetailScreen] 렌더링 상태:')
-  console.log('  - loading:', loading)
-  console.log('  - post:', post ? 'EXISTS' : 'NULL')
-  console.log('  - userProfile:', userProfile ? 'EXISTS' : 'NULL')
-  console.log('  - isMyPost:', isMyPost)
-  
-  if (post) {
-    console.log('🎨 [PostDetailScreen] 게시글 상세:')
-    console.log('  - ID:', post.id)
-    console.log('  - 제목:', post.title)
-    console.log('  - 새로운 필드들 존재 여부:')
-    console.log('    • roles:', !!post.roles, post.roles?.length || 0)
-    console.log('    • audition:', !!post.audition)
-    console.log('    • performance:', !!post.performance)
-    console.log('    • benefits:', !!post.benefits)
-    console.log('    • contact:', !!post.contact)
-    console.log('    • deadline:', !!post.deadline)
-  }
-
   if (loading) {
     return (
       <Screen preset="fixed" safeAreaEdges={["top"]}>
@@ -198,8 +178,6 @@ export const PostDetailScreen = () => {
     )
   }
 
-  console.log('🎨 [PostDetailScreen] 메인 렌더 시작')
-  
   return (
     <Screen preset="scroll" safeAreaEdges={["top"]}>
       <View style={themed($container)}>
@@ -368,13 +346,13 @@ const $header = ({ spacing, colors }) => ({
   backgroundColor: colors.background,
   borderBottomWidth: 1,
   borderBottomColor: colors.separator,
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "space-between",
+  flexDirection: "row" as const,
+  alignItems: "center" as const,
+  justifyContent: "space-between" as const,
 })
 
 const $appTitle = ({ colors, typography, spacing }) => ({
-  textAlign: "center",
+  textAlign: "center" as const,
   color: colors.palette.primary500,
   fontFamily: typography.primary.bold,
   flex: 1,
@@ -385,8 +363,8 @@ const $backButton = ({ spacing }) => ({
   paddingVertical: spacing.xs,
   minWidth: 44,
   minHeight: 44,
-  justifyContent: "center",
-  alignItems: "center",
+  justifyContent: "center" as const,
+  alignItems: "center" as const,
 })
 
 const $backButtonText = ({ colors, typography }) => ({
@@ -396,8 +374,8 @@ const $backButtonText = ({ colors, typography }) => ({
 })
 
 const $headerButtons = () => ({
-  flexDirection: "row",
-  alignItems: "center",
+  flexDirection: "row" as const,
+  alignItems: "center" as const,
   minWidth: 44, // 균형을 위한 최소 너비
 })
 

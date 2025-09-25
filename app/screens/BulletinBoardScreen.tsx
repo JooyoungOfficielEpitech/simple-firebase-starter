@@ -769,13 +769,13 @@ const $header = ({ spacing, colors }) => ({
   backgroundColor: colors.background,
   borderBottomWidth: 1,
   borderBottomColor: colors.separator,
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "space-between",
+  flexDirection: "row" as const,
+  alignItems: "center" as const,
+  justifyContent: "space-between" as const,
 })
 
 const $appTitle = ({ colors, typography, spacing }) => ({
-  textAlign: "center",
+  textAlign: "center" as const,
   color: colors.palette.primary500,
   fontFamily: typography.primary.bold,
   flex: 1,
@@ -786,8 +786,8 @@ const $backButton = ({ spacing }) => ({
   paddingVertical: spacing.xs,
   minWidth: 44,
   minHeight: 44,
-  justifyContent: "center",
-  alignItems: "center",
+  justifyContent: "center" as const,
+  alignItems: "center" as const,
 })
 
 const $backButtonText = ({ colors, typography }) => ({

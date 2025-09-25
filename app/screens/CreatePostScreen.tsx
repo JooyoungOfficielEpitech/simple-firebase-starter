@@ -21,14 +21,10 @@ type NavigationProp = NativeStackNavigationProp<BulletinBoardStackParamList>
 type RoutePropType = RouteProp<BulletinBoardStackParamList, "CreatePost">
 
 export const CreatePostScreen = () => {
-  console.log('🎬 [CreatePostScreen] 컴포넌트 렌더링 시작')
-  
   const { top } = useSafeAreaInsets()
   const navigation = useNavigation<NavigationProp>()
   const route = useRoute<RoutePropType>()
   const { postId, isEdit } = route.params || {}
-  
-  console.log('🎬 [CreatePostScreen] 라우트 파라미터:', { postId, isEdit, params: route.params })
   
   const {
     themed,
@@ -219,17 +215,8 @@ export const CreatePostScreen = () => {
   }, [isEdit, postId])
 
   const handleSave = async () => {
-    console.log('🚨 [CreatePostScreen] handleSave 호출됨!')
-    console.log('🚨 [CreatePostScreen] 현재 상태:', {
-      loading,
-      title: formData.title,
-      titleTrim: formData.title.trim(),
-      titleLength: formData.title.trim().length
-    })
-    
     // 유효성 검증
     if (!formData.title.trim()) {
-      console.log('❌ [CreatePostScreen] 제목 유효성 검증 실패')
       Alert.alert("오류", "제목을 입력해주세요.")
       return
     }
@@ -355,24 +342,6 @@ export const CreatePostScreen = () => {
           updatedAt: firestore.FieldValue.serverTimestamp(),
         }
 
-        // 🔍 저장 전 데이터 디버깅
-        console.log('🔍 [CreatePostScreen] 저장 전 데이터 검증:')
-        console.log('  • formData.roles:', formData.roles)
-        console.log('  • 필터링된 roles:', roles)
-        console.log('  • roles.length > 0:', roles.length > 0)
-        console.log('  • formData.auditionDate:', formData.auditionDate)
-        console.log('  • auditionInfo:', auditionInfo)
-        console.log('  • performanceInfo:', performanceInfo)
-        console.log('  • benefitsInfo:', benefitsInfo)
-        console.log('  • contactInfo:', contactInfo)
-        console.log('  • 최종 createData:', {
-          roles: roles.length > 0 ? roles : undefined,
-          audition: auditionInfo,
-          performance: performanceInfo,
-          benefits: benefitsInfo,
-          contact: contactInfo,
-        })
-
         console.log('📝 [CreatePostScreen] 게시글 생성 시작:', {
           userProfile: {
             organizationId: userProfile.organizationId,
@@ -429,7 +398,7 @@ export const CreatePostScreen = () => {
     }
   }
 
-  const updateFormData = (field: string, value: string) => {
+  const updateFormData = (field: string, value: string | boolean) => {
     setFormData(prev => ({
       ...prev,
       [field]: value,
@@ -437,12 +406,7 @@ export const CreatePostScreen = () => {
   }
 
   const applyTemplate = (template: PostTemplate) => {
-    console.log('템플릿 적용 시작:', template.name)
-    console.log('템플릿 데이터:', {
-      title: template.template.title,
-      production: template.template.production,
-      description: template.template.description
-    })
+    console.log('템플릿 적용:', template.name)
     
     setFormData(prev => {
       const newData = {
@@ -476,18 +440,11 @@ export const CreatePostScreen = () => {
         tags: template.template.tags,
       }
       
-      console.log('새 formData 설정:', {
-        title: newData.title,
-        production: newData.production,
-        description: newData.description.substring(0, 50) + '...'
-      })
-      
       return newData
     })
     
     setSelectedTemplate(template)
     setShowTemplateModal(false)
-    console.log('템플릿 적용 완료')
   }
 
   // 폼 완성도 계산 함수
@@ -533,18 +490,8 @@ export const CreatePostScreen = () => {
     }
   }
 
-  console.log('🎬 [CreatePostScreen] 사용자 프로필 상태:', {
-    userProfile: userProfile ? {
-      userType: userProfile.userType,
-      name: userProfile.name,
-      organizationName: userProfile.organizationName
-    } : null,
-    loading
-  })
-
   // 로딩 중일 때
   if (!userProfile) {
-    console.log('🎬 [CreatePostScreen] 로딩 상태 렌더링')
     return (
       <Screen preset="fixed" safeAreaEdges={["top"]}>
         <ScreenHeader title="게시글 작성" />
@@ -559,7 +506,6 @@ export const CreatePostScreen = () => {
 
   // 운영자가 아닐 때
   if (userProfile.userType !== "organizer") {
-    console.log('🎬 [CreatePostScreen] 권한 없음 상태 렌더링')
     return (
       <Screen preset="fixed" safeAreaEdges={["top"]}>
         <ScreenHeader title="게시글 작성" />
@@ -578,9 +524,6 @@ export const CreatePostScreen = () => {
     )
   }
 
-  console.log('🎬 [CreatePostScreen] 메인 폼 렌더링 시작')
-  console.log('🎬 [CreatePostScreen] formData:', formData)
-
   return (
     <Screen preset="scroll" safeAreaEdges={["top"]}>
       <ScreenHeader title={isEdit ? "게시글 수정" : "게시글 작성"} />
@@ -591,11 +534,7 @@ export const CreatePostScreen = () => {
           <Text text="⚡ 빠른 작성" style={themed($sectionHeader)} />
           <TouchableOpacity 
             style={themed($templateButton)}
-            onPress={() => {
-              console.log('템플릿 버튼 클릭됨')
-              console.log('POST_TEMPLATES:', POST_TEMPLATES.length, '개')
-              setShowTemplateModal(true)
-            }}
+            onPress={() => setShowTemplateModal(true)}
             activeOpacity={0.7}
           >
             <View style={themed($templateButtonContent)}>
@@ -624,15 +563,7 @@ export const CreatePostScreen = () => {
             <Text text={`📊 작성 진행률: ${calculateCompleteness()}%`} style={themed($progressTitle)} />
             <TouchableOpacity 
               style={themed($previewButton)}
-              onPress={() => {
-                console.log('미리보기 버튼 클릭됨')
-                console.log('현재 formData:', {
-                  title: formData.title,
-                  production: formData.production,
-                  description: formData.description.substring(0, 30) + '...'
-                })
-                setShowPreview(true)
-              }}
+              onPress={() => setShowPreview(true)}
               activeOpacity={0.7}
             >
               <Text text="👀 미리보기" style={themed($previewButtonText)} />
@@ -1142,10 +1073,7 @@ export const CreatePostScreen = () => {
                 <TouchableOpacity
                   key={item.id}
                   style={themed($templateItem)}
-                  onPress={() => {
-                    console.log('템플릿 선택됨:', item.name)
-                    applyTemplate(item)
-                  }}
+                  onPress={() => applyTemplate(item)}
                   activeOpacity={0.7}
                 >
                   <View style={themed($templateItemHeader)}>
@@ -1630,7 +1558,7 @@ const $templateButtonContent = {
   flexDirection: "row" as const,
   justifyContent: "space-between" as const,
   alignItems: "center" as const,
-  width: "100%",
+  width: "100%" as const,
 }
 
 const $templateButtonText = ({ colors, typography }) => ({
@@ -1693,8 +1621,8 @@ const $modalContainer = ({ colors, spacing }) => ({
   paddingHorizontal: spacing?.md || 12,
   paddingTop: spacing?.md || 12,
   paddingBottom: spacing?.xl || 24,
-  height: "80%",
-  width: "100%",
+  height: "80%" as const,
+  width: "100%" as const,
 })
 
 const $modalHeader = ({ spacing }) => ({
@@ -1818,7 +1746,7 @@ const $progressBarContainer = ({ colors, spacing }) => ({
 })
 
 const $progressBar = ({ colors }) => ({
-  height: "100%",
+  height: "100%" as const,
   backgroundColor: colors.tint || '#007AFF',
   borderRadius: 4,
 })
@@ -1849,8 +1777,8 @@ const $previewModalContainer = ({ colors, spacing }) => ({
   paddingHorizontal: spacing?.md || 12,
   paddingTop: spacing?.md || 12,
   paddingBottom: spacing?.xl || 24,
-  height: "85%",
-  width: "100%",
+  height: "85%" as const,
+  width: "100%" as const,
 })
 
 const $previewContent = ({ spacing }) => ({
