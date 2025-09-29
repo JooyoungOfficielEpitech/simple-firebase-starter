@@ -5,6 +5,13 @@ const ar: Translations = {
     ok: "نعم",
     cancel: "حذف",
     back: "خلف",
+    error: {
+      title: "حدث خطأ",
+      description: "حدثت مشكلة مؤقتة.\nيرجى المحاولة مرة أخرى لاحقاً.",
+      retry: "حاول مرة أخرى",
+      networkError: "يرجى فحص اتصال الشبكة",
+      serverError: "يوجد مشكلة مؤقتة في الخادم",
+    },
   },
   welcomeScreen: {
     postscript:
@@ -268,6 +275,45 @@ const ar: Translations = {
     // Status messages
     notVerifiedTitle: "لم يتم التحقق من البريد الإلكتروني بعد",
     notVerifiedMessage: "يرجى النقر على رابط التحقق في بريدك الإلكتروني أولاً.",
+  },
+  bulletinBoard: {
+    title: "لوحة الإعلانات",
+    loading: "جاري تحميل المنشورات...",
+    tabs: {
+      announcements: "الإعلانات",
+      organizations: "المنظمات",
+    },
+    empty: {
+      posts: {
+        title: "لا توجد إعلانات توظيف بعد",
+        description: "ستظهر إعلانات اختيار الممثلين للمسرح والموسيقى\nهنا.",
+        organizationDescription: "هذه المنظمة ليس لديها إعلانات توظيف بعد.\nستظهر المنشورات هنا عندما ينشئها مالك المنظمة.",
+      },
+      organizations: {
+        title: "لا توجد منظمات مسجلة",
+        description: "ستظهر المنظمات هنا\nبمجرد تسجيلها",
+      },
+    },
+    actions: {
+      createFirstPost: "إنشاء أول إعلان توظيف",
+      exploreOrganizations: "استكشاف منظمات أخرى",
+      createOrganization: "تسجيل منظمة جديدة",
+      addSampleData: "إضافة بيانات تجريبية",
+      edit: "تعديل",
+      delete: "حذف",
+      editPost: "تعديل المنشور",
+      deletePost: "حذف المنشور",
+    },
+    status: {
+      recruiting: "يوظف",
+      closed: "مغلق",
+      verified: "موثق",
+    },
+    posts: {
+      applicants: "{{count}} متقدم",
+      deadline: "الموعد النهائي {{date}}",
+      moreRoles: "{{count}} أدوار إضافية",
+    },
   },
 }
 

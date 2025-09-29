@@ -9,6 +9,8 @@ import { Icon } from "@/components/Icon"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { ScreenHeader } from "@/components/ScreenHeader"
+import { PostCard } from "@/components/PostCard"
+import { HeaderBackButton } from "@/components/HeaderBackButton"
 import { postService, userService, organizationService } from "@/services/firestore"
 import firestore from "@react-native-firebase/firestore"
 import auth from "@react-native-firebase/auth"
@@ -18,6 +20,7 @@ import { UserProfile } from "@/types/user"
 import { Organization } from "@/types/organization"
 import { BulletinBoardStackParamList } from "@/navigators/BulletinBoardStackNavigator"
 import { createComponentLogger } from "@/utils/logger"
+import { translate } from "@/i18n"
 
 type NavigationProp = NativeStackNavigationProp<BulletinBoardStackParamList>
 
@@ -459,7 +462,7 @@ export const BulletinBoardScreen = () => {
           {/* Header */}
           <View style={themed($header)}>
             <Text
-              text="게시판"
+              text={translate("bulletinBoard:title")}
               preset="heading"
               style={themed($appTitle)}
             />
@@ -469,7 +472,7 @@ export const BulletinBoardScreen = () => {
             <View style={themed($loadingIconContainer)}>
               <Text text="🎭" style={themed($loadingIcon)} />
             </View>
-            <Text text="게시글을 불러오는 중..." style={themed($loadingText)} />
+            <Text text={translate("bulletinBoard:loading")} style={themed($loadingText)} />
           </View>
         </View>
       </Screen>
@@ -482,30 +485,16 @@ export const BulletinBoardScreen = () => {
         {/* Header */}
         <View style={themed($header)}>
           {!!selectedOrganizationId && (
-            <TouchableOpacity
-              style={themed($backButton)}
-              onPress={handleBackToAllPosts}
-              accessibilityRole="button"
-              accessibilityLabel="뒤로가기"
-            >
-              <Text text="←" style={themed($backButtonText)} />
-            </TouchableOpacity>
+            <HeaderBackButton onPress={handleBackToAllPosts} />
           )}
           <Text
             text={selectedOrganizationId ? 
-              organizations.find(org => org.id === selectedOrganizationId)?.name || "단체" : 
-              "게시판 📊"}
+              organizations.find(org => org.id === selectedOrganizationId)?.name || translate("bulletinBoard:tabs.organizations") : 
+              translate("bulletinBoard:title")}
             preset="heading"
             style={themed($appTitle)}
           />
           <View style={themed($headerButtons)}>
-            <Button
-              text="📊"
-              preset="filled"
-              onPress={addTestData}
-              style={themed($testDataButton)}
-              textStyle={themed($buttonText)}
-            />
             <Button
               text="+"
               preset="default"
@@ -524,7 +513,7 @@ export const BulletinBoardScreen = () => {
               onPress={() => setActiveTab('announcements')}
             >
               <Text 
-                text="공고" 
+                text={translate("bulletinBoard:tabs.announcements")} 
                 style={themed(activeTab === 'announcements' ? $activeTabText : $tabText)} 
               />
             </TouchableOpacity>
@@ -537,7 +526,7 @@ export const BulletinBoardScreen = () => {
               }}
             >
               <Text 
-                text="단체" 
+                text={translate("bulletinBoard:tabs.organizations")} 
                 style={themed(activeTab === 'organizations' ? $activeTabText : $tabText)} 
               />
             </TouchableOpacity>
@@ -555,11 +544,11 @@ export const BulletinBoardScreen = () => {
                     <View style={themed($emptyIconContainer)}>
                       <Text text="🎭" style={themed($emptyIcon)} />
                     </View>
-                    <Text text="아직 모집 공고가 없어요" style={themed($emptyTitle)} />
+                    <Text text={translate("bulletinBoard:empty.posts.title")} style={themed($emptyTitle)} />
                     <Text 
                       text={selectedOrganizationId 
-                        ? "이 단체의 모집 공고가 아직 없습니다.\n단체 운영자가 공고를 올리면 여기에 나타납니다."
-                        : "연극, 뮤지컬 배우 모집 공고가\n여기에 표시됩니다."} 
+                        ? translate("bulletinBoard:empty.posts.organizationDescription")
+                        : translate("bulletinBoard:empty.posts.description")} 
                       style={themed($emptyDescription)} 
                     />
                     
@@ -567,7 +556,7 @@ export const BulletinBoardScreen = () => {
                     <View style={themed($emptyActions)}>
                       {isOrganizer && !selectedOrganizationId ? (
                         <Button
-                          text="첫 모집 공고 작성하기"
+                          text={translate("bulletinBoard:actions.createFirstPost")}
                           style={themed($primaryEmptyButton)}
                           textStyle={themed($primaryEmptyButtonText)}
                           onPress={handleCreatePost}
@@ -576,7 +565,7 @@ export const BulletinBoardScreen = () => {
                       
                       {!selectedOrganizationId && (
                         <Button
-                          text="다른 단체 둘러보기"
+                          text={translate("bulletinBoard:actions.exploreOrganizations")}
                           style={themed($secondaryEmptyButton)}
                           textStyle={themed($secondaryEmptyButtonText)}
                           onPress={() => setActiveTab('organizations')}
@@ -586,7 +575,7 @@ export const BulletinBoardScreen = () => {
                       {/* 개발용 테스트 버튼 - 개발 모드에서만 */}
                       {__DEV__ && (
                         <Button
-                          text="샘플 데이터 추가"
+                          text={translate("bulletinBoard:actions.addSampleData")}
                           style={themed($sampleDataButton)}
                           textStyle={themed($sampleDataButtonText)}
                           onPress={addTestData}
@@ -613,70 +602,11 @@ export const BulletinBoardScreen = () => {
                   
                   try {
                     return (
-                      <TouchableOpacity
+                      <PostCard
                         key={post.id}
-                        style={themed($postCard)}
-                        onPress={() => handlePostPress(post.id)}
-                        accessibilityRole="button"
-                        accessibilityLabel={`${post.title} - ${post.production} 모집공고`}
-                        accessibilityHint="터치하여 상세정보 보기"
-                      >
-                        <View style={themed($postCardHeader)}>
-                          <View style={themed($postStatusRow)}>
-                            <View style={themed(post.status === "active" ? $activeBadge : $closedBadge)}>
-                              <Text
-                                text={post.status === "active" ? "모집중" : "마감"}
-                                style={themed(post.status === "active" ? $activeText : $closedText)}
-                              />
-                            </View>
-                            {post.deadline && (
-                              <Text text={`마감 ${post.deadline}`} style={themed($deadlineText)} />
-                            )}
-                          </View>
-                          <Text preset="subheading" text={post.title} style={themed($postTitle)} />
-                          <Text text={post.production} style={themed($production)} />
-                        </View>
-                        
-                        <View style={themed($postMeta)}>
-                          <View style={themed($organizationRow)}>
-                            <Text text={post.organizationName} style={themed($organization)} />
-                            {post.totalApplicants && (
-                              <Text text={`지원자 ${post.totalApplicants}명`} style={themed($applicantCount)} />
-                            )}
-                          </View>
-                          <Text text={post.location} style={themed($location)} />
-                          <Text text={post.rehearsalSchedule} style={themed($schedule)} />
-                        </View>
-
-                        {/* Role summary for quick scanning */}
-                        {post.roles && post.roles.length > 0 && (
-                          <View style={themed($rolesPreview)}>
-                            <Text 
-                              text={post.roles.slice(0, 2).map(role => `${role.name}(${role.count}명)`).join(", ")}
-                              style={themed($rolesPreviewText)}
-                              numberOfLines={1}
-                            />
-                            {post.roles.length > 2 && (
-                              <Text text={`외 ${post.roles.length - 2}개 역할`} style={themed($moreRoles)} />
-                            )}
-                          </View>
-                        )}
-
-                        {post.tags && post.tags.length > 0 && (
-                          <View style={themed($tagsContainer)}>
-                            {post.tags.slice(0, 3).map((tag, tagIndex) => (
-                              <View key={tagIndex} style={themed($tag)}>
-                                <Text text={tag} style={themed($tagText)} />
-                              </View>
-                            ))}
-                            {post.tags.length > 3 && (
-                              <View style={themed($tag)}>
-                                <Text text={`+${post.tags.length - 3}`} style={themed($tagText)} />
-                              </View>
-                            )}
-                          </View>
-                        )}
-                      </TouchableOpacity>
+                        post={post}
+                        onPress={handlePostPress}
+                      />
                     )
                   } catch (renderError) {
                     console.error(`❌ [BulletinBoardScreen] 게시글 ${index + 1} 렌더링 에러:`, renderError)
@@ -691,7 +621,7 @@ export const BulletinBoardScreen = () => {
               {isOrganizer && (
                 <View style={themed($createOrgButtonContainer)}>
                   <Button
-                    text="새 단체 등록"
+                    text={translate("bulletinBoard:actions.createOrganization")}
                     onPress={handleCreateOrganization}
                     style={themed($createOrgButton)}
                     LeftAccessory={(props) => (
@@ -706,8 +636,8 @@ export const BulletinBoardScreen = () => {
                   <View style={themed($emptyIconContainer)}>
                     <Text text="🏢" style={themed($emptyIcon)} />
                   </View>
-                  <Text text="등록된 단체가 없습니다" style={themed($emptyTitle)} />
-                  <Text text="단체가 등록되면\n여기에 표시됩니다" style={themed($emptyDescription)} />
+                  <Text text={translate("bulletinBoard:empty.organizations.title")} style={themed($emptyTitle)} />
+                  <Text text={translate("bulletinBoard:empty.organizations.description")} style={themed($emptyDescription)} />
                 </View>
               ) : (
                 organizations.map((organization) => (
@@ -720,7 +650,7 @@ export const BulletinBoardScreen = () => {
                     <Text preset="subheading" text={organization.name} style={themed($organizationName)} />
                     {organization.isVerified && (
                       <View style={themed($verifiedBadge)}>
-                        <Text text="인증" style={themed($verifiedText)} />
+                        <Text text={translate("bulletinBoard:status.verified")} style={themed($verifiedText)} />
                       </View>
                     )}
                   </View>
@@ -781,20 +711,7 @@ const $appTitle = ({ colors, typography, spacing }) => ({
   flex: 1,
 })
 
-const $backButton = ({ spacing }) => ({
-  paddingHorizontal: spacing.sm,
-  paddingVertical: spacing.xs,
-  minWidth: 44,
-  minHeight: 44,
-  justifyContent: "center" as const,
-  alignItems: "center" as const,
-})
-
-const $backButtonText = ({ colors, typography }) => ({
-  fontSize: 24,
-  color: colors.palette.primary500,
-  fontFamily: typography.primary.bold,
-})
+// BackButton styles moved to HeaderBackButton component
 
 
 const $contentContainer = {
@@ -899,84 +816,7 @@ const $loadingText = ({ colors }) => ({
   textAlign: "center" as const,
 })
 
-const $postCard = ({ colors, spacing }) => ({
-  backgroundColor: colors.background,
-  borderRadius: 12,
-  padding: spacing?.md || 12,
-  marginBottom: spacing?.md || 12,
-  borderWidth: 1,
-  borderColor: colors.border,
-})
-
-const $postHeader = ({ spacing }) => ({
-  flexDirection: "row" as const,
-  justifyContent: "space-between" as const,
-  alignItems: "flex-start" as const,
-  marginBottom: spacing?.xs || 4,
-})
-
-const $postTitle = ({ colors, spacing }) => ({
-  color: colors.text,
-  flex: 1,
-  marginRight: spacing?.xs || 4,
-})
-
-
-const $activeBadge = ({ colors, spacing }) => ({
-  paddingHorizontal: spacing?.xs || 4,
-  paddingVertical: 4,
-  borderRadius: 6,
-  backgroundColor: colors.tint + "20",
-})
-
-const $closedBadge = ({ colors, spacing }) => ({
-  paddingHorizontal: spacing?.xs || 4,
-  paddingVertical: 4,
-  borderRadius: 6,
-  backgroundColor: colors.textDim + "20",
-})
-
-
-const $activeText = ({ colors }) => ({
-  fontSize: 12,
-  fontWeight: "bold" as const,
-  color: colors.tint,
-})
-
-const $closedText = ({ colors }) => ({
-  fontSize: 12,
-  fontWeight: "bold" as const,
-  color: colors.textDim,
-})
-
-const $production = ({ colors, spacing }) => ({
-  color: colors.text,
-  fontSize: 16,
-  fontWeight: "600" as const,
-  marginBottom: spacing?.xs || 4,
-})
-
-const $organization = ({ colors, spacing }) => ({
-  color: colors.tint,
-  fontSize: 14,
-  marginBottom: spacing?.sm || 8,
-})
-
-const $postFooter = ({ spacing }) => ({
-  marginBottom: spacing?.sm || 8,
-})
-
-const $location = ({ colors }) => ({
-  color: colors.textDim,
-  fontSize: 14,
-  marginBottom: 2,
-})
-
-const $schedule = ({ colors }) => ({
-  color: colors.textDim,
-  fontSize: 14,
-})
-
+// PostCard styles moved to PostCard component
 const $tagsContainer = ({ spacing }) => ({
   flexDirection: "row" as const,
   flexWrap: "wrap" as const,
@@ -1003,21 +843,7 @@ const $headerButtons = () => ({
   alignItems: "center" as const,
 })
 
-const $testDataButton = ({ colors, spacing }) => ({
-  width: 40,
-  height: 40,
-  borderRadius: 20,
-  paddingHorizontal: 0,
-  paddingVertical: 0,
-  marginRight: spacing.sm,
-  minHeight: 40,
-  backgroundColor: colors.palette.orange500,
-})
-
-const $buttonText = ({ colors }) => ({
-  fontSize: 18,
-  color: colors.palette.neutral100,
-})
+// Unused button styles removed
 
 const $createButtonText = ({ colors }) => ({
   fontSize: 24,
@@ -1134,65 +960,7 @@ const $createOrgButton = ({ colors, spacing }) => ({
   paddingVertical: spacing?.sm || 8,
 })
 
-// 새로운 Post Card 스타일들
-const $postCardHeader = ({ spacing }) => ({
-  marginBottom: spacing?.sm || 8,
-})
-
-const $postStatusRow = ({ spacing }) => ({
-  flexDirection: "row" as const,
-  justifyContent: "space-between" as const,
-  alignItems: "center" as const,
-  marginBottom: spacing?.xs || 4,
-})
-
-const $deadlineText = ({ colors, typography }) => ({
-  fontSize: 12,
-  lineHeight: 18,
-  color: colors.textDim,
-  fontFamily: typography.primary.medium,
-})
-
-const $postMeta = ({ spacing }) => ({
-  marginBottom: spacing?.sm || 8,
-})
-
-const $organizationRow = ({ spacing }) => ({
-  flexDirection: "row" as const,
-  justifyContent: "space-between" as const,
-  alignItems: "center" as const,
-  marginBottom: spacing?.xs || 4,
-})
-
-const $applicantCount = ({ colors, typography }) => ({
-  fontSize: 12,
-  lineHeight: 18,
-  color: colors.palette.primary500,
-  fontFamily: typography.primary.medium,
-})
-
-const $rolesPreview = ({ spacing }) => ({
-  flexDirection: "row" as const,
-  justifyContent: "space-between" as const,
-  alignItems: "center" as const,
-  marginBottom: spacing?.xs || 4,
-  paddingVertical: spacing?.xxxs || 2,
-})
-
-const $rolesPreviewText = ({ colors, typography }) => ({
-  flex: 1,
-  fontSize: 13,
-  lineHeight: 20,
-  color: colors.text,
-  fontFamily: typography.primary.normal,
-})
-
-const $moreRoles = ({ colors, typography }) => ({
-  fontSize: 12,
-  lineHeight: 18,
-  color: colors.textDim,
-  fontFamily: typography.primary.normal,
-})
+// PostCard detail styles moved to PostCard component
 
 // Empty State 버튼 스타일들
 const $primaryEmptyButton = ({ colors, spacing }) => ({

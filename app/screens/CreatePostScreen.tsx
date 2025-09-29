@@ -1212,8 +1212,9 @@ export const CreatePostScreen = () => {
 
 const $container = ({ spacing }) => ({
   flex: 1,
-  paddingHorizontal: spacing.lg,
-  paddingTop: spacing.md,
+  paddingHorizontal: spacing?.lg || 16,
+  paddingTop: spacing?.md || 12,
+  paddingBottom: spacing?.xl || 24, // 하단 여백 추가
 })
 
 const $scrollView = ({ spacing }) => ({
@@ -1228,8 +1229,9 @@ const $centerContainer = {
 }
 
 const $inputSection = ({ spacing }) => ({
-  marginBottom: spacing.lg,
-  marginTop: spacing.xs,
+  marginBottom: spacing?.lg || 16,
+  marginTop: spacing?.xs || 4,
+  width: '100%' as const, // 화면 너비에 맞춤
 })
 
 const $label = ({ colors, spacing }) => ({
@@ -1243,10 +1245,13 @@ const $textInput = ({ colors, spacing }) => ({
   borderWidth: 1,
   borderColor: colors.border,
   borderRadius: 8,
-  padding: spacing.md,
+  padding: spacing?.md || 12,
   fontSize: 16,
   color: colors.text,
   backgroundColor: colors.background,
+  minHeight: 44, // 터치하기 좋은 최소 높이
+  width: '100%' as const, // 화면 너비에 맞춤
+  marginBottom: spacing?.xs || 4,
 })
 
 const $textArea = {
@@ -1294,8 +1299,9 @@ const $closedStatusButtonText = ({ colors }) => ({
 })
 
 const $saveSection = ({ spacing }) => ({
-  marginTop: spacing.lg,
-  marginBottom: spacing.xl,
+  marginTop: spacing?.lg || 16,
+  marginBottom: spacing?.xl || 24,
+  paddingHorizontal: spacing?.sm || 8, // 좌우 여백 추가
 })
 
 const $saveButton = {

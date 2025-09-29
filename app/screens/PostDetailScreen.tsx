@@ -8,6 +8,8 @@ import type { RouteProp } from "@react-navigation/native"
 import { Screen } from "@/components/Screen"
 import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
+import { HeaderBackButton } from "@/components/HeaderBackButton"
+import { translate } from "@/i18n"
 import { postService, userService } from "@/services/firestore"
 import { useAppTheme } from "@/theme/context"
 import { Post } from "@/types/post"
@@ -88,35 +90,6 @@ export const PostDetailScreen = () => {
     )
   }
 
-  const handleStatusToggle = async () => {
-    if (!post) return
-    
-    const newStatus = post.status === "active" ? "closed" : "active"
-    const statusText = newStatus === "active" ? "모집 재개" : "모집 중지"
-    
-    Alert.alert(
-      `게시글 ${statusText}`,
-      `이 게시글을 ${statusText}하시겠습니까?`,
-      [
-        {
-          text: "취소",
-          style: "cancel",
-        },
-        {
-          text: statusText,
-          onPress: async () => {
-            try {
-              await postService.updatePostStatus(postId, newStatus)
-              Alert.alert("완료", `게시글이 ${statusText}되었습니다.`)
-            } catch (error) {
-              const errorMessage = error.message || `${statusText}에 실패했습니다.`
-              Alert.alert(`${statusText} 실패`, errorMessage)
-            }
-          },
-        },
-      ],
-    )
-  }
 
   const isMyPost = post && userProfile && post.authorId === userProfile.uid && userProfile.userType === "organizer"
 
@@ -126,14 +99,7 @@ export const PostDetailScreen = () => {
         <View style={themed($container)}>
           {/* Header */}
           <View style={themed($header)}>
-            <TouchableOpacity
-              style={themed($backButton)}
-              onPress={() => navigation.goBack()}
-              accessibilityRole="button"
-              accessibilityLabel="뒤로가기"
-            >
-              <Text text="←" style={themed($backButtonText)} />
-            </TouchableOpacity>
+            <HeaderBackButton onPress={() => navigation.goBack()} />
             <Text
               text="게시글"
               preset="heading"
@@ -155,14 +121,7 @@ export const PostDetailScreen = () => {
         <View style={themed($container)}>
           {/* Header */}
           <View style={themed($header)}>
-            <TouchableOpacity
-              style={themed($backButton)}
-              onPress={() => navigation.goBack()}
-              accessibilityRole="button"
-              accessibilityLabel="뒤로가기"
-            >
-              <Text text="←" style={themed($backButtonText)} />
-            </TouchableOpacity>
+            <HeaderBackButton onPress={() => navigation.goBack()} />
             <Text
               text="게시글"
               preset="heading"
@@ -183,14 +142,7 @@ export const PostDetailScreen = () => {
       <View style={themed($container)}>
         {/* Header */}
         <View style={themed($header)}>
-          <TouchableOpacity
-            style={themed($backButton)}
-            onPress={() => navigation.goBack()}
-            accessibilityRole="button"
-            accessibilityLabel="뒤로가기"
-          >
-            <Text text="←" style={themed($backButtonText)} />
-          </TouchableOpacity>
+          <HeaderBackButton onPress={() => navigation.goBack()} />
           <Text
             text="모집 공고"
             preset="heading"
@@ -296,36 +248,21 @@ export const PostDetailScreen = () => {
         {isMyPost && (
           <View style={themed($actionButtonsContainer)}>
             <TouchableOpacity
-              style={themed($primaryActionButton)}
-              onPress={() => console.log("Navigate to edit")} // 수정 기능 구현 예정
-              accessibilityLabel="공고 수정"
+              style={themed($editButton)}
+              onPress={() => navigation.navigate("CreatePost", { postId: post.id, isEdit: true })}
+              accessibilityLabel={translate("bulletinBoard:actions.editPost")}
             >
               <Text text="✏️" style={themed($buttonIcon)} />
-              <Text text="수정하기" style={themed($primaryActionText)} />
+              <Text text={translate("bulletinBoard:actions.edit")} style={themed($editButtonText)} />
             </TouchableOpacity>
             
             <TouchableOpacity
-              style={themed($secondaryActionButton)}
-              onPress={handleStatusToggle}
-              accessibilityLabel={post.status === "active" ? "모집 중지" : "모집 재개"}
-            >
-              <Text 
-                text={post.status === "active" ? "⏸️" : "▶️"} 
-                style={themed($buttonIcon)} 
-              />
-              <Text
-                text={post.status === "active" ? "모집중지" : "모집재개"}
-                style={themed($secondaryActionText)}
-              />
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={themed($dangerActionButton)}
+              style={themed($deleteButton)}
               onPress={handleDelete}
-              accessibilityLabel="공고 삭제"
+              accessibilityLabel={translate("bulletinBoard:actions.deletePost")}
             >
               <Text text="🗑️" style={themed($buttonIcon)} />
-              <Text text="삭제하기" style={themed($dangerActionText)} />
+              <Text text={translate("bulletinBoard:actions.delete")} style={themed($deleteButtonText)} />
             </TouchableOpacity>
           </View>
         )}
@@ -458,39 +395,62 @@ const $contactText = ({ colors }) => ({
 // Action button styles
 const $actionButtonsContainer = ({ spacing }) => ({
   flexDirection: "row" as const,
-  justifyContent: "space-between" as const,
+  justifyContent: "center" as const,
+  alignItems: "center" as const,
   marginTop: spacing.lg,
   gap: spacing.md,
+  paddingHorizontal: spacing.md,
 })
 
-const $statusButton = ({ colors, spacing }) => ({
-  flex: 1,
-  backgroundColor: colors.tint,
-  paddingVertical: spacing.md,
-  paddingHorizontal: spacing.lg,
-  borderRadius: 8,
+// 새로운 통일된 버튼 스타일
+const $editButton = ({ colors, spacing }) => ({
+  flexDirection: "row" as const,
   alignItems: "center" as const,
+  justifyContent: "center" as const,
+  backgroundColor: colors.palette.primary500,
+  paddingVertical: spacing?.md || 12,
+  paddingHorizontal: spacing?.lg || 20,
+  borderRadius: 25,
+  minWidth: 120,
+  minHeight: 50,
+  shadowColor: colors.palette.primary500,
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.2,
+  shadowRadius: 4,
+  elevation: 3,
 })
 
-const $statusButtonText = ({ colors }) => ({
+const $editButtonText = ({ colors, typography }) => ({
   color: colors.palette.neutral100,
   fontSize: 16,
-  fontWeight: "600" as const,
+  lineHeight: 24,
+  fontFamily: typography.primary.medium,
+  marginLeft: 6,
 })
 
 const $deleteButton = ({ colors, spacing }) => ({
-  flex: 1,
-  backgroundColor: colors.palette.angry500,
-  paddingVertical: spacing.md,
-  paddingHorizontal: spacing.lg,
-  borderRadius: 8,
+  flexDirection: "row" as const,
   alignItems: "center" as const,
+  justifyContent: "center" as const,
+  backgroundColor: colors.palette.angry500,
+  paddingVertical: spacing?.md || 12,
+  paddingHorizontal: spacing?.lg || 20,
+  borderRadius: 25,
+  minWidth: 120,
+  minHeight: 50,
+  shadowColor: colors.palette.angry500,
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.2,
+  shadowRadius: 4,
+  elevation: 3,
 })
 
-const $deleteButtonText = ({ colors }) => ({
+const $deleteButtonText = ({ colors, typography }) => ({
   color: colors.palette.neutral100,
   fontSize: 16,
-  fontWeight: "600" as const,
+  lineHeight: 24,
+  fontFamily: typography.primary.medium,
+  marginLeft: 6,
 })
 
 // 새로운 PostDetail 스타일들
@@ -663,7 +623,7 @@ const $dangerActionText = ({ colors, typography }) => ({
 })
 
 const $buttonIcon = {
-  fontSize: 16,
+  fontSize: 18,
 }
 
 // Badge 스타일들 (BulletinBoardScreen에서 가져옴)

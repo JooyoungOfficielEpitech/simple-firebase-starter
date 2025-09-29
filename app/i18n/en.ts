@@ -3,6 +3,13 @@ const en = {
     ok: "OK!",
     cancel: "Cancel",
     back: "Back",
+    error: {
+      title: "An error occurred",
+      description: "A temporary problem has occurred.\nPlease try again later.",
+      retry: "Try Again",
+      networkError: "Please check your network connection",
+      serverError: "There's a temporary problem with the server",
+    },
   },
   welcomeScreen: {
     postscript:
@@ -266,6 +273,45 @@ const en = {
     // Status messages
     notVerifiedTitle: "Email Not Yet Verified",
     notVerifiedMessage: "Please click the verification link in your email first.",
+  },
+  bulletinBoard: {
+    title: "Bulletin Board",
+    loading: "Loading posts...",
+    tabs: {
+      announcements: "Announcements",
+      organizations: "Organizations",
+    },
+    empty: {
+      posts: {
+        title: "No recruitment posts yet",
+        description: "Theater and musical casting announcements\nwill appear here.",
+        organizationDescription: "This organization doesn't have any recruitment posts yet.\nPosts will appear here when the organization owner creates them.",
+      },
+      organizations: {
+        title: "No organizations registered",
+        description: "Organizations will appear here\nonce they're registered",
+      },
+    },
+    actions: {
+      createFirstPost: "Create first recruitment post",
+      exploreOrganizations: "Explore other organizations",
+      createOrganization: "Register new organization",
+      addSampleData: "Add sample data",
+      edit: "Edit",
+      delete: "Delete",
+      editPost: "Edit Post",
+      deletePost: "Delete Post",
+    },
+    status: {
+      recruiting: "Recruiting",
+      closed: "Closed",
+      verified: "Verified",
+    },
+    posts: {
+      applicants: "{{count}} applicants",
+      deadline: "Due {{date}}",
+      moreRoles: "{{count}} more roles",
+    },
   },
 }
 

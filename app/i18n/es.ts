@@ -5,6 +5,13 @@ const es: Translations = {
     ok: "OK",
     cancel: "Cancel",
     back: "Back",
+    error: {
+      title: "Ha ocurrido un error",
+      description: "Ha ocurrido un problema temporal.\nPor favor, inténtalo de nuevo más tarde.",
+      retry: "Intentar de Nuevo",
+      networkError: "Por favor, verifica tu conexión de red",
+      serverError: "Hay un problema temporal con el servidor",
+    },
   },
   welcomeScreen: {
     postscript: "Welcome screen postscript",
@@ -267,6 +274,45 @@ const es: Translations = {
     // Status messages
     notVerifiedTitle: "Email Not Yet Verified",
     notVerifiedMessage: "Please click the verification link in your email first.",
+  },
+  bulletinBoard: {
+    title: "Tablón de Anuncios",
+    loading: "Cargando publicaciones...",
+    tabs: {
+      announcements: "Anuncios",
+      organizations: "Organizaciones",
+    },
+    empty: {
+      posts: {
+        title: "Aún no hay anuncios de reclutamiento",
+        description: "Los anuncios de casting de teatro y musicales\naparecerán aquí.",
+        organizationDescription: "Esta organización aún no tiene anuncios de reclutamiento.\nLas publicaciones aparecerán aquí cuando el propietario de la organización las cree.",
+      },
+      organizations: {
+        title: "No hay organizaciones registradas",
+        description: "Las organizaciones aparecerán aquí\nuna vez que se registren",
+      },
+    },
+    actions: {
+      createFirstPost: "Crear primer anuncio de reclutamiento",
+      exploreOrganizations: "Explorar otras organizaciones",
+      createOrganization: "Registrar nueva organización",
+      addSampleData: "Agregar datos de muestra",
+      edit: "Editar",
+      delete: "Eliminar",
+      editPost: "Editar publicación",
+      deletePost: "Eliminar publicación",
+    },
+    status: {
+      recruiting: "Reclutando",
+      closed: "Cerrado",
+      verified: "Verificado",
+    },
+    posts: {
+      applicants: "{{count}} solicitantes",
+      deadline: "Vence {{date}}",
+      moreRoles: "{{count}} roles más",
+    },
   },
 }
 

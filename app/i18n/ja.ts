@@ -5,6 +5,13 @@ const ja: Translations = {
     ok: "OK",
     cancel: "Cancel",
     back: "Back",
+    error: {
+      title: "エラーが発生しました",
+      description: "一時的な問題が発生しました。\n後でもう一度お試しください。",
+      retry: "再試行",
+      networkError: "ネットワーク接続を確認してください",
+      serverError: "サーバーに一時的な問題があります",
+    },
   },
   welcomeScreen: {
     postscript: "Welcome screen postscript",
@@ -267,6 +274,45 @@ const ja: Translations = {
     // Status messages
     notVerifiedTitle: "Email Not Yet Verified",
     notVerifiedMessage: "Please click the verification link in your email first.",
+  },
+  bulletinBoard: {
+    title: "掲示板",
+    loading: "投稿を読み込み中...",
+    tabs: {
+      announcements: "告知",
+      organizations: "団体",
+    },
+    empty: {
+      posts: {
+        title: "まだ募集投稿がありません",
+        description: "演劇・ミュージカルのキャスト募集告知が\nここに表示されます。",
+        organizationDescription: "この団体にはまだ募集投稿がありません。\n団体のオーナーが投稿を作成すると、ここに表示されます。",
+      },
+      organizations: {
+        title: "登録された団体がありません",
+        description: "団体が登録されると\nここに表示されます",
+      },
+    },
+    actions: {
+      createFirstPost: "最初の募集投稿を作成",
+      exploreOrganizations: "他の団体を探す",
+      createOrganization: "新しい団体を登録",
+      addSampleData: "サンプルデータを追加",
+      edit: "編集",
+      delete: "削除",
+      editPost: "投稿を編集",
+      deletePost: "投稿を削除",
+    },
+    status: {
+      recruiting: "募集中",
+      closed: "終了",
+      verified: "認証済み",
+    },
+    posts: {
+      applicants: "応募者{{count}}名",
+      deadline: "締切{{date}}",
+      moreRoles: "他{{count}}役",
+    },
   },
 }
 

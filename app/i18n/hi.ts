@@ -5,6 +5,13 @@ const hi: Translations = {
     ok: "OK",
     cancel: "Cancel",
     back: "Back",
+    error: {
+      title: "एक त्रुटि हुई",
+      description: "एक अस्थायी समस्या हुई है।\nकृपया बाद में फिर से कोशिश करें।",
+      retry: "फिर से कोशिश करें",
+      networkError: "कृपया अपना नेटवर्क कनेक्शन जांचें",
+      serverError: "सर्वर में अस्थायी समस्या है",
+    },
   },
   welcomeScreen: {
     postscript: "Welcome screen postscript",
@@ -267,6 +274,45 @@ const hi: Translations = {
     // Status messages
     notVerifiedTitle: "Email Not Yet Verified",
     notVerifiedMessage: "Please click the verification link in your email first.",
+  },
+  bulletinBoard: {
+    title: "सूचना बोर्ड",
+    loading: "पोस्ट लोड हो रहे हैं...",
+    tabs: {
+      announcements: "घोषणाएं",
+      organizations: "संगठन",
+    },
+    empty: {
+      posts: {
+        title: "अभी तक कोई भर्ती पोस्ट नहीं",
+        description: "थिएटर और म्यूजिकल कास्टिंग घोषणाएं\nयहां दिखाई देंगी।",
+        organizationDescription: "इस संगठन के पास अभी तक कोई भर्ती पोस्ट नहीं है।\nजब संगठन का मालिक उन्हें बनाएगा तो पोस्ट यहां दिखाई देंगे।",
+      },
+      organizations: {
+        title: "कोई संगठन पंजीकृत नहीं",
+        description: "संगठन यहां दिखाई देंगे\nजब वे पंजीकृत हो जाएंगे",
+      },
+    },
+    actions: {
+      createFirstPost: "पहली भर्ती पोस्ट बनाएं",
+      exploreOrganizations: "अन्य संगठनों का अन्वेषण करें",
+      createOrganization: "नया संगठन पंजीकृत करें",
+      addSampleData: "नमूना डेटा जोड़ें",
+      edit: "संपादित करें",
+      delete: "हटाएं",
+      editPost: "पोस्ट संपादित करें",
+      deletePost: "पोस्ट हटाएं",
+    },
+    status: {
+      recruiting: "भर्ती",
+      closed: "बंद",
+      verified: "सत्यापित",
+    },
+    posts: {
+      applicants: "{{count}} आवेदक",
+      deadline: "समय सीमा {{date}}",
+      moreRoles: "{{count}} और भूमिकाएं",
+    },
   },
 }
 

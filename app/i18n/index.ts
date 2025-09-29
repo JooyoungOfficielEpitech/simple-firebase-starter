@@ -13,6 +13,9 @@ import hi from "./hi"
 import ja from "./ja"
 import ko from "./ko"
 
+// Export translate function
+export { translate } from "./translate"
+
 const fallbackLocale = "en-US"
 
 const systemLocales = Localization.getLocales()

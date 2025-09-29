@@ -5,6 +5,13 @@ const fr: Translations = {
     ok: "OK",
     cancel: "Cancel",
     back: "Back",
+    error: {
+      title: "Une erreur s'est produite",
+      description: "Un problème temporaire s'est produit.\nVeuillez réessayer plus tard.",
+      retry: "Réessayer",
+      networkError: "Veuillez vérifier votre connexion réseau",
+      serverError: "Il y a un problème temporaire avec le serveur",
+    },
   },
   welcomeScreen: {
     postscript: "Welcome screen postscript",
@@ -267,6 +274,45 @@ const fr: Translations = {
     // Status messages
     notVerifiedTitle: "Email Not Yet Verified",
     notVerifiedMessage: "Please click the verification link in your email first.",
+  },
+  bulletinBoard: {
+    title: "Tableau d'Affichage",
+    loading: "Chargement des publications...",
+    tabs: {
+      announcements: "Annonces",
+      organizations: "Organisations",
+    },
+    empty: {
+      posts: {
+        title: "Aucune annonce de recrutement pour le moment",
+        description: "Les annonces de casting de théâtre et de comédie musicale\napparaîtront ici.",
+        organizationDescription: "Cette organisation n'a pas encore d'annonces de recrutement.\nLes publications apparaîtront ici lorsque le propriétaire de l'organisation les créera.",
+      },
+      organizations: {
+        title: "Aucune organisation enregistrée",
+        description: "Les organisations apparaîtront ici\nune fois qu'elles seront enregistrées",
+      },
+    },
+    actions: {
+      createFirstPost: "Créer la première annonce de recrutement",
+      exploreOrganizations: "Explorer d'autres organisations",
+      createOrganization: "Enregistrer une nouvelle organisation",
+      addSampleData: "Ajouter des données d'exemple",
+      edit: "Modifier",
+      delete: "Supprimer",
+      editPost: "Modifier la publication",
+      deletePost: "Supprimer la publication",
+    },
+    status: {
+      recruiting: "Recrutement",
+      closed: "Fermé",
+      verified: "Vérifié",
+    },
+    posts: {
+      applicants: "{{count}} candidats",
+      deadline: "Échéance {{date}}",
+      moreRoles: "{{count}} rôles de plus",
+    },
   },
 }
 

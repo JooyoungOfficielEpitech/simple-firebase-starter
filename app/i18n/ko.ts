@@ -5,6 +5,13 @@ const ko: Translations = {
     ok: "확인!",
     cancel: "취소",
     back: "뒤로",
+    error: {
+      title: "오류가 발생했습니다",
+      description: "일시적인 문제가 발생했습니다.\n잠시 후 다시 시도해주세요.",
+      retry: "다시 시도",
+      networkError: "네트워크 연결을 확인해주세요",
+      serverError: "서버에 일시적인 문제가 있습니다",
+    },
   },
   welcomeScreen: {
     postscript:
@@ -267,6 +274,45 @@ const ko: Translations = {
     // Status messages
     notVerifiedTitle: "아직 이메일 인증이 안됨",
     notVerifiedMessage: "먼저 이메일의 인증 링크를 클릭해주세요.",
+  },
+  bulletinBoard: {
+    title: "게시판",
+    loading: "게시글을 불러오는 중...",
+    tabs: {
+      announcements: "공고",
+      organizations: "단체",
+    },
+    empty: {
+      posts: {
+        title: "아직 모집 공고가 없어요",
+        description: "연극, 뮤지컬 배우 모집 공고가\n여기에 표시됩니다.",
+        organizationDescription: "이 단체의 모집 공고가 아직 없습니다.\n단체 운영자가 공고를 올리면 여기에 나타납니다.",
+      },
+      organizations: {
+        title: "등록된 단체가 없습니다",
+        description: "단체가 등록되면\n여기에 표시됩니다",
+      },
+    },
+    actions: {
+      createFirstPost: "첫 모집 공고 작성하기",
+      exploreOrganizations: "다른 단체 둘러보기",
+      createOrganization: "새 단체 등록",
+      addSampleData: "샘플 데이터 추가",
+      edit: "수정",
+      delete: "삭제",
+      editPost: "공고 수정",
+      deletePost: "공고 삭제",
+    },
+    status: {
+      recruiting: "모집중",
+      closed: "마감",
+      verified: "인증",
+    },
+    posts: {
+      applicants: "지원자 {{count}}명",
+      deadline: "마감 {{date}}",
+      moreRoles: "외 {{count}}개 역할",
+    },
   },
 }
 
