@@ -7,8 +7,8 @@ import type { RouteProp } from "@react-navigation/native"
 
 import { Button } from "@/components/Button"
 import { Screen } from "@/components/Screen"
-import { Text } from "@/components/Text"
 import { HeaderBackButton } from "@/components/HeaderBackButton"
+import { Text } from "@/components/Text"
 import { postService, userService, organizationService } from "@/services/firestore"
 import firestore from "@react-native-firebase/firestore"
 import { useAppTheme } from "@/theme/context"
@@ -28,7 +28,7 @@ export const CreatePostScreen = () => {
   
   const {
     themed,
-    theme: { colors },
+    theme: { colors, spacing, typography },
   } = useAppTheme()
 
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
@@ -491,7 +491,6 @@ export const CreatePostScreen = () => {
             />
             <View style={themed($headerButtons)} />
           </View>
-          
           <View style={themed($centerContainer) as any}>
             <Text text="사용자 정보를 불러오는 중..." style={themed($messageText) as any} />
           </View>
@@ -515,10 +514,9 @@ export const CreatePostScreen = () => {
             />
             <View style={themed($headerButtons)} />
           </View>
-          
           <View style={themed($centerContainer) as any}>
             <Text text="단체 운영자만 게시글을 작성할 수 있습니다." style={themed($messageText) as any} />
-            <Text text={`현재 사용자 타입: ${userProfile.userType}`} style={themed($debugText) as any} />
+            <Text text={`현재 사용자 타입: ${userProfile.userType}`} style={themed($debugInfoText) as any} />
             <Button
               text="설정에서 운영자로 전환"
               onPress={() => navigation.navigate("Settings" as any)}
@@ -543,8 +541,6 @@ export const CreatePostScreen = () => {
           />
           <View style={themed($headerButtons)} />
         </View>
-        
-        <View style={themed($contentWrapper)}>
         {/* 템플릿 선택 섹션 */}
         <View style={themed($templateSection)}>
           <Text text="⚡ 빠른 작성" style={themed($sectionHeader)} />
@@ -552,6 +548,9 @@ export const CreatePostScreen = () => {
             style={themed($templateButton)}
             onPress={() => setShowTemplateModal(true)}
             activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="템플릿 선택"
+            accessibilityHint="미리 만들어진 양식을 선택합니다"
           >
             <View style={themed($templateButtonContent)}>
               <Text text="📝 템플릿 선택하기" style={themed($templateButtonText)} />
@@ -581,6 +580,9 @@ export const CreatePostScreen = () => {
               style={themed($previewButton)}
               onPress={() => setShowPreview(true)}
               activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel="미리보기"
+              accessibilityHint="작성 중인 게시글을 미리 볼 수 있습니다"
             >
               <Text text="👀 미리보기" style={themed($previewButtonText)} />
             </TouchableOpacity>
@@ -736,6 +738,9 @@ export const CreatePostScreen = () => {
                   newRoles[0] = { ...newRoles[0], gender: genders[nextIndex] as any }
                   setFormData(prev => ({ ...prev, roles: newRoles }))
                 }}
+                accessibilityRole="button"
+                accessibilityLabel="성별 조건 선택"
+                accessibilityHint="모집하는 역할의 성별 조건을 변경합니다"
               >
                 <Text 
                   text={formData.roles[0]?.gender === "male" ? "남성" : 
@@ -855,6 +860,9 @@ export const CreatePostScreen = () => {
               <TouchableOpacity
                 style={themed($checkbox)}
                 onPress={() => updateFormData("transportation", !formData.transportation)}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: formData.transportation }}
+                accessibilityLabel="교통비 지원"
               >
                 <Text text={formData.transportation ? "✓" : ""} style={themed($checkboxText)} />
               </TouchableOpacity>
@@ -865,6 +873,9 @@ export const CreatePostScreen = () => {
               <TouchableOpacity
                 style={themed($checkbox)}
                 onPress={() => updateFormData("costume", !formData.costume)}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: formData.costume }}
+                accessibilityLabel="의상 제공"
               >
                 <Text text={formData.costume ? "✓" : ""} style={themed($checkboxText)} />
               </TouchableOpacity>
@@ -875,6 +886,9 @@ export const CreatePostScreen = () => {
               <TouchableOpacity
                 style={themed($checkbox)}
                 onPress={() => updateFormData("meals", !formData.meals)}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: formData.meals }}
+                accessibilityLabel="식사 제공"
               >
                 <Text text={formData.meals ? "✓" : ""} style={themed($checkboxText)} />
               </TouchableOpacity>
@@ -885,6 +899,9 @@ export const CreatePostScreen = () => {
               <TouchableOpacity
                 style={themed($checkbox)}
                 onPress={() => updateFormData("portfolio", !formData.portfolio)}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: formData.portfolio }}
+                accessibilityLabel="포트폴리오 제공"
               >
                 <Text text={formData.portfolio ? "✓" : ""} style={themed($checkboxText)} />
               </TouchableOpacity>
@@ -1027,7 +1044,6 @@ export const CreatePostScreen = () => {
             </View>
           </View>
         </View>
-        </View>
 
         {/* 저장 버튼 */}
         <View style={themed($saveSection)}>
@@ -1038,7 +1054,7 @@ export const CreatePostScreen = () => {
             style={themed($saveButton)}
           />
         </View>
-      </View>
+        </View>
 
       {/* 템플릿 선택 모달 */}
       <Modal
@@ -1071,22 +1087,17 @@ export const CreatePostScreen = () => {
             </View>
             
             <ScrollView style={themed($templateScrollView)} showsVerticalScrollIndicator={false}>
-              <Text text={`템플릿 개수: ${POST_TEMPLATES.length}개`} style={{ color: '#000', padding: 10 }} />
+              <Text text={`템플릿 개수: ${POST_TEMPLATES.length}개`} style={themed($debugText)} />
               
               {/* 간단한 테스트 버튼 */}
               <TouchableOpacity
-                style={{
-                  backgroundColor: '#FF6B6B',
-                  padding: 20,
-                  margin: 10,
-                  borderRadius: 10,
-                }}
+                style={themed($testButton)}
                 onPress={() => {
                   console.log('테스트 버튼 클릭됨!')
                   setShowTemplateModal(false)
                 }}
               >
-                <Text text="🧪 테스트 버튼 - 클릭해보세요!" style={{ color: 'white', textAlign: 'center' }} />
+                <Text text="🧪 테스트 버튼 - 클릭해보세요!" style={themed($testButtonText)} />
               </TouchableOpacity>
               
               {POST_TEMPLATES.length > 0 ? POST_TEMPLATES.map((item) => (
@@ -1145,22 +1156,17 @@ export const CreatePostScreen = () => {
             
             <ScrollView style={themed($previewContent)} showsVerticalScrollIndicator={false}>
               {/* 디버깅 정보 */}
-              <Text text="🔍 미리보기 테스트" style={{ color: '#000', padding: 10, fontSize: 16, fontWeight: 'bold' }} />
+              <Text text="🔍 미리보기 테스트" style={themed($debugHeaderText)} />
               
               {/* 테스트 버튼 */}
               <TouchableOpacity
-                style={{
-                  backgroundColor: '#4ECDC4',
-                  padding: 15,
-                  margin: 10,
-                  borderRadius: 10,
-                }}
+                style={themed($testButton2)}
                 onPress={() => {
                   console.log('미리보기 테스트 버튼 클릭됨!')
                   console.log('현재 제목:', formData.title || '제목 없음')
                 }}
               >
-                <Text text="🧪 미리보기 테스트 버튼" style={{ color: 'white', textAlign: 'center' }} />
+                <Text text="🧪 미리보기 테스트 버튼" style={themed($testButtonText)} />
               </TouchableOpacity>
               
               {/* 미리보기 게시글 카드 */}
@@ -1232,37 +1238,9 @@ export const CreatePostScreen = () => {
 
 const $container = ({ spacing }) => ({
   flex: 1,
-  paddingBottom: spacing?.xl || 24,
-  width: '100%' as const,
-  alignSelf: 'stretch' as const,
-})
-
-const $header = ({ spacing, colors }) => ({
-  paddingHorizontal: spacing?.lg || 16,
-  paddingVertical: spacing?.md || 12,
-  backgroundColor: colors.background,
-  borderBottomWidth: 1,
-  borderBottomColor: colors.separator,
-  flexDirection: "row" as const,
-  alignItems: "center" as const,
-  justifyContent: "space-between" as const,
-})
-
-const $appTitle = ({ colors, typography }) => ({
-  textAlign: "center" as const,
-  color: colors.palette.primary500,
-  fontFamily: typography.primary.bold,
-  flex: 1,
-})
-
-const $headerButtons = {
-  width: 40, // HeaderBackButton과 같은 너비로 균형 맞춤
-}
-
-const $contentWrapper = ({ spacing }) => ({
-  flex: 1,
   paddingHorizontal: spacing?.lg || 16,
   paddingTop: spacing?.md || 12,
+  paddingBottom: spacing?.xl || 24,
 })
 
 
@@ -1278,19 +1256,20 @@ const $inputSection = ({ spacing }) => ({
   flex: 1, // 유연한 너비 사용
 })
 
-const $label = ({ colors, spacing }) => ({
+const $label = ({ colors, spacing, typography }) => ({
   color: colors.text,
+  fontFamily: typography.primary.medium,
   fontSize: 16,
-  fontWeight: "600" as const,
   marginBottom: spacing.xs,
 })
 
-const $textInput = ({ colors, spacing }) => ({
+const $textInput = ({ colors, spacing, typography }) => ({
   borderWidth: 1,
   borderColor: colors.border,
   borderRadius: 8,
   padding: spacing?.md || 12,
   fontSize: 16,
+  fontFamily: typography.primary.normal,
   color: colors.text,
   backgroundColor: colors.background,
   minHeight: 44, // 터치하기 좋은 최소 높이
@@ -1313,18 +1292,18 @@ const $saveButton = {
   // 추가 스타일링 필요시 여기에
 }
 
-const $messageText = ({ colors }) => ({
+const $messageText = ({ colors, spacing }) => ({
   fontSize: 16,
   color: colors.text,
   textAlign: "center" as const,
-  marginBottom: 16,
+  marginBottom: spacing.md,
 })
 
-const $debugText = ({ colors }) => ({
+const $debugInfoText = ({ colors, spacing }) => ({
   fontSize: 14,
   color: colors.textDim,
   textAlign: "center" as const,
-  marginBottom: 20,
+  marginBottom: spacing.lg,
 })
 
 const $convertButton = ({ colors, spacing }) => ({
@@ -1381,10 +1360,11 @@ const $halfWidth = {
   flex: 1,
 }
 
-const $required = ({ colors }) => ({
+const $required = ({ colors, typography }) => ({
   color: colors.palette.angry500,
   marginLeft: 2,
   fontSize: 14,
+  fontFamily: typography.primary.normal,
 })
 
 const $dropdownButton = ({ colors, spacing }) => ({
@@ -1531,7 +1511,7 @@ const $templateSection = ({ spacing }) => ({
 
 const $templateButton = ({ colors, spacing }) => ({
   borderWidth: 2,
-  borderColor: colors.tint || '#007AFF',
+  borderColor: colors.palette.primary500,
   borderRadius: 12,
   paddingVertical: spacing?.md || 12,
   paddingHorizontal: spacing?.md || 12,
@@ -1551,7 +1531,7 @@ const $templateButtonContent = {
 const $templateButtonText = ({ colors, typography }) => ({
   fontSize: 16,
   fontFamily: typography.primary.medium,
-  color: colors.tint || '#007AFF',
+  color: colors.palette.primary500,
   flex: 1,
 })
 
@@ -1565,7 +1545,7 @@ const $templateButtonSubText = ({ colors, typography }) => ({
 
 const $templateButtonArrow = ({ colors }) => ({
   fontSize: 16,
-  color: colors.tint || '#007AFF',
+  color: colors.palette.primary500,
   fontWeight: "bold" as const,
 })
 
@@ -1587,11 +1567,11 @@ const $selectedTemplateText = ({ colors, typography }) => ({
   flex: 1,
 })
 
-const $removeTemplateButton = ({ colors }) => ({
+const $removeTemplateButton = ({ colors, spacing }) => ({
   fontSize: 14,
   color: colors.palette.angry500,
   fontWeight: "bold" as const,
-  paddingHorizontal: 8,
+  paddingHorizontal: spacing.xs,
 })
 
 // 모달 스타일들
@@ -1672,12 +1652,12 @@ const $templateName = ({ colors, typography }) => ({
   marginBottom: 2,
 })
 
-const $templateCategory = ({ colors, typography }) => ({
+const $templateCategory = ({ colors, typography, spacing }) => ({
   fontSize: 12,
   fontFamily: typography.primary.normal,
   color: colors.palette.primary500,
   backgroundColor: colors.palette.primary100,
-  paddingHorizontal: 8,
+  paddingHorizontal: spacing.xs,
   paddingVertical: 2,
   borderRadius: 4,
   alignSelf: "flex-start" as const,
@@ -1708,22 +1688,22 @@ const $progressTitle = ({ colors, typography }) => ({
   color: colors.text,
 })
 
-const $previewButton = ({ spacing }) => ({
-  backgroundColor: '#007AFF',
+const $previewButton = ({ colors, spacing }) => ({
+  backgroundColor: colors.palette.primary500,
   paddingHorizontal: spacing?.md || 12,
   paddingVertical: spacing?.xs || 4,
   borderRadius: 20,
 })
 
-const $previewButtonText = ({ typography }) => ({
+const $previewButtonText = ({ colors, typography }) => ({
   fontSize: 14,
   fontFamily: typography.primary.medium,
-  color: '#FFFFFF',
+  color: colors.palette.neutral100,
 })
 
 const $progressBarContainer = ({ colors, spacing }) => ({
   height: 8,
-  backgroundColor: colors.border || '#E5E5E5',
+  backgroundColor: colors.palette.neutral200,
   borderRadius: 4,
   marginBottom: spacing?.sm || 8,
   overflow: "hidden" as const,
@@ -1731,7 +1711,7 @@ const $progressBarContainer = ({ colors, spacing }) => ({
 
 const $progressBar = ({ colors }) => ({
   height: "100%" as const,
-  backgroundColor: colors.tint || '#007AFF',
+  backgroundColor: colors.palette.primary500,
   borderRadius: 4,
 })
 
@@ -1787,13 +1767,13 @@ const $previewHeader = ({ spacing }) => ({
   marginBottom: spacing?.sm || 8,
 })
 
-const $previewStatus = ({ colors, typography }) => ({
+const $previewStatus = ({ colors, typography, spacing }) => ({
   fontSize: 12,
   fontFamily: typography.primary.medium,
   color: colors.palette.secondary700,
   backgroundColor: colors.palette.secondary100,
-  paddingHorizontal: 8,
-  paddingVertical: 4,
+  paddingHorizontal: spacing.xs,
+  paddingVertical: spacing.xxs,
   borderRadius: 12,
 })
 
@@ -1803,22 +1783,22 @@ const $previewDeadline = ({ colors, typography }) => ({
   color: colors.textDim,
 })
 
-const $previewTitle = ({ colors, typography }) => ({
+const $previewTitle = ({ colors, typography, spacing }) => ({
   fontSize: 18,
   fontFamily: typography.primary.medium,
   color: colors.text,
-  marginBottom: 8,
+  marginBottom: spacing.xs,
 })
 
 const $previewDetails = ({ spacing }) => ({
   marginBottom: spacing?.sm || 8,
 })
 
-const $previewProduction = ({ colors, typography }) => ({
+const $previewProduction = ({ colors, typography, spacing }) => ({
   fontSize: 14,
   fontFamily: typography.primary.medium,
   color: colors.palette.secondary600,
-  marginBottom: 4,
+  marginBottom: spacing.xxs,
 })
 
 const $previewOrganization = ({ colors, typography }) => ({
@@ -1871,23 +1851,80 @@ const $previewRoleCard = ({ colors, spacing }) => ({
   borderLeftColor: colors.palette.primary500,
 })
 
-const $previewRoleName = ({ colors, typography }) => ({
+const $previewRoleName = ({ colors, typography, spacing }) => ({
   fontSize: 14,
   fontFamily: typography.primary.medium,
   color: colors.palette.primary700,
-  marginBottom: 4,
+  marginBottom: spacing.xxs,
 })
 
-const $previewRoleDetail = ({ colors, typography }) => ({
+const $previewRoleDetail = ({ colors, typography, spacing }) => ({
   fontSize: 12,
   fontFamily: typography.primary.normal,
   color: colors.palette.primary600,
-  marginBottom: 2,
+  marginBottom: spacing.xxs,
 })
 
-const $previewContact = ({ colors, typography }) => ({
+const $previewContact = ({ colors, typography, spacing }) => ({
   fontSize: 14,
   fontFamily: typography.primary.normal,
   color: colors.text,
-  marginBottom: 4,
+  marginBottom: spacing.xxs,
+})
+
+// 테스트 버튼 스타일들
+const $testButton = ({ colors, spacing }) => ({
+  backgroundColor: colors.palette.angry500,
+  padding: spacing.md,
+  margin: spacing.sm,
+  borderRadius: 10,
+})
+
+const $testButton2 = ({ colors, spacing }) => ({
+  backgroundColor: colors.palette.secondary400,
+  padding: spacing.sm,
+  margin: spacing.sm,
+  borderRadius: 10,
+})
+
+const $testButtonText = ({ colors, typography }) => ({
+  color: colors.palette.neutral100,
+  textAlign: "center" as const,
+  fontFamily: typography.primary.medium,
+})
+
+const $debugText = ({ colors, spacing }) => ({
+  color: colors.text,
+  padding: spacing.sm,
+})
+
+const $debugHeaderText = ({ colors, spacing, typography }) => ({
+  color: colors.text,
+  padding: spacing.sm,
+  fontSize: 16,
+  fontFamily: typography.primary.bold,
+})
+
+// Header 스타일들 (PostDetailScreen과 동일)
+const $header = ({ spacing, colors }) => ({
+  paddingHorizontal: 0,
+  paddingVertical: spacing.md,
+  backgroundColor: colors.background,
+  flexDirection: "row" as const,
+  alignItems: "center" as const,
+  justifyContent: "space-between" as const,
+})
+
+const $appTitle = ({ colors, typography }) => ({
+  flex: 1,
+  fontSize: 32,
+  textAlign: "center" as const,
+  color: colors.palette.primary500,
+  fontFamily: typography.primary.bold,
+})
+
+const $headerButtons = () => ({
+  flexDirection: "row" as const,
+  alignItems: "center" as const,
+  minWidth: 44, // 균형을 위한 최소 너비
 })
