@@ -1,4 +1,3 @@
-import React from "react"
 import { View, TouchableOpacity } from "react-native"
 import { Text } from "@/components/Text"
 import { StatusBadge } from "@/components/StatusBadge"
@@ -12,7 +11,7 @@ interface PostCardProps {
   variant?: "compact" | "detailed"
 }
 
-export const PostCard: React.FC<PostCardProps> = ({ 
+export const PostCard = ({ 
   post, 
   onPress, 
   variant = "compact" 

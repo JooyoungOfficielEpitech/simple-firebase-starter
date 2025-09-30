@@ -1,4 +1,3 @@
-import React from "react"
 import { View } from "react-native"
 import { Text } from "@/components/Text"
 import { Button } from "@/components/Button"
@@ -13,7 +12,7 @@ interface ErrorStateProps {
   icon?: string
 }
 
-export const ErrorState: React.FC<ErrorStateProps> = ({
+export const ErrorState = ({
   title = translate("common:error.title"),
   description = translate("common:error.description"),
   actionText = translate("common:error.retry"),

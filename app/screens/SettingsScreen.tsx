@@ -6,9 +6,9 @@ import { $styles } from "@/theme/styles"
 import { Button } from "@/components/Button"
 import { Radio } from "@/components/Toggle/Radio"
 import { Screen } from "@/components/Screen"
-import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
 import { TextField } from "@/components/TextField"
+import { ScreenContainer, UnifiedScreenHeader, ContentSection } from "@/components/Layout"
 import { useAuth } from "@/context/AuthContext"
 import { userService, organizationService } from "@/services/firestore"
 import { UserProfile } from "@/types/user"
@@ -283,150 +283,140 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
   if (showOrgNameInput) {
     return (
       <Screen preset="scroll" safeAreaEdges={["top"]}>
-        <View style={themed($container)}>
-          {/* Header */}
-          <View style={themed($header)}>
-            <Text
-              text="단체명 입력"
-              preset="heading"
-              style={themed($appTitle)}
-            />
-          </View>
+        <ScreenContainer>
+          <UnifiedScreenHeader title="단체명 입력" />
           
-          <View style={themed($contentContainer)}>
-            <View style={themed($orgNameInputSection)}>
-            <Text style={themed($sectionTitle)}>운영할 단체명을 입력해주세요</Text>
-            
-            <TextField
-              value={organizationName}
-              onChangeText={setOrganizationName}
-              placeholder="예: 극단 봄날"
-              style={themed($orgNameInput)}
-            />
-            
-            <View style={themed($buttonRow)}>
-              <Button
-                text="취소"
-                preset="default"
-                onPress={() => {
-                  setShowOrgNameInput(false)
-                  setOrganizationName("")
-                }}
-                style={themed($cancelButton)}
+          <View style={$styles.contentContainer}>
+            <ContentSection
+              title="운영할 단체명을 입력해주세요"
+              variant="default"
+            >
+              <TextField
+                value={organizationName}
+                onChangeText={setOrganizationName}
+                placeholder="예: 극단 봄날"
+                style={themed($orgNameInput)}
               />
-              <Button
-                text="확인"
-                onPress={handleConfirmConversion}
-                isLoading={converting}
-                style={themed($confirmButton)}
-              />
-            </View>
+              
+              <View style={$styles.buttonRow}>
+                <Button
+                  text="취소"
+                  preset="default"
+                  onPress={() => {
+                    setShowOrgNameInput(false)
+                    setOrganizationName("")
+                  }}
+                  style={themed($cancelButton)}
+                />
+                <Button
+                  text="확인"
+                  onPress={handleConfirmConversion}
+                  isLoading={converting}
+                  style={themed($confirmButton)}
+                />
+              </View>
+            </ContentSection>
           </View>
-        </View>
-        </View>
+        </ScreenContainer>
       </Screen>
     )
   }
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top"]}>
-      <View style={themed($container)}>
-        {/* Header */}
-        <View style={themed($header)}>
-          <Text
-            text="Settings"
-            preset="heading"
-            style={themed($appTitle)}
-          />
-        </View>
+      <ScreenContainer>
+        <UnifiedScreenHeader title="Settings" />
         
-        <View style={themed($contentContainer)}>
+        <View style={$styles.contentContainer}>
           {/* User Type Section */}
           {!loading && userProfile && (
-            <View style={themed($userTypeSection)}>
-            <Text style={themed($sectionTitle)}>사용자 유형</Text>
-            <Text style={themed($currentUserType)}>
-              현재: {userProfile.userType === "organizer" 
-                ? `운영자 (${userProfile.organizationName || "단체"})` 
-                : "일반 사용자"}
-            </Text>
-            
-            {userProfile.userType === "general" ? (
-              <Button
-                text="운영자로 전환"
-                onPress={handleConvertToOrganizer}
-                isLoading={converting}
-                style={themed($convertButton)}
-              />
-            ) : (
-              <Button
-                text="일반 사용자로 전환"
-                onPress={handleRevertToGeneral}
-                isLoading={converting}
-                style={$revertButton(wickedCharacterTheme)}
-              />
-            )}
-          </View>
-        )}
-        
-        {/* Wicked Character Theme Selection */}
-        <View style={themed($themeSection)}>
-          <Text style={themed($sectionTitle)}>테마 선택</Text>
-          <Text style={themed($sectionSubtitle)}>좋아하는 캐릭터의 테마를 선택해보세요</Text>
+            <ContentSection
+              title="사용자 유형"
+              variant="default"
+            >
+              <Text style={themed($currentUserType)}>
+                현재: {userProfile.userType === "organizer" 
+                  ? `운영자 (${userProfile.organizationName || "단체"})` 
+                  : "일반 사용자"}
+              </Text>
+              
+              {userProfile.userType === "general" ? (
+                <Button
+                  text="운영자로 전환"
+                  onPress={handleConvertToOrganizer}
+                  isLoading={converting}
+                  style={themed($convertButton)}
+                />
+              ) : (
+                <Button
+                  text="일반 사용자로 전환"
+                  onPress={handleRevertToGeneral}
+                  isLoading={converting}
+                  style={$revertButton(wickedCharacterTheme)}
+                />
+              )}
+            </ContentSection>
+          )}
           
-          <View style={themed($radioGroup)}>
-            <View style={themed($radioOption)}>
-              <Radio
-                value={wickedCharacterTheme === "elphaba"}
-                onValueChange={() => !isThemeChanging && handleCharacterThemeChange("elphaba")}
-                inputDetailStyle={$elphabaRadioDetail}
-                inputOuterStyle={wickedCharacterTheme === "elphaba" ? $elphabaRadioOuterSelected : undefined}
-                disabled={isThemeChanging}
-              />
-              <View style={themed($radioLabelContainer)}>
-                <Text style={themed($radioLabel)}>🟢 엘파바 (Elphaba)</Text>
-                <Text style={themed($radioDescription)}>누구나 세상을 날아오를 수 있어 (Defying Gravity)</Text>
+          {/* Wicked Character Theme Selection */}
+          <ContentSection
+            title="테마 선택"
+            subtitle="좋아하는 캐릭터의 테마를 선택해보세요"
+            variant="default"
+          >
+            <View style={themed($radioGroup)}>
+              <View style={themed($radioOption)}>
+                <Radio
+                  value={wickedCharacterTheme === "elphaba"}
+                  onValueChange={() => !isThemeChanging && handleCharacterThemeChange("elphaba")}
+                  inputDetailStyle={$elphabaRadioDetail}
+                  inputOuterStyle={wickedCharacterTheme === "elphaba" ? $elphabaRadioOuterSelected : undefined}
+                  disabled={isThemeChanging}
+                />
+                <View style={themed($radioLabelContainer)}>
+                  <Text style={themed($radioLabel)}>🟢 엘파바 (Elphaba)</Text>
+                  <Text style={themed($radioDescription)}>누구나 세상을 날아오를 수 있어 (Defying Gravity)</Text>
+                </View>
+              </View>
+              
+              <View style={themed($radioOption)}>
+                <Radio
+                  value={wickedCharacterTheme === "glinda"}
+                  onValueChange={() => !isThemeChanging && handleCharacterThemeChange("glinda")}
+                  inputDetailStyle={$glindaRadioDetail}
+                  inputOuterStyle={wickedCharacterTheme === "glinda" ? $glindaRadioOuterSelected : undefined}
+                  disabled={isThemeChanging}
+                />
+                <View style={themed($radioLabelContainer)}>
+                  <Text style={themed($radioLabel)}>🌸 글린다 (Glinda)</Text>
+                  <Text style={themed($radioDescription)}>인기가 많아질거야! 넌 인기가 많아질 거라고! (Popular)</Text>
+                </View>
+              </View>
+              
+              <View style={themed($radioOption)}>
+                <Radio
+                  value={wickedCharacterTheme === "gwynplaine"}
+                  onValueChange={() => !isThemeChanging && handleCharacterThemeChange("gwynplaine")}
+                  inputDetailStyle={$gwynplaineRadioDetail}
+                  inputOuterStyle={wickedCharacterTheme === "gwynplaine" ? $gwynplaineRadioOuterSelected : undefined}
+                  disabled={isThemeChanging}
+                />
+                <View style={themed($radioLabelContainer)}>
+                  <Text style={themed($radioLabel)}>🍷 그윈플렌 (Gwynplaine)</Text>
+                  <Text style={themed($radioDescription)}>그래, 내가 바꿀수 있어 (모두의 세상)</Text>
+                </View>
               </View>
             </View>
-            
-            <View style={themed($radioOption)}>
-              <Radio
-                value={wickedCharacterTheme === "glinda"}
-                onValueChange={() => !isThemeChanging && handleCharacterThemeChange("glinda")}
-                inputDetailStyle={$glindaRadioDetail}
-                inputOuterStyle={wickedCharacterTheme === "glinda" ? $glindaRadioOuterSelected : undefined}
-                disabled={isThemeChanging}
-              />
-              <View style={themed($radioLabelContainer)}>
-                <Text style={themed($radioLabel)}>🌸 글린다 (Glinda)</Text>
-                <Text style={themed($radioDescription)}>인기가 많아질거야! 넌 인기가 많아질 거라고! (Popular)</Text>
-              </View>
-            </View>
-            
-            <View style={themed($radioOption)}>
-              <Radio
-                value={wickedCharacterTheme === "gwynplaine"}
-                onValueChange={() => !isThemeChanging && handleCharacterThemeChange("gwynplaine")}
-                inputDetailStyle={$gwynplaineRadioDetail}
-                inputOuterStyle={wickedCharacterTheme === "gwynplaine" ? $gwynplaineRadioOuterSelected : undefined}
-                disabled={isThemeChanging}
-              />
-              <View style={themed($radioLabelContainer)}>
-                <Text style={themed($radioLabel)}>🍷 그윈플렌 (Gwynplaine)</Text>
-                <Text style={themed($radioDescription)}>그래, 내가 바꿀수 있어 (모두의 세상)</Text>
-              </View>
-            </View>
-          </View>
+          </ContentSection>
+          
+          <Button
+            text="로그아웃"
+            preset="filled"
+            onPress={handleLogout}
+            style={themed($logoutButton)}
+          />
         </View>
-        
-        <Button
-          text="로그아웃"
-          preset="filled"
-          onPress={handleLogout}
-          style={themed($logoutButton)}
-        />
-        </View>
-      </View>
+      </ScreenContainer>
       
       {/* 커튼 효과 */}
       <Animated.View 
@@ -539,41 +529,6 @@ const getRevertButtonColor = (characterTheme: WickedCharacterTheme): string => {
   }
 }
 
-const $container: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  flexGrow: 1,
-  backgroundColor: "transparent",
-  paddingHorizontal: spacing.lg,
-})
-
-const $header: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
-  paddingHorizontal: 0,
-  paddingVertical: spacing.md,
-  backgroundColor: colors.background,
-  borderBottomWidth: 1,
-  borderBottomColor: colors.separator,
-})
-
-const $appTitle: ThemedStyle<TextStyle> = ({ colors, typography, spacing }) => ({
-  textAlign: "center",
-  color: colors.palette.primary500,
-  fontFamily: typography.primary.bold,
-  marginBottom: spacing.xs,
-})
-
-
-const $contentContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  alignItems: "center",
-  paddingVertical: spacing.md,
-})
-
-const $userTypeSection: ThemedStyle<ViewStyle> = () => ({
-  width: "100%",
-  maxWidth: 400,
-  marginBottom: 24,
-  padding: 20,
-  borderRadius: 12,
-  backgroundColor: "rgba(0, 0, 0, 0.05)",
-})
 
 const $currentUserType: ThemedStyle<TextStyle> = (theme) => ({
   fontSize: 16,
@@ -593,23 +548,8 @@ const $revertButton = (wickedCharacterTheme: WickedCharacterTheme): ViewStyle =>
   marginTop: 8,
 })
 
-const $orgNameInputSection: ThemedStyle<ViewStyle> = () => ({
-  width: "100%",
-  maxWidth: 400,
-  padding: 20,
-  borderRadius: 12,
-  backgroundColor: "rgba(0, 0, 0, 0.05)",
-})
-
 const $orgNameInput: ThemedStyle<ViewStyle> = () => ({
   marginVertical: 16,
-})
-
-const $buttonRow: ThemedStyle<ViewStyle> = () => ({
-  flexDirection: "row",
-  justifyContent: "space-between",
-  gap: 12,
-  marginTop: 16,
 })
 
 const $cancelButton: ThemedStyle<ViewStyle> = () => ({
@@ -621,28 +561,6 @@ const $confirmButton: ThemedStyle<ViewStyle> = (theme) => ({
   backgroundColor: theme.colors.tint,
 })
 
-const $themeSection: ThemedStyle<ViewStyle> = () => ({
-  width: "100%",
-  maxWidth: 400,
-  marginBottom: 32,
-  padding: 20,
-  borderRadius: 12,
-  backgroundColor: "rgba(0, 0, 0, 0.05)",
-})
-
-const $sectionTitle: ThemedStyle<TextStyle> = () => ({
-  fontSize: 18,
-  fontWeight: "600",
-  marginBottom: 8,
-  textAlign: "center",
-})
-
-const $sectionSubtitle: ThemedStyle<TextStyle> = (theme) => ({
-  fontSize: 14,
-  color: theme.colors.textDim,
-  textAlign: "center",
-  marginBottom: 20,
-})
 
 const $radioGroup: ThemedStyle<ViewStyle> = () => ({
   gap: 16,
