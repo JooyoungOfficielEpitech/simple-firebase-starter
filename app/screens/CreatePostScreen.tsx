@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { View, ScrollView, Alert, TouchableOpacity, TextInput, Modal, FlatList } from "react-native"
+import { View, ScrollView, Alert, TouchableOpacity, TextInput, Modal } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -7,28 +7,28 @@ import type { RouteProp } from "@react-navigation/native"
 
 import { Button } from "@/components/Button"
 import { Screen } from "@/components/Screen"
-import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
+import { HeaderBackButton } from "@/components/HeaderBackButton"
 import { postService, userService, organizationService } from "@/services/firestore"
 import firestore from "@react-native-firebase/firestore"
 import { useAppTheme } from "@/theme/context"
 import { CreatePost, UpdatePost } from "@/types/post"
 import { UserProfile } from "@/types/user"
 import { BulletinBoardStackParamList } from "@/navigators/BulletinBoardStackNavigator"
-import { POST_TEMPLATES, PostTemplate, getTemplateById } from "@/utils/postTemplates"
+import { POST_TEMPLATES, PostTemplate } from "@/utils/postTemplates"
 
 type NavigationProp = NativeStackNavigationProp<BulletinBoardStackParamList>
 type RoutePropType = RouteProp<BulletinBoardStackParamList, "CreatePost">
 
 export const CreatePostScreen = () => {
-  const { top } = useSafeAreaInsets()
+  useSafeAreaInsets()
   const navigation = useNavigation<NavigationProp>()
   const route = useRoute<RoutePropType>()
   const { postId, isEdit } = route.params || {}
   
   const {
     themed,
-    theme: { colors, spacing },
+    theme: { colors },
   } = useAppTheme()
 
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
@@ -36,7 +36,6 @@ export const CreatePostScreen = () => {
   const [showTemplateModal, setShowTemplateModal] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<PostTemplate | null>(null)
   const [showPreview, setShowPreview] = useState(false)
-  const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState({
     title: "",
     production: "",
@@ -476,26 +475,23 @@ export const CreatePostScreen = () => {
     return Math.round(requiredScore + optionalScore)
   }
 
-  // 다음 단계로 이동하는 함수
-  const goToNextStep = () => {
-    if (currentStep < 4) {
-      setCurrentStep(currentStep + 1)
-    }
-  }
-
-  // 이전 단계로 이동하는 함수
-  const goToPrevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1)
-    }
-  }
 
   // 로딩 중일 때
   if (!userProfile) {
     return (
       <Screen preset="fixed" safeAreaEdges={["top"]}>
-        <ScreenHeader title="게시글 작성" />
         <View style={themed($container)}>
+          {/* Header */}
+          <View style={themed($header)}>
+            <HeaderBackButton onPress={() => navigation.goBack()} />
+            <Text
+              text="게시글 작성"
+              preset="heading"
+              style={themed($appTitle)}
+            />
+            <View style={themed($headerButtons)} />
+          </View>
+          
           <View style={themed($centerContainer) as any}>
             <Text text="사용자 정보를 불러오는 중..." style={themed($messageText) as any} />
           </View>
@@ -508,8 +504,18 @@ export const CreatePostScreen = () => {
   if (userProfile.userType !== "organizer") {
     return (
       <Screen preset="fixed" safeAreaEdges={["top"]}>
-        <ScreenHeader title="게시글 작성" />
         <View style={themed($container)}>
+          {/* Header */}
+          <View style={themed($header)}>
+            <HeaderBackButton onPress={() => navigation.goBack()} />
+            <Text
+              text="게시글 작성"
+              preset="heading"
+              style={themed($appTitle)}
+            />
+            <View style={themed($headerButtons)} />
+          </View>
+          
           <View style={themed($centerContainer) as any}>
             <Text text="단체 운영자만 게시글을 작성할 수 있습니다." style={themed($messageText) as any} />
             <Text text={`현재 사용자 타입: ${userProfile.userType}`} style={themed($debugText) as any} />
@@ -526,9 +532,19 @@ export const CreatePostScreen = () => {
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top"]}>
-      <ScreenHeader title={isEdit ? "게시글 수정" : "게시글 작성"} />
       <View style={themed($container)}>
+        {/* Header */}
+        <View style={themed($header)}>
+          <HeaderBackButton onPress={() => navigation.goBack()} />
+          <Text
+            text={isEdit ? "게시글 수정" : "게시글 작성"}
+            preset="heading"
+            style={themed($appTitle)}
+          />
+          <View style={themed($headerButtons)} />
+        </View>
         
+        <View style={themed($contentWrapper)}>
         {/* 템플릿 선택 섹션 */}
         <View style={themed($templateSection)}>
           <Text text="⚡ 빠른 작성" style={themed($sectionHeader)} />
@@ -646,6 +662,8 @@ export const CreatePostScreen = () => {
           </View>
         </View>
 
+        {/* 추가 기본 정보 섹션 */}
+        <View style={themed($formSection)}>
           {/* 연습 일정 */}
           <View style={themed($inputSection)}>
             <Text text="연습 일정 *" style={themed($label) as any} />
@@ -1008,15 +1026,17 @@ export const CreatePostScreen = () => {
               </TouchableOpacity>
             </View>
           </View>
+        </View>
+        </View>
 
-          {/* 저장 버튼 */}
-          <View style={themed($saveSection)}>
-            <Button
-              text={isEdit ? "수정 완료" : "게시글 작성"}
-              onPress={handleSave}
-              isLoading={loading}
-              style={themed($saveButton)}
-            />
+        {/* 저장 버튼 */}
+        <View style={themed($saveSection)}>
+          <Button
+            text={isEdit ? "수정 완료" : "게시글 작성"}
+            onPress={handleSave}
+            isLoading={loading}
+            style={themed($saveButton)}
+          />
         </View>
       </View>
 
@@ -1212,15 +1232,39 @@ export const CreatePostScreen = () => {
 
 const $container = ({ spacing }) => ({
   flex: 1,
-  paddingHorizontal: spacing?.lg || 16,
-  paddingTop: spacing?.md || 12,
-  paddingBottom: spacing?.xl || 24, // 하단 여백 추가
+  paddingBottom: spacing?.xl || 24,
+  width: '100%' as const,
+  alignSelf: 'stretch' as const,
 })
 
-const $scrollView = ({ spacing }) => ({
-  flex: 1,
-  paddingTop: spacing.sm,
+const $header = ({ spacing, colors }) => ({
+  paddingHorizontal: spacing?.lg || 16,
+  paddingVertical: spacing?.md || 12,
+  backgroundColor: colors.background,
+  borderBottomWidth: 1,
+  borderBottomColor: colors.separator,
+  flexDirection: "row" as const,
+  alignItems: "center" as const,
+  justifyContent: "space-between" as const,
 })
+
+const $appTitle = ({ colors, typography }) => ({
+  textAlign: "center" as const,
+  color: colors.palette.primary500,
+  fontFamily: typography.primary.bold,
+  flex: 1,
+})
+
+const $headerButtons = {
+  width: 40, // HeaderBackButton과 같은 너비로 균형 맞춤
+}
+
+const $contentWrapper = ({ spacing }) => ({
+  flex: 1,
+  paddingHorizontal: spacing?.lg || 16,
+  paddingTop: spacing?.md || 12,
+})
+
 
 const $centerContainer = {
   flex: 1,
@@ -1231,7 +1275,7 @@ const $centerContainer = {
 const $inputSection = ({ spacing }) => ({
   marginBottom: spacing?.lg || 16,
   marginTop: spacing?.xs || 4,
-  width: '100%' as const, // 화면 너비에 맞춤
+  flex: 1, // 유연한 너비 사용
 })
 
 const $label = ({ colors, spacing }) => ({
@@ -1250,7 +1294,7 @@ const $textInput = ({ colors, spacing }) => ({
   color: colors.text,
   backgroundColor: colors.background,
   minHeight: 44, // 터치하기 좋은 최소 높이
-  width: '100%' as const, // 화면 너비에 맞춤
+  flex: 1, // 유연한 너비 사용
   marginBottom: spacing?.xs || 4,
 })
 
@@ -1258,45 +1302,6 @@ const $textArea = {
   height: 120,
 }
 
-const $statusContainer = ({ spacing }) => ({
-  flexDirection: "row" as const,
-  gap: spacing.sm,
-})
-
-const $statusButton = ({ colors, spacing }) => ({
-  flex: 1,
-  borderWidth: 1,
-  borderColor: colors.border,
-  borderRadius: 8,
-  padding: spacing.md,
-  alignItems: "center" as const,
-  backgroundColor: colors.background,
-})
-
-const $activeStatusButton = ({ colors }) => ({
-  borderColor: colors.tint,
-  backgroundColor: colors.tint + "10",
-})
-
-const $closedStatusButton = ({ colors }) => ({
-  borderColor: colors.textDim,
-  backgroundColor: colors.textDim + "10",
-})
-
-const $statusButtonText = ({ colors }) => ({
-  fontSize: 16,
-  color: colors.textDim,
-})
-
-const $activeStatusButtonText = ({ colors }) => ({
-  color: colors.tint,
-  fontWeight: "600" as const,
-})
-
-const $closedStatusButtonText = ({ colors }) => ({
-  color: colors.textDim,
-  fontWeight: "600" as const,
-})
 
 const $saveSection = ({ spacing }) => ({
   marginTop: spacing?.lg || 16,
@@ -1349,30 +1354,6 @@ const $helpText = ({ colors }) => ({
   fontStyle: "italic" as const,
 })
 
-// 새로운 Form UX 스타일들
-const $formProgress = ({ spacing }) => ({
-  marginBottom: spacing?.lg || 16,
-})
-
-const $progressSteps = ({ spacing }) => ({
-  flexDirection: "row" as const,
-  alignItems: "center" as const,
-  marginBottom: spacing?.sm || 8,
-})
-
-const $activeStep = ({ colors }) => ({
-  width: 20,
-  height: 20,
-  borderRadius: 10,
-  backgroundColor: colors.palette.primary500,
-  marginRight: 8,
-})
-
-const $stepLabel = ({ colors, typography }) => ({
-  fontSize: 14,
-  fontFamily: typography.primary.medium,
-  color: colors.text,
-})
 
 const $formSection = ({ spacing }) => ({
   marginBottom: spacing?.xl || 24,
@@ -1614,7 +1595,7 @@ const $removeTemplateButton = ({ colors }) => ({
 })
 
 // 모달 스타일들
-const $modalOverlay = ({ colors }) => ({
+const $modalOverlay = () => ({
   flex: 1,
   backgroundColor: "rgba(0, 0, 0, 0.5)",
   justifyContent: "flex-end" as const,
@@ -1653,9 +1634,6 @@ const $modalCloseText = ({ colors }) => ({
   color: colors.textDim,
 })
 
-const $templateList = ({ spacing }) => ({
-  flex: 1,
-})
 
 const $templateScrollView = ({ spacing }) => ({
   flex: 1,
@@ -1730,14 +1708,14 @@ const $progressTitle = ({ colors, typography }) => ({
   color: colors.text,
 })
 
-const $previewButton = ({ colors, spacing }) => ({
-  backgroundColor: colors.tint || '#007AFF',
+const $previewButton = ({ spacing }) => ({
+  backgroundColor: '#007AFF',
   paddingHorizontal: spacing?.md || 12,
   paddingVertical: spacing?.xs || 4,
   borderRadius: 20,
 })
 
-const $previewButtonText = ({ colors, typography }) => ({
+const $previewButtonText = ({ typography }) => ({
   fontSize: 14,
   fontFamily: typography.primary.medium,
   color: '#FFFFFF',
