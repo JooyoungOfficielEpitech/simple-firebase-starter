@@ -282,6 +282,22 @@ export class PostService {
   }
 
   /**
+   * 조회수 증가
+   */
+  async incrementViewCount(postId: string): Promise<void> {
+    try {
+      await this.db.collection("posts").doc(postId).update({
+        viewCount: firestore.FieldValue.increment(1),
+        updatedAt: this.getServerTimestamp(),
+      })
+      console.log(`👁️ [PostService] 조회수 증가: ${postId}`)
+    } catch (error) {
+      console.error(`❌ [PostService] 조회수 증가 실패: ${postId}`, error)
+      // 조회수 증가 실패는 사용자 경험에 영향을 주지 않도록 조용히 처리
+    }
+  }
+
+  /**
    * 게시글 실시간 리스너 (목록)
    */
   subscribeToActivePosts(callback: (posts: Post[]) => void): () => void {

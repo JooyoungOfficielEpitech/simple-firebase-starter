@@ -73,7 +73,7 @@ interface ApplicationQueryOptions {
  * - applicantId + createdAt (desc)
  */
 export class ApplicationService {
-  private db: FirebaseFirestoreTypes.Module
+  public db: FirebaseFirestoreTypes.Module
   private cache: Map<string, CacheEntry<any>> = new Map()
   private readonly CACHE_TTL = 3 * 60 * 1000 // 3분 (지원서는 더 자주 변경될 수 있음)
   private readonly DEFAULT_PAGE_SIZE = 20
@@ -208,20 +208,33 @@ export class ApplicationService {
       const userData = userDoc.data()
       const docRef = this.db.collection("applications").doc()
       
-      const application = {
+      // 기본 필수 필드들
+      const application: any = {
         postId: applicationData.postId,
         applicantId: userId,
         applicantName: userData?.name || userData?.displayName || "Unknown",
         applicantEmail: userData?.email || "",
         status: "pending" as ApplicationStatus,
-        message: applicationData.message,
-        portfolio: applicationData.portfolio,
-        phoneNumber: applicationData.phoneNumber,
-        experience: applicationData.experience,
-        rolePreference: applicationData.rolePreference,
         availableDates: applicationData.availableDates || [],
         createdAt: this.getServerTimestamp(),
         updatedAt: this.getServerTimestamp(),
+      }
+
+      // 선택적 필드들 - undefined가 아닌 경우에만 추가
+      if (applicationData.message && applicationData.message.trim()) {
+        application.message = applicationData.message.trim()
+      }
+      if (applicationData.portfolio && applicationData.portfolio.trim()) {
+        application.portfolio = applicationData.portfolio.trim()
+      }
+      if (applicationData.phoneNumber && applicationData.phoneNumber.trim()) {
+        application.phoneNumber = applicationData.phoneNumber.trim()
+      }
+      if (applicationData.experience && applicationData.experience.trim()) {
+        application.experience = applicationData.experience.trim()
+      }
+      if (applicationData.rolePreference && applicationData.rolePreference.trim()) {
+        application.rolePreference = applicationData.rolePreference.trim()
       }
 
       await docRef.set(application)
@@ -503,6 +516,24 @@ export class ApplicationService {
   }
 
   /**
+   * 특정 게시글에 대한 지원 여부 확인 (간단한 쿼리)
+   */
+  async hasAppliedToPost(postId: string, applicantId?: string): Promise<boolean> {
+    const userId = applicantId || this.getCurrentUserId()
+    
+    return this.executeWithErrorHandling(async () => {
+      const snapshot = await this.db
+        .collection("applications")
+        .where("postId", "==", postId)
+        .where("applicantId", "==", userId)
+        .limit(1)
+        .get()
+      
+      return !snapshot.empty
+    }, '지원 여부 확인')
+  }
+
+  /**
    * 지원서 통계 조회
    */
   async getApplicationStats(postId?: string): Promise<{
@@ -569,13 +600,17 @@ export class ApplicationService {
     
     return query
       .orderBy("createdAt", "desc")
-      .limit(finalLimit)
       .onSnapshot(
         (snapshot) => {
-          const applications = snapshot.docs.map(doc => ({
+          let applications = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data(),
           } as Application))
+          
+          // 클라이언트에서 limit 적용 (인덱스 문제 해결을 위한 임시 조치)
+          if (applications.length > finalLimit) {
+            applications = applications.slice(0, finalLimit)
+          }
           
           // 실시간 업데이트시 캐시 무효화
           this.invalidateCache(`post_${postId}`)

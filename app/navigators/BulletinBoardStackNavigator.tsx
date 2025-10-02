@@ -5,6 +5,7 @@ import { BulletinBoardScreen } from "@/screens/BulletinBoardScreen"
 import { CreatePostScreen } from "@/screens/CreatePostScreen"
 import { PostDetailScreen } from "@/screens/PostDetailScreen"
 import { CreateOrganizationScreen } from "@/screens/CreateOrganizationScreen"
+import { ApplicationManagementScreen } from "@/screens/ApplicationManagementScreen"
 import { useAppTheme } from "@/theme/context"
 
 import { MainTabParamList, MainTabScreenProps } from "./MainNavigator"
@@ -14,6 +15,7 @@ export type BulletinBoardStackParamList = {
   PostDetail: { postId: string }
   CreatePost: { postId?: string; isEdit?: boolean }
   CreateOrganization: { organizationId?: string; isEdit?: boolean }
+  ApplicationManagement: { postId: string; postTitle: string }
 }
 
 /**
@@ -77,6 +79,14 @@ export function BulletinBoardStackNavigator() {
         component={CreateOrganizationScreen}
         options={{
           headerShown: false, // 단체 등록 화면은 커스텀 헤더 사용
+        }}
+      />
+
+      <Stack.Screen
+        name="ApplicationManagement"
+        component={ApplicationManagementScreen}
+        options={{
+          headerShown: false, // 지원자 관리 화면은 커스텀 헤더 사용
         }}
       />
     </Stack.Navigator>
