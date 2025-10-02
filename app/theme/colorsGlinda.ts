@@ -1,20 +1,20 @@
 import { baseColors, createOverlays, createThemeColors } from "./colorsBase"
 
 const glindaSpecific = {
-  // Glinda Pink (primary) - Hot pink/Magenta tones
-  primary100: "#FFF0F5",
-  primary200: "#FFCCE0",
-  primary300: "#FF99CC",
-  primary400: "#FF66B8", 
-  primary500: "#FF1493", // Hot pink - main color
-  primary600: "#DC143C", // Deeper pink
+  // Glinda Pink (primary) - Elegant rose gold tones
+  primary100: "#FDF2F8", // Soft blush
+  primary200: "#FCE7F3", // Light rose
+  primary300: "#F9A8D4", // Warm pink
+  primary400: "#F472B6", // Vibrant rose
+  primary500: "#EC4899", // Strong rose (WCAG AA compliant)
+  primary600: "#BE185D", // Deep rose
 
-  // Green (secondary) - Supporting tones
-  secondary100: "#E8F5E8",
-  secondary200: "#C3E6C3",
-  secondary300: "#9DD69D",
-  secondary400: "#76C676",
-  secondary500: "#4FB84F", // Supporting green
+  // Sage (secondary) - Sophisticated green accent
+  secondary100: "#F7FAF7",
+  secondary200: "#E8F5E8",
+  secondary300: "#A7C7AC", 
+  secondary400: "#7BA082",
+  secondary500: "#52796F", // Sage green
 
   // Gold accent colors
   accent100: baseColors.goldAccent100,
@@ -51,13 +51,13 @@ export const colors = {
   /**
    * The default color of the screen background.
    */
-  background: palette.neutral200,
+  background: palette.primary100, // Soft blush background
   /**
    * The default border color.
    */
   border: palette.neutral400,
   /**
-   * The main tinting color - Glinda's pink.
+   * The main tinting color - Elegant rose.
    */
   tint: palette.primary500,
   /**

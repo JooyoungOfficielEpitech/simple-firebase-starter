@@ -1,20 +1,20 @@
 import { baseColors, createOverlays, createThemeColors } from "./colorsBase"
 
 const elphabaSpecific = {
-  // Elphaba Green (primary) - Emerald/Forest tones
-  primary100: "#E8F5E8",
-  primary200: "#C3E6C3", 
-  primary300: "#9DD69D",
-  primary400: "#76C676",
-  primary500: "#4FB84F", // Main green
-  primary600: "#228B22", // Forest green
+  // Elphaba Green (primary) - Modern nature-inspired emerald tones
+  primary100: "#F0F9F0", // Ultra light mint
+  primary200: "#D4EDDA", // Soft mint green
+  primary300: "#A3D9A5", // Fresh green
+  primary400: "#6CBF6C", // Vibrant emerald
+  primary500: "#28A745", // Strong emerald (WCAG AA compliant)
+  primary600: "#1E7E34", // Deep forest green
 
-  // Pink (secondary) - Supporting tones
-  secondary100: "#FFF0F5",
-  secondary200: "#FFCCE0",
-  secondary300: "#FF99CC", 
-  secondary400: "#FF66B8",
-  secondary500: "#FF1493", // Supporting pink
+  // Coral (secondary) - Modern warm accent
+  secondary100: "#FFF5F5",
+  secondary200: "#FED7D7",
+  secondary300: "#FEB2B2", 
+  secondary400: "#FC8181",
+  secondary500: "#E53E3E", // Modern coral red
 
   // Gold accent colors
   accent100: baseColors.goldAccent100,
@@ -51,13 +51,13 @@ export const colors = {
   /**
    * The default color of the screen background.
    */
-  background: palette.neutral200,
+  background: palette.primary100, // Ultra light mint background
   /**
    * The default border color.
    */
   border: palette.neutral400,
   /**
-   * The main tinting color - Elphaba's green.
+   * The main tinting color - Modern emerald green.
    */
   tint: palette.primary500,
   /**

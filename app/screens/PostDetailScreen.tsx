@@ -18,6 +18,7 @@ import { Post } from "@/types/post"
 import { UserProfile } from "@/types/user"
 import { Application } from "@/services/firestore/applicationService"
 import { BulletinBoardStackParamList } from "@/navigators/BulletinBoardStackNavigator"
+import { ThemeDebugger } from "@/debug/ThemeDebugger"
 
 type NavigationProp = NativeStackNavigationProp<BulletinBoardStackParamList>
 type RoutePropType = RouteProp<BulletinBoardStackParamList, "PostDetail">
@@ -234,6 +235,7 @@ export const PostDetailScreen = () => {
 
   return (
     <Screen preset="scroll" safeAreaEdges={[]}>
+      <ThemeDebugger />
       <ScreenHeader title="모집 공고" />
       <View style={themed($container)}>
         {/* Hero section with key info */}

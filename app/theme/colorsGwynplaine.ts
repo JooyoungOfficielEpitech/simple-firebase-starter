@@ -1,20 +1,20 @@
 import { baseColors, createOverlays, createThemeColors } from "./colorsBase"
 
 const gwynplaineSpecific = {
-  // Gwynplaine Wine/Burgundy (primary) - Deep wine/burgundy tones
-  primary100: "#FCE4EC",
-  primary200: "#F8BBD9",
-  primary300: "#F48FB1",
-  primary400: "#F06292",
-  primary500: "#AD1457", // Deep wine/burgundy - main color
-  primary600: "#880E4F", // Dark burgundy
+  // Gwynplaine Purple (primary) - Deep mystical purple tones
+  primary100: "#FAF5FF", // Ultra light lavender
+  primary200: "#E9D5FF", // Soft lavender
+  primary300: "#C084FC", // Bright purple
+  primary400: "#A855F7", // Vibrant purple
+  primary500: "#7C3AED", // Strong purple (WCAG AA compliant)
+  primary600: "#5B21B6", // Deep purple
 
-  // Brown/Tan (secondary) - Supporting brown/tan tones
-  secondary100: "#EFEBE9",
-  secondary200: "#D7CCC8", 
-  secondary300: "#BCAAA4",
-  secondary400: "#A1887F",
-  secondary500: "#8D6E63", // Medium brown
+  // Gold (secondary) - Luxurious accent
+  secondary100: "#FFFBEB",
+  secondary200: "#FEF3C7", 
+  secondary300: "#FCD34D",
+  secondary400: "#F59E0B",
+  secondary500: "#D97706", // Warm gold
 
   // Silver accent colors
   accent100: baseColors.silverAccent100,
@@ -51,13 +51,13 @@ export const colors = {
   /**
    * The default color of the screen background.
    */
-  background: palette.neutral200,
+  background: palette.primary100, // Ultra light lavender background
   /**
    * The default border color.
    */
   border: palette.neutral400,
   /**
-   * The main tinting color - Gwynplaine's purple.
+   * The main tinting color - Mystical purple.
    */
   tint: palette.primary500,
   /**
