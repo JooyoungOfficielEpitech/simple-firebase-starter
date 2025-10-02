@@ -3,6 +3,7 @@ import { View, ViewStyle, TextStyle } from "react-native"
 
 import { LoadingOverlay } from "@/components/LoadingOverlay"
 import { Screen } from "@/components/Screen"
+import { ScreenHeader } from "@/components/ScreenHeader"
 import { SearchBar } from "@/components/SearchBar"
 import { SongList } from "@/components/SongList"
 import { Text } from "@/components/Text"
@@ -79,17 +80,12 @@ export function MusicalKaraokeHomeScreen({ navigation }: HomeStackScreenProps<"H
   }
 
   return (
-    <Screen preset="scroll" safeAreaEdges={["top"]}>
+    <Screen preset="scroll" safeAreaEdges={[]}>
+      <ScreenHeader 
+        title="🎤 오르피 Orphy"
+        showBackButton={false}
+      />
       <View style={themed($container)}>
-        {/* Header */}
-        <View style={themed($header)}>
-          <Text
-            text="🎤 오르피 Orphy"
-            preset="heading"
-            style={themed($appTitle)}
-          />
-        </View>
-        
         {/* Welcome message */}
         <View style={themed($welcomeContainer)}>
           <Text
@@ -137,25 +133,10 @@ const $container: ThemedStyle<ViewStyle> = ({ colors }) => ({
   backgroundColor: colors.background,
 })
 
-const $header: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
-  paddingHorizontal: spacing.lg,
-  paddingVertical: spacing.md,
-  backgroundColor: colors.background,
-  borderBottomWidth: 1,
-  borderBottomColor: colors.separator,
-})
-
 const $welcomeContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   paddingHorizontal: spacing.lg,
   paddingTop: spacing.sm,
   paddingBottom: spacing.xs,
-})
-
-const $appTitle: ThemedStyle<TextStyle> = ({ colors, typography, spacing }) => ({
-  textAlign: "center",
-  color: colors.palette.primary500, // Use Korean karaoke blue
-  fontFamily: typography.primary.bold, // Consistent with heading preset
-  marginBottom: spacing.xs,
 })
 
 const $appSubtitle: ThemedStyle<TextStyle> = ({ colors, typography }) => ({

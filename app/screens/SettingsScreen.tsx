@@ -8,7 +8,8 @@ import { Radio } from "@/components/Toggle/Radio"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { TextField } from "@/components/TextField"
-import { ScreenContainer, UnifiedScreenHeader, ContentSection } from "@/components/Layout"
+import { ScreenHeader } from "@/components/ScreenHeader"
+import { ContentSection } from "@/components/Layout"
 import { useAuth } from "@/context/AuthContext"
 import { userService, organizationService } from "@/services/firestore"
 import { UserProfile } from "@/types/user"
@@ -282,10 +283,12 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
 
   if (showOrgNameInput) {
     return (
-      <Screen preset="scroll" safeAreaEdges={["top"]}>
-        <ScreenContainer>
-          <UnifiedScreenHeader title="단체명 입력" />
-          
+      <Screen preset="scroll" safeAreaEdges={[]}>
+        <ScreenHeader 
+          title="단체명 입력"
+          showBackButton={false}
+        />
+        <View style={themed($container)}>
           <View style={$styles.contentContainer}>
             <ContentSection
               title="운영할 단체명을 입력해주세요"
@@ -317,16 +320,18 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
               </View>
             </ContentSection>
           </View>
-        </ScreenContainer>
+        </View>
       </Screen>
     )
   }
 
   return (
-    <Screen preset="scroll" safeAreaEdges={["top"]}>
-      <ScreenContainer>
-        <UnifiedScreenHeader title="Settings" />
-        
+    <Screen preset="scroll" safeAreaEdges={[]}>
+      <ScreenHeader 
+        title="Settings"
+        showBackButton={false}
+      />
+      <View style={themed($container)}>
         <View style={$styles.contentContainer}>
           {/* User Type Section */}
           {!loading && userProfile && (
@@ -416,7 +421,7 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
             style={themed($logoutButton)}
           />
         </View>
-      </ScreenContainer>
+      </View>
       
       {/* 커튼 효과 */}
       <Animated.View 
@@ -591,6 +596,12 @@ const $radioDescription: ThemedStyle<TextStyle> = (theme) => ({
 const $logoutButton: ThemedStyle<ViewStyle> = () => ({
   marginTop: 16,
   minWidth: 120,
+})
+
+const $container: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flexGrow: 1,
+  backgroundColor: "transparent",
+  paddingHorizontal: spacing.lg,
 })
 
 // Elphaba (Green) Radio Button Styles

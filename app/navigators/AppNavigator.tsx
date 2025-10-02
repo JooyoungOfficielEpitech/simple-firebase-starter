@@ -12,6 +12,7 @@ import Config from "@/config"
 import { useAuth } from "@/context/AuthContext"
 import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary"
 import { ForgotPasswordScreen } from "@/screens/ForgotPasswordScreen"
+import { ProfileScreen } from "@/screens/ProfileScreen"
 import { SignInScreen } from "@/screens/SignInScreen"
 import { SignUpScreen } from "@/screens/SignUpScreen"
 import { useAppTheme } from "@/theme/context"
@@ -34,6 +35,7 @@ export type AppStackParamList = {
   SignIn: undefined
   SignUp: undefined
   ForgotPassword: undefined
+  Profile: undefined
 }
 
 /**
@@ -88,6 +90,10 @@ const AppStack = () => {
         // 인증된 사용자
         <>
           <Stack.Screen name="Main" component={MainNavigator} />
+          <Stack.Screen 
+            name="Profile" 
+            component={ProfileScreen}
+          />
         </>
       )}
     </Stack.Navigator>

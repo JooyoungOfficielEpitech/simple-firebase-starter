@@ -6,8 +6,8 @@ import type { RouteProp } from "@react-navigation/native"
 import firestore, { FirebaseFirestoreTypes } from "@react-native-firebase/firestore"
 
 import { Screen } from "@/components/Screen"
+import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
-import { HeaderBackButton } from "@/components/HeaderBackButton"
 import { Icon } from "@/components/Icon"
 import { ApplicationService, Application, ApplicationStatus } from "@/services/firestore/applicationService"
 import { useAppTheme } from "@/theme/context"
@@ -300,14 +300,14 @@ export const ApplicationManagementScreen = () => {
 
   if (loading && applications.length === 0) {
     return (
-      <Screen preset="fixed" safeAreaEdges={["top"]}>
+      <Screen preset="fixed" safeAreaEdges={[]}>
+        <ScreenHeader 
+          title="지원서 확인"
+          backButtonProps={{
+            onPress: () => navigation.goBack()
+          }}
+        />
         <View style={themed($container)}>
-          <View style={themed($header)}>
-            <HeaderBackButton onPress={() => navigation.goBack()} />
-            <Text text="지원서 확인" preset="heading" style={themed($appTitle)} />
-            <View style={themed($headerButtons)} />
-          </View>
-          
           <View style={themed($loadingContainer)}>
             <View style={themed($loadingIconContainer)}>
               <Text text="📋" style={themed($loadingIcon)} />
@@ -320,15 +320,14 @@ export const ApplicationManagementScreen = () => {
   }
 
   return (
-    <Screen preset="scroll" safeAreaEdges={["top"]}>
+    <Screen preset="scroll" safeAreaEdges={[]}>
+      <ScreenHeader 
+        title="지원서 확인"
+        backButtonProps={{
+          onPress: () => navigation.goBack()
+        }}
+      />
       <View style={themed($container)}>
-        {/* Header */}
-        <View style={themed($header)}>
-          <HeaderBackButton onPress={() => navigation.goBack()} />
-          <Text text="지원서 확인" preset="heading" style={themed($appTitle)} />
-          <View style={themed($headerButtons)} />
-        </View>
-
         {/* Content */}
         <View style={themed($content)}>
           {/* Post info */}

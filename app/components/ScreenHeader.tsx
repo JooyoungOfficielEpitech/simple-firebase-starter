@@ -1,8 +1,10 @@
 import { type FC, type ReactElement } from "react"
 import { View, type ViewStyle, type TextStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { useNavigation } from "@react-navigation/native"
 
 import { BackButton, type BackButtonProps } from "./BackButton"
+import { PressableIcon } from "./Icon"
 import { Text, type TextProps } from "./Text"
 import { useAppTheme } from "@/theme/context"
 import { type ThemedStyle } from "@/theme/types"
@@ -47,6 +49,11 @@ export interface ScreenHeaderProps {
    * Safe Area 상단 여백 포함 여부 (기본: true)
    */
   includeSafeArea?: boolean
+  
+  /**
+   * 프로필 아이콘 표시 여부 (기본: true)
+   */
+  showProfileIcon?: boolean
 }
 
 /**
@@ -86,11 +93,25 @@ export const ScreenHeader: FC<ScreenHeaderProps> = function ScreenHeader({
   containerStyle,
   titleStyle,
   includeSafeArea = true,
+  showProfileIcon = true,
 }) {
   const { top } = useSafeAreaInsets()
-  const { themed } = useAppTheme()
+  const { themed, theme: { colors } } = useAppTheme()
+  const navigation = useNavigation<any>()
 
   const displayTitle = titleTx ? titleTx : title
+
+  const ProfileIcon = () => (
+    <PressableIcon
+      icon="user"
+      size={24}
+      color={colors.text}
+      onPress={() => navigation.navigate("Profile")}
+      containerStyle={themed($profileIcon)}
+    />
+  )
+
+  const rightContent = rightComponent || (showProfileIcon ? <ProfileIcon /> : null)
 
   return (
     <View 
@@ -117,12 +138,14 @@ export const ScreenHeader: FC<ScreenHeaderProps> = function ScreenHeader({
             text={displayTitle}
             style={[themed($title), titleStyle]}
             numberOfLines={1}
+            adjustsFontSizeToFit={true}
+            minimumFontScale={0.7}
           />
         </View>
 
-        {/* 오른쪽: 커스텀 컴포넌트 */}
+        {/* 오른쪽: 커스텀 컴포넌트 또는 프로필 아이콘 */}
         <View style={themed($rightSection)}>
-          {rightComponent || <View style={themed($placeholder)} />}
+          {rightContent || <View style={themed($placeholder)} />}
         </View>
       </View>
     </View>
@@ -150,7 +173,7 @@ const $leftSection: ThemedStyle<ViewStyle> = () => ({
 })
 
 const $centerSection: ThemedStyle<ViewStyle> = () => ({
-  flex: 2,
+  flex: 4,
   alignItems: "center",
   justifyContent: "center",
 })
@@ -162,11 +185,15 @@ const $rightSection: ThemedStyle<ViewStyle> = () => ({
 })
 
 const $title: ThemedStyle<TextStyle> = ({ colors }) => ({
-  color: colors.text,
+  color: colors.palette.primary500,
   textAlign: "center",
 })
 
 const $placeholder: ThemedStyle<ViewStyle> = () => ({
   width: 44,
   height: 44,
+})
+
+const $profileIcon: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  padding: spacing.xs,
 })

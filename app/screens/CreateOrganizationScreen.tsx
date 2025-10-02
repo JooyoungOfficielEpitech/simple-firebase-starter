@@ -5,9 +5,9 @@ import { useNavigation, useRoute } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { Button } from "@/components/Button"
-import { BackButton } from "@/components/BackButton"
 import { Icon } from "@/components/Icon"
 import { Screen } from "@/components/Screen"
+import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
 import { TextField } from "@/components/TextField"
 import { organizationService, userService } from "@/services/firestore"
@@ -172,7 +172,10 @@ export const CreateOrganizationScreen = () => {
 
   if (loading) {
     return (
-      <Screen preset="fixed" safeAreaEdges={["top"]}>
+      <Screen preset="fixed" safeAreaEdges={[]}>
+        <ScreenHeader 
+          title={isEdit ? "단체 수정" : "단체 등록"}
+        />
         <View style={[themed($container), { paddingTop: top + (spacing?.lg || 16) }]}>
           <View style={themed($loadingContainer)}>
             <Text text="단체 정보를 불러오는 중..." style={themed($loadingText)} />
@@ -183,16 +186,11 @@ export const CreateOrganizationScreen = () => {
   }
 
   return (
-    <Screen preset="scroll" safeAreaEdges={["top"]}>
+    <Screen preset="scroll" safeAreaEdges={[]}>
+      <ScreenHeader 
+        title={isEdit ? "단체 수정" : "단체 등록"}
+      />
       <View style={[themed($container), { paddingTop: top + (spacing?.lg || 16) }]}>
-        {/* 헤더 */}
-        <View style={themed($header)}>
-          <View style={themed($headerLeft)}>
-            <BackButton />
-            <Text preset="heading" text={isEdit ? "단체 수정" : "단체 등록"} style={themed($title)} />
-          </View>
-        </View>
-
         {/* 폼 */}
         <View style={themed($form)}>
           <TextField

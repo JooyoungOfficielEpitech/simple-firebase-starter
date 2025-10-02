@@ -84,20 +84,9 @@ export function KaraokeScreen({ route, navigation }: HomeStackScreenProps<"Karao
   const hasLyrics = testSong.musicXMLFile || testSong.musicXMLUrl
 
   return (
-    <Screen preset="scroll" safeAreaEdges={["top"]}>
+    <Screen preset="scroll" safeAreaEdges={[]}>
+      <ScreenHeader title={testSong.title} />
       <View style={themed($container)}>
-        {/* Header */}
-        <View style={themed($header)}>
-          <TouchableOpacity
-            style={themed($backButton)}
-            onPress={() => navigation.goBack()}
-            accessibilityRole="button"
-            accessibilityLabel="뒤로가기"
-          >
-            <Text text="←" style={themed($backButtonText)} />
-          </TouchableOpacity>
-          <View style={themed($headerButtons)} />
-        </View>
         {/* 통합 가사 및 오디오 플레이어 영역 */}
         <View style={themed($lyricsContainer)}>
           {hasLyrics ? (
@@ -157,45 +146,6 @@ const $container: ThemedStyle<ViewStyle> = ({ colors }) => ({
   backgroundColor: colors.background,
 })
 
-const $header: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
-  paddingHorizontal: spacing.lg,
-  paddingVertical: spacing.md,
-  backgroundColor: colors.background,
-  borderBottomWidth: 1,
-  borderBottomColor: colors.separator,
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "space-between",
-})
-
-const $appTitle: ThemedStyle<TextStyle> = ({ colors, typography, spacing }) => ({
-  textAlign: "center",
-  color: colors.palette.primary500,
-  fontFamily: typography.primary.bold,
-  flex: 1,
-  marginBottom: spacing.xs,
-})
-
-const $backButton: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  paddingHorizontal: spacing.sm,
-  paddingVertical: spacing.xs,
-  minWidth: 44,
-  minHeight: 44,
-  justifyContent: "center",
-  alignItems: "center",
-})
-
-const $backButtonText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
-  fontSize: 24,
-  color: colors.palette.primary500,
-  fontFamily: typography.primary.bold,
-})
-
-const $headerButtons: ThemedStyle<ViewStyle> = () => ({
-  flexDirection: "row",
-  alignItems: "center",
-  minWidth: 44, // 균형을 위한 최소 너비
-})
 
 
 

@@ -457,17 +457,12 @@ export const BulletinBoardScreen = () => {
   if (loading && posts.length === 0) {
     console.log('⏳ [BulletinBoardScreen] 로딩 화면 렌더링')
     return (
-      <Screen preset="fixed" safeAreaEdges={["top"]}>
+      <Screen preset="fixed" safeAreaEdges={[]}>
+        <ScreenHeader 
+          title={translate("bulletinBoard:title")}
+          showBackButton={false}
+        />
         <View style={themed($container)}>
-          {/* Header */}
-          <View style={themed($header)}>
-            <Text
-              text={translate("bulletinBoard:title")}
-              preset="heading"
-              style={themed($appTitle)}
-            />
-          </View>
-          
           <View style={themed($loadingContainer)}>
             <View style={themed($loadingIconContainer)}>
               <Text text="🎭" style={themed($loadingIcon)} />
@@ -479,31 +474,31 @@ export const BulletinBoardScreen = () => {
     )
   }
 
+  const headerTitle = selectedOrganizationId ? 
+    organizations.find(org => org.id === selectedOrganizationId)?.name || translate("bulletinBoard:tabs.organizations") : 
+    translate("bulletinBoard:title")
+
+  const HeaderRightComponent = () => (
+    <Button
+      text="+"
+      preset="default"
+      onPress={handleCreatePost}
+      style={themed($createButton)}
+      textStyle={themed($createButtonText)}
+    />
+  )
+
   return (
-    <Screen preset="scroll" safeAreaEdges={["top"]}>
+    <Screen preset="scroll" safeAreaEdges={[]}>
+      <ScreenHeader 
+        title={headerTitle}
+        showBackButton={!!selectedOrganizationId}
+        backButtonProps={{
+          onPress: handleBackToAllPosts
+        }}
+        rightComponent={<HeaderRightComponent />}
+      />
       <View style={themed($container)}>
-        {/* Header */}
-        <View style={themed($header)}>
-          {!!selectedOrganizationId && (
-            <HeaderBackButton onPress={handleBackToAllPosts} />
-          )}
-          <Text
-            text={selectedOrganizationId ? 
-              organizations.find(org => org.id === selectedOrganizationId)?.name || translate("bulletinBoard:tabs.organizations") : 
-              translate("bulletinBoard:title")}
-            preset="heading"
-            style={themed($appTitle)}
-          />
-          <View style={themed($headerButtons)}>
-            <Button
-              text="+"
-              preset="default"
-              onPress={handleCreatePost}
-              style={themed($createButton)}
-              textStyle={themed($createButtonText)}
-            />
-          </View>
-        </View>
 
         {/* 탭 메뉴 (단체가 선택되지 않았을 때만 표시) */}
         {!selectedOrganizationId && (
@@ -693,25 +688,6 @@ const $container = ({ spacing }) => ({
   paddingHorizontal: spacing.lg,
 })
 
-const $header = ({ spacing, colors }) => ({
-  paddingHorizontal: 0,
-  paddingVertical: spacing.md,
-  backgroundColor: colors.background,
-  borderBottomWidth: 1,
-  borderBottomColor: colors.separator,
-  flexDirection: "row" as const,
-  alignItems: "center" as const,
-  justifyContent: "space-between" as const,
-})
-
-const $appTitle = ({ colors, typography, spacing }) => ({
-  textAlign: "center" as const,
-  color: colors.palette.primary500,
-  fontFamily: typography.primary.bold,
-  flex: 1,
-})
-
-// BackButton styles moved to HeaderBackButton component
 
 
 const $contentContainer = {
@@ -838,12 +814,6 @@ const $tagText = ({ colors }) => ({
 })
 
 
-const $headerButtons = () => ({
-  flexDirection: "row" as const,
-  alignItems: "center" as const,
-})
-
-// Unused button styles removed
 
 const $createButtonText = ({ colors }) => ({
   fontSize: 24,

@@ -134,9 +134,9 @@ export const BackButton: FC<BackButtonProps> = function BackButton({
       accessibilityHint="이전 화면으로 돌아갑니다"
     >
       <Icon 
-        icon="caretLeft" 
+        icon="back" 
         size={24} 
-        color={disabled ? theme.colors.textDim : theme.colors.text} 
+        color={disabled ? theme.colors.textDim : theme.colors.palette.primary500} 
       />
     </TouchableOpacity>
   )

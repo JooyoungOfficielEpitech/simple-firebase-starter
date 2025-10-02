@@ -109,3 +109,4 @@ const $tabBarLabel: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   lineHeight: 16,
   color: colors.text,
 })
+

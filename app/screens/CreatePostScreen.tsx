@@ -7,7 +7,7 @@ import type { RouteProp } from "@react-navigation/native"
 
 import { Button } from "@/components/Button"
 import { Screen } from "@/components/Screen"
-import { HeaderBackButton } from "@/components/HeaderBackButton"
+import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
 import { postService, userService, organizationService } from "@/services/firestore"
 import firestore from "@react-native-firebase/firestore"
@@ -479,18 +479,11 @@ export const CreatePostScreen = () => {
   // 로딩 중일 때
   if (!userProfile) {
     return (
-      <Screen preset="fixed" safeAreaEdges={["top"]}>
+      <Screen preset="fixed" safeAreaEdges={[]}>
+        <ScreenHeader 
+          title="게시글 작성"
+        />
         <View style={themed($container)}>
-          {/* Header */}
-          <View style={themed($header)}>
-            <HeaderBackButton onPress={() => navigation.goBack()} />
-            <Text
-              text="게시글 작성"
-              preset="heading"
-              style={themed($appTitle)}
-            />
-            <View style={themed($headerButtons)} />
-          </View>
           <View style={themed($centerContainer) as any}>
             <Text text="사용자 정보를 불러오는 중..." style={themed($messageText) as any} />
           </View>
@@ -502,18 +495,11 @@ export const CreatePostScreen = () => {
   // 운영자가 아닐 때
   if (userProfile.userType !== "organizer") {
     return (
-      <Screen preset="fixed" safeAreaEdges={["top"]}>
+      <Screen preset="fixed" safeAreaEdges={[]}>
+        <ScreenHeader 
+          title="게시글 작성"
+        />
         <View style={themed($container)}>
-          {/* Header */}
-          <View style={themed($header)}>
-            <HeaderBackButton onPress={() => navigation.goBack()} />
-            <Text
-              text="게시글 작성"
-              preset="heading"
-              style={themed($appTitle)}
-            />
-            <View style={themed($headerButtons)} />
-          </View>
           <View style={themed($centerContainer) as any}>
             <Text text="단체 운영자만 게시글을 작성할 수 있습니다." style={themed($messageText) as any} />
             <Text text={`현재 사용자 타입: ${userProfile.userType}`} style={themed($debugInfoText) as any} />
@@ -529,18 +515,11 @@ export const CreatePostScreen = () => {
   }
 
   return (
-    <Screen preset="scroll" safeAreaEdges={["top"]}>
+    <Screen preset="scroll" safeAreaEdges={[]}>
+      <ScreenHeader 
+        title={isEdit ? "게시글 수정" : "게시글 작성"}
+      />
       <View style={themed($container)}>
-        {/* Header */}
-        <View style={themed($header)}>
-          <HeaderBackButton onPress={() => navigation.goBack()} />
-          <Text
-            text={isEdit ? "게시글 수정" : "게시글 작성"}
-            preset="heading"
-            style={themed($appTitle)}
-          />
-          <View style={themed($headerButtons)} />
-        </View>
         {/* 템플릿 선택 섹션 */}
         <View style={themed($templateSection)}>
           <Text text="⚡ 빠른 작성" style={themed($sectionHeader)} />
@@ -1905,26 +1884,3 @@ const $debugHeaderText = ({ colors, spacing, typography }) => ({
   fontFamily: typography.primary.bold,
 })
 
-// Header 스타일들 (PostDetailScreen과 동일)
-const $header = ({ spacing, colors }) => ({
-  paddingHorizontal: 0,
-  paddingVertical: spacing.md,
-  backgroundColor: colors.background,
-  flexDirection: "row" as const,
-  alignItems: "center" as const,
-  justifyContent: "space-between" as const,
-})
-
-const $appTitle = ({ colors, typography }) => ({
-  flex: 1,
-  fontSize: 32,
-  textAlign: "center" as const,
-  color: colors.palette.primary500,
-  fontFamily: typography.primary.bold,
-})
-
-const $headerButtons = () => ({
-  flexDirection: "row" as const,
-  alignItems: "center" as const,
-  minWidth: 44, // 균형을 위한 최소 너비
-})

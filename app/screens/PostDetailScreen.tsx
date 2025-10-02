@@ -10,7 +10,6 @@ import { Screen } from "@/components/Screen"
 import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
 import { TextField } from "@/components/TextField"
-import { HeaderBackButton } from "@/components/HeaderBackButton"
 import { translate } from "@/i18n"
 import { postService, userService } from "@/services/firestore"
 import { ApplicationService } from "@/services/firestore/applicationService"
@@ -209,18 +208,9 @@ export const PostDetailScreen = () => {
 
   if (loading) {
     return (
-      <Screen preset="fixed" safeAreaEdges={["top"]}>
+      <Screen preset="fixed" safeAreaEdges={[]}>
+        <ScreenHeader title="게시글" />
         <View style={themed($container)}>
-          {/* Header */}
-          <View style={themed($header)}>
-            <HeaderBackButton onPress={() => navigation.goBack()} />
-            <Text
-              text="게시글"
-              preset="heading"
-              style={themed($appTitle)}
-            />
-            <View style={themed($headerButtons)} />
-          </View>
           <View style={themed($centerContainer) as any}>
             <Text text="로딩 중..." />
           </View>
@@ -231,18 +221,9 @@ export const PostDetailScreen = () => {
 
   if (!post) {
     return (
-      <Screen preset="fixed" safeAreaEdges={["top"]}>
+      <Screen preset="fixed" safeAreaEdges={[]}>
+        <ScreenHeader title="게시글" />
         <View style={themed($container)}>
-          {/* Header */}
-          <View style={themed($header)}>
-            <HeaderBackButton onPress={() => navigation.goBack()} />
-            <Text
-              text="게시글"
-              preset="heading"
-              style={themed($appTitle)}
-            />
-            <View style={themed($headerButtons)} />
-          </View>
           <View style={themed($centerContainer) as any}>
             <Text text="게시글을 찾을 수 없습니다." />
           </View>
@@ -252,20 +233,9 @@ export const PostDetailScreen = () => {
   }
 
   return (
-    <Screen preset="scroll" safeAreaEdges={["top"]}>
+    <Screen preset="scroll" safeAreaEdges={[]}>
+      <ScreenHeader title="모집 공고" />
       <View style={themed($container)}>
-        {/* Header */}
-        <View style={themed($header)}>
-          <HeaderBackButton onPress={() => navigation.goBack()} />
-          <Text
-            text="모집 공고"
-            preset="heading"
-            style={themed($appTitle)}
-          />
-          <View style={themed($headerButtons)}>
-            {/* Action buttons can go here */}
-          </View>
-        </View>
         {/* Hero section with key info */}
         <View style={themed($heroCard)}>
           <View style={themed($statusHeader)}>
@@ -546,44 +516,6 @@ const $container = ({ spacing }) => ({
   paddingHorizontal: spacing.lg,
 })
 
-const $header = ({ spacing, colors }) => ({
-  paddingHorizontal: 0,
-  paddingVertical: spacing.md,
-  backgroundColor: colors.background,
-  borderBottomWidth: 1,
-  borderBottomColor: colors.separator,
-  flexDirection: "row" as const,
-  alignItems: "center" as const,
-  justifyContent: "space-between" as const,
-})
-
-const $appTitle = ({ colors, typography, spacing }) => ({
-  textAlign: "center" as const,
-  color: colors.palette.primary500,
-  fontFamily: typography.primary.bold,
-  flex: 1,
-})
-
-const $backButton = ({ spacing }) => ({
-  paddingHorizontal: spacing.sm,
-  paddingVertical: spacing.xs,
-  minWidth: 44,
-  minHeight: 44,
-  justifyContent: "center" as const,
-  alignItems: "center" as const,
-})
-
-const $backButtonText = ({ colors, typography }) => ({
-  fontSize: 24,
-  color: colors.palette.primary500,
-  fontFamily: typography.primary.bold,
-})
-
-const $headerButtons = () => ({
-  flexDirection: "row" as const,
-  alignItems: "center" as const,
-  minWidth: 44, // 균형을 위한 최소 너비
-})
 
 const $centerContainer = {
   flex: 1,
