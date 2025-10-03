@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
-import { View, ScrollView, Alert, TouchableOpacity, TextInput, Modal } from "react-native"
+import { View, ScrollView, Alert, TouchableOpacity, TextInput, Modal, Switch, Platform } from "react-native"
+import DateTimePicker from '@react-native-community/datetimepicker'
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -36,6 +37,10 @@ export const CreatePostScreen = () => {
   const [showTemplateModal, setShowTemplateModal] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<PostTemplate | null>(null)
   const [showPreview, setShowPreview] = useState(false)
+  const [showDeadlinePicker, setShowDeadlinePicker] = useState(false)
+  const [showAuditionDatePicker, setShowAuditionDatePicker] = useState(false)
+  const [showAuditionResultPicker, setShowAuditionResultPicker] = useState(false)
+  const [showPerformanceDatePicker, setShowPerformanceDatePicker] = useState(false)
   const [formData, setFormData] = useState({
     title: "",
     production: "",
@@ -404,6 +409,51 @@ export const CreatePostScreen = () => {
     }))
   }
 
+  // 날짜 포맷 헬퍼 함수
+  const formatDate = (date: Date): string => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const weekDay = ['일', '월', '화', '수', '목', '금', '토'][date.getDay()]
+    return `${year}.${month}.${day} (${weekDay})`
+  }
+
+  // 문자열을 Date 객체로 변환하는 함수
+  const parseDate = (dateString: string): Date => {
+    if (!dateString) return new Date()
+    
+    // "2024.10.20 (일)" 형식 파싱
+    const match = dateString.match(/(\d{4})\.(\d{2})\.(\d{2})/)
+    if (match) {
+      const [, year, month, day] = match
+      return new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+    }
+    
+    return new Date()
+  }
+
+  // 날짜 변경 핸들러들
+  const handleDeadlineChange = (event: any, selectedDate?: Date) => {
+    setShowDeadlinePicker(Platform.OS === 'ios')
+    if (selectedDate) {
+      updateFormData("deadline", formatDate(selectedDate))
+    }
+  }
+
+  const handleAuditionDateChange = (event: any, selectedDate?: Date) => {
+    setShowAuditionDatePicker(Platform.OS === 'ios')
+    if (selectedDate) {
+      updateFormData("auditionDate", formatDate(selectedDate))
+    }
+  }
+
+  const handleAuditionResultChange = (event: any, selectedDate?: Date) => {
+    setShowAuditionResultPicker(Platform.OS === 'ios')
+    if (selectedDate) {
+      updateFormData("auditionResultDate", formatDate(selectedDate))
+    }
+  }
+
   const applyTemplate = (template: PostTemplate) => {
     console.log('템플릿 적용:', template.name)
     
@@ -607,30 +657,40 @@ export const CreatePostScreen = () => {
             <Text text="💡 구체적이고 매력적인 제목을 작성해주세요" style={themed($hintText)} />
           </View>
           
-          {/* Two-column layout for related fields */}
-          <View style={themed($twoColumnRow)}>
-            <View style={[themed($inputSection), themed($halfWidth)]}>
-              <View style={themed($labelRow)}>
-                <Text text="작품명" style={themed($label) as any} />
-                <Text text="*" style={themed($required)} />
-              </View>
-              <TextInput
-                style={themed($textInput)}
-                value={formData.production}
-                onChangeText={(text) => updateFormData("production", text)}
-                placeholder="햄릿"
-                placeholderTextColor={colors.textDim}
-                accessibilityLabel="작품명"
-              />
+          {/* 작품명 */}
+          <View style={themed($inputSection)}>
+            <View style={themed($labelRow)}>
+              <Text text="작품명" style={themed($label) as any} />
+              <Text text="*" style={themed($required)} />
             </View>
-            
-            <View style={[themed($inputSection), themed($halfWidth)]}>
-              <Text text="장르" style={themed($label) as any} />
-              <TouchableOpacity style={themed($dropdownButton)} disabled>
-                <Text text="연극" style={themed($dropdownText)} />
-                <Text text="▼" style={themed($dropdownArrow)} />
-              </TouchableOpacity>
-            </View>
+            <TextInput
+              style={themed($textInput)}
+              value={formData.production}
+              onChangeText={(text) => updateFormData("production", text)}
+              placeholder="햄릿"
+              placeholderTextColor={colors.textDim}
+              accessibilityLabel="작품명"
+            />
+          </View>
+          
+          {/* 장르 */}
+          <View style={themed($inputSection)}>
+            <Text text="장르" style={themed($label) as any} />
+            <TouchableOpacity 
+              style={themed($dropdownButton)}
+              onPress={() => {
+                const genres = ["연극", "뮤지컬", "창작", "기타"]
+                const currentIndex = genres.indexOf(formData.genre)
+                const nextIndex = (currentIndex + 1) % genres.length
+                updateFormData("genre", genres[nextIndex] as any)
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="장르 선택"
+              accessibilityHint="터치하면 장르가 순환됩니다"
+            >
+              <Text text={formData.genre} style={themed($dropdownText)} />
+              <Text text="▼" style={themed($dropdownArrow)} />
+            </TouchableOpacity>
           </View>
 
           {/* 단체명 - read only */}
@@ -675,13 +735,29 @@ export const CreatePostScreen = () => {
           {/* 마감일 */}
           <View style={themed($inputSection)}>
             <Text text="모집 마감일" style={themed($label) as any} />
-            <TextInput
-              style={themed($textInput)}
-              value={formData.deadline}
-              onChangeText={(text) => updateFormData("deadline", text)}
-              placeholder="예: 2024년 10월 18일 (금) 23:59"
-              placeholderTextColor={colors.textDim}
-            />
+            <TouchableOpacity
+              style={themed($dateInput)}
+              onPress={() => setShowDeadlinePicker(true)}
+              accessibilityRole="button"
+              accessibilityLabel="마감일 선택"
+              accessibilityHint="터치하면 날짜 선택기가 열립니다"
+            >
+              <Text 
+                text={formData.deadline || "날짜를 선택해주세요"} 
+                style={[themed($dateInputText), !formData.deadline && themed($placeholderText)]} 
+              />
+              <Text text="📅" style={themed($dateIcon)} />
+            </TouchableOpacity>
+            
+            {showDeadlinePicker && (
+              <DateTimePicker
+                value={parseDate(formData.deadline)}
+                mode="date"
+                display="default"
+                onChange={handleDeadlineChange}
+                minimumDate={new Date()}
+              />
+            )}
           </View>
         </View>
 
@@ -772,24 +848,56 @@ export const CreatePostScreen = () => {
           <View style={themed($twoColumnRow)}>
             <View style={[themed($inputSection), themed($halfWidth)]}>
               <Text text="오디션 일정" style={themed($label) as any} />
-              <TextInput
-                style={themed($textInput)}
-                value={formData.auditionDate}
-                onChangeText={(text) => updateFormData("auditionDate", text)}
-                placeholder="예: 2024.10.20 (일) 14:00"
-                placeholderTextColor={colors.textDim}
-              />
+              <TouchableOpacity
+                style={themed($dateInput)}
+                onPress={() => setShowAuditionDatePicker(true)}
+                accessibilityRole="button"
+                accessibilityLabel="오디션 일정 선택"
+                accessibilityHint="터치하면 날짜 선택기가 열립니다"
+              >
+                <Text 
+                  text={formData.auditionDate || "날짜 선택"} 
+                  style={[themed($dateInputText), !formData.auditionDate && themed($placeholderText)]} 
+                />
+                <Text text="📅" style={themed($dateIcon)} />
+              </TouchableOpacity>
+              
+              {showAuditionDatePicker && (
+                <DateTimePicker
+                  value={parseDate(formData.auditionDate)}
+                  mode="date"
+                  display="default"
+                  onChange={handleAuditionDateChange}
+                  minimumDate={new Date()}
+                />
+              )}
             </View>
             
             <View style={[themed($inputSection), themed($halfWidth)]}>
               <Text text="결과 발표일" style={themed($label) as any} />
-              <TextInput
-                style={themed($textInput)}
-                value={formData.auditionResultDate}
-                onChangeText={(text) => updateFormData("auditionResultDate", text)}
-                placeholder="예: 2024.10.22 (화)"
-                placeholderTextColor={colors.textDim}
-              />
+              <TouchableOpacity
+                style={themed($dateInput)}
+                onPress={() => setShowAuditionResultPicker(true)}
+                accessibilityRole="button"
+                accessibilityLabel="결과 발표일 선택"
+                accessibilityHint="터치하면 날짜 선택기가 열립니다"
+              >
+                <Text 
+                  text={formData.auditionResultDate || "날짜 선택"} 
+                  style={[themed($dateInputText), !formData.auditionResultDate && themed($placeholderText)]} 
+                />
+                <Text text="📅" style={themed($dateIcon)} />
+              </TouchableOpacity>
+              
+              {showAuditionResultPicker && (
+                <DateTimePicker
+                  value={parseDate(formData.auditionResultDate)}
+                  mode="date"
+                  display="default"
+                  onChange={handleAuditionResultChange}
+                  minimumDate={new Date()}
+                />
+              )}
             </View>
           </View>
 
@@ -832,59 +940,55 @@ export const CreatePostScreen = () => {
             />
           </View>
 
-          <View style={themed($checkboxSection)}>
+          <View style={themed($benefitsSection)}>
             <Text text="제공 혜택" style={themed($label) as any} />
             
-            <View style={themed($checkboxRow)}>
-              <TouchableOpacity
-                style={themed($checkbox)}
-                onPress={() => updateFormData("transportation", !formData.transportation)}
-                accessibilityRole="checkbox"
-                accessibilityState={{ checked: formData.transportation }}
-                accessibilityLabel="교통비 지원"
-              >
-                <Text text={formData.transportation ? "✓" : ""} style={themed($checkboxText)} />
-              </TouchableOpacity>
-              <Text text="교통비 지원" style={themed($checkboxLabel)} />
+            <View style={themed($benefitRow)}>
+              <Text text="🚗 교통비 지원" style={themed($benefitLabel)} />
+              <Switch
+                value={formData.transportation}
+                onValueChange={(value) => updateFormData("transportation", value)}
+                trackColor={{ false: colors.palette.neutral300, true: colors.palette.primary200 }}
+                thumbColor={formData.transportation ? colors.palette.primary500 : colors.palette.neutral400}
+                ios_backgroundColor={colors.palette.neutral300}
+                accessibilityLabel="교통비 지원 토글"
+              />
             </View>
 
-            <View style={themed($checkboxRow)}>
-              <TouchableOpacity
-                style={themed($checkbox)}
-                onPress={() => updateFormData("costume", !formData.costume)}
-                accessibilityRole="checkbox"
-                accessibilityState={{ checked: formData.costume }}
-                accessibilityLabel="의상 제공"
-              >
-                <Text text={formData.costume ? "✓" : ""} style={themed($checkboxText)} />
-              </TouchableOpacity>
-              <Text text="의상 제공" style={themed($checkboxLabel)} />
+            <View style={themed($benefitRow)}>
+              <Text text="👗 의상 제공" style={themed($benefitLabel)} />
+              <Switch
+                value={formData.costume}
+                onValueChange={(value) => updateFormData("costume", value)}
+                trackColor={{ false: colors.palette.neutral300, true: colors.palette.primary200 }}
+                thumbColor={formData.costume ? colors.palette.primary500 : colors.palette.neutral400}
+                ios_backgroundColor={colors.palette.neutral300}
+                accessibilityLabel="의상 제공 토글"
+              />
             </View>
 
-            <View style={themed($checkboxRow)}>
-              <TouchableOpacity
-                style={themed($checkbox)}
-                onPress={() => updateFormData("meals", !formData.meals)}
-                accessibilityRole="checkbox"
-                accessibilityState={{ checked: formData.meals }}
-                accessibilityLabel="식사 제공"
-              >
-                <Text text={formData.meals ? "✓" : ""} style={themed($checkboxText)} />
-              </TouchableOpacity>
-              <Text text="식사 제공" style={themed($checkboxLabel)} />
+            <View style={themed($benefitRow)}>
+              <Text text="🍽️ 식사 제공" style={themed($benefitLabel)} />
+              <Switch
+                value={formData.meals}
+                onValueChange={(value) => updateFormData("meals", value)}
+                trackColor={{ false: colors.palette.neutral300, true: colors.palette.primary200 }}
+                thumbColor={formData.meals ? colors.palette.primary500 : colors.palette.neutral400}
+                ios_backgroundColor={colors.palette.neutral300}
+                accessibilityLabel="식사 제공 토글"
+              />
             </View>
 
-            <View style={themed($checkboxRow)}>
-              <TouchableOpacity
-                style={themed($checkbox)}
-                onPress={() => updateFormData("portfolio", !formData.portfolio)}
-                accessibilityRole="checkbox"
-                accessibilityState={{ checked: formData.portfolio }}
-                accessibilityLabel="포트폴리오 제공"
-              >
-                <Text text={formData.portfolio ? "✓" : ""} style={themed($checkboxText)} />
-              </TouchableOpacity>
-              <Text text="포트폴리오 제공" style={themed($checkboxLabel)} />
+            <View style={themed($benefitRow)}>
+              <Text text="📸 포트폴리오 제공" style={themed($benefitLabel)} />
+              <Switch
+                value={formData.portfolio}
+                onValueChange={(value) => updateFormData("portfolio", value)}
+                trackColor={{ false: colors.palette.neutral300, true: colors.palette.primary200 }}
+                thumbColor={formData.portfolio ? colors.palette.primary500 : colors.palette.neutral400}
+                ios_backgroundColor={colors.palette.neutral300}
+                accessibilityLabel="포트폴리오 제공 토글"
+              />
             </View>
           </View>
         </View>
@@ -977,50 +1081,28 @@ export const CreatePostScreen = () => {
           <Text text="⚙️ 모집 설정" style={themed($sectionHeader)} />
           
           <View style={themed($inputSection)}>
-            <Text text="모집 상태" style={themed($label) as any} />
-            <View style={themed($statusToggleContainer)}>
-              <TouchableOpacity
-                style={[
-                  themed($statusToggle),
-                  formData.status === "active" && themed($activeToggle)
-                ]}
-                onPress={() => updateFormData("status", "active")}
-                accessibilityRole="radio"
-                accessibilityState={{ checked: formData.status === "active" }}
-                accessibilityLabel="모집중으로 설정"
-              >
-                <View style={themed($toggleIndicator)}>
-                  {formData.status === "active" && (
-                    <View style={themed($activeIndicator)} />
-                  )}
-                </View>
-                <View style={themed($toggleContent)}>
-                  <Text text="모집중" style={themed($toggleLabel)} />
-                  <Text text="지원자들이 볼 수 있음" style={themed($toggleDescription)} />
-                </View>
-              </TouchableOpacity>
-              
-              <TouchableOpacity
-                style={[
-                  themed($statusToggle),
-                  formData.status === "closed" && themed($closedToggle)
-                ]}
-                onPress={() => updateFormData("status", "closed")}
-                accessibilityRole="radio"
-                accessibilityState={{ checked: formData.status === "closed" }}
-                accessibilityLabel="모집마감으로 설정"
-              >
-                <View style={themed($toggleIndicator)}>
-                  {formData.status === "closed" && (
-                    <View style={themed($closedIndicator)} />
-                  )}
-                </View>
-                <View style={themed($toggleContent)}>
-                  <Text text="모집마감" style={themed($toggleLabel)} />
-                  <Text text="더 이상 지원받지 않음" style={themed($toggleDescription)} />
-                </View>
-              </TouchableOpacity>
+            <View style={themed($switchContainer)}>
+              <View style={themed($switchLabelContainer)}>
+                <Text text="모집 상태" style={themed($label) as any} />
+                <Text 
+                  text={formData.status === "active" ? "🟢 모집중" : "🔴 모집마감"} 
+                  style={themed($statusText)} 
+                />
+              </View>
+              <Switch
+                value={formData.status === "active"}
+                onValueChange={(value) => updateFormData("status", value ? "active" : "closed")}
+                trackColor={{ false: colors.palette.neutral300, true: colors.palette.primary200 }}
+                thumbColor={formData.status === "active" ? colors.palette.primary500 : colors.palette.neutral400}
+                ios_backgroundColor={colors.palette.neutral300}
+                accessibilityLabel="모집 상태 토글"
+                accessibilityHint={formData.status === "active" ? "현재 모집중입니다. 터치하면 모집마감으로 변경됩니다." : "현재 모집마감입니다. 터치하면 모집중으로 변경됩니다."}
+              />
             </View>
+            <Text 
+              text={formData.status === "active" ? "💡 지원자들이 이 게시글을 볼 수 있습니다" : "⏸️ 지원을 받지 않는 상태입니다"} 
+              style={themed($hintText)} 
+            />
           </View>
         </View>
 
@@ -1355,13 +1437,13 @@ const $dropdownButton = ({ colors, spacing }) => ({
   flexDirection: "row" as const,
   justifyContent: "space-between" as const,
   alignItems: "center" as const,
-  backgroundColor: colors.palette.neutral200,
+  backgroundColor: colors.background,
   minHeight: 48,
 })
 
 const $dropdownText = ({ colors, typography }) => ({
   fontSize: 16,
-  color: colors.textDim,
+  color: colors.text,
   fontFamily: typography.primary.normal,
 })
 
@@ -1370,74 +1452,54 @@ const $dropdownArrow = ({ colors }) => ({
   color: colors.textDim,
 })
 
-// Status Toggle 스타일들
-const $statusToggleContainer = ({ spacing }) => ({
-  gap: spacing?.sm || 8,
-})
-
-const $statusToggle = ({ colors, spacing }) => ({
+// Switch 스타일들
+const $switchContainer = ({ spacing }) => ({
   flexDirection: "row" as const,
+  justifyContent: "space-between" as const,
   alignItems: "center" as const,
-  paddingVertical: spacing?.md || 12,
-  paddingHorizontal: spacing?.sm || 8,
-  borderRadius: 8,
-  borderWidth: 1,
-  borderColor: colors.border,
-  backgroundColor: colors.palette.neutral100,
+  paddingVertical: spacing?.sm || 8,
 })
 
-const $activeToggle = ({ colors }) => ({
-  borderColor: colors.palette.primary500,
-  backgroundColor: colors.palette.primary100,
-})
-
-const $closedToggle = ({ colors }) => ({
-  borderColor: colors.textDim,
-  backgroundColor: colors.palette.neutral200,
-})
-
-const $toggleIndicator = ({ spacing }) => ({
-  width: 20,
-  height: 20,
-  borderRadius: 10,
-  borderWidth: 2,
-  borderColor: "transparent",
-  marginRight: spacing?.sm || 8,
-  justifyContent: "center" as const,
-  alignItems: "center" as const,
-})
-
-const $activeIndicator = ({ colors }) => ({
-  width: 10,
-  height: 10,
-  borderRadius: 5,
-  backgroundColor: colors.palette.primary500,
-})
-
-const $closedIndicator = ({ colors }) => ({
-  width: 10,
-  height: 10,
-  borderRadius: 5,
-  backgroundColor: colors.textDim,
-})
-
-const $toggleContent = {
+const $switchLabelContainer = {
   flex: 1,
 }
 
-const $toggleLabel = ({ colors, typography }) => ({
-  fontSize: 16,
+const $statusText = ({ colors, typography, spacing }) => ({
+  fontSize: 14,
   fontFamily: typography.primary.medium,
   color: colors.text,
-  marginBottom: 2,
+  marginTop: spacing?.xs || 4,
 })
 
-const $toggleDescription = ({ colors, typography }) => ({
-  fontSize: 12,
-  fontFamily: typography.primary.normal,
-  color: colors.textDim,
-  lineHeight: 18,
+// DateInput 스타일들
+const $dateInput = ({ colors, spacing }) => ({
+  borderWidth: 1,
+  borderColor: colors.border,
+  borderRadius: 8,
+  paddingHorizontal: spacing?.md || 12,
+  paddingVertical: spacing?.md || 12,
+  backgroundColor: colors.background,
+  flexDirection: "row" as const,
+  justifyContent: "space-between" as const,
+  alignItems: "center" as const,
+  minHeight: 44,
 })
+
+const $dateInputText = ({ colors, typography }) => ({
+  fontSize: 16,
+  fontFamily: typography.primary.normal,
+  color: colors.text,
+  flex: 1,
+})
+
+const $placeholderText = ({ colors }) => ({
+  color: colors.textDim,
+})
+
+const $dateIcon = {
+  fontSize: 16,
+  marginLeft: 8,
+}
 
 // 새로운 UI 스타일들
 const $hintText = ({ colors, spacing }) => ({
@@ -1448,36 +1510,21 @@ const $hintText = ({ colors, spacing }) => ({
   lineHeight: 16,
 })
 
-const $checkboxSection = ({ spacing }) => ({
+const $benefitsSection = ({ spacing }) => ({
   marginTop: spacing?.sm || 8,
 })
 
-const $checkboxRow = ({ spacing }) => ({
+const $benefitRow = ({ spacing }) => ({
   flexDirection: "row" as const,
+  justifyContent: "space-between" as const,
   alignItems: "center" as const,
-  marginBottom: spacing?.sm || 8,
+  paddingVertical: spacing?.sm || 8,
+  borderBottomWidth: 1,
+  borderBottomColor: "rgba(0,0,0,0.05)",
 })
 
-const $checkbox = ({ colors, spacing }) => ({
-  width: 20,
-  height: 20,
-  borderWidth: 1,
-  borderColor: colors.border,
-  borderRadius: 4,
-  marginRight: spacing?.sm || 8,
-  alignItems: "center" as const,
-  justifyContent: "center" as const,
-  backgroundColor: colors.background,
-})
-
-const $checkboxText = ({ colors }) => ({
-  fontSize: 14,
-  color: colors.tint,
-  fontWeight: "bold" as const,
-})
-
-const $checkboxLabel = ({ colors, typography }) => ({
-  fontSize: 14,
+const $benefitLabel = ({ colors, typography }) => ({
+  fontSize: 16,
   color: colors.text,
   fontFamily: typography.primary.normal,
   flex: 1,

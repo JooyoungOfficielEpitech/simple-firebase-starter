@@ -295,6 +295,7 @@ const ko: Translations = {
     },
     actions: {
       createFirstPost: "첫 모집 공고 작성하기",
+      createPost: "새 공고 작성",
       exploreOrganizations: "다른 단체 둘러보기",
       createOrganization: "새 단체 등록",
       addSampleData: "샘플 데이터 추가",

@@ -479,13 +479,9 @@ export const BulletinBoardScreen = () => {
     translate("bulletinBoard:title")
 
   const HeaderRightComponent = () => (
-    <Button
-      text="+"
-      preset="default"
-      onPress={handleCreatePost}
-      style={themed($createButton)}
-      textStyle={themed($createButtonText)}
-    />
+    <TouchableOpacity>
+      <Icon icon="account_circle" size={32} color={colors.tint} />
+    </TouchableOpacity>
   )
 
   return (
@@ -531,7 +527,22 @@ export const BulletinBoardScreen = () => {
         {/* 컨텐츠 영역 */}
         <View style={themed($contentContainer)}>
           {activeTab === 'announcements' ? (
-            getFilteredPosts().length === 0 ? (
+            <View>
+              {/* 게시글 작성 버튼 */}
+              {isOrganizer && (
+                <View style={themed($createPostButtonContainer)}>
+                  <Button
+                    text={translate("bulletinBoard:actions.createPost") || "새 공고 작성"}
+                    onPress={handleCreatePost}
+                    style={themed($createPostButton)}
+                    LeftAccessory={(props) => (
+                      <Icon icon="edit" size={20} color={props.style.color} />
+                    )}
+                  />
+                </View>
+              )}
+              
+              {getFilteredPosts().length === 0 ? (
               (() => {
                 console.log('📋 [BulletinBoardScreen] 빈 상태 렌더링 - 게시글이 없음')
                 return (
@@ -549,15 +560,6 @@ export const BulletinBoardScreen = () => {
                     
                     {/* Show different CTAs based on user type and context */}
                     <View style={themed($emptyActions)}>
-                      {isOrganizer && !selectedOrganizationId ? (
-                        <Button
-                          text={translate("bulletinBoard:actions.createFirstPost")}
-                          style={themed($primaryEmptyButton)}
-                          textStyle={themed($primaryEmptyButtonText)}
-                          onPress={handleCreatePost}
-                        />
-                      ) : null}
-                      
                       {!selectedOrganizationId && (
                         <Button
                           text={translate("bulletinBoard:actions.exploreOrganizations")}
@@ -610,6 +612,8 @@ export const BulletinBoardScreen = () => {
                 }).filter(Boolean)
               })()
             )
+            }
+            </View>
           ) : (
             <View>
               {/* 단체 등록 버튼 */}
@@ -694,20 +698,15 @@ const $contentContainer = {
   // 게시글 목록 컨테이너
 }
 
-const $createButton = ({ colors }) => ({
-  width: 40,
-  height: 40,
-  borderRadius: 20,
-  paddingHorizontal: 0,
-  paddingVertical: 0,
-  minHeight: 40,
-  backgroundColor: colors.background,
-  borderWidth: 1,
-  borderColor: colors.tint,
+const $createPostButtonContainer = ({ spacing }) => ({
+  marginBottom: spacing?.md || 12,
 })
 
-
-
+const $createPostButton = ({ colors, spacing }) => ({
+  backgroundColor: colors.tint,
+  paddingHorizontal: spacing?.md || 12,
+  paddingVertical: spacing?.sm || 8,
+})
 
 // 새로운 빈 상태 스타일들
 const $emptyStateContainer = ({ spacing }) => ({
@@ -815,11 +814,6 @@ const $tagText = ({ colors }) => ({
 
 
 
-const $createButtonText = ({ colors }) => ({
-  fontSize: 24,
-  fontWeight: "bold" as const,
-  color: colors.tint,
-})
 
 
 const $tabContainer = ({ colors, spacing }) => ({
@@ -932,23 +926,6 @@ const $createOrgButton = ({ colors, spacing }) => ({
 
 // PostCard detail styles moved to PostCard component
 
-// Empty State 버튼 스타일들
-const $primaryEmptyButton = ({ colors, spacing }) => ({
-  backgroundColor: colors.palette.primary500,
-  paddingVertical: spacing?.md || 12,
-  paddingHorizontal: spacing?.lg || 16,
-  borderRadius: 8,
-  marginBottom: spacing?.sm || 8,
-  minHeight: 56,
-})
-
-const $primaryEmptyButtonText = ({ colors, typography }) => ({
-  color: colors.palette.neutral100,
-  fontSize: 16,
-  lineHeight: 24,
-  fontFamily: typography.primary.medium,
-  textAlign: "center" as const,
-})
 
 const $secondaryEmptyButton = ({ colors, spacing }) => ({
   backgroundColor: colors.palette.neutral100,
