@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react"
-import { View, ViewStyle, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl } from "react-native"
+import { View, ViewStyle, TouchableOpacity, ActivityIndicator } from "react-native"
 import { Screen } from "@/components/Screen"
 import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
@@ -8,7 +8,36 @@ import { useAuth } from "@/context/AuthContext"
 import { notificationService } from "@/services/firestore/notificationService"
 import type { ThemedStyle } from "@/theme/types"
 import type { Notification } from "@/types/notification"
-import type { TextStyle } from "react-native"
+
+// 알림 타입별 아이콘 매핑
+const NOTIFICATION_ICONS = {
+  application_received: "👤",
+  application_accepted: "✅", 
+  application_rejected: "❌",
+  application_cancelled: "🚫",
+  post_status_changed: "📝",
+  post_updated: "✏️",
+  default: "🔔"
+} as const
+
+// 시간 변환 상수
+const TIME_UNITS = {
+  MINUTE: 60000,
+  HOUR: 3600000,
+  DAY: 86400000
+} as const
+
+// 알림 카드 스타일 상수
+const CARD_STYLES = {
+  READ: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#E5E7EB'
+  },
+  unread: {
+    backgroundColor: '#F0F9FF', 
+    borderColor: '#3B82F6'
+  }
+} as const
 
 interface NotificationCenterScreenProps {
   navigation?: any
@@ -19,7 +48,6 @@ export const NotificationCenterScreen: FC<NotificationCenterScreenProps> = ({ na
   const { user } = useAuth()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [isRefreshing, setIsRefreshing] = useState(false)
 
   useEffect(() => {
     if (!user) {
@@ -46,14 +74,6 @@ export const NotificationCenterScreen: FC<NotificationCenterScreenProps> = ({ na
     }
   }, [user])
 
-  const handleRefresh = async () => {
-    setIsRefreshing(true)
-    // 실시간 구독 방식이므로 특별한 새로고침 로직이 필요하지 않음
-    // 잠시 기다렸다가 리프레시 상태만 종료
-    setTimeout(() => {
-      setIsRefreshing(false)
-    }, 1000)
-  }
 
   const handleNotificationPress = async (notification: Notification) => {
     try {
@@ -69,19 +89,25 @@ export const NotificationCenterScreen: FC<NotificationCenterScreenProps> = ({ na
         
         // 운영자가 받는 알림 (지원자 관리 화면으로)
         if (notification.type === 'application_received' || notification.type === 'application_cancelled') {
-          navigation?.navigate("BulletinBoard", {
-            screen: "ApplicationManagement",
-            params: { 
-              postId: notification.postId,
-              postTitle: notification.postTitle || "게시글"
+          navigation?.navigate("Main", {
+            screen: "BulletinBoard", 
+            params: {
+              screen: "ApplicationManagement",
+              params: { 
+                postId: notification.postId,
+                postTitle: notification.postTitle || "게시글"
+              }
             }
           })
         } 
         // 지원자가 받는 알림 (게시글 상세로)
         else {
-          navigation?.navigate("BulletinBoard", {
-            screen: "PostDetail",
-            params: { postId: notification.postId }
+          navigation?.navigate("Main", {
+            screen: "BulletinBoard",
+            params: {
+              screen: "PostDetail",
+              params: { postId: notification.postId }
+            }
           })
         }
       }
@@ -90,24 +116,19 @@ export const NotificationCenterScreen: FC<NotificationCenterScreenProps> = ({ na
     }
   }
 
-  const formatRelativeTime = (timestamp: any) => {
+  const formatRelativeTime = (timestamp: any): string => {
     try {
       const now = Date.now()
-      let notificationTime: number
+      const notificationTime = timestamp?.seconds 
+        ? timestamp.seconds * 1000
+        : timestamp?.toDate?.()?.getTime()
       
-      if (timestamp && timestamp.seconds) {
-        notificationTime = timestamp.seconds * 1000
-      } else if (timestamp && timestamp.toDate) {
-        notificationTime = timestamp.toDate().getTime()
-      } else {
-        return "시간 알 수 없음"
-      }
+      if (!notificationTime) return "시간 알 수 없음"
       
       const diff = now - notificationTime
-      
-      const minutes = Math.floor(diff / 60000)
-      const hours = Math.floor(diff / 3600000)
-      const days = Math.floor(diff / 86400000)
+      const minutes = Math.floor(diff / TIME_UNITS.MINUTE)
+      const hours = Math.floor(diff / TIME_UNITS.HOUR)
+      const days = Math.floor(diff / TIME_UNITS.DAY)
       
       if (minutes < 1) return "방금 전"
       if (minutes < 60) return `${minutes}분 전`
@@ -119,76 +140,9 @@ export const NotificationCenterScreen: FC<NotificationCenterScreenProps> = ({ na
     }
   }
 
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case "application_received":
-        return "👤"
-      case "application_accepted":
-        return "✅"
-      case "application_rejected":
-        return "❌"
-      case "application_cancelled":
-        return "🚫"
-      case "post_status_changed":
-        return "📝"
-      case "post_updated":
-        return "✏️"
-      default:
-        return "🔔"
-    }
-  }
+  const getNotificationIcon = (type: string): string => 
+    NOTIFICATION_ICONS[type as keyof typeof NOTIFICATION_ICONS] || NOTIFICATION_ICONS.default
 
-  const renderNotificationItem = ({ item }: { item: Notification }) => (
-    <View
-      style={{
-        backgroundColor: '#F8F9FA',
-        marginVertical: 8,
-        padding: 20,
-        borderRadius: 8,
-        borderLeftWidth: 4,
-        borderLeftColor: item.isRead ? '#E9ECEF' : '#007AFF',
-        minHeight: 100,
-      }}
-    >
-      <View style={{ marginBottom: 8 }}>
-        <Text 
-          style={{
-            fontSize: 18,
-            fontWeight: 'bold',
-            color: '#1A1A1A',
-            marginBottom: 4,
-          }}
-        >
-          {getNotificationIcon(item.type)} {item.title}
-        </Text>
-        <Text style={{ fontSize: 12, color: '#8E8E93' }}>
-          {formatRelativeTime(item.createdAt)}
-        </Text>
-      </View>
-      
-      <Text 
-        style={{ 
-          fontSize: 16, 
-          color: '#3C3C43',
-          lineHeight: 22,
-        }}
-      >
-        {item.message}
-      </Text>
-      
-      {!item.isRead && (
-        <View style={{
-          position: 'absolute',
-          top: 16,
-          right: 16,
-          width: 10,
-          height: 10,
-          borderRadius: 5,
-          backgroundColor: '#007AFF',
-        }} />
-      )}
-    </View>
-  )
 
   const unreadCount = notifications.filter(n => !n.isRead).length
 
@@ -225,12 +179,11 @@ export const NotificationCenterScreen: FC<NotificationCenterScreenProps> = ({ na
             <TouchableOpacity
               key={item.id}
               style={{
-                backgroundColor: item.isRead ? '#FFFFFF' : '#F0F9FF',
+                ...(item.isRead ? CARD_STYLES.read : CARD_STYLES.unread),
                 marginVertical: 8,
                 padding: 20,
                 borderRadius: 12,
                 borderWidth: 1,
-                borderColor: item.isRead ? '#E5E7EB' : '#3B82F6',
                 minHeight: 120,
               }}
               onPress={() => handleNotificationPress(item)}
@@ -299,7 +252,7 @@ const $loadingContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   padding: spacing.lg,
 })
 
-const $loadingText: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
+const $loadingText: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   fontSize: 16,
   color: colors.textDim,
   marginTop: spacing.md,
@@ -312,95 +265,22 @@ const $emptyContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   padding: spacing.lg,
 })
 
-const $emptyIcon: ThemedStyle<TextStyle> = () => ({
+const $emptyIcon: ThemedStyle<ViewStyle> = () => ({
   fontSize: 48,
   marginBottom: 16,
 })
 
-const $emptyTitle: ThemedStyle<TextStyle> = ({ colors }) => ({
+const $emptyTitle: ThemedStyle<ViewStyle> = ({ colors }) => ({
   fontSize: 18,
   fontWeight: "600",
   color: colors.text,
   marginBottom: 8,
 })
 
-const $emptyMessage: ThemedStyle<TextStyle> = ({ colors }) => ({
+const $emptyMessage: ThemedStyle<ViewStyle> = ({ colors }) => ({
   fontSize: 14,
   color: colors.textDim,
   textAlign: "center",
   lineHeight: 20,
 })
 
-const $notificationList: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  flex: 1,
-  paddingHorizontal: spacing.md,
-})
-
-const $notificationItem: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
-  backgroundColor: colors.background,
-  borderRadius: spacing.sm,
-  marginVertical: spacing.xs,
-  padding: spacing.md,
-  borderWidth: 1,
-  borderColor: colors.border,
-  shadowColor: colors.palette.neutral800,
-  shadowOffset: { width: 0, height: 1 },
-  shadowOpacity: 0.05,
-  shadowRadius: 2,
-  elevation: 1,
-})
-
-const $unreadItem: ThemedStyle<ViewStyle> = ({ colors }) => ({
-  backgroundColor: colors.palette.primary50,
-  borderColor: colors.palette.primary200,
-})
-
-const $notificationContent: ThemedStyle<ViewStyle> = () => ({
-  flex: 1,
-})
-
-const $notificationHeader: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  flexDirection: "row",
-  alignItems: "center",
-  marginBottom: spacing.xs,
-})
-
-const $notificationIcon: ThemedStyle<TextStyle> = ({ spacing }) => ({
-  fontSize: 20,
-  marginRight: spacing.sm,
-})
-
-const $notificationTextContainer: ThemedStyle<ViewStyle> = () => ({
-  flex: 1,
-})
-
-const $notificationTitle: ThemedStyle<TextStyle> = ({ colors }) => ({
-  fontSize: 16,
-  fontWeight: "600",
-  color: colors.text,
-  marginBottom: 2,
-})
-
-const $unreadText: ThemedStyle<TextStyle> = ({ colors }) => ({
-  color: colors.palette.primary600,
-})
-
-const $notificationTime: ThemedStyle<TextStyle> = ({ colors }) => ({
-  fontSize: 12,
-  color: colors.textDim,
-})
-
-const $notificationMessage: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
-  fontSize: 14,
-  color: colors.textDim,
-  lineHeight: 20,
-  marginTop: spacing.xs,
-})
-
-const $unreadDot: ThemedStyle<ViewStyle> = ({ colors }) => ({
-  width: 8,
-  height: 8,
-  borderRadius: 4,
-  backgroundColor: colors.palette.primary500,
-  marginLeft: 8,
-})

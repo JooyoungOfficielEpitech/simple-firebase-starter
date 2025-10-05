@@ -18,7 +18,6 @@ import { Post } from "@/types/post"
 import { UserProfile } from "@/types/user"
 import { Application } from "@/services/firestore/applicationService"
 import { BulletinBoardStackParamList } from "@/navigators/BulletinBoardStackNavigator"
-import { ThemeDebugger } from "@/debug/ThemeDebugger"
 
 type NavigationProp = NativeStackNavigationProp<BulletinBoardStackParamList>
 type RoutePropType = RouteProp<BulletinBoardStackParamList, "PostDetail">
@@ -43,6 +42,7 @@ export const PostDetailScreen = () => {
   const [showApplicationModal, setShowApplicationModal] = useState(false)
   const [applications, setApplications] = useState<Application[]>([])
   const [hasApplied, setHasApplied] = useState(false)
+  const [myApplication, setMyApplication] = useState<Application | null>(null)
   const [applicationMessage, setApplicationMessage] = useState("")
   const [applicationPhoneNumber, setApplicationPhoneNumber] = useState("")
   const [applicationExperience, setApplicationExperience] = useState("")
@@ -58,9 +58,18 @@ export const PostDetailScreen = () => {
     const loadUserProfile = async () => {
       try {
         const profile = await userService.getUserProfile()
+        console.log("🔍 [PostDetailScreen] 프로필 데이터:", JSON.stringify(profile, null, 2))
         setUserProfile(profile)
         if (!profile) {
           console.warn("⚠️ [PostDetailScreen] 사용자 프로필이 존재하지 않습니다")
+        } else {
+          console.log("✅ [PostDetailScreen] requiredProfileComplete:", profile.requiredProfileComplete)
+          console.log("📋 [PostDetailScreen] 프로필 필드 상태:", {
+            name: !!profile.name,
+            gender: !!profile.gender,
+            birthday: !!profile.birthday,
+            heightCm: typeof profile.heightCm === "number"
+          })
         }
       } catch (error) {
         console.error("❌ [PostDetailScreen] 사용자 프로필 로드 오류:", error)
@@ -106,15 +115,28 @@ export const PostDetailScreen = () => {
       )
       return unsubscribeApplications
     } else {
-      // 일반 유저인 경우 본인의 지원 여부 확인
+      // 일반 유저인 경우 본인의 지원 여부 및 지원서 정보 확인
       const checkApplication = async () => {
         try {
           const applied = await applicationService.hasAppliedToPost(postId, userProfile.uid)
           setHasApplied(applied)
+          
+          if (applied) {
+            // 지원한 경우 해당 게시글의 지원서 정보 가져오기
+            const myApps = await applicationService.getApplicationsByApplicant(userProfile.uid, { 
+              limit: 10 
+            })
+            // 클라이언트에서 해당 게시글 지원서 찾기
+            const myPostApplication = myApps.data.find(app => app.postId === postId)
+            if (myPostApplication) {
+              setMyApplication(myPostApplication)
+            }
+          }
         } catch (error) {
           console.error("❌ [PostDetailScreen] 지원 여부 확인 오류:", error)
           // 오류 발생시 지원하기 버튼은 활성화
           setHasApplied(false)
+          setMyApplication(null)
         }
       }
       checkApplication()
@@ -159,9 +181,27 @@ export const PostDetailScreen = () => {
         "지원하려면 프로필을 먼저 설정해주세요.",
         [
           { text: "취소", style: "cancel" },
-          { text: "프로필 설정", onPress: () => {
-            // 프로필 설정 화면으로 이동
-            navigation.navigate("Profile")
+          { text: "프로필 편집", onPress: () => {
+            // 지원 팝업 닫고 프로필 편집 화면으로 이동
+            setShowApplicationModal(false)
+            navigation.navigate("EditProfile")
+          }}
+        ]
+      )
+      return
+    }
+
+    // 필수 프로필 정보 완성도 확인
+    if (!userProfile.requiredProfileComplete) {
+      Alert.alert(
+        "프로필 완성 필요",
+        "지원하려면 프로필 정보를 완성해주세요.\n(성별, 생년월일, 키 정보가 필요합니다)",
+        [
+          { text: "취소", style: "cancel" },
+          { text: "프로필 편집", onPress: () => {
+            // 지원 팝업 닫고 프로필 편집 화면으로 이동
+            setShowApplicationModal(false)
+            navigation.navigate("EditProfile")
           }}
         ]
       )
@@ -200,6 +240,19 @@ export const PostDetailScreen = () => {
       setHasApplied(true)
       setShowApplicationModal(false)
       
+      // 새로 생성된 지원서 정보 다시 로드
+      try {
+        const myApps = await applicationService.getApplicationsByApplicant(userProfile.uid, { 
+          limit: 10 
+        })
+        const myPostApplication = myApps.data.find(app => app.postId === postId)
+        if (myPostApplication) {
+          setMyApplication(myPostApplication)
+        }
+      } catch (error) {
+        console.error("❌ [PostDetailScreen] 지원서 정보 다시 로드 실패:", error)
+      }
+      
       // 폼 초기화
       setApplicationMessage("")
       setApplicationPhoneNumber("")
@@ -214,6 +267,50 @@ export const PostDetailScreen = () => {
     } finally {
       setSubmittingApplication(false)
     }
+  }
+
+  const handleWithdrawApplication = () => {
+    if (!myApplication) {
+      Alert.alert("오류", "지원서 정보를 찾을 수 없습니다.")
+      return
+    }
+
+    Alert.alert(
+      "지원 철회",
+      "정말로 지원을 철회하시겠습니까?\n철회 후에는 다시 지원할 수 있습니다.",
+      [
+        { text: "취소", style: "cancel" },
+        {
+          text: "철회",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              setSubmittingApplication(true)
+              await applicationService.withdrawApplication(myApplication.id)
+              
+              Alert.alert("철회 완료", "지원이 철회되었습니다.\n다시 지원하실 수 있습니다.")
+              
+              // 상태 초기화 - 다시 지원 가능하도록
+              setHasApplied(false)
+              setMyApplication(null)
+              setShowApplicationModal(false)
+              
+              // 폼 초기화
+              setApplicationMessage("")
+              setApplicationPhoneNumber("")
+              setApplicationExperience("")
+              setApplicationRolePreference("")
+              setApplicationPortfolio("")
+            } catch (error) {
+              console.error("❌ [PostDetailScreen] 지원 철회 오류:", error)
+              Alert.alert("철회 실패", error.message || "지원 철회에 실패했습니다.")
+            } finally {
+              setSubmittingApplication(false)
+            }
+          }
+        }
+      ]
+    )
   }
 
   const handleViewApplications = () => {
@@ -256,7 +353,6 @@ export const PostDetailScreen = () => {
 
   return (
     <Screen preset="scroll" safeAreaEdges={[]}>
-      <ThemeDebugger />
       <ScreenHeader title="모집 공고" />
       <View style={themed($container)}>
         {/* Hero section with key info */}
@@ -305,16 +401,43 @@ export const PostDetailScreen = () => {
           {/* 액션 버튼들 */}
           <View style={themed($actionButtonsRow)}>
             {!isMyPost && userProfile?.userType !== "organizer" && (
-              <TouchableOpacity 
-                style={themed(hasApplied ? $appliedButton : $applyButton)}
-                onPress={hasApplied ? undefined : () => setShowApplicationModal(true)}
-                disabled={hasApplied || post.status !== "active"}
-              >
-                <Text 
-                  text={hasApplied ? "✅ 지원완료" : "💼 지원하기"} 
-                  style={themed(hasApplied ? $appliedButtonText : $applyButtonText)} 
-                />
-              </TouchableOpacity>
+              <View style={themed($applicationButtonContainer)}>
+                {!hasApplied || !myApplication ? (
+                  <TouchableOpacity 
+                    style={themed($applyButton)}
+                    onPress={() => setShowApplicationModal(true)}
+                    disabled={post.status !== "active"}
+                  >
+                    <Text 
+                      text="💼 지원하기" 
+                      style={themed($applyButtonText)} 
+                    />
+                  </TouchableOpacity>
+                ) : myApplication.status === 'pending' ? (
+                  <TouchableOpacity 
+                    style={themed($withdrawButton)}
+                    onPress={handleWithdrawApplication}
+                    disabled={submittingApplication}
+                  >
+                    <Text 
+                      text={submittingApplication ? "철회 중..." : "❌ 취소"} 
+                      style={themed($withdrawButtonText)} 
+                    />
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity 
+                    style={themed($statusButton(myApplication.status))}
+                    disabled={true}
+                  >
+                    <Text 
+                      text={myApplication.status === 'accepted' ? '승인됨' : 
+                            myApplication.status === 'rejected' ? '거절됨' : 
+                            myApplication.status === 'withdrawn' ? '철회됨' : '상태 확인 중'}
+                      style={themed($statusButtonText)} 
+                    />
+                  </TouchableOpacity>
+                )}
+              </View>
             )}
             
             {isMyPost && (
@@ -1125,4 +1248,58 @@ const $modalRoleDetailText = ({ colors, typography }) => ({
 
 const $formInput = ({ spacing }) => ({
   marginBottom: spacing?.md || 12,
+})
+
+// 기존 지원하기 버튼과 동일한 스타일 유지
+const $applicationButtonContainer = ({ spacing }) => ({
+  flex: 1,
+})
+
+const $appliedButtonsRow = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  gap: spacing?.sm || 8,
+  width: "100%",
+  alignItems: "stretch" as const,
+})
+
+// 기존 $applyButton 스타일을 기반으로 상태별 색상만 변경
+// 지원하기 버튼과 정확히 동일한 스타일, 상태별 색상만 변경
+const $statusButton = (status: string) => ({ colors, spacing }) => ({
+  backgroundColor: 
+    status === 'pending' ? colors.palette.warning500 :
+    status === 'accepted' ? '#22c55e' : // 초록색
+    status === 'rejected' ? colors.palette.angry500 :
+    colors.palette.neutral500,
+  paddingVertical: spacing?.sm || 8,
+  paddingHorizontal: spacing?.md || 12,
+  borderRadius: 8,
+  alignItems: "center" as const,
+  flex: 1,
+  minWidth: 100,
+})
+
+// 지원하기 버튼과 동일한 텍스트 스타일
+const $statusButtonText = ({ colors, typography }) => ({
+  color: colors.palette.neutral100,
+  fontSize: 14,
+  lineHeight: 20,
+  fontFamily: typography.primary.medium,
+})
+
+// 지원하기 버튼과 정확히 동일한 스타일, 색상만 빨간색
+const $withdrawButton = ({ colors, spacing }) => ({
+  backgroundColor: colors.palette.angry500,
+  paddingVertical: spacing?.sm || 8,
+  paddingHorizontal: spacing?.md || 12,
+  borderRadius: 8,
+  alignItems: "center" as const,
+  flex: 1,
+  minWidth: 100,
+})
+
+const $withdrawButtonText = ({ colors, typography }) => ({
+  color: colors.palette.neutral100,
+  fontSize: 14,
+  lineHeight: 20,
+  fontFamily: typography.primary.medium,
 })

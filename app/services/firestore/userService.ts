@@ -90,7 +90,43 @@ export class UserService {
       return null
     }
 
-    return doc.data() as UserProfile
+    const profile = doc.data() as UserProfile
+    
+    // 디버깅: 프로필 데이터 로그
+    console.log("🔍 [UserService] 프로필 조회 결과:", {
+      uid: profile.uid,
+      name: profile.name,
+      gender: profile.gender,
+      birthday: profile.birthday,
+      heightCm: profile.heightCm,
+      requiredProfileComplete: profile.requiredProfileComplete
+    })
+
+    // requiredProfileComplete가 undefined이거나 잘못된 경우 재계산
+    const calculatedComplete = Boolean(
+      profile.gender &&
+      profile.birthday &&
+      typeof profile.heightCm === "number"
+    )
+    
+    console.log("🧮 [UserService] 재계산된 requiredProfileComplete:", calculatedComplete)
+
+    // 계산된 값과 저장된 값이 다른 경우 업데이트
+    if (profile.requiredProfileComplete !== calculatedComplete) {
+      console.log("🔄 [UserService] requiredProfileComplete 불일치, 업데이트 중...")
+      try {
+        await this.db.collection("users").doc(targetUserId).update({
+          requiredProfileComplete: calculatedComplete,
+          updatedAt: this.getServerTimestamp()
+        })
+        profile.requiredProfileComplete = calculatedComplete
+        console.log("✅ [UserService] requiredProfileComplete 업데이트 완료")
+      } catch (error) {
+        console.error("❌ [UserService] requiredProfileComplete 업데이트 실패:", error)
+      }
+    }
+
+    return profile
   }
 
   /**
@@ -123,6 +159,14 @@ export class UserService {
         updatedProfile.birthday &&
         typeof updatedProfile.heightCm === "number"
     )
+
+    console.log("🧮 [UserService] 업데이트 시 requiredProfileComplete 계산:", {
+      gender: updatedProfile.gender,
+      birthday: updatedProfile.birthday,
+      heightCm: updatedProfile.heightCm,
+      heightCmType: typeof updatedProfile.heightCm,
+      result: requiredProfileComplete
+    })
 
     // Filter out undefined values to avoid Firestore errors
     const filteredUpdateData = Object.entries(updateData).reduce((acc, [key, value]) => {

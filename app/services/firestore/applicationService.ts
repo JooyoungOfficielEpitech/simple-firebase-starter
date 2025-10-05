@@ -189,14 +189,20 @@ export class ApplicationService {
     const userId = this.getCurrentUserId()
     
     return this.executeWithErrorHandling(async () => {
-      // 중복 지원 확인
+      // 중복 지원 확인 (철회된 지원서 제외)
       const existingApplications = await this.db
         .collection("applications")
         .where("postId", "==", applicationData.postId)
         .where("applicantId", "==", userId)
         .get()
 
-      if (!existingApplications.empty) {
+      // 철회되지 않은 지원서가 있는지 확인
+      const activeApplications = existingApplications.docs.filter(doc => {
+        const data = doc.data()
+        return data.status !== "withdrawn"
+      })
+
+      if (activeApplications.length > 0) {
         throw new Error("이미 해당 공고에 지원하셨습니다.")
       }
 
@@ -588,20 +594,26 @@ export class ApplicationService {
   }
 
   /**
-   * 특정 게시글에 대한 지원 여부 확인 (간단한 쿼리)
+   * 특정 게시글에 대한 지원 여부 확인 (철회된 지원서 제외)
    */
   async hasAppliedToPost(postId: string, applicantId?: string): Promise<boolean> {
     const userId = applicantId || this.getCurrentUserId()
     
     return this.executeWithErrorHandling(async () => {
+      // 먼저 기본 쿼리로 모든 지원서를 가져온 후 클라이언트에서 필터링
       const snapshot = await this.db
         .collection("applications")
         .where("postId", "==", postId)
         .where("applicantId", "==", userId)
-        .limit(1)
         .get()
       
-      return !snapshot.empty
+      // 철회되지 않은 지원서가 있는지 확인
+      const activeApplications = snapshot.docs.filter(doc => {
+        const data = doc.data()
+        return data.status !== "withdrawn"
+      })
+      
+      return activeApplications.length > 0
     }, '지원 여부 확인')
   }
 
