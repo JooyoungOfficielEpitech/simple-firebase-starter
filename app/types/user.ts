@@ -15,7 +15,6 @@ export interface UserProfile {
   /** YYYY-MM-DD */
   birthday?: string
   heightCm?: number
-  media: string[]
   requiredProfileComplete: boolean
   userType: UserType          // 사용자 유형
   organizationId?: string     // 소속 단체 (운영자만)
@@ -42,9 +41,6 @@ export type CreateUserProfile = {
 export type UpdateUserProfile = Partial<
   Pick<
     UserProfile,
-    "name" | "gender" | "birthday" | "heightCm" | "media" | "requiredProfileComplete" | "userType" | "organizationId" | "organizationName" | "previousOrganizationName" | "hasBeenOrganizer"
+    "name" | "gender" | "birthday" | "heightCm" | "requiredProfileComplete" | "userType" | "organizationId" | "organizationName" | "previousOrganizationName" | "hasBeenOrganizer"
   >
 >
-
-// Minimum number of photos required to mark profile complete
-export const MIN_PROFILE_PHOTOS = 3

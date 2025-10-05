@@ -2,6 +2,7 @@ import auth from "@react-native-firebase/auth"
 import firestore, { FirebaseFirestoreTypes } from "@react-native-firebase/firestore"
 
 import { translate } from "@/i18n/translate"
+import { notificationService } from "./notificationService"
 
 // 지원서 상태
 export type ApplicationStatus = "pending" | "accepted" | "rejected" | "withdrawn"
@@ -239,6 +240,26 @@ export class ApplicationService {
 
       await docRef.set(application)
       
+      // 공고 정보 조회 (운영자 알림용)
+      const postDoc = await this.db.collection("posts").doc(applicationData.postId).get()
+      if (postDoc.exists) {
+        const postData = postDoc.data()
+        
+        // 운영자에게 새 지원자 알림 발송
+        try {
+          await notificationService.notifyApplicationReceived({
+            organizerId: postData?.authorId,
+            postId: applicationData.postId,
+            postTitle: postData?.title || "공고",
+            applicantId: userId,
+            applicantName: application.applicantName
+          })
+        } catch (notificationError) {
+          console.error('❌ [ApplicationService] 알림 발송 실패:', notificationError)
+          // 알림 발송 실패는 지원서 생성을 방해하지 않음
+        }
+      }
+      
       // 캐시 무효화
       this.invalidateCache('applications')
       
@@ -448,6 +469,30 @@ export class ApplicationService {
         updatedAt: this.getServerTimestamp(),
       })
       
+      // 지원자에게 결과 알림 발송
+      try {
+        if (status === 'accepted') {
+          await notificationService.notifyApplicationAccepted({
+            applicantId: application.applicantId,
+            postId: application.postId,
+            postTitle: postData?.title || "공고",
+            organizerId: userId,
+            organizerName: postData?.authorName || "운영자"
+          })
+        } else if (status === 'rejected') {
+          await notificationService.notifyApplicationRejected({
+            applicantId: application.applicantId,
+            postId: application.postId,
+            postTitle: postData?.title || "공고",
+            organizerId: userId,
+            organizerName: postData?.authorName || "운영자"
+          })
+        }
+      } catch (notificationError) {
+        console.error('❌ [ApplicationService] 상태 변경 알림 발송 실패:', notificationError)
+        // 알림 발송 실패는 상태 업데이트를 방해하지 않음
+      }
+      
       // 캐시 무효화
       this.invalidateCache(applicationId)
       this.invalidateCache('applications')
@@ -511,7 +556,34 @@ export class ApplicationService {
         throw new Error("이미 철회된 지원서입니다.")
       }
 
-      await this.updateApplicationStatus(applicationId, 'withdrawn')
+      // 상태를 withdrawn으로 직접 업데이트 (알림 발송 로직 별도 처리)
+      await this.db.collection("applications").doc(applicationId).update({
+        status: 'withdrawn',
+        updatedAt: this.getServerTimestamp(),
+      })
+      
+      // 운영자에게 지원 취소 알림 발송
+      try {
+        const postDoc = await this.db.collection("posts").doc(application.postId).get()
+        if (postDoc.exists) {
+          const postData = postDoc.data()
+          
+          await notificationService.notifyApplicationCancelled({
+            organizerId: postData?.authorId,
+            postId: application.postId,
+            postTitle: postData?.title || "공고",
+            applicantId: userId,
+            applicantName: application.applicantName
+          })
+        }
+      } catch (notificationError) {
+        console.error('❌ [ApplicationService] 지원 취소 알림 발송 실패:', notificationError)
+        // 알림 발송 실패는 취소를 방해하지 않음
+      }
+      
+      // 캐시 무효화
+      this.invalidateCache(applicationId)
+      this.invalidateCache('applications')
     }, '지원서 철회')
   }
 

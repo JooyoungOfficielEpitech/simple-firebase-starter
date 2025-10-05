@@ -2,6 +2,7 @@ import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navig
 import { CompositeScreenProps } from "@react-navigation/native"
 
 import { BulletinBoardScreen } from "@/screens/BulletinBoardScreen"
+import { BulletinBoardScreenSimple } from "@/screens/BulletinBoardScreenSimple"
 import { CreatePostScreen } from "@/screens/CreatePostScreen"
 import { PostDetailScreen } from "@/screens/PostDetailScreen"
 import { CreateOrganizationScreen } from "@/screens/CreateOrganizationScreen"

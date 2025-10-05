@@ -189,7 +189,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
   if (isLoading) {
     return (
       <Screen style={themed($root)} preset="fixed" safeAreaEdges={[]}>
-        <ScreenHeader title="프로필" showProfileIcon={false} />
+        <ScreenHeader title="프로필" showNotificationIcon={false} />
         <View style={themed($loadingContainer)}>
           <Text>프로필 로딩 중...</Text>
         </View>
@@ -204,7 +204,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
       safeAreaEdges={[]}
       contentContainerStyle={themed($contentContainer)}
     >
-      <ScreenHeader title="프로필" showProfileIcon={false} />
+      <ScreenHeader title="프로필" showNotificationIcon={false} />
       
       {/* 기본 정보 섹션 */}
       <View style={themed($card)}>

@@ -33,6 +33,7 @@ import { ThemeProvider } from "./theme/context"
 import { customFontsToLoad } from "./theme/typography"
 import { loadDateFnsLocale } from "./utils/formatDate"
 import * as storage from "./utils/storage"
+import { NotificationCleanupUtils } from "./utils/notificationCleanup"
 
 // Splash screen이 자동으로 숨겨지는 것을 방지
 SplashScreen.preventAutoHideAsync()
@@ -78,6 +79,14 @@ export function App() {
     initI18n()
       .then(() => setIsI18nInitialized(true))
       .then(() => loadDateFnsLocale())
+      .then(() => {
+        // 앱 시작 시 주기적 알림 정리 스케줄러 시작
+        console.log('🚀 [App] 주기적 알림 정리 스케줄러 시작')
+        NotificationCleanupUtils.startPeriodicCleanup()
+      })
+      .catch((error) => {
+        console.error('❌ [App] 초기화 실패:', error)
+      })
   }, [])
 
   // 모든 초기화가 완료되면 splash screen을 숨김

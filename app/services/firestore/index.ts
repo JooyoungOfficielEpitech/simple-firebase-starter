@@ -6,11 +6,13 @@ import { UserService } from "./userService"
 import { SongService } from "./songService"
 import { PostService } from "./postService"
 import { OrganizationService } from "./organizationService"
+import { NotificationService } from "./notificationService"
 
 export { UserService } from "./userService"
 export { SongService } from "./songService"
 export { PostService } from "./postService"
 export { OrganizationService } from "./organizationService"
+export { NotificationService } from "./notificationService"
 
 // 각 서비스의 싱글톤 인스턴스 생성
 console.log('🔥 [Firestore Index] 서비스 인스턴스 생성 시작')
@@ -26,5 +28,8 @@ console.log('🔥 [Firestore Index] OrganizationService 생성:', organizationSe
 const postService = new PostService(db, organizationService)
 console.log('🔥 [Firestore Index] PostService 생성:', postService ? 'OK' : 'ERROR')
 
+const notificationService = new NotificationService(db)
+console.log('🔥 [Firestore Index] NotificationService 생성:', notificationService ? 'OK' : 'ERROR')
+
 // SongService는 static 메서드를 사용하므로 클래스 자체를 export
-export { userService, postService, organizationService, SongService as songService }
+export { userService, postService, organizationService, notificationService, SongService as songService }

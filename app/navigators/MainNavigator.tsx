@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { Icon } from "@/components/Icon"
 import { SettingsScreen } from "@/screens/SettingsScreen"
 import { WelcomeScreen } from "@/screens/WelcomeScreen"
+import { ProfileScreen } from "@/screens/ProfileScreen"
 import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
 
@@ -17,6 +18,7 @@ export type MainTabParamList = {
   Home: undefined
   BulletinBoard: undefined
   Settings: undefined
+  Profile: undefined
 }
 
 /**
@@ -87,6 +89,17 @@ export function MainNavigator() {
           tabBarLabel: "설정",
           tabBarIcon: ({ focused }) => (
             <Icon icon="settings" color={focused ? colors.tint : colors.tintInactive} size={30} />
+          ),
+        }}
+      />
+
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          tabBarLabel: "프로필",
+          tabBarIcon: ({ focused }) => (
+            <Icon icon="user" color={focused ? colors.tint : colors.tintInactive} size={30} />
           ),
         }}
       />

@@ -14,6 +14,7 @@ import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary"
 import { ForgotPasswordScreen } from "@/screens/ForgotPasswordScreen"
 import { ProfileScreen } from "@/screens/ProfileScreen"
 import { EditProfileScreen } from "@/screens/EditProfileScreen"
+import { NotificationCenterScreen } from "@/screens/NotificationCenterScreen"
 import { SignInScreen } from "@/screens/SignInScreen"
 import { SignUpScreen } from "@/screens/SignUpScreen"
 import { useAppTheme } from "@/theme/context"
@@ -38,6 +39,7 @@ export type AppStackParamList = {
   ForgotPassword: undefined
   Profile: undefined
   EditProfile: undefined
+  NotificationCenter: undefined
 }
 
 /**
@@ -99,6 +101,14 @@ const AppStack = () => {
           <Stack.Screen 
             name="EditProfile" 
             component={EditProfileScreen}
+          />
+          <Stack.Screen 
+            name="NotificationCenter" 
+            component={NotificationCenterScreen}
+            options={{
+              presentation: 'modal',
+              headerShown: false,
+            }}
           />
         </>
       )}

@@ -3,6 +3,7 @@ import firestore, { FirebaseFirestoreTypes } from "@react-native-firebase/firest
 
 import { translate } from "@/i18n/translate"
 import { Post, CreatePost, UpdatePost } from "@/types/post"
+import { notificationService } from "./notificationService"
 
 /**
  * 게시글 관련 Firestore 서비스
@@ -47,6 +48,30 @@ export class PostService {
     } catch (error) {
       console.error(`❌ [PostService] 사용자 권한 확인 실패:`, error)
       return false
+    }
+  }
+
+  /**
+   * 특정 공고의 지원자 ID 목록 조회
+   */
+  private async getPostApplicantIds(postId: string): Promise<string[]> {
+    try {
+      const applicationsSnapshot = await this.db
+        .collection("applications")
+        .where("postId", "==", postId)
+        .where("status", "!=", "withdrawn")
+        .get()
+
+      const applicantIds = applicationsSnapshot.docs.map(doc => {
+        const data = doc.data()
+        return data.applicantId
+      })
+
+      console.log(`🔍 [PostService] 공고 ${postId}의 지원자 ${applicantIds.length}명 조회`)
+      return applicantIds
+    } catch (error) {
+      console.error(`❌ [PostService] 지원자 목록 조회 실패:`, error)
+      return []
     }
   }
 
@@ -201,6 +226,21 @@ export class PostService {
       updatedAt: this.getServerTimestamp(),
     })
 
+    // 공고 수정 알림 발송 (지원자들에게)
+    try {
+      const applicantIds = await this.getPostApplicantIds(postId)
+      if (applicantIds.length > 0) {
+        await notificationService.notifyPostUpdated({
+          postId,
+          postTitle: post.title,
+          applicantIds
+        })
+      }
+    } catch (notificationError) {
+      console.error('❌ [PostService] 공고 수정 알림 발송 실패:', notificationError)
+      // 알림 발송 실패는 수정을 방해하지 않음
+    }
+
     // 상태가 변경된 경우 단체의 활성 공고 수 업데이트
     if (this.organizationService && updateData.status && post.organizationId) {
       console.log('📊 [PostService] 게시글 상태 변경으로 인한 단체 활성 공고 수 업데이트 시작:', post.organizationId)
@@ -268,6 +308,22 @@ export class PostService {
       status,
       updatedAt: this.getServerTimestamp(),
     })
+
+    // 공고 상태 변경 알림 발송 (지원자들에게)
+    try {
+      const applicantIds = await this.getPostApplicantIds(postId)
+      if (applicantIds.length > 0) {
+        await notificationService.notifyPostStatusChanged({
+          postId,
+          postTitle: post.title,
+          newStatus: status,
+          applicantIds
+        })
+      }
+    } catch (notificationError) {
+      console.error('❌ [PostService] 공고 상태 변경 알림 발송 실패:', notificationError)
+      // 알림 발송 실패는 상태 변경을 방해하지 않음
+    }
 
     // 상태 변경 후 단체의 활성 공고 수 업데이트
     if (this.organizationService && post.organizationId) {

@@ -17,7 +17,6 @@ export async function addTestData() {
       gender: 'female',
       birthday: '1990-01-01',
       heightCm: 165,
-      media: [],
       requiredProfileComplete: true,
       userType: 'organizer',
       organizationId: 'test-organizer',

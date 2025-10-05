@@ -6,7 +6,6 @@ import {
   UserProfile,
   CreateUserProfile,
   UpdateUserProfile,
-  MIN_PROFILE_PHOTOS,
 } from "@/types/user"
 
 /**
@@ -53,7 +52,6 @@ export class UserService {
       uid: userId,
       email: user.email,
       name: profileData.name,
-      media: [],
       requiredProfileComplete: false,
       userType: profileData.userType || "general",
       createdAt: now,
@@ -112,7 +110,6 @@ export class UserService {
       uid: userId,
       email: user.email ?? "",
       name: user.displayName || user.email?.split("@")[0] || "User",
-      media: [],
       requiredProfileComplete: false,
       userType: "general",
       createdAt: new Date() as unknown as FirebaseFirestoreTypes.Timestamp,
@@ -121,14 +118,10 @@ export class UserService {
 
     const updatedProfile = { ...baseProfile, ...updateData }
 
-    const minPhotosDone = Array.isArray(updatedProfile.media)
-      ? updatedProfile.media.length >= MIN_PROFILE_PHOTOS
-      : false
     const requiredProfileComplete = Boolean(
       updatedProfile.gender &&
         updatedProfile.birthday &&
-        typeof updatedProfile.heightCm === "number" &&
-        minPhotosDone,
+        typeof updatedProfile.heightCm === "number"
     )
 
     // Filter out undefined values to avoid Firestore errors
@@ -150,23 +143,39 @@ export class UserService {
     if (!currentProfile) {
       // Create the full document with allowed fields only
       const now = new Date() as unknown as FirebaseFirestoreTypes.Timestamp
-      const newDoc: UserProfile = {
+      const newDoc: any = {
         uid: userId,
         email: user.email ?? "",
         name: (updatedProfile.name as string) ?? baseProfile.name!,
-        gender: updatedProfile.gender as UserProfile["gender"],
-        birthday: updatedProfile.birthday as UserProfile["birthday"],
-        heightCm: updatedProfile.heightCm as UserProfile["heightCm"],
-        media: Array.isArray(updatedProfile.media) ? (updatedProfile.media as string[]) : [],
         requiredProfileComplete,
         userType: (updatedProfile.userType as UserProfile["userType"]) ?? "general",
-        organizationId: updatedProfile.organizationId as UserProfile["organizationId"],
-        organizationName: updatedProfile.organizationName as UserProfile["organizationName"],
-        previousOrganizationName: updatedProfile.previousOrganizationName as UserProfile["previousOrganizationName"],
-        hasBeenOrganizer: updatedProfile.hasBeenOrganizer as UserProfile["hasBeenOrganizer"],
         createdAt: now,
         updatedAt: now,
       }
+
+      // Only add fields that are not undefined
+      if (updatedProfile.gender !== undefined) {
+        newDoc.gender = updatedProfile.gender
+      }
+      if (updatedProfile.birthday !== undefined) {
+        newDoc.birthday = updatedProfile.birthday
+      }
+      if (updatedProfile.heightCm !== undefined) {
+        newDoc.heightCm = updatedProfile.heightCm
+      }
+      if (updatedProfile.organizationId !== undefined) {
+        newDoc.organizationId = updatedProfile.organizationId
+      }
+      if (updatedProfile.organizationName !== undefined) {
+        newDoc.organizationName = updatedProfile.organizationName
+      }
+      if (updatedProfile.previousOrganizationName !== undefined) {
+        newDoc.previousOrganizationName = updatedProfile.previousOrganizationName
+      }
+      if (updatedProfile.hasBeenOrganizer !== undefined) {
+        newDoc.hasBeenOrganizer = updatedProfile.hasBeenOrganizer
+      }
+
       await docRef.set(newDoc)
       return
     }

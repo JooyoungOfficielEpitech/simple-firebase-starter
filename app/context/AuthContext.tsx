@@ -19,6 +19,7 @@ import {
 import { translate } from "@/i18n/translate"
 import { userService } from "@/services/firestore"
 import { type CreateUserProfile } from "@/types/user"
+import { NotificationCleanupUtils } from "@/utils/notificationCleanup"
 
 export type AuthContextType = {
   isAuthenticated: boolean
@@ -61,10 +62,19 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({ childre
   }, [])
 
   useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged((user) => {
+    const unsubscribe = auth().onAuthStateChanged(async (user) => {
       setUser(user)
       setIsEmailVerified(user?.emailVerified || false)
       setIsLoading(false)
+
+      // 사용자 로그인 시 알림 정리 실행
+      if (user) {
+        try {
+          await NotificationCleanupUtils.cleanupUserNotificationsOnLogin(user.uid)
+        } catch (error) {
+          console.error('❌ [AuthContext] 로그인 시 알림 정리 실패:', error)
+        }
+      }
     })
 
     return unsubscribe

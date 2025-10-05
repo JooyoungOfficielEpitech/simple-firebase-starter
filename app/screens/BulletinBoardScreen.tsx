@@ -10,7 +10,6 @@ import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { ScreenHeader } from "@/components/ScreenHeader"
 import { PostCard } from "@/components/PostCard"
-import { HeaderBackButton } from "@/components/HeaderBackButton"
 import { postService, userService, organizationService } from "@/services/firestore"
 import firestore from "@react-native-firebase/firestore"
 import auth from "@react-native-firebase/auth"
@@ -25,6 +24,7 @@ import { translate } from "@/i18n"
 type NavigationProp = NativeStackNavigationProp<BulletinBoardStackParamList>
 
 export const BulletinBoardScreen = () => {
+  // All hooks must be called at the top level, unconditionally
   const { top } = useSafeAreaInsets()
   const navigation = useNavigation<NavigationProp>()
   const {
@@ -32,9 +32,7 @@ export const BulletinBoardScreen = () => {
     theme: { colors, spacing },
   } = useAppTheme()
   
-  // Create component-specific logger
-  const log = createComponentLogger('BulletinBoardScreen')
-
+  // State hooks - all called unconditionally
   const [posts, setPosts] = useState<Post[]>([])
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([])
   const [organizations, setOrganizations] = useState<Organization[]>([])
@@ -43,6 +41,9 @@ export const BulletinBoardScreen = () => {
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'announcements' | 'organizations'>('announcements')
   const [selectedOrganizationId, setSelectedOrganizationId] = useState<string | null>(null)
+  
+  // Create component-specific logger
+  const log = createComponentLogger('BulletinBoardScreen')
   
 
   useEffect(() => {
@@ -53,7 +54,7 @@ export const BulletinBoardScreen = () => {
     log.authInfo(currentUser)
     
     // 사용자 프로필 실시간 구독
-    let unsubscribeUserProfile = () => {}
+    let unsubscribeUserProfile: (() => void) | null = null
     
     if (currentUser) {
       console.log('👤 [BulletinBoardScreen] 사용자 프로필 실시간 구독 시작')
@@ -90,23 +91,31 @@ export const BulletinBoardScreen = () => {
     return () => {
       unsubscribePosts()
       unsubscribeOrganizations()
-      unsubscribeUserProfile()
+      if (unsubscribeUserProfile) {
+        unsubscribeUserProfile()
+      }
     }
   }, [])
 
   // 선택된 단체에 따른 게시글 필터링
   useEffect(() => {
+    let unsubscribeFiltered: (() => void) | null = null
+    
     if (selectedOrganizationId) {
       console.log(`🔍 [BulletinBoardScreen] 단체별 필터링 시작: ${selectedOrganizationId}`)
-      const unsubscribeFiltered = postService.subscribeToOrganizationPosts(selectedOrganizationId, (filteredPosts) => {
+      unsubscribeFiltered = postService.subscribeToOrganizationPosts(selectedOrganizationId, (filteredPosts) => {
         console.log(`🔍 [BulletinBoardScreen] 단체별 게시글 받음: ${filteredPosts.length}개`)
         setFilteredPosts(filteredPosts)
       })
-
-      return unsubscribeFiltered
     } else {
       console.log('🔍 [BulletinBoardScreen] 전체 게시글 모드')
       setFilteredPosts([])
+    }
+
+    return () => {
+      if (unsubscribeFiltered) {
+        unsubscribeFiltered()
+      }
     }
   }, [selectedOrganizationId])
 
@@ -178,7 +187,6 @@ export const BulletinBoardScreen = () => {
         gender: 'female',
         birthday: '1990-01-01',
         heightCm: 165,
-        media: [],
         requiredProfileComplete: true,
         userType: 'organizer',
         organizationId: 'test-organizer',
@@ -478,11 +486,9 @@ export const BulletinBoardScreen = () => {
     organizations.find(org => org.id === selectedOrganizationId)?.name || translate("bulletinBoard:tabs.organizations") : 
     translate("bulletinBoard:title")
 
-  const HeaderRightComponent = () => (
-    <TouchableOpacity>
-      <Icon icon="account_circle" size={32} color={colors.tint} />
-    </TouchableOpacity>
-  )
+  // 알림 구독은 ScreenHeader에서 처리하므로 여기서는 제거
+
+  // 알림 아이콘은 ScreenHeader에서 기본 제공되므로 커스텀 rightComponent는 불필요
 
   return (
     <Screen preset="scroll" safeAreaEdges={[]}>
@@ -492,7 +498,6 @@ export const BulletinBoardScreen = () => {
         backButtonProps={{
           onPress: handleBackToAllPosts
         }}
-        rightComponent={<HeaderRightComponent />}
       />
       <View style={themed($container)}>
 
@@ -532,11 +537,11 @@ export const BulletinBoardScreen = () => {
               {isOrganizer && (
                 <View style={themed($createPostButtonContainer)}>
                   <Button
-                    text={translate("bulletinBoard:actions.createPost") || "새 공고 작성"}
+                    text="새 공고 작성"
                     onPress={handleCreatePost}
                     style={themed($createPostButton)}
                     LeftAccessory={(props) => (
-                      <Icon icon="edit" size={20} color={props.style.color} />
+                      <Icon icon="more" size={20} color={props.style.color} />
                     )}
                   />
                 </View>

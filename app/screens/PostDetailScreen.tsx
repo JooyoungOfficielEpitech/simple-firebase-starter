@@ -59,8 +59,19 @@ export const PostDetailScreen = () => {
       try {
         const profile = await userService.getUserProfile()
         setUserProfile(profile)
+        if (!profile) {
+          console.warn("⚠️ [PostDetailScreen] 사용자 프로필이 존재하지 않습니다")
+        }
       } catch (error) {
         console.error("❌ [PostDetailScreen] 사용자 프로필 로드 오류:", error)
+        // 프로필 로드 실패 시 더 구체적인 오류 메시지
+        Alert.alert(
+          "프로필 오류", 
+          "사용자 프로필을 불러오는데 실패했습니다. 프로필을 먼저 설정해주세요.",
+          [
+            { text: "확인", onPress: () => navigation.goBack() }
+          ]
+        )
       }
     }
 
@@ -143,7 +154,17 @@ export const PostDetailScreen = () => {
 
   const handleApply = async () => {
     if (!userProfile) {
-      Alert.alert("로그인 필요", "지원하려면 로그인이 필요합니다.")
+      Alert.alert(
+        "프로필 설정 필요", 
+        "지원하려면 프로필을 먼저 설정해주세요.",
+        [
+          { text: "취소", style: "cancel" },
+          { text: "프로필 설정", onPress: () => {
+            // 프로필 설정 화면으로 이동
+            navigation.navigate("Profile")
+          }}
+        ]
+      )
       return
     }
 

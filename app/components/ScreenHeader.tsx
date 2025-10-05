@@ -1,4 +1,4 @@
-import { type FC, type ReactElement } from "react"
+import { type FC, type ReactElement, useState, useEffect } from "react"
 import { View, type ViewStyle, type TextStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useNavigation } from "@react-navigation/native"
@@ -6,7 +6,10 @@ import { useNavigation } from "@react-navigation/native"
 import { BackButton, type BackButtonProps } from "./BackButton"
 import { PressableIcon } from "./Icon"
 import { Text, type TextProps } from "./Text"
+import { NotificationBadge } from "./NotificationBadge"
 import { useAppTheme } from "@/theme/context"
+import { useAuth } from "@/context/AuthContext"
+import { notificationService } from "@/services/firestore/notificationService"
 import { type ThemedStyle } from "@/theme/types"
 
 export interface ScreenHeaderProps {
@@ -51,9 +54,9 @@ export interface ScreenHeaderProps {
   includeSafeArea?: boolean
   
   /**
-   * 프로필 아이콘 표시 여부 (기본: true)
+   * 알림 아이콘 표시 여부 (기본: true)
    */
-  showProfileIcon?: boolean
+  showNotificationIcon?: boolean
 }
 
 /**
@@ -93,25 +96,56 @@ export const ScreenHeader: FC<ScreenHeaderProps> = function ScreenHeader({
   containerStyle,
   titleStyle,
   includeSafeArea = true,
-  showProfileIcon = true,
+  showNotificationIcon = true,
 }) {
   const { top } = useSafeAreaInsets()
   const { themed, theme: { colors } } = useAppTheme()
   const navigation = useNavigation<any>()
+  const { user } = useAuth()
+  const [unreadCount, setUnreadCount] = useState(0)
 
   const displayTitle = titleTx ? titleTx : title
 
-  const ProfileIcon = () => (
-    <PressableIcon
-      icon="user"
-      size={24}
-      color={colors.text}
-      onPress={() => navigation.navigate("Profile")}
-      containerStyle={themed($profileIcon)}
-    />
+  // 읽지 않은 알림 수 구독
+  useEffect(() => {
+    let unsubscribe: (() => void) | null = null
+    
+    if (user && showNotificationIcon) {
+      console.log('🔔 [ScreenHeader] 읽지 않은 알림 수 구독 시작:', user.uid)
+      
+      unsubscribe = notificationService.subscribeToUnreadCount(
+        user.uid,
+        (count) => {
+          console.log('🔔 [ScreenHeader] 읽지 않은 알림 수 업데이트:', count)
+          setUnreadCount(count)
+        }
+      )
+    } else {
+      setUnreadCount(0)
+    }
+
+    return () => {
+      if (unsubscribe) {
+        console.log('🔔 [ScreenHeader] 읽지 않은 알림 수 구독 해제')
+        unsubscribe()
+      }
+    }
+  }, [user, showNotificationIcon])
+
+  const NotificationIcon = () => (
+    <View style={themed($notificationIconContainer)}>
+      <PressableIcon
+        icon="bell"
+        size={24}
+        color={colors.text}
+        onPress={() => navigation.navigate("NotificationCenter")}
+        containerStyle={themed($notificationIcon)}
+      />
+      <NotificationBadge count={unreadCount} />
+    </View>
   )
 
-  const rightContent = rightComponent || (showProfileIcon ? <ProfileIcon /> : null)
+  const rightContent = rightComponent || (showNotificationIcon ? <NotificationIcon /> : null)
 
   return (
     <View 
@@ -143,7 +177,7 @@ export const ScreenHeader: FC<ScreenHeaderProps> = function ScreenHeader({
           />
         </View>
 
-        {/* 오른쪽: 커스텀 컴포넌트 또는 프로필 아이콘 */}
+        {/* 오른쪽: 커스텀 컴포넌트 또는 알림 아이콘 */}
         <View style={themed($rightSection)}>
           {rightContent || <View style={themed($placeholder)} />}
         </View>
@@ -194,6 +228,10 @@ const $placeholder: ThemedStyle<ViewStyle> = () => ({
   height: 44,
 })
 
-const $profileIcon: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+const $notificationIconContainer: ThemedStyle<ViewStyle> = () => ({
+  position: "relative",
+})
+
+const $notificationIcon: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   padding: spacing.xs,
 })
