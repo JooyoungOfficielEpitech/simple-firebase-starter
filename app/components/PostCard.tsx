@@ -1,4 +1,5 @@
 import { View, TouchableOpacity } from "react-native"
+import { memo } from "react"
 import { Text } from "@/components/Text"
 import { StatusBadge } from "@/components/StatusBadge"
 import { useAppTheme } from "@/theme/context"
@@ -11,7 +12,7 @@ interface PostCardProps {
   variant?: "compact" | "detailed"
 }
 
-export const PostCard = ({ 
+export const PostCard = memo<PostCardProps>(({ 
   post, 
   onPress, 
   variant = "compact" 
@@ -84,7 +85,7 @@ export const PostCard = ({
       )}
     </TouchableOpacity>
   )
-}
+})
 
 // Styles
 const $postCard = ({ colors, spacing }) => ({

@@ -1,4 +1,4 @@
-import { type FC, type ReactElement, useState, useEffect } from "react"
+import { type FC, type ReactElement, useState, useEffect, useCallback, useMemo } from "react"
 import { View, type ViewStyle, type TextStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useNavigation } from "@react-navigation/native"
@@ -104,7 +104,7 @@ export const ScreenHeader: FC<ScreenHeaderProps> = function ScreenHeader({
   const { user } = useAuth()
   const [unreadCount, setUnreadCount] = useState(0)
 
-  const displayTitle = titleTx ? titleTx : title
+  const displayTitle = useMemo(() => titleTx ? titleTx : title, [titleTx, title])
 
   // 읽지 않은 알림 수 구독
   useEffect(() => {
@@ -132,20 +132,27 @@ export const ScreenHeader: FC<ScreenHeaderProps> = function ScreenHeader({
     }
   }, [user, showNotificationIcon])
 
-  const NotificationIcon = () => (
+  const handleNotificationPress = useCallback(() => {
+    navigation.navigate("NotificationCenter")
+  }, [navigation])
+
+  const NotificationIcon = useMemo(() => (
     <View style={themed($notificationIconContainer)}>
       <PressableIcon
         icon="bell"
         size={24}
         color={colors.text}
-        onPress={() => navigation.navigate("NotificationCenter")}
+        onPress={handleNotificationPress}
         containerStyle={themed($notificationIcon)}
       />
       <NotificationBadge count={unreadCount} />
     </View>
-  )
+  ), [colors.text, unreadCount, themed, handleNotificationPress])
 
-  const rightContent = rightComponent || (showNotificationIcon ? <NotificationIcon /> : null)
+  const rightContent = useMemo(() => 
+    rightComponent || (showNotificationIcon ? NotificationIcon : null),
+    [rightComponent, showNotificationIcon, NotificationIcon]
+  )
 
   return (
     <View 

@@ -4,7 +4,7 @@
  * Generally speaking, it will contain an auth flow (registration, signin, forgot password)
  * and a "main" flow which the user will use once logged in.
  */
-import { ComponentProps } from "react"
+import { ComponentProps, useMemo } from "react"
 import { NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
 
@@ -62,14 +62,10 @@ const AppStack = () => {
   } = useAppTheme()
   const { isAuthenticated } = useAuth()
 
-  // 초기 라우트 결정 로직
-  const getInitialRouteName = (): keyof AppStackParamList => {
-    if (!isAuthenticated) {
-      return "SignIn"
-    }
-
-    return "Main"
-  }
+  // 초기 라우트를 useMemo로 최적화
+  const initialRouteName = useMemo((): keyof AppStackParamList => {
+    return isAuthenticated ? "Main" : "SignIn"
+  }, [isAuthenticated])
 
   return (
     <Stack.Navigator
@@ -81,7 +77,7 @@ const AppStack = () => {
           backgroundColor: colors.background,
         },
       }}
-      initialRouteName={getInitialRouteName()}
+      initialRouteName={initialRouteName}
     >
       {!isAuthenticated ? (
         // 미인증 사용자 화면들
