@@ -87,29 +87,35 @@ export const NotificationCenterScreen: FC<NotificationCenterScreenProps> = ({ na
       if (notification.postId) {
         console.log('🔔 [NotificationCenter] 게시글로 이동:', notification.postId)
         
-        // 운영자가 받는 알림 (지원자 관리 화면으로)
-        if (notification.type === 'application_received' || notification.type === 'application_cancelled') {
-          navigation?.navigate("Main", {
-            screen: "BulletinBoard", 
-            params: {
-              screen: "ApplicationManagement",
-              params: { 
-                postId: notification.postId,
-                postTitle: notification.postTitle || "게시글"
+        // 알림센터를 먼저 닫고 타겟 화면으로 이동
+        navigation?.goBack()
+        
+        // 짧은 딜레이 후 타겟 화면으로 이동 (스택 안정화)
+        setTimeout(() => {
+          // 운영자가 받는 알림 (지원자 관리 화면으로)
+          if (notification.type === 'application_received' || notification.type === 'application_cancelled') {
+            navigation?.navigate("Main", {
+              screen: "BulletinBoard", 
+              params: {
+                screen: "ApplicationManagement",
+                params: { 
+                  postId: notification.postId,
+                  postTitle: notification.postTitle || "게시글"
+                }
               }
-            }
-          })
-        } 
-        // 지원자가 받는 알림 (게시글 상세로)
-        else {
-          navigation?.navigate("Main", {
-            screen: "BulletinBoard",
-            params: {
-              screen: "PostDetail",
-              params: { postId: notification.postId }
-            }
-          })
-        }
+            })
+          } 
+          // 지원자가 받는 알림 (게시글 상세로)
+          else {
+            navigation?.navigate("Main", {
+              screen: "BulletinBoard",
+              params: {
+                screen: "PostDetail",
+                params: { postId: notification.postId }
+              }
+            })
+          }
+        }, 100)
       }
     } catch (error) {
       console.error("❌ [NotificationCenter] 알림 처리 오류:", error)
@@ -148,7 +154,7 @@ export const NotificationCenterScreen: FC<NotificationCenterScreenProps> = ({ na
 
   if (isLoading) {
     return (
-      <Screen style={themed($root)} preset="fixed" safeAreaEdges={[]}>
+      <Screen preset="fixed" safeAreaEdges={[]}>
         <ScreenHeader title="알림" showNotificationIcon={false} />
         <View style={themed($loadingContainer)}>
           <ActivityIndicator size="large" color={colors.palette.primary500} />
@@ -159,7 +165,7 @@ export const NotificationCenterScreen: FC<NotificationCenterScreenProps> = ({ na
   }
 
   return (
-    <Screen style={themed($root)} preset="fixed" safeAreaEdges={[]}>
+    <Screen preset="scroll" safeAreaEdges={[]}>
       <ScreenHeader 
         title={`알림 ${unreadCount > 0 ? `(${unreadCount})` : ''}`}
         showNotificationIcon={false}
@@ -174,63 +180,29 @@ export const NotificationCenterScreen: FC<NotificationCenterScreenProps> = ({ na
           </Text>
         </View>
       ) : (
-        <View style={{ flex: 1, padding: 16 }}>
+        <View style={themed($notificationContainer)}>
           {notifications.map((item) => (
             <TouchableOpacity
               key={item.id}
-              style={{
-                ...(item.isRead ? CARD_STYLES.read : CARD_STYLES.unread),
-                marginVertical: 8,
-                padding: 20,
-                borderRadius: 12,
-                borderWidth: 1,
-                minHeight: 120,
-              }}
+              style={themed($notificationCard(item.isRead))}
               onPress={() => handleNotificationPress(item)}
             >
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                <Text 
-                  style={{
-                    fontSize: 18,
-                    fontWeight: 'bold',
-                    color: '#1A1A1A',
-                    lineHeight: 24,
-                    flex: 1,
-                  }}
-                >
+              <View style={themed($cardHeader)}>
+                <Text style={themed($cardTitle)}>
                   {getNotificationIcon(item.type)} {item.title}
                 </Text>
                 
-                <Text style={{ 
-                  fontSize: 12, 
-                  color: '#999999',
-                  fontWeight: '500',
-                  marginLeft: 8,
-                }}>
+                <Text style={themed($cardTime)}>
                   {formatRelativeTime(item.createdAt)}
                 </Text>
               </View>
               
-              <Text 
-                style={{
-                  fontSize: 15,
-                  color: '#333333',
-                  lineHeight: 22,
-                }}
-              >
+              <Text style={themed($cardMessage)}>
                 {item.message}
               </Text>
               
               {!item.isRead && (
-                <View style={{
-                  position: 'absolute',
-                  top: 12,
-                  right: 12,
-                  width: 8,
-                  height: 8,
-                  borderRadius: 4,
-                  backgroundColor: '#FF3B30',
-                }} />
+                <View style={themed($unreadDot)} />
               )}
             </TouchableOpacity>
           ))}
@@ -239,11 +211,6 @@ export const NotificationCenterScreen: FC<NotificationCenterScreenProps> = ({ na
     </Screen>
   )
 }
-
-const $root: ThemedStyle<ViewStyle> = ({ colors }) => ({
-  flex: 1,
-  backgroundColor: colors.background,
-})
 
 const $loadingContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   flex: 1,
@@ -263,6 +230,7 @@ const $emptyContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   justifyContent: "center",
   alignItems: "center",
   padding: spacing.lg,
+  minHeight: 400,
 })
 
 const $emptyIcon: ThemedStyle<ViewStyle> = () => ({
@@ -282,5 +250,58 @@ const $emptyMessage: ThemedStyle<ViewStyle> = ({ colors }) => ({
   color: colors.textDim,
   textAlign: "center",
   lineHeight: 20,
+})
+
+const $notificationContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  padding: spacing.lg,
+})
+
+const $notificationCard = (isRead: boolean): ThemedStyle<ViewStyle> => ({ colors, spacing }) => ({
+  backgroundColor: isRead ? colors.background : colors.palette.neutral100,
+  borderColor: isRead ? colors.border : colors.palette.primary500,
+  borderWidth: 1,
+  borderRadius: 12,
+  padding: spacing.lg,
+  marginBottom: spacing.md,
+  minHeight: 120,
+  position: "relative",
+})
+
+const $cardHeader: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "flex-start",
+  marginBottom: spacing.xs,
+})
+
+const $cardTitle: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  fontSize: 18,
+  fontWeight: "bold",
+  color: colors.text,
+  lineHeight: 24,
+  flex: 1,
+})
+
+const $cardTime: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  fontSize: 12,
+  color: colors.textDim,
+  fontWeight: "500",
+  marginLeft: spacing.xs,
+})
+
+const $cardMessage: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  fontSize: 15,
+  color: colors.textDim,
+  lineHeight: 22,
+})
+
+const $unreadDot: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  position: "absolute",
+  top: spacing.md,
+  right: spacing.md,
+  width: 8,
+  height: 8,
+  borderRadius: 4,
+  backgroundColor: "#FF3B30",
 })
 

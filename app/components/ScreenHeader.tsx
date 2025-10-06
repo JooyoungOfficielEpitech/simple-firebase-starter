@@ -1,7 +1,7 @@
 import { type FC, type ReactElement, useState, useEffect, useCallback, useMemo } from "react"
 import { View, type ViewStyle, type TextStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation, useRoute } from "@react-navigation/native"
 
 import { BackButton, type BackButtonProps } from "./BackButton"
 import { PressableIcon } from "./Icon"
@@ -101,16 +101,39 @@ export const ScreenHeader: FC<ScreenHeaderProps> = function ScreenHeader({
   const { top } = useSafeAreaInsets()
   const { themed, theme: { colors } } = useAppTheme()
   const navigation = useNavigation<any>()
+  const route = useRoute()
   const { user } = useAuth()
   const [unreadCount, setUnreadCount] = useState(0)
 
   const displayTitle = useMemo(() => titleTx ? titleTx : title, [titleTx, title])
 
+  // 현재 화면이 노래방 홈이나 게시판 홈인지 확인
+  const shouldShowNotificationIcon = useMemo(() => {
+    // showNotificationIcon prop이 false면 무조건 숨김
+    if (!showNotificationIcon) return false
+    
+    // 현재 화면 정보를 기반으로 판단
+    const currentRouteName = route.name
+    
+    // 노래방 홈 (HomeMain)이나 게시판 홈 (BulletinBoardMain)에서만 표시
+    const isKaraokeHome = currentRouteName === 'HomeMain'
+    const isBulletinBoardHome = currentRouteName === 'BulletinBoardMain'
+    
+    console.log('🔔 [ScreenHeader] 알림 아이콘 표시 조건 체크:', {
+      currentRouteName,
+      isKaraokeHome,
+      isBulletinBoardHome,
+      shouldShow: isKaraokeHome || isBulletinBoardHome
+    })
+    
+    return isKaraokeHome || isBulletinBoardHome
+  }, [showNotificationIcon, route.name])
+
   // 읽지 않은 알림 수 구독
   useEffect(() => {
     let unsubscribe: (() => void) | null = null
     
-    if (user && showNotificationIcon) {
+    if (user && shouldShowNotificationIcon) {
       console.log('🔔 [ScreenHeader] 읽지 않은 알림 수 구독 시작:', user.uid)
       
       unsubscribe = notificationService.subscribeToUnreadCount(
@@ -130,7 +153,7 @@ export const ScreenHeader: FC<ScreenHeaderProps> = function ScreenHeader({
         unsubscribe()
       }
     }
-  }, [user, showNotificationIcon])
+  }, [user, shouldShowNotificationIcon])
 
   const handleNotificationPress = useCallback(() => {
     navigation.navigate("NotificationCenter")
@@ -150,8 +173,8 @@ export const ScreenHeader: FC<ScreenHeaderProps> = function ScreenHeader({
   ), [colors.text, unreadCount, themed, handleNotificationPress])
 
   const rightContent = useMemo(() => 
-    rightComponent || (showNotificationIcon ? NotificationIcon : null),
-    [rightComponent, showNotificationIcon, NotificationIcon]
+    rightComponent || (shouldShowNotificationIcon ? NotificationIcon : null),
+    [rightComponent, shouldShowNotificationIcon, NotificationIcon]
   )
 
   return (

@@ -102,7 +102,6 @@ const AppStack = () => {
             name="NotificationCenter" 
             component={NotificationCenterScreen}
             options={{
-              presentation: 'modal',
               headerShown: false,
             }}
           />
