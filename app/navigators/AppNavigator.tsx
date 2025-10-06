@@ -15,6 +15,8 @@ import { ForgotPasswordScreen } from "@/screens/ForgotPasswordScreen"
 import { ProfileScreen } from "@/screens/ProfileScreen"
 import { EditProfileScreen } from "@/screens/EditProfileScreen"
 import { NotificationCenterScreen } from "@/screens/NotificationCenterScreen"
+import { PostDetailScreen } from "@/screens/PostDetailScreen"
+import { ApplicationManagementScreen } from "@/screens/ApplicationManagementScreen"
 import { SignInScreen } from "@/screens/SignInScreen"
 import { SignUpScreen } from "@/screens/SignUpScreen"
 import { useAppTheme } from "@/theme/context"
@@ -40,6 +42,8 @@ export type AppStackParamList = {
   Profile: undefined
   EditProfile: undefined
   NotificationCenter: undefined
+  PostDetail: { postId: string }
+  ApplicationManagement: { postId: string; postTitle: string }
 }
 
 /**
@@ -101,6 +105,20 @@ const AppStack = () => {
           <Stack.Screen 
             name="NotificationCenter" 
             component={NotificationCenterScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen 
+            name="PostDetail" 
+            component={PostDetailScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen 
+            name="ApplicationManagement" 
+            component={ApplicationManagementScreen}
             options={{
               headerShown: false,
             }}

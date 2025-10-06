@@ -87,35 +87,19 @@ export const NotificationCenterScreen: FC<NotificationCenterScreenProps> = ({ na
       if (notification.postId) {
         console.log('🔔 [NotificationCenter] 게시글로 이동:', notification.postId)
         
-        // 알림센터를 먼저 닫고 타겟 화면으로 이동
-        navigation?.goBack()
-        
-        // 짧은 딜레이 후 타겟 화면으로 이동 (스택 안정화)
-        setTimeout(() => {
-          // 운영자가 받는 알림 (지원자 관리 화면으로)
-          if (notification.type === 'application_received' || notification.type === 'application_cancelled') {
-            navigation?.navigate("Main", {
-              screen: "BulletinBoard", 
-              params: {
-                screen: "ApplicationManagement",
-                params: { 
-                  postId: notification.postId,
-                  postTitle: notification.postTitle || "게시글"
-                }
-              }
-            })
-          } 
-          // 지원자가 받는 알림 (게시글 상세로)
-          else {
-            navigation?.navigate("Main", {
-              screen: "BulletinBoard",
-              params: {
-                screen: "PostDetail",
-                params: { postId: notification.postId }
-              }
-            })
-          }
-        }, 100)
+        // 운영자가 받는 알림 (지원자 관리 화면으로)
+        if (notification.type === 'application_received' || notification.type === 'application_cancelled') {
+          navigation?.push("ApplicationManagement", { 
+            postId: notification.postId,
+            postTitle: notification.postTitle || "게시글"
+          })
+        } 
+        // 지원자가 받는 알림 (게시글 상세로)
+        else {
+          navigation?.push("PostDetail", { 
+            postId: notification.postId 
+          })
+        }
       }
     } catch (error) {
       console.error("❌ [NotificationCenter] 알림 처리 오류:", error)
