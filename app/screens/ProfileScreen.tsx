@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react"
+import { FC, useEffect, useState, useMemo } from "react"
 import { View, ViewStyle, ScrollView, Alert, TouchableOpacity } from "react-native"
 import { Screen } from "@/components/Screen"
 import { ScreenHeader } from "@/components/ScreenHeader"
@@ -36,14 +36,36 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
   }, [navigation])
 
   const loadUserProfile = async () => {
-    if (!user) return
+    if (!user) {
+      console.log("❌ [ProfileScreen] 사용자가 없어서 프로필 로드 불가")
+      return
+    }
     
     try {
       setIsLoading(true)
-      const profile = await userService.getUserProfile(user.uid)
+      console.log("🔄 [ProfileScreen] 프로필 로드 시작 - userId:", user.uid)
+      let profile = await userService.getUserProfile(user.uid)
+      console.log("✅ [ProfileScreen] 프로필 로드 결과:", profile)
+      
+      // 프로필이 없는 경우 기본 프로필 생성
+      if (!profile) {
+        console.log("🔄 [ProfileScreen] 프로필이 없어서 기본 프로필 생성 중...")
+        try {
+          await userService.createUserProfile({
+            name: user.displayName || user.email?.split("@")[0] || "사용자",
+          })
+          
+          // 생성 후 다시 로드
+          profile = await userService.getUserProfile(user.uid)
+          console.log("✅ [ProfileScreen] 기본 프로필 생성 및 로드 완료:", profile)
+        } catch (createError) {
+          console.error("❌ [ProfileScreen] 기본 프로필 생성 실패:", createError)
+        }
+      }
+      
       setUserProfile(profile)
     } catch (error) {
-      console.error("프로필 로드 오류:", error)
+      console.error("❌ [ProfileScreen] 프로필 로드 오류:", error)
     } finally {
       setIsLoading(false)
     }
@@ -64,72 +86,61 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
   const handleBecomeOrganizer = async () => {
     if (!userProfile) return
 
-    Alert.alert(
-      "운영자 계정 전환",
-      "운영자 계정으로 전환하시겠습니까?",
-      [
-        { text: "취소", style: "cancel" },
-        {
-          text: "확인",
-          onPress: async () => {
-            try {
-              setIsUpdating(true)
-              
-              // 이전 운영자 경험이 있는 경우 자동 전환 시도
-              const autoResult = await userService.attemptAutoOrganizerConversion()
-              
-              if (autoResult.success) {
-                Alert.alert("성공", `${autoResult.organizationName} 운영자로 전환되었습니다.`)
-                await loadUserProfile()
-              } else {
-                // 새로운 운영자 계정 생성 로직
-                Alert.prompt(
-                  "단체명 입력",
-                  "운영할 단체명을 입력해주세요.",
-                  async (organizationName) => {
-                    if (organizationName && organizationName.trim()) {
-                      try {
-                        await userService.updateUserProfile({
-                          userType: "organizer",
-                          organizationId: user?.uid,
-                          organizationName: organizationName.trim()
-                        })
-                        Alert.alert("성공", "운영자 계정으로 전환되었습니다.")
-                        await loadUserProfile()
-                      } catch (error) {
-                        Alert.alert("오류", "운영자 전환에 실패했습니다.")
-                      }
-                    }
-                  }
-                )
-              }
-            } catch (error) {
-              Alert.alert("오류", "운영자 전환에 실패했습니다.")
-            } finally {
-              setIsUpdating(false)
-            }
-          }
-        }
-      ]
-    )
+    // 먼저 이미 단체를 소유하고 있는지 확인
+    try {
+      const hasOrganization = await userService.hasOwnedOrganization()
+      if (hasOrganization) {
+        Alert.alert("알림", "이미 단체를 소유하고 있습니다. 계정당 하나의 단체만 소유할 수 있습니다.")
+        return
+      }
+    } catch (error) {
+      console.error("단체 소유 확인 오류:", error)
+    }
+
+    // 이전 운영자 경험이 있는 경우 자동 전환 시도
+    try {
+      const autoResult = await userService.attemptAutoOrganizerConversion()
+      
+      if (autoResult.success) {
+        Alert.alert("성공", `${autoResult.organizationName} 운영자로 전환되었습니다.`)
+        await loadUserProfile()
+        return
+      }
+    } catch (error) {
+      console.error("자동 운영자 전환 확인 오류:", error)
+    }
+
+    // 바로 단체 등록 화면으로 이동
+    navigation?.navigate("CreateOrganization", { isOrganizerConversion: true })
   }
 
   const handleDeleteAccount = () => {
     Alert.alert(
-      "계정 삭제",
-      "정말로 계정을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+      "회원 탈퇴",
+      "정말로 계정 데이터를 모두 삭제하시겠습니까?\n\n⚠️ 다음 데이터가 모두 삭제됩니다:\n• 프로필 정보\n• 작성한 게시글\n• 제출한 지원서\n• 받은 알림\n• 소유한 단체 정보\n\n이 작업은 되돌릴 수 없습니다.",
       [
         { text: "취소", style: "cancel" },
         {
-          text: "삭제",
+          text: "회원 탈퇴",
           style: "destructive",
           onPress: async () => {
             try {
               setIsUpdating(true)
-              await userService.deleteUserProfile()
+              
+              // 모든 사용자 데이터 삭제
+              await userService.deleteUserAccount()
+              
+              // 데이터 삭제 후 로그아웃
               await logout()
+              
+              Alert.alert("완료", "모든 데이터가 삭제되었습니다.")
+              
             } catch (error) {
-              Alert.alert("오류", "계정 삭제에 실패했습니다.")
+              console.error("데이터 삭제 오류:", error)
+              Alert.alert(
+                "삭제 실패", 
+                error.message || "데이터 삭제에 실패했습니다. 다시 시도해주세요."
+              )
             } finally {
               setIsUpdating(false)
             }
@@ -139,37 +150,115 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
     )
   }
 
-  const getProfileCompletionData = () => {
-    if (!userProfile) return { percentage: 0, missing: [], completed: [] }
+  // useMemo로 프로필 완성도 데이터 캐싱
+  const profileCompletionData = useMemo(() => {
+    console.log("🔍 [ProfileScreen] profileCompletionData 계산 시작")
+    console.log("🔍 [ProfileScreen] userProfile 상태:", userProfile ? "존재함" : "null/undefined")
+    
+    if (!userProfile) {
+      console.log("❌ [ProfileScreen] userProfile이 없어서 기본값 반환")
+      return { percentage: 0, missing: [], completed: [] }
+    }
+    
+    // 전체 프로필 데이터 디버깅
+    console.log("🔍 [ProfileScreen] 전체 프로필 데이터:", JSON.stringify(userProfile, null, 2))
+    
+    // 각 필드별 상세 체크
+    const nameCheck = {
+      value: userProfile.name,
+      exists: !!userProfile.name,
+      notEmpty: userProfile.name && userProfile.name.trim() !== "",
+      final: !!userProfile.name && userProfile.name.trim() !== ""
+    }
+    
+    const genderCheck = {
+      value: userProfile.gender,
+      exists: !!userProfile.gender,
+      isValidGender: userProfile.gender === 'male' || userProfile.gender === 'female',
+      final: !!userProfile.gender && (userProfile.gender === 'male' || userProfile.gender === 'female')
+    }
+    
+    const birthdayCheck = {
+      value: userProfile.birthday,
+      exists: !!userProfile.birthday,
+      notEmpty: userProfile.birthday && userProfile.birthday.trim() !== "",
+      final: !!userProfile.birthday && userProfile.birthday.trim() !== ""
+    }
+    
+    const heightCheck = {
+      value: userProfile.heightCm,
+      type: typeof userProfile.heightCm,
+      isNumber: typeof userProfile.heightCm === 'number',
+      isPositive: typeof userProfile.heightCm === 'number' && userProfile.heightCm > 0,
+      final: typeof userProfile.heightCm === 'number' && userProfile.heightCm > 0
+    }
+    
+    console.log("🔍 [ProfileScreen] 각 필드 상세 체크:", {
+      name: nameCheck,
+      gender: genderCheck,
+      birthday: birthdayCheck,
+      height: heightCheck
+    })
     
     const items = [
-      { key: 'name', label: '이름', completed: !!userProfile.name },
-      { key: 'gender', label: '성별', completed: !!userProfile.gender },
-      { key: 'birthday', label: '생년월일', completed: !!userProfile.birthday },
-      { key: 'height', label: '키', completed: !!userProfile.heightCm }
+      { 
+        key: 'name', 
+        label: '이름', 
+        completed: nameCheck.final,
+        value: userProfile.name
+      },
+      { 
+        key: 'gender', 
+        label: '성별', 
+        completed: genderCheck.final,
+        value: userProfile.gender
+      },
+      { 
+        key: 'birthday', 
+        label: '생년월일', 
+        completed: birthdayCheck.final,
+        value: userProfile.birthday
+      },
+      { 
+        key: 'height', 
+        label: '키', 
+        completed: heightCheck.final,
+        value: userProfile.heightCm
+      }
     ]
     
     const completed = items.filter(item => item.completed)
     const missing = items.filter(item => !item.completed)
     const percentage = Math.round((completed.length / items.length) * 100)
     
+    console.log("📈 [ProfileScreen] 최종 완성도 결과:", {
+      completedCount: completed.length,
+      missingCount: missing.length,
+      totalItems: items.length,
+      percentage,
+      completedItems: completed.map(item => `${item.label}: ${item.value}`),
+      missingItems: missing.map(item => `${item.label}: ${item.value || '미설정'}`)
+    })
+    
     return { percentage, missing, completed }
-  }
+  }, [userProfile])
 
   const handleProfileCompletionClick = () => {
-    const { missing, completed } = getProfileCompletionData()
+    const { missing, completed, percentage } = profileCompletionData
+    
+    console.log("🎯 [ProfileScreen] 완성도 클릭 - missing:", missing.length, "completed:", completed.length, "percentage:", percentage)
     
     if (missing.length === 0) {
       Alert.alert("프로필 완성!", "모든 프로필 정보가 완성되었습니다. 🎉")
       return
     }
     
-    const missingList = missing.map(item => `• ${item.label}`).join('\n')
-    const completedList = completed.map(item => `• ${item.label}`).join('\n')
+    const missingList = missing.map(item => `• ${item.label} (현재: ${item.value || '미설정'})`).join('\n')
+    const completedList = completed.map(item => `• ${item.label} (현재: ${item.value})`).join('\n')
     
     Alert.alert(
       "프로필 완성도",
-      `완성된 항목:\n${completedList}\n\n아직 필요한 항목:\n${missingList}`,
+      `완성된 항목 (${completed.length}/4):\n${completedList || '없음'}\n\n아직 필요한 항목 (${missing.length}/4):\n${missingList}`,
       [
         { text: "닫기", style: "cancel" },
         { text: "프로필 편집", onPress: () => navigation?.navigate("EditProfile") }
@@ -189,7 +278,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
   if (isLoading) {
     return (
       <Screen style={themed($root)} preset="fixed" safeAreaEdges={[]}>
-        <ScreenHeader title="프로필" showNotificationIcon={false} />
+        <ScreenHeader title="프로필" showNotificationIcon={false} showBackButton={false} />
         <View style={themed($loadingContainer)}>
           <Text>프로필 로딩 중...</Text>
         </View>
@@ -204,7 +293,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
       safeAreaEdges={[]}
       contentContainerStyle={themed($contentContainer)}
     >
-      <ScreenHeader title="프로필" showNotificationIcon={false} />
+      <ScreenHeader title="프로필" showNotificationIcon={false} showBackButton={false} />
       
       {/* 기본 정보 섹션 */}
       <View style={themed($card)}>
@@ -257,7 +346,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
           <TouchableOpacity style={themed($infoRow)} onPress={handleProfileCompletionClick}>
             <Text style={themed($label)}>프로필 완성도:</Text>
             <View style={themed($completionContainer)}>
-              <Text style={themed($completionValue)}>{getProfileCompletionData().percentage}%</Text>
+              <Text style={themed($completionValue)}>{profileCompletionData.percentage}%</Text>
               <Text style={themed($completionHint)}>📊 탭하여 상세보기</Text>
             </View>
           </TouchableOpacity>
@@ -321,7 +410,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
           />
           
           <Button
-            text="계정 삭제"
+            text="회원 탈퇴"
             onPress={handleDeleteAccount}
             preset="filled"
             style={themed($deleteButton)}

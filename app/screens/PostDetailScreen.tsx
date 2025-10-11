@@ -498,18 +498,225 @@ export const PostDetailScreen = () => {
         {post.audition && (
           <View style={themed($section)}>
             <Text preset="subheading" text="오디션 정보" style={themed($sectionTitle)} />
-            <Text text={`일정: ${post.audition.date}`} style={themed($infoText)} />
-            <Text text={`장소: ${post.audition.location}`} style={themed($infoText)} />
-            <Text text={`방식: ${post.audition.method}`} style={themed($infoText)} />
+            <View style={themed($auditionCard)}>
+              <View style={themed($auditionInfoRow)}>
+                <Text text="📅" style={themed($infoIcon)} />
+                <Text text={`일정: ${post.audition.date}`} style={themed($infoText)} />
+              </View>
+              <View style={themed($auditionInfoRow)}>
+                <Text text="📍" style={themed($infoIcon)} />
+                <Text text={`장소: ${post.audition.location}`} style={themed($infoText)} />
+              </View>
+              <View style={themed($auditionInfoRow)}>
+                <Text text="💻" style={themed($infoIcon)} />
+                <Text text={`방식: ${post.audition.method}`} style={themed($infoText)} />
+              </View>
+              {post.audition.resultDate && (
+                <View style={themed($auditionInfoRow)}>
+                  <Text text="🗓️" style={themed($infoIcon)} />
+                  <Text text={`결과 발표: ${post.audition.resultDate}`} style={themed($infoText)} />
+                </View>
+              )}
+              {post.audition.requirements && post.audition.requirements.length > 0 && (
+                <View style={themed($preparationSection)}>
+                  <Text text="📋 준비사항" style={themed($preparationTitle)} />
+                  {post.audition.requirements.map((requirement, index) => (
+                    <View key={index} style={themed($preparationItem)}>
+                      <Text text="•" style={themed($bulletPoint)} />
+                      <Text text={requirement} style={themed($preparationText)} />
+                    </View>
+                  ))}
+                </View>
+              )}
+            </View>
+          </View>
+        )}
+
+        {/* 공연 정보 */}
+        {post.performance && (
+          <View style={themed($section)}>
+            <Text preset="subheading" text="공연 정보" style={themed($sectionTitle)} />
+            <View style={themed($performanceCard)}>
+              {post.performance.dates && post.performance.dates.length > 0 && (
+                <View style={themed($performanceInfoRow)}>
+                  <Text text="🎭" style={themed($infoIcon)} />
+                  <View style={themed($performanceDetails)}>
+                    <Text text="공연 일정" style={themed($performanceLabel)} />
+                    {post.performance.dates.map((date, index) => (
+                      <Text key={index} text={`• ${date}`} style={themed($performanceDate)} />
+                    ))}
+                  </View>
+                </View>
+              )}
+              {post.performance.venue && (
+                <View style={themed($performanceInfoRow)}>
+                  <Text text="🏛️" style={themed($infoIcon)} />
+                  <View style={themed($performanceDetails)}>
+                    <Text text="공연 장소" style={themed($performanceLabel)} />
+                    <Text text={post.performance.venue} style={themed($performanceText)} />
+                  </View>
+                </View>
+              )}
+              {post.performance.ticketPrice && (
+                <View style={themed($performanceInfoRow)}>
+                  <Text text="🎫" style={themed($infoIcon)} />
+                  <View style={themed($performanceDetails)}>
+                    <Text text="티켓 가격" style={themed($performanceLabel)} />
+                    <Text text={post.performance.ticketPrice} style={themed($performanceText)} />
+                  </View>
+                </View>
+              )}
+              {post.performance.targetAudience && (
+                <View style={themed($performanceInfoRow)}>
+                  <Text text="👥" style={themed($infoIcon)} />
+                  <View style={themed($performanceDetails)}>
+                    <Text text="관객 대상" style={themed($performanceLabel)} />
+                    <Text text={post.performance.targetAudience} style={themed($performanceText)} />
+                  </View>
+                </View>
+              )}
+              {post.performance.genre && (
+                <View style={themed($performanceInfoRow)}>
+                  <Text text="🎨" style={themed($infoIcon)} />
+                  <View style={themed($performanceDetails)}>
+                    <Text text="장르" style={themed($performanceLabel)} />
+                    <Text text={post.performance.genre} style={themed($performanceText)} />
+                  </View>
+                </View>
+              )}
+            </View>
+          </View>
+        )}
+
+        {/* 혜택 정보 */}
+        {post.benefits && (
+          <View style={themed($section)}>
+            <Text preset="subheading" text="혜택 정보" style={themed($sectionTitle)} />
+            <View style={themed($benefitsCard)}>
+              {post.benefits.fee && (
+                <View style={themed($benefitRow)}>
+                  <Text text="💰" style={themed($benefitIcon)} />
+                  <View style={themed($benefitContent)}>
+                    <Text text="출연료/활동비" style={themed($benefitLabel)} />
+                    <Text text={post.benefits.fee} style={themed($benefitValue)} />
+                  </View>
+                </View>
+              )}
+              
+              {/* 제공 혜택들 */}
+              <View style={themed($providedBenefits)}>
+                <Text text="🎁 제공 혜택" style={themed($benefitSectionTitle)} />
+                <View style={themed($benefitsList)}>
+                  {post.benefits.transportation && (
+                    <View style={themed($benefitItem)}>
+                      <Text text="✅ 🚗 교통비 지원" style={themed($benefitItemText)} />
+                    </View>
+                  )}
+                  {post.benefits.costume && (
+                    <View style={themed($benefitItem)}>
+                      <Text text="✅ 👗 의상 제공" style={themed($benefitItemText)} />
+                    </View>
+                  )}
+                  {post.benefits.portfolio && (
+                    <View style={themed($benefitItem)}>
+                      <Text text="✅ 📸 포트폴리오 제공" style={themed($benefitItemText)} />
+                    </View>
+                  )}
+                  {post.benefits.photography && (
+                    <View style={themed($benefitItem)}>
+                      <Text text="✅ 📷 프로필 촬영" style={themed($benefitItemText)} />
+                    </View>
+                  )}
+                  {post.benefits.meals && (
+                    <View style={themed($benefitItem)}>
+                      <Text text="✅ 🍽️ 식사 제공" style={themed($benefitItemText)} />
+                    </View>
+                  )}
+                </View>
+              </View>
+
+              {/* 기타 혜택 */}
+              {post.benefits.other && post.benefits.other.length > 0 && (
+                <View style={themed($otherBenefits)}>
+                  <Text text="🌟 기타 혜택" style={themed($benefitSectionTitle)} />
+                  {post.benefits.other.map((benefit, index) => (
+                    <View key={index} style={themed($benefitItem)}>
+                      <Text text="•" style={themed($bulletPoint)} />
+                      <Text text={benefit} style={themed($otherBenefitText)} />
+                    </View>
+                  ))}
+                </View>
+              )}
+            </View>
           </View>
         )}
 
         {/* 연락처 */}
         {post.contact && (
           <View style={themed($section)}>
-            <Text preset="subheading" text="연락처" style={themed($sectionTitle)} />
-            <Text text={post.contact.email} style={themed($contactText) as any} />
-            {post.contact.phone && <Text text={post.contact.phone} style={themed($infoText)} />}
+            <Text preset="subheading" text="연락처 정보" style={themed($sectionTitle)} />
+            <View style={themed($contactCard)}>
+              <View style={themed($contactRow)}>
+                <Text text="📧" style={themed($contactIcon)} />
+                <View style={themed($contactContent)}>
+                  <Text text="담당자 이메일" style={themed($contactLabel)} />
+                  <Text text={post.contact.email} style={themed($contactText) as any} />
+                </View>
+              </View>
+              
+              {post.contact.phone && (
+                <View style={themed($contactRow)}>
+                  <Text text="📞" style={themed($contactIcon)} />
+                  <View style={themed($contactContent)}>
+                    <Text text="연락처" style={themed($contactLabel)} />
+                    <Text text={post.contact.phone} style={themed($contactValue)} />
+                  </View>
+                </View>
+              )}
+
+              {post.contact.applicationMethod && (
+                <View style={themed($contactRow)}>
+                  <Text text="📝" style={themed($contactIcon)} />
+                  <View style={themed($contactContent)}>
+                    <Text text="지원 방법" style={themed($contactLabel)} />
+                    <Text text={post.contact.applicationMethod} style={themed($contactValue)} />
+                  </View>
+                </View>
+              )}
+
+              {post.contact.requiredDocuments && post.contact.requiredDocuments.length > 0 && (
+                <View style={themed($documentsSection)}>
+                  <View style={themed($contactRow)}>
+                    <Text text="📄" style={themed($contactIcon)} />
+                    <View style={themed($contactContent)}>
+                      <Text text="제출 서류" style={themed($contactLabel)} />
+                      <View style={themed($documentsList)}>
+                        {post.contact.requiredDocuments.map((document, index) => (
+                          <View key={index} style={themed($documentItem)}>
+                            <Text text="•" style={themed($bulletPoint)} />
+                            <Text text={document} style={themed($documentText)} />
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              )}
+            </View>
+          </View>
+        )}
+
+        {/* 태그 정보 */}
+        {post.tags && post.tags.length > 0 && (
+          <View style={themed($section)}>
+            <Text preset="subheading" text="태그" style={themed($sectionTitle)} />
+            <View style={themed($tagsContainer)}>
+              {post.tags.map((tag, index) => (
+                <View key={index} style={themed($tag)}>
+                  <Text text={tag} style={themed($tagText)} />
+                </View>
+              ))}
+            </View>
           </View>
         )}
 
@@ -1301,5 +1508,259 @@ const $withdrawButtonText = ({ colors, typography }) => ({
   color: colors.palette.neutral100,
   fontSize: 14,
   lineHeight: 20,
+  fontFamily: typography.primary.medium,
+})
+
+// 오디션 정보 스타일들
+const $auditionCard = ({ colors, spacing }) => ({
+  backgroundColor: colors.palette.neutral50,
+  borderRadius: 12,
+  padding: spacing?.md || 12,
+  borderLeftWidth: 4,
+  borderLeftColor: colors.palette.primary500,
+})
+
+const $auditionInfoRow = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  alignItems: "center" as const,
+  marginBottom: spacing?.sm || 8,
+})
+
+const $preparationSection = ({ spacing }) => ({
+  marginTop: spacing?.md || 12,
+  paddingTop: spacing?.sm || 8,
+  borderTopWidth: 1,
+  borderTopColor: "rgba(0,0,0,0.1)",
+})
+
+const $preparationTitle = ({ colors, typography, spacing }) => ({
+  fontSize: 14,
+  fontFamily: typography.primary.medium,
+  color: colors.text,
+  marginBottom: spacing?.xs || 4,
+})
+
+const $preparationItem = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  alignItems: "flex-start" as const,
+  marginBottom: spacing?.xs || 4,
+})
+
+const $preparationText = ({ colors, typography }) => ({
+  fontSize: 14,
+  fontFamily: typography.primary.normal,
+  color: colors.text,
+  flex: 1,
+  marginLeft: 8,
+})
+
+const $bulletPoint = ({ colors }) => ({
+  fontSize: 14,
+  color: colors.text,
+  marginRight: 4,
+})
+
+// 공연 정보 스타일들
+const $performanceCard = ({ colors, spacing }) => ({
+  backgroundColor: colors.palette.secondary50 || colors.palette.neutral50,
+  borderRadius: 12,
+  padding: spacing?.md || 12,
+  borderLeftWidth: 4,
+  borderLeftColor: colors.palette.secondary500 || colors.tint,
+})
+
+const $performanceInfoRow = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  alignItems: "flex-start" as const,
+  marginBottom: spacing?.md || 12,
+})
+
+const $performanceDetails = {
+  flex: 1,
+  marginLeft: 8,
+}
+
+const $performanceLabel = ({ colors, typography, spacing }) => ({
+  fontSize: 14,
+  fontFamily: typography.primary.medium,
+  color: colors.text,
+  marginBottom: spacing?.xs || 4,
+})
+
+const $performanceText = ({ colors, typography }) => ({
+  fontSize: 14,
+  fontFamily: typography.primary.normal,
+  color: colors.text,
+})
+
+const $performanceDate = ({ colors, typography, spacing }) => ({
+  fontSize: 14,
+  fontFamily: typography.primary.normal,
+  color: colors.text,
+  marginBottom: spacing?.xs || 4,
+})
+
+// 혜택 정보 스타일들
+const $benefitsCard = ({ colors, spacing }) => ({
+  backgroundColor: colors.palette.primary50 || colors.palette.neutral50,
+  borderRadius: 12,
+  padding: spacing?.md || 12,
+  borderLeftWidth: 4,
+  borderLeftColor: colors.palette.primary500,
+})
+
+const $benefitRow = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  alignItems: "center" as const,
+  marginBottom: spacing?.md || 12,
+})
+
+const $benefitIcon = {
+  fontSize: 20,
+  marginRight: 12,
+}
+
+const $benefitContent = {
+  flex: 1,
+}
+
+const $benefitLabel = ({ colors, typography, spacing }) => ({
+  fontSize: 14,
+  fontFamily: typography.primary.medium,
+  color: colors.text,
+  marginBottom: spacing?.xs || 4,
+})
+
+const $benefitValue = ({ colors, typography }) => ({
+  fontSize: 16,
+  fontFamily: typography.primary.normal,
+  color: colors.palette.primary600,
+  fontWeight: "600" as const,
+})
+
+const $providedBenefits = ({ spacing }) => ({
+  marginTop: spacing?.sm || 8,
+  paddingTop: spacing?.sm || 8,
+  borderTopWidth: 1,
+  borderTopColor: "rgba(0,0,0,0.1)",
+})
+
+const $benefitSectionTitle = ({ colors, typography, spacing }) => ({
+  fontSize: 14,
+  fontFamily: typography.primary.medium,
+  color: colors.text,
+  marginBottom: spacing?.sm || 8,
+})
+
+const $benefitsList = ({ spacing }) => ({
+  marginBottom: spacing?.sm || 8,
+})
+
+const $benefitItem = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  alignItems: "center" as const,
+  marginBottom: spacing?.xs || 4,
+})
+
+const $benefitItemText = ({ colors, typography }) => ({
+  fontSize: 14,
+  fontFamily: typography.primary.normal,
+  color: colors.text,
+})
+
+const $otherBenefits = ({ spacing }) => ({
+  marginTop: spacing?.sm || 8,
+  paddingTop: spacing?.sm || 8,
+  borderTopWidth: 1,
+  borderTopColor: "rgba(0,0,0,0.1)",
+})
+
+const $otherBenefitText = ({ colors, typography }) => ({
+  fontSize: 14,
+  fontFamily: typography.primary.normal,
+  color: colors.text,
+  marginLeft: 8,
+  flex: 1,
+})
+
+// 연락처 정보 스타일들
+const $contactCard = ({ colors, spacing }) => ({
+  backgroundColor: colors.palette.neutral50,
+  borderRadius: 12,
+  padding: spacing?.md || 12,
+  borderLeftWidth: 4,
+  borderLeftColor: colors.palette.secondary500 || colors.tint,
+})
+
+const $contactRow = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  alignItems: "flex-start" as const,
+  marginBottom: spacing?.md || 12,
+})
+
+const $contactIcon = {
+  fontSize: 18,
+  marginRight: 12,
+  marginTop: 2,
+}
+
+const $contactContent = {
+  flex: 1,
+}
+
+const $contactLabel = ({ colors, typography, spacing }) => ({
+  fontSize: 14,
+  fontFamily: typography.primary.medium,
+  color: colors.text,
+  marginBottom: spacing?.xs || 4,
+})
+
+const $contactValue = ({ colors, typography }) => ({
+  fontSize: 14,
+  fontFamily: typography.primary.normal,
+  color: colors.text,
+})
+
+const $documentsSection = ({ spacing }) => ({
+  marginTop: spacing?.xs || 4,
+})
+
+const $documentsList = ({ spacing }) => ({
+  marginTop: spacing?.xs || 4,
+})
+
+const $documentItem = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  alignItems: "flex-start" as const,
+  marginBottom: spacing?.xs || 4,
+})
+
+const $documentText = ({ colors, typography }) => ({
+  fontSize: 14,
+  fontFamily: typography.primary.normal,
+  color: colors.text,
+  marginLeft: 8,
+  flex: 1,
+})
+
+// 태그 스타일들 (PostCard에서 가져옴)
+const $tagsContainer = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  flexWrap: "wrap" as const,
+  marginTop: spacing?.xs || 4,
+})
+
+const $tag = ({ colors, spacing }) => ({
+  backgroundColor: colors.palette.primary100,
+  paddingHorizontal: spacing?.sm || 8,
+  paddingVertical: spacing?.xs || 4,
+  borderRadius: 16,
+  marginRight: spacing?.xs || 4,
+  marginBottom: spacing?.xs || 4,
+})
+
+const $tagText = ({ colors, typography }) => ({
+  color: colors.palette.primary600,
+  fontSize: 12,
   fontFamily: typography.primary.medium,
 })

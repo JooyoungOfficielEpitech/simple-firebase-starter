@@ -17,6 +17,7 @@ import { EditProfileScreen } from "@/screens/EditProfileScreen"
 import { NotificationCenterScreen } from "@/screens/NotificationCenterScreen"
 import { PostDetailScreen } from "@/screens/PostDetailScreen"
 import { ApplicationManagementScreen } from "@/screens/ApplicationManagementScreen"
+import { CreateOrganizationScreen } from "@/screens/CreateOrganizationScreen"
 import { SignInScreen } from "@/screens/SignInScreen"
 import { SignUpScreen } from "@/screens/SignUpScreen"
 import { useAppTheme } from "@/theme/context"
@@ -44,6 +45,7 @@ export type AppStackParamList = {
   NotificationCenter: undefined
   PostDetail: { postId: string }
   ApplicationManagement: { postId: string; postTitle: string }
+  CreateOrganization: { organizationId?: string; isEdit?: boolean; isOrganizerConversion?: boolean }
 }
 
 /**
@@ -119,6 +121,13 @@ const AppStack = () => {
           <Stack.Screen 
             name="ApplicationManagement" 
             component={ApplicationManagementScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen 
+            name="CreateOrganization" 
+            component={CreateOrganizationScreen}
             options={{
               headerShown: false,
             }}

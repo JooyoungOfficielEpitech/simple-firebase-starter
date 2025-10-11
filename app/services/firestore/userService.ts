@@ -1,5 +1,6 @@
 import auth from "@react-native-firebase/auth"
 import firestore, { FirebaseFirestoreTypes } from "@react-native-firebase/firestore"
+import { collection, doc, getDoc, setDoc, updateDoc, serverTimestamp, deleteField, query, where, getDocs } from "@react-native-firebase/firestore"
 
 import { translate } from "@/i18n/translate"
 import {
@@ -33,7 +34,7 @@ export class UserService {
    * 서버 타임스탬프 생성
    */
   private getServerTimestamp(): FirebaseFirestoreTypes.FieldValue {
-    return firestore.FieldValue.serverTimestamp()
+    return serverTimestamp()
   }
 
   /**
@@ -75,7 +76,8 @@ export class UserService {
       }
     }
 
-    await this.db.collection("users").doc(userId).set(profile)
+    const userRef = doc(this.db, "users", userId)
+    await setDoc(userRef, profile)
   }
 
   /**
@@ -84,13 +86,14 @@ export class UserService {
   async getUserProfile(userId?: string): Promise<UserProfile | null> {
     const targetUserId = userId || this.getCurrentUserId()
 
-    const doc = await this.db.collection("users").doc(targetUserId).get()
+    const userRef = doc(this.db, "users", targetUserId)
+    const docSnap = await getDoc(userRef)
 
-    if (!doc.exists) {
+    if (!docSnap.exists()) {
       return null
     }
 
-    const profile = doc.data() as UserProfile
+    const profile = docSnap.data() as UserProfile
     
     // 디버깅: 프로필 데이터 로그
     console.log("🔍 [UserService] 프로필 조회 결과:", {
@@ -115,7 +118,8 @@ export class UserService {
     if (profile.requiredProfileComplete !== calculatedComplete) {
       console.log("🔄 [UserService] requiredProfileComplete 불일치, 업데이트 중...")
       try {
-        await this.db.collection("users").doc(targetUserId).update({
+        const userRef = doc(this.db, "users", targetUserId)
+        await updateDoc(userRef, {
           requiredProfileComplete: calculatedComplete,
           updatedAt: this.getServerTimestamp()
         })
@@ -182,7 +186,7 @@ export class UserService {
       updatedAt: this.getServerTimestamp(),
     }
 
-    const docRef = this.db.collection("users").doc(userId)
+    const docRef = doc(this.db, "users", userId)
 
     if (!currentProfile) {
       // Create the full document with allowed fields only
@@ -220,11 +224,11 @@ export class UserService {
         newDoc.hasBeenOrganizer = updatedProfile.hasBeenOrganizer
       }
 
-      await docRef.set(newDoc)
+      await setDoc(docRef, newDoc)
       return
     }
 
-    await docRef.update(commonPayload)
+    await updateDoc(docRef, commonPayload)
   }
 
   /**
@@ -232,15 +236,15 @@ export class UserService {
    */
   async revertToGeneralUser(): Promise<void> {
     const userId = this.getCurrentUserId()
-    const docRef = this.db.collection("users").doc(userId)
+    const docRef = doc(this.db, "users", userId)
 
     // 현재 단체 정보를 이전 단체 정보로 저장
     const currentProfile = await this.getUserProfile(userId)
     
     const updateData: any = {
       userType: "general",
-      organizationId: firestore.FieldValue.delete(),
-      organizationName: firestore.FieldValue.delete(),
+      organizationId: deleteField(),
+      organizationName: deleteField(),
       updatedAt: this.getServerTimestamp(),
     }
 
@@ -250,7 +254,7 @@ export class UserService {
       updateData.hasBeenOrganizer = true
     }
 
-    await docRef.update(updateData)
+    await updateDoc(docRef, updateData)
   }
 
   /**
@@ -259,16 +263,152 @@ export class UserService {
   async isUserOwnerOfOrganization(userId: string, organizationName: string): Promise<boolean> {
     try {
       // Organizations 컬렉션에서 해당 단체 조회
-      const organizationsSnapshot = await this.db
-        .collection("organizations")
-        .where("name", "==", organizationName)
-        .where("ownerId", "==", userId)
-        .get()
+      const q = query(
+        collection(this.db, "organizations"),
+        where("name", "==", organizationName),
+        where("ownerId", "==", userId)
+      )
+      const organizationsSnapshot = await getDocs(q)
 
       return !organizationsSnapshot.empty
     } catch (error) {
       console.error("단체 소유자 확인 오류:", error)
       return false
+    }
+  }
+
+  /**
+   * 사용자가 이미 단체를 소유하고 있는지 확인
+   */
+  async hasOwnedOrganization(): Promise<boolean> {
+    const userId = this.getCurrentUserId()
+    
+    try {
+      const organizationsSnapshot = await this.db
+        .collection("organizations")
+        .where("ownerId", "==", userId)
+        .get()
+      
+      return !organizationsSnapshot.empty
+    } catch (error) {
+      console.error("단체 소유 확인 오류:", error)
+      return false
+    }
+  }
+
+  /**
+   * 운영자 전환과 동시에 단체 생성 (1회 제한)
+   */
+  async convertToOrganizerWithOrganization(orgData: {
+    name: string
+    description: string
+    contactEmail: string
+    contactPhone?: string
+    website?: string
+    location: string
+    establishedDate?: string
+    tags?: string[]
+    // 소셜 미디어 링크
+    instagramUrl?: string
+    youtubeUrl?: string
+    facebookUrl?: string
+    twitterUrl?: string
+    // 추가 상세 정보
+    foundingStory?: string
+    vision?: string
+    specialties?: string[]
+    pastWorks?: string[]
+    facilities?: string
+    recruitmentInfo?: string
+  }): Promise<{ success: boolean; organizationId?: string; error?: string }> {
+    const userId = this.getCurrentUserId()
+    const user = auth().currentUser
+    
+    if (!user) {
+      return { success: false, error: "사용자 정보를 찾을 수 없습니다." }
+    }
+
+    try {
+      // 1. 이미 단체를 소유하고 있는지 확인
+      const hasOrganization = await this.hasOwnedOrganization()
+      if (hasOrganization) {
+        return { success: false, error: "이미 단체를 소유하고 있습니다. 계정당 하나의 단체만 소유할 수 있습니다." }
+      }
+
+      // 2. 현재 사용자 프로필 확인
+      const userProfile = await this.getUserProfile(userId)
+      if (!userProfile) {
+        return { success: false, error: "사용자 프로필을 찾을 수 없습니다." }
+      }
+
+      // 3. 단체명 중복 검증
+      const organizationService = await import("./organizationService")
+      const orgServiceInstance = new organizationService.OrganizationService(this.db)
+      await orgServiceInstance.validateUniqueOrganizationName(orgData.name)
+
+      // 4. 트랜잭션으로 사용자 프로필 업데이트와 단체 생성을 동시에 처리
+      const organizationId = await this.db.runTransaction(async (transaction) => {
+        // 단체 문서 생성
+        const orgRef = this.db.collection("organizations").doc()
+        const organization = {
+          name: orgData.name,
+          description: orgData.description,
+          contactEmail: orgData.contactEmail,
+          contactPhone: orgData.contactPhone || "",
+          website: orgData.website || "",
+          location: orgData.location,
+          establishedDate: orgData.establishedDate || "",
+          tags: orgData.tags || [],
+          // 소셜 미디어 링크
+          instagramUrl: orgData.instagramUrl || "",
+          youtubeUrl: orgData.youtubeUrl || "",
+          facebookUrl: orgData.facebookUrl || "",
+          twitterUrl: orgData.twitterUrl || "",
+          // 추가 상세 정보
+          foundingStory: orgData.foundingStory || "",
+          vision: orgData.vision || "",
+          specialties: orgData.specialties || [],
+          pastWorks: orgData.pastWorks || [],
+          facilities: orgData.facilities || "",
+          recruitmentInfo: orgData.recruitmentInfo || "",
+          // 기존 필드
+          logoUrl: null,
+          isVerified: false,
+          ownerId: userId,
+          ownerName: userProfile.name,
+          memberCount: 1,
+          activePostCount: 0,
+          createdAt: this.getServerTimestamp(),
+          updatedAt: this.getServerTimestamp(),
+        }
+
+        // 사용자 프로필 업데이트
+        const userRef = this.db.collection("users").doc(userId)
+        const userUpdate = {
+          userType: "organizer" as const,
+          organizationId: orgRef.id,
+          organizationName: orgData.name,
+          hasBeenOrganizer: true,
+          updatedAt: this.getServerTimestamp(),
+        }
+
+        transaction.set(orgRef, organization)
+        transaction.update(userRef, userUpdate)
+
+        return orgRef.id
+      })
+
+      return { 
+        success: true, 
+        organizationId 
+      }
+
+    } catch (error) {
+      console.error("운영자 전환 및 단체 생성 오류:", error)
+      return { 
+        success: false, 
+        error: error.message || "운영자 전환에 실패했습니다." 
+      }
     }
   }
 
@@ -359,12 +499,119 @@ export class UserService {
   // Removed unused complex queries and status flags for MVP scope.
 
   /**
+   * 사용자 재인증 (계정 삭제 전 필수)
+   */
+  async reauthenticateUser(password: string): Promise<void> {
+    const user = auth().currentUser
+    if (!user || !user.email) {
+      throw new Error(translate("matching:errors.userNotFound"))
+    }
+
+    try {
+      const credential = auth.EmailAuthProvider.credential(user.email, password)
+      await user.reauthenticateWithCredential(credential)
+      console.log("✅ [UserService] 사용자 재인증 성공")
+    } catch (error) {
+      console.error("❌ [UserService] 재인증 실패:", error)
+      if (error.code === 'auth/wrong-password') {
+        throw new Error("비밀번호가 올바르지 않습니다.")
+      } else if (error.code === 'auth/too-many-requests') {
+        throw new Error("너무 많은 시도가 있었습니다. 잠시 후 다시 시도해주세요.")
+      } else {
+        throw new Error("재인증에 실패했습니다. 다시 시도해주세요.")
+      }
+    }
+  }
+
+  /**
+   * 완전한 계정 삭제 - 모든 사용자 데이터 삭제 (Firebase Auth 제외)
+   */
+  async deleteUserAccount(): Promise<void> {
+    const userId = this.getCurrentUserId()
+
+    try {
+      // 트랜잭션으로 안전하게 Firestore 데이터 삭제
+      await this.db.runTransaction(async (transaction) => {
+        // 1. 사용자가 작성한 게시글 삭제
+        const postsQuery = query(
+          collection(this.db, "posts"),
+          where("authorId", "==", userId)
+        )
+        const postsSnapshot = await getDocs(postsQuery)
+        
+        // 각 게시글과 관련 지원서들 삭제
+        for (const postDoc of postsSnapshot.docs) {
+          const postId = postDoc.id
+          
+          // 해당 게시글의 지원서들 삭제
+          const applicationsQuery = query(
+            collection(this.db, "applications"),
+            where("postId", "==", postId)
+          )
+          const applicationsSnapshot = await getDocs(applicationsQuery)
+          
+          for (const appDoc of applicationsSnapshot.docs) {
+            transaction.delete(doc(this.db, "applications", appDoc.id))
+          }
+          
+          // 게시글 삭제
+          transaction.delete(doc(this.db, "posts", postId))
+        }
+
+        // 2. 사용자가 제출한 지원서 삭제
+        const userApplicationsQuery = query(
+          collection(this.db, "applications"),
+          where("applicantId", "==", userId)
+        )
+        const userApplicationsSnapshot = await getDocs(userApplicationsQuery)
+        
+        for (const appDoc of userApplicationsSnapshot.docs) {
+          transaction.delete(doc(this.db, "applications", appDoc.id))
+        }
+
+        // 3. 사용자 관련 알림 삭제
+        const notificationsQuery = query(
+          collection(this.db, "notifications"),
+          where("userId", "==", userId)
+        )
+        const notificationsSnapshot = await getDocs(notificationsQuery)
+        
+        for (const notificationDoc of notificationsSnapshot.docs) {
+          transaction.delete(doc(this.db, "notifications", notificationDoc.id))
+        }
+
+        // 4. 단체 소유자인 경우 단체 삭제
+        const organizationsQuery = query(
+          collection(this.db, "organizations"),
+          where("ownerId", "==", userId)
+        )
+        const organizationsSnapshot = await getDocs(organizationsQuery)
+        
+        for (const orgDoc of organizationsSnapshot.docs) {
+          transaction.delete(doc(this.db, "organizations", orgDoc.id))
+        }
+
+        // 5. 사용자 프로필 완전 삭제
+        transaction.delete(doc(this.db, "users", userId))
+      })
+
+      console.log("✅ [UserService] 모든 사용자 데이터 삭제 완료:", userId)
+      
+    } catch (error) {
+      console.error("❌ [UserService] 데이터 삭제 실패:", error)
+      throw new Error("사용자 데이터 삭제 중 오류가 발생했습니다.")
+    }
+  }
+
+  /**
+   * @deprecated 완전한 삭제를 위해 deleteUserAccount() 사용
    * 사용자 프로필 삭제 (소프트 삭제)
    */
   async deleteUserProfile(): Promise<void> {
     const userId = this.getCurrentUserId()
 
-    await this.db.collection("users").doc(userId).update({
+    const userRef = doc(this.db, "users", userId)
+    await updateDoc(userRef, {
       isDeleted: true,
       status: "offline",
       isOnline: false,
@@ -376,7 +623,8 @@ export class UserService {
    * 사용자 차단
    */
   async blockUser(targetUserId: string): Promise<void> {
-    await this.db.collection("users").doc(targetUserId).update({
+    const userRef = doc(this.db, "users", targetUserId)
+    await updateDoc(userRef, {
       isBlocked: true,
       status: "offline",
       isOnline: false,
@@ -388,7 +636,8 @@ export class UserService {
    * 사용자 차단 해제
    */
   async unblockUser(targetUserId: string): Promise<void> {
-    await this.db.collection("users").doc(targetUserId).update({
+    const userRef = doc(this.db, "users", targetUserId)
+    await updateDoc(userRef, {
       isBlocked: false,
       status: "available",
       isOnline: true,

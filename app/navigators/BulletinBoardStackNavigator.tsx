@@ -15,7 +15,7 @@ export type BulletinBoardStackParamList = {
   BulletinBoardMain: undefined
   PostDetail: { postId: string }
   CreatePost: { postId?: string; isEdit?: boolean }
-  CreateOrganization: { organizationId?: string; isEdit?: boolean }
+  CreateOrganization: { organizationId?: string; isEdit?: boolean; isOrganizerConversion?: boolean }
   ApplicationManagement: { postId: string; postTitle: string }
 }
 

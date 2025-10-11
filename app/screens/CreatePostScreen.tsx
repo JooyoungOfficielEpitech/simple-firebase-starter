@@ -36,7 +36,6 @@ export const CreatePostScreen = () => {
   const [loading, setLoading] = useState(false)
   const [showTemplateModal, setShowTemplateModal] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<PostTemplate | null>(null)
-  const [showPreview, setShowPreview] = useState(false)
   const [showDeadlinePicker, setShowDeadlinePicker] = useState(false)
   const [showAuditionDatePicker, setShowAuditionDatePicker] = useState(false)
   const [showAuditionResultPicker, setShowAuditionResultPicker] = useState(false)
@@ -434,23 +433,38 @@ export const CreatePostScreen = () => {
 
   // 날짜 변경 핸들러들
   const handleDeadlineChange = (event: any, selectedDate?: Date) => {
-    setShowDeadlinePicker(Platform.OS === 'ios')
+    if (Platform.OS === 'android') {
+      setShowDeadlinePicker(false)
+    }
     if (selectedDate) {
       updateFormData("deadline", formatDate(selectedDate))
+      if (Platform.OS === 'ios') {
+        setShowDeadlinePicker(false)
+      }
     }
   }
 
   const handleAuditionDateChange = (event: any, selectedDate?: Date) => {
-    setShowAuditionDatePicker(Platform.OS === 'ios')
+    if (Platform.OS === 'android') {
+      setShowAuditionDatePicker(false)
+    }
     if (selectedDate) {
       updateFormData("auditionDate", formatDate(selectedDate))
+      if (Platform.OS === 'ios') {
+        setShowAuditionDatePicker(false)
+      }
     }
   }
 
   const handleAuditionResultChange = (event: any, selectedDate?: Date) => {
-    setShowAuditionResultPicker(Platform.OS === 'ios')
+    if (Platform.OS === 'android') {
+      setShowAuditionResultPicker(false)
+    }
     if (selectedDate) {
       updateFormData("auditionResultDate", formatDate(selectedDate))
+      if (Platform.OS === 'ios') {
+        setShowAuditionResultPicker(false)
+      }
     }
   }
 
@@ -605,16 +619,6 @@ export const CreatePostScreen = () => {
         <View style={themed($progressSection)}>
           <View style={themed($progressHeader)}>
             <Text text={`📊 작성 진행률: ${calculateCompleteness()}%`} style={themed($progressTitle)} />
-            <TouchableOpacity 
-              style={themed($previewButton)}
-              onPress={() => setShowPreview(true)}
-              activeOpacity={0.7}
-              accessibilityRole="button"
-              accessibilityLabel="미리보기"
-              accessibilityHint="작성 중인 게시글을 미리 볼 수 있습니다"
-            >
-              <Text text="👀 미리보기" style={themed($previewButtonText)} />
-            </TouchableOpacity>
           </View>
           
           <View style={themed($progressBarContainer)}>
@@ -749,7 +753,38 @@ export const CreatePostScreen = () => {
               <Text text="📅" style={themed($dateIcon)} />
             </TouchableOpacity>
             
-            {showDeadlinePicker && (
+{/* 마감일 선택 모달 */}
+            {showDeadlinePicker && Platform.OS === 'ios' && (
+              <Modal transparent animationType="slide">
+                <TouchableOpacity 
+                  style={themed($dateModalOverlay)}
+                  activeOpacity={1}
+                  onPress={() => setShowDeadlinePicker(false)}
+                >
+                  <View style={themed($dateModalContainer)}>
+                    <View style={themed($dateModalHeader)}>
+                      <TouchableOpacity onPress={() => setShowDeadlinePicker(false)}>
+                        <Text text="취소" style={themed($dateModalCancelText)} />
+                      </TouchableOpacity>
+                      <Text text="마감일 선택" style={themed($dateModalTitle)} />
+                      <TouchableOpacity onPress={() => setShowDeadlinePicker(false)}>
+                        <Text text="완료" style={themed($dateModalDoneText)} />
+                      </TouchableOpacity>
+                    </View>
+                    <DateTimePicker
+                      value={parseDate(formData.deadline)}
+                      mode="date"
+                      display="spinner"
+                      onChange={handleDeadlineChange}
+                      minimumDate={new Date()}
+                      style={themed($datePicker)}
+                    />
+                  </View>
+                </TouchableOpacity>
+              </Modal>
+            )}
+            
+            {showDeadlinePicker && Platform.OS === 'android' && (
               <DateTimePicker
                 value={parseDate(formData.deadline)}
                 mode="date"
@@ -780,46 +815,44 @@ export const CreatePostScreen = () => {
             />
           </View>
 
-          <View style={themed($twoColumnRow)}>
-            <View style={[themed($inputSection), themed($halfWidth)]}>
-              <Text text="성별 조건" style={themed($label) as any} />
-              <TouchableOpacity 
-                style={themed($dropdownButton)} 
-                onPress={() => {
-                  const genders = ["any", "male", "female"]
-                  const currentIndex = genders.indexOf(formData.roles[0]?.gender || "any")
-                  const nextIndex = (currentIndex + 1) % genders.length
-                  const newRoles = [...formData.roles]
-                  newRoles[0] = { ...newRoles[0], gender: genders[nextIndex] as any }
-                  setFormData(prev => ({ ...prev, roles: newRoles }))
-                }}
-                accessibilityRole="button"
-                accessibilityLabel="성별 조건 선택"
-                accessibilityHint="모집하는 역할의 성별 조건을 변경합니다"
-              >
-                <Text 
-                  text={formData.roles[0]?.gender === "male" ? "남성" : 
-                        formData.roles[0]?.gender === "female" ? "여성" : "무관"} 
-                  style={themed($dropdownText)} 
-                />
-                <Text text="▼" style={themed($dropdownArrow)} />
-              </TouchableOpacity>
-            </View>
-            
-            <View style={[themed($inputSection), themed($halfWidth)]}>
-              <Text text="나이 조건" style={themed($label) as any} />
-              <TextInput
-                style={themed($textInput)}
-                value={formData.roles[0]?.ageRange || ""}
-                onChangeText={(text) => {
-                  const newRoles = [...formData.roles]
-                  newRoles[0] = { ...newRoles[0], ageRange: text }
-                  setFormData(prev => ({ ...prev, roles: newRoles }))
-                }}
-                placeholder="예: 20-40세"
-                placeholderTextColor={colors.textDim}
+          <View style={themed($inputSection)}>
+            <Text text="성별 조건" style={themed($label) as any} />
+            <TouchableOpacity 
+              style={themed($dropdownButton)} 
+              onPress={() => {
+                const genders = ["any", "male", "female"]
+                const currentIndex = genders.indexOf(formData.roles[0]?.gender || "any")
+                const nextIndex = (currentIndex + 1) % genders.length
+                const newRoles = [...formData.roles]
+                newRoles[0] = { ...newRoles[0], gender: genders[nextIndex] as any }
+                setFormData(prev => ({ ...prev, roles: newRoles }))
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="성별 조건 선택"
+              accessibilityHint="모집하는 역할의 성별 조건을 변경합니다"
+            >
+              <Text 
+                text={formData.roles[0]?.gender === "male" ? "남성" : 
+                      formData.roles[0]?.gender === "female" ? "여성" : "무관"} 
+                style={themed($dropdownText)} 
               />
-            </View>
+              <Text text="▼" style={themed($dropdownArrow)} />
+            </TouchableOpacity>
+          </View>
+          
+          <View style={themed($inputSection)}>
+            <Text text="나이 조건" style={themed($label) as any} />
+            <TextInput
+              style={themed($textInput)}
+              value={formData.roles[0]?.ageRange || ""}
+              onChangeText={(text) => {
+                const newRoles = [...formData.roles]
+                newRoles[0] = { ...newRoles[0], ageRange: text }
+                setFormData(prev => ({ ...prev, roles: newRoles }))
+              }}
+              placeholder="예: 20-40세"
+              placeholderTextColor={colors.textDim}
+            />
           </View>
 
           <View style={themed($inputSection)}>
@@ -845,60 +878,120 @@ export const CreatePostScreen = () => {
         <View style={themed($formSection)}>
           <Text text="🎯 오디션 정보" style={themed($sectionHeader)} />
           
-          <View style={themed($twoColumnRow)}>
-            <View style={[themed($inputSection), themed($halfWidth)]}>
-              <Text text="오디션 일정" style={themed($label) as any} />
-              <TouchableOpacity
-                style={themed($dateInput)}
-                onPress={() => setShowAuditionDatePicker(true)}
-                accessibilityRole="button"
-                accessibilityLabel="오디션 일정 선택"
-                accessibilityHint="터치하면 날짜 선택기가 열립니다"
-              >
-                <Text 
-                  text={formData.auditionDate || "날짜 선택"} 
-                  style={[themed($dateInputText), !formData.auditionDate && themed($placeholderText)]} 
-                />
-                <Text text="📅" style={themed($dateIcon)} />
-              </TouchableOpacity>
-              
-              {showAuditionDatePicker && (
-                <DateTimePicker
-                  value={parseDate(formData.auditionDate)}
-                  mode="date"
-                  display="default"
-                  onChange={handleAuditionDateChange}
-                  minimumDate={new Date()}
-                />
-              )}
-            </View>
+          <View style={themed($inputSection)}>
+            <Text text="오디션 일정" style={themed($label) as any} />
+            <TouchableOpacity
+              style={themed($dateInput)}
+              onPress={() => setShowAuditionDatePicker(true)}
+              accessibilityRole="button"
+              accessibilityLabel="오디션 일정 선택"
+              accessibilityHint="터치하면 날짜 선택기가 열립니다"
+            >
+              <Text 
+                text={formData.auditionDate || "날짜 선택"} 
+                style={[themed($dateInputText), !formData.auditionDate && themed($placeholderText)]} 
+              />
+              <Text text="📅" style={themed($dateIcon)} />
+            </TouchableOpacity>
             
-            <View style={[themed($inputSection), themed($halfWidth)]}>
-              <Text text="결과 발표일" style={themed($label) as any} />
-              <TouchableOpacity
-                style={themed($dateInput)}
-                onPress={() => setShowAuditionResultPicker(true)}
-                accessibilityRole="button"
-                accessibilityLabel="결과 발표일 선택"
-                accessibilityHint="터치하면 날짜 선택기가 열립니다"
-              >
-                <Text 
-                  text={formData.auditionResultDate || "날짜 선택"} 
-                  style={[themed($dateInputText), !formData.auditionResultDate && themed($placeholderText)]} 
-                />
-                <Text text="📅" style={themed($dateIcon)} />
-              </TouchableOpacity>
-              
-              {showAuditionResultPicker && (
-                <DateTimePicker
-                  value={parseDate(formData.auditionResultDate)}
-                  mode="date"
-                  display="default"
-                  onChange={handleAuditionResultChange}
-                  minimumDate={new Date()}
-                />
-              )}
-            </View>
+{/* 오디션 일정 선택 모달 */}
+            {showAuditionDatePicker && Platform.OS === 'ios' && (
+              <Modal transparent animationType="slide">
+                <TouchableOpacity 
+                  style={themed($dateModalOverlay)}
+                  activeOpacity={1}
+                  onPress={() => setShowAuditionDatePicker(false)}
+                >
+                  <View style={themed($dateModalContainer)}>
+                    <View style={themed($dateModalHeader)}>
+                      <TouchableOpacity onPress={() => setShowAuditionDatePicker(false)}>
+                        <Text text="취소" style={themed($dateModalCancelText)} />
+                      </TouchableOpacity>
+                      <Text text="오디션 일정 선택" style={themed($dateModalTitle)} />
+                      <TouchableOpacity onPress={() => setShowAuditionDatePicker(false)}>
+                        <Text text="완료" style={themed($dateModalDoneText)} />
+                      </TouchableOpacity>
+                    </View>
+                    <DateTimePicker
+                      value={parseDate(formData.auditionDate)}
+                      mode="date"
+                      display="spinner"
+                      onChange={handleAuditionDateChange}
+                      minimumDate={new Date()}
+                      style={themed($datePicker)}
+                    />
+                  </View>
+                </TouchableOpacity>
+              </Modal>
+            )}
+            
+            {showAuditionDatePicker && Platform.OS === 'android' && (
+              <DateTimePicker
+                value={parseDate(formData.auditionDate)}
+                mode="date"
+                display="default"
+                onChange={handleAuditionDateChange}
+                minimumDate={new Date()}
+              />
+            )}
+          </View>
+          
+          <View style={themed($inputSection)}>
+            <Text text="결과 발표일" style={themed($label) as any} />
+            <TouchableOpacity
+              style={themed($dateInput)}
+              onPress={() => setShowAuditionResultPicker(true)}
+              accessibilityRole="button"
+              accessibilityLabel="결과 발표일 선택"
+              accessibilityHint="터치하면 날짜 선택기가 열립니다"
+            >
+              <Text 
+                text={formData.auditionResultDate || "날짜 선택"} 
+                style={[themed($dateInputText), !formData.auditionResultDate && themed($placeholderText)]} 
+              />
+              <Text text="📅" style={themed($dateIcon)} />
+            </TouchableOpacity>
+            
+{/* 결과 발표일 선택 모달 */}
+            {showAuditionResultPicker && Platform.OS === 'ios' && (
+              <Modal transparent animationType="slide">
+                <TouchableOpacity 
+                  style={themed($dateModalOverlay)}
+                  activeOpacity={1}
+                  onPress={() => setShowAuditionResultPicker(false)}
+                >
+                  <View style={themed($dateModalContainer)}>
+                    <View style={themed($dateModalHeader)}>
+                      <TouchableOpacity onPress={() => setShowAuditionResultPicker(false)}>
+                        <Text text="취소" style={themed($dateModalCancelText)} />
+                      </TouchableOpacity>
+                      <Text text="결과 발표일 선택" style={themed($dateModalTitle)} />
+                      <TouchableOpacity onPress={() => setShowAuditionResultPicker(false)}>
+                        <Text text="완료" style={themed($dateModalDoneText)} />
+                      </TouchableOpacity>
+                    </View>
+                    <DateTimePicker
+                      value={parseDate(formData.auditionResultDate)}
+                      mode="date"
+                      display="spinner"
+                      onChange={handleAuditionResultChange}
+                      minimumDate={new Date()}
+                      style={themed($datePicker)}
+                    />
+                  </View>
+                </TouchableOpacity>
+              </Modal>
+            )}
+            
+            {showAuditionResultPicker && Platform.OS === 'android' && (
+              <DateTimePicker
+                value={parseDate(formData.auditionResultDate)}
+                mode="date"
+                display="default"
+                onChange={handleAuditionResultChange}
+                minimumDate={new Date()}
+              />
+            )}
           </View>
 
           <View style={themed($inputSection)}>
@@ -997,34 +1090,32 @@ export const CreatePostScreen = () => {
         <View style={themed($formSection)}>
           <Text text="📞 연락처 정보" style={themed($sectionHeader)} />
           
-          <View style={themed($twoColumnRow)}>
-            <View style={[themed($inputSection), themed($halfWidth)]}>
-              <View style={themed($labelRow)}>
-                <Text text="담당자 이메일" style={themed($label) as any} />
-                <Text text="*" style={themed($required)} />
-              </View>
-              <TextInput
-                style={themed($textInput)}
-                value={formData.contactEmail}
-                onChangeText={(text) => updateFormData("contactEmail", text)}
-                placeholder="contact@example.com"
-                placeholderTextColor={colors.textDim}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
+          <View style={themed($inputSection)}>
+            <View style={themed($labelRow)}>
+              <Text text="담당자 이메일" style={themed($label) as any} />
+              <Text text="*" style={themed($required)} />
             </View>
-            
-            <View style={[themed($inputSection), themed($halfWidth)]}>
-              <Text text="연락처" style={themed($label) as any} />
-              <TextInput
-                style={themed($textInput)}
-                value={formData.contactPhone}
-                onChangeText={(text) => updateFormData("contactPhone", text)}
-                placeholder="010-1234-5678"
-                placeholderTextColor={colors.textDim}
-                keyboardType="phone-pad"
-              />
-            </View>
+            <TextInput
+              style={themed($textInput)}
+              value={formData.contactEmail}
+              onChangeText={(text) => updateFormData("contactEmail", text)}
+              placeholder="contact@example.com"
+              placeholderTextColor={colors.textDim}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
+          
+          <View style={themed($inputSection)}>
+            <Text text="연락처" style={themed($label) as any} />
+            <TextInput
+              style={themed($textInput)}
+              value={formData.contactPhone}
+              onChangeText={(text) => updateFormData("contactPhone", text)}
+              placeholder="010-1234-5678"
+              placeholderTextColor={colors.textDim}
+              keyboardType="phone-pad"
+            />
           </View>
 
           <View style={themed($inputSection)}>
@@ -1148,19 +1239,6 @@ export const CreatePostScreen = () => {
             </View>
             
             <ScrollView style={themed($templateScrollView)} showsVerticalScrollIndicator={false}>
-              <Text text={`템플릿 개수: ${POST_TEMPLATES.length}개`} style={themed($debugText)} />
-              
-              {/* 간단한 테스트 버튼 */}
-              <TouchableOpacity
-                style={themed($testButton)}
-                onPress={() => {
-                  console.log('테스트 버튼 클릭됨!')
-                  setShowTemplateModal(false)
-                }}
-              >
-                <Text text="🧪 테스트 버튼 - 클릭해보세요!" style={themed($testButtonText)} />
-              </TouchableOpacity>
-              
               {POST_TEMPLATES.length > 0 ? POST_TEMPLATES.map((item) => (
                 <TouchableOpacity
                   key={item.id}
@@ -1188,111 +1266,6 @@ export const CreatePostScreen = () => {
         </TouchableOpacity>
       </Modal>
 
-      {/* 미리보기 모달 */}
-      <Modal
-        visible={showPreview}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowPreview(false)}
-      >
-        <TouchableOpacity 
-          style={themed($modalOverlay)} 
-          activeOpacity={1}
-          onPress={() => setShowPreview(false)}
-        >
-          <TouchableOpacity 
-            style={themed($previewModalContainer)}
-            activeOpacity={1}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <View style={themed($modalHeader)}>
-              <Text text="👀 게시글 미리보기" style={themed($modalTitle)} />
-              <TouchableOpacity
-                onPress={() => setShowPreview(false)}
-                style={themed($modalCloseButton)}
-              >
-                <Text text="✖" style={themed($modalCloseText)} />
-              </TouchableOpacity>
-            </View>
-            
-            <ScrollView style={themed($previewContent)} showsVerticalScrollIndicator={false}>
-              {/* 디버깅 정보 */}
-              <Text text="🔍 미리보기 테스트" style={themed($debugHeaderText)} />
-              
-              {/* 테스트 버튼 */}
-              <TouchableOpacity
-                style={themed($testButton2)}
-                onPress={() => {
-                  console.log('미리보기 테스트 버튼 클릭됨!')
-                  console.log('현재 제목:', formData.title || '제목 없음')
-                }}
-              >
-                <Text text="🧪 미리보기 테스트 버튼" style={themed($testButtonText)} />
-              </TouchableOpacity>
-              
-              {/* 미리보기 게시글 카드 */}
-              <View style={themed($previewCard)}>
-                <View style={themed($previewHeader)}>
-                  <Text text="모집중" style={themed($previewStatus)} />
-                  <Text text={formData.deadline || "마감일 2024년 10월 18일 (금) 23:59"} style={themed($previewDeadline)} />
-                </View>
-                
-                <Text text={formData.title || "[제목을 입력해주세요]"} style={themed($previewTitle)} />
-                
-                <View style={themed($previewDetails)}>
-                  <Text text={formData.production || "작품명"} style={themed($previewProduction)} />
-                  <Text text={formData.organizationName || "단체명"} style={themed($previewOrganization)} />
-                </View>
-                
-                <View style={themed($previewLocationRow)}>
-                  <Text text="📍" style={themed($previewIcon)} />
-                  <Text text={formData.location || "장소"} style={themed($previewLocationText)} />
-                </View>
-                
-                <View style={themed($previewLocationRow)}>
-                  <Text text="📅" style={themed($previewIcon)} />
-                  <Text text={formData.rehearsalSchedule || "연습 일정"} style={themed($previewLocationText)} />
-                </View>
-              </View>
-
-              {/* 상세 정보 섹션 */}
-              <View style={themed($previewSection)}>
-                <Text text="상세 설명" style={themed($previewSectionTitle)} />
-                <Text 
-                  text={formData.description || "🎵 상세 설명을 입력해주세요!\n\n모집하는 역할과 요구사항을 자세히 설명해주세요."} 
-                  style={themed($previewDescription)} 
-                />
-              </View>
-
-              {formData.roles[0]?.name && (
-                <View style={themed($previewSection)}>
-                  <Text text="모집 역할" style={themed($previewSectionTitle)} />
-                  <View style={themed($previewRoleCard)}>
-                    <Text text={formData.roles[0].name} style={themed($previewRoleName)} />
-                    <Text text={`성별: ${formData.roles[0].gender === 'male' ? '남성' : formData.roles[0].gender === 'female' ? '여성' : '무관'}`} style={themed($previewRoleDetail)} />
-                    {formData.roles[0].ageRange && (
-                      <Text text={`나이: ${formData.roles[0].ageRange}`} style={themed($previewRoleDetail)} />
-                    )}
-                    {formData.roles[0].requirements && (
-                      <Text text={`요구사항: ${formData.roles[0].requirements}`} style={themed($previewRoleDetail)} />
-                    )}
-                  </View>
-                </View>
-              )}
-
-              {formData.contactEmail && (
-                <View style={themed($previewSection)}>
-                  <Text text="연락처 정보" style={themed($previewSectionTitle)} />
-                  <Text text={`📧 ${formData.contactEmail}`} style={themed($previewContact)} />
-                  {formData.contactPhone && (
-                    <Text text={`📞 ${formData.contactPhone}`} style={themed($previewContact)} />
-                  )}
-                </View>
-              )}
-            </ScrollView>
-          </TouchableOpacity>
-        </TouchableOpacity>
-      </Modal>
     </Screen>
   )
 }
@@ -1714,18 +1687,6 @@ const $progressTitle = ({ colors, typography }) => ({
   color: colors.text,
 })
 
-const $previewButton = ({ colors, spacing }) => ({
-  backgroundColor: colors.palette.primary500,
-  paddingHorizontal: spacing?.md || 12,
-  paddingVertical: spacing?.xs || 4,
-  borderRadius: 20,
-})
-
-const $previewButtonText = ({ colors, typography }) => ({
-  fontSize: 14,
-  fontFamily: typography.primary.medium,
-  color: colors.palette.neutral100,
-})
 
 const $progressBarContainer = ({ colors, spacing }) => ({
   height: 8,
@@ -1759,175 +1720,50 @@ const $progressCompletedText = ({ colors, typography }) => ({
   textAlign: "center" as const,
 })
 
-// 미리보기 모달 스타일들
-const $previewModalContainer = ({ colors, spacing }) => ({
+
+// 날짜 선택 모달 스타일들
+const $dateModalOverlay = () => ({
+  flex: 1,
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  justifyContent: "flex-end" as const,
+})
+
+const $dateModalContainer = ({ colors, spacing }) => ({
   backgroundColor: colors.background,
   borderTopLeftRadius: 20,
   borderTopRightRadius: 20,
-  paddingHorizontal: spacing?.md || 12,
-  paddingTop: spacing?.md || 12,
-  paddingBottom: spacing?.xl || 24,
-  height: "85%" as const,
-  width: "100%" as const,
+  paddingBottom: spacing.xl,
 })
 
-const $previewContent = ({ spacing }) => ({
-  flex: 1,
-  paddingTop: spacing?.sm || 8,
-})
-
-const $previewCard = ({ colors, spacing }) => ({
-  backgroundColor: colors.background,
-  borderRadius: 12,
-  padding: spacing?.md || 12,
-  marginBottom: spacing?.md || 12,
-  borderWidth: 1,
-  borderColor: colors.border,
-  minHeight: 200,
-})
-
-const $previewHeader = ({ spacing }) => ({
+const $dateModalHeader = ({ colors, spacing }) => ({
   flexDirection: "row" as const,
   justifyContent: "space-between" as const,
   alignItems: "center" as const,
-  marginBottom: spacing?.sm || 8,
+  paddingHorizontal: spacing.lg,
+  paddingVertical: spacing.md,
+  borderBottomWidth: 1,
+  borderBottomColor: colors.border,
 })
 
-const $previewStatus = ({ colors, typography, spacing }) => ({
-  fontSize: 12,
+const $dateModalTitle = ({ colors, typography }) => ({
+  fontSize: 18,
   fontFamily: typography.primary.medium,
-  color: colors.palette.secondary700,
-  backgroundColor: colors.palette.secondary100,
-  paddingHorizontal: spacing.xs,
-  paddingVertical: spacing.xxs,
-  borderRadius: 12,
+  color: colors.text,
 })
 
-const $previewDeadline = ({ colors, typography }) => ({
-  fontSize: 12,
+const $dateModalCancelText = ({ colors, typography }) => ({
+  fontSize: 16,
   fontFamily: typography.primary.normal,
   color: colors.textDim,
 })
 
-const $previewTitle = ({ colors, typography, spacing }) => ({
-  fontSize: 18,
-  fontFamily: typography.primary.medium,
-  color: colors.text,
-  marginBottom: spacing.xs,
-})
-
-const $previewDetails = ({ spacing }) => ({
-  marginBottom: spacing?.sm || 8,
-})
-
-const $previewProduction = ({ colors, typography, spacing }) => ({
-  fontSize: 14,
-  fontFamily: typography.primary.medium,
-  color: colors.palette.secondary600,
-  marginBottom: spacing.xxs,
-})
-
-const $previewOrganization = ({ colors, typography }) => ({
-  fontSize: 14,
-  fontFamily: typography.primary.normal,
-  color: colors.palette.secondary500,
-})
-
-const $previewLocationRow = ({ spacing }) => ({
-  flexDirection: "row" as const,
-  alignItems: "center" as const,
-  marginBottom: spacing?.xs || 4,
-})
-
-const $previewIcon = {
-  fontSize: 14,
-  marginRight: 6,
-}
-
-const $previewLocationText = ({ colors, typography }) => ({
-  fontSize: 14,
-  fontFamily: typography.primary.normal,
-  color: colors.text,
-  flex: 1,
-})
-
-const $previewSection = ({ spacing }) => ({
-  marginBottom: spacing?.md || 12,
-})
-
-const $previewSectionTitle = ({ colors, typography, spacing }) => ({
+const $dateModalDoneText = ({ colors, typography }) => ({
   fontSize: 16,
   fontFamily: typography.primary.medium,
-  color: colors.text,
-  marginBottom: spacing?.xs || 4,
+  color: colors.palette.primary500,
 })
 
-const $previewDescription = ({ colors, typography }) => ({
-  fontSize: 14,
-  fontFamily: typography.primary.normal,
-  color: colors.text,
-  lineHeight: 20,
-})
-
-const $previewRoleCard = ({ colors, spacing }) => ({
-  backgroundColor: colors.palette.primary50,
-  borderRadius: 8,
-  padding: spacing?.sm || 8,
-  borderLeftWidth: 3,
-  borderLeftColor: colors.palette.primary500,
-})
-
-const $previewRoleName = ({ colors, typography, spacing }) => ({
-  fontSize: 14,
-  fontFamily: typography.primary.medium,
-  color: colors.palette.primary700,
-  marginBottom: spacing.xxs,
-})
-
-const $previewRoleDetail = ({ colors, typography, spacing }) => ({
-  fontSize: 12,
-  fontFamily: typography.primary.normal,
-  color: colors.palette.primary600,
-  marginBottom: spacing.xxs,
-})
-
-const $previewContact = ({ colors, typography, spacing }) => ({
-  fontSize: 14,
-  fontFamily: typography.primary.normal,
-  color: colors.text,
-  marginBottom: spacing.xxs,
-})
-
-// 테스트 버튼 스타일들
-const $testButton = ({ colors, spacing }) => ({
-  backgroundColor: colors.palette.angry500,
-  padding: spacing.md,
-  margin: spacing.sm,
-  borderRadius: 10,
-})
-
-const $testButton2 = ({ colors, spacing }) => ({
-  backgroundColor: colors.palette.secondary400,
-  padding: spacing.sm,
-  margin: spacing.sm,
-  borderRadius: 10,
-})
-
-const $testButtonText = ({ colors, typography }) => ({
-  color: colors.palette.neutral100,
-  textAlign: "center" as const,
-  fontFamily: typography.primary.medium,
-})
-
-const $debugText = ({ colors, spacing }) => ({
-  color: colors.text,
-  padding: spacing.sm,
-})
-
-const $debugHeaderText = ({ colors, spacing, typography }) => ({
-  color: colors.text,
-  padding: spacing.sm,
-  fontSize: 16,
-  fontFamily: typography.primary.bold,
+const $datePicker = () => ({
+  height: 200,
 })
 

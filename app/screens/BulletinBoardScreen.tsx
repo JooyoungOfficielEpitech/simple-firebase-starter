@@ -158,30 +158,6 @@ export const BulletinBoardScreen = () => {
       result = posts
     }
     
-    // 해결: 데이터 없을 때 테스트 데이터 사용
-    if (result.length === 0 && __DEV__) {
-      console.log('🔧 [DEBUG] 븈 데이터 - 테스트 데이터 사용');
-      result = [{
-        id: 'test-post-1',
-        title: '[DEBUG] 테스트 공고',
-        production: '테스트 작품',
-        description: '디버깅용 테스트 데이터입니다.',
-        organizationName: '테스트 극단',
-        location: '서울',
-        rehearsalSchedule: '매주 토요일',
-        status: 'active',
-        tags: ['테스트'],
-        authorId: 'test',
-        authorName: '테스트',
-        organizationId: 'test',
-        deadline: '2024-12-31',
-        totalApplicants: 0,
-        viewCount: 1,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }];
-    }
-    
     console.log('📄 [getFilteredPosts] result length:', result.length);
     return result;
   }, [selectedOrganizationId, filteredPosts, posts])
@@ -191,25 +167,9 @@ export const BulletinBoardScreen = () => {
     setActiveTab('organizations') // 단체 목록으로 돌아가기
   }, [])
 
-  const handleCreateOrganization = useCallback(() => {
-    navigation.navigate("CreateOrganization", {})
-  }, [navigation])
 
   const isOrganizer = useMemo(() => userProfile?.userType === "organizer", [userProfile?.userType])
 
-  // 해결: 데이터 문제 진단을 위한 테스트 데이터
-  useEffect(() => {
-    if (posts.length === 0 && !loading) {
-      console.log('⚠️ [DEBUG] 데이터가 비어있음 - 테스트 데이터 생성 추천');
-      // 개발 모드에서 자동으로 테스트 데이터 추가
-      if (__DEV__) {
-        console.log('🔧 [AUTO-DEBUG] 테스트 데이터 자동 생성 시도');
-        setTimeout(() => {
-          addTestData();
-        }, 2000); // 2초 후 자동 실행
-      }
-    }
-  }, [posts.length, loading])
 
   // 테스트 데이터 추가 함수
   const addTestData = async () => {
@@ -560,14 +520,14 @@ export const BulletinBoardScreen = () => {
           {activeTab === 'announcements' ? (
             <FlatList
               data={getFilteredPosts}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <PostCard
-                post={item}
-                onPress={handlePostPress}
-              />
-            )}
-            ListHeaderComponent={() => (
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <PostCard
+                  post={item}
+                  onPress={handlePostPress}
+                />
+              )}
+              ListHeaderComponent={() => (
               <View>
                 {/* 탭 메뉴 (단체가 선택되지 않았을 때만 표시) */}
                 {!selectedOrganizationId && (
@@ -610,8 +570,8 @@ export const BulletinBoardScreen = () => {
                   </View>
                 )}
               </View>
-            )}
-            ListEmptyComponent={() => (
+              )}
+              ListEmptyComponent={() => (
               <View style={themed($emptyStateContainer)}>
                 <View style={themed($emptyIconContainer)}>
                   <Text text="🎭" style={themed($emptyIcon)} />
@@ -644,35 +604,19 @@ export const BulletinBoardScreen = () => {
                   )}
                 </View>
               </View>
-            )}
-            style={themed($flatListContainer)}
-            showsVerticalScrollIndicator={false}
-            removeClippedSubviews={false} // 해결: 렌더링 문제 방지
-            maxToRenderPerBatch={5}
-            windowSize={5}
-            initialNumToRender={3}
+              )}
+              style={themed($flatListContainer)}
+              showsVerticalScrollIndicator={false}
+              removeClippedSubviews={false} // 해결: 렌더링 문제 방지
+              maxToRenderPerBatch={5}
+              windowSize={5}
+              initialNumToRender={3}
             />
           ) : (
             <FlatList
-              data={organizations.length === 0 && __DEV__ ? [
-                {
-                  id: 'test-org-1',
-                  name: '[DEBUG] 테스트 극단',
-                  description: '디버깅용 테스트 단체입니다.',
-                  location: '서울',
-                  isVerified: false,
-                  activePostCount: 1,
-                  tags: ['테스트'],
-                  ownerId: 'test',
-                  ownerName: '테스트',
-                  memberCount: 1,
-                  contactEmail: 'test@test.com',
-                  createdAt: new Date(),
-                  updatedAt: new Date()
-                } as Organization
-              ] : organizations}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item: organization }) => (
+              data={organizations}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item: organization }) => (
               <TouchableOpacity
                 style={themed($organizationCard)}
                 onPress={() => handleOrganizationPress(organization.id)}
@@ -708,8 +652,8 @@ export const BulletinBoardScreen = () => {
                   </View>
                 )}
               </TouchableOpacity>
-            )}
-            ListHeaderComponent={() => (
+              )}
+              ListHeaderComponent={() => (
               <View>
                 {/* 탭 메뉴 */}
                 <View style={themed($tabContainer)}>
@@ -736,36 +680,23 @@ export const BulletinBoardScreen = () => {
                   </TouchableOpacity>
                 </View>
                 
-                {/* 단체 등록 버튼 */}
-                {isOrganizer && (
-                  <View style={themed($createOrgButtonContainer)}>
-                    <Button
-                      text={translate("bulletinBoard:actions.createOrganization")}
-                      onPress={handleCreateOrganization}
-                      style={themed($createOrgButton)}
-                      LeftAccessory={(props) => (
-                        <Icon icon="check" size={20} color={props.style.color} />
-                      )}
-                    />
+              </View>
+              )}
+              ListEmptyComponent={() => (
+                <View style={themed($emptyStateContainer)}>
+                  <View style={themed($emptyIconContainer)}>
+                    <Text text="🏢" style={themed($emptyIcon)} />
                   </View>
-                )}
-              </View>
-            )}
-            ListEmptyComponent={() => (
-              <View style={themed($emptyStateContainer)}>
-                <View style={themed($emptyIconContainer)}>
-                  <Text text="🏢" style={themed($emptyIcon)} />
+                  <Text text={translate("bulletinBoard:empty.organizations.title")} style={themed($emptyTitle)} />
+                  <Text text={translate("bulletinBoard:empty.organizations.description")} style={themed($emptyDescription)} />
                 </View>
-                <Text text={translate("bulletinBoard:empty.organizations.title")} style={themed($emptyTitle)} />
-                <Text text={translate("bulletinBoard:empty.organizations.description")} style={themed($emptyDescription)} />
-              </View>
-            )}
-            style={themed($flatListContainer)}
-            showsVerticalScrollIndicator={false}
-            removeClippedSubviews={false} // 해결: 렌더링 문제 방지
-            maxToRenderPerBatch={5}
-            windowSize={5}
-            initialNumToRender={3}
+              )}
+              style={themed($flatListContainer)}
+              showsVerticalScrollIndicator={false}
+              removeClippedSubviews={false} // 해결: 렌더링 문제 방지
+              maxToRenderPerBatch={5}
+              windowSize={5}
+              initialNumToRender={3}
             />
           )}
         </View>
@@ -1010,15 +941,6 @@ const $organizationStats = ({ colors }) => ({
   fontWeight: "500" as const,
 })
 
-const $createOrgButtonContainer = ({ spacing }) => ({
-  marginBottom: spacing?.md || 12,
-})
-
-const $createOrgButton = ({ colors, spacing }) => ({
-  backgroundColor: colors.tint,
-  paddingHorizontal: spacing?.md || 12,
-  paddingVertical: spacing?.sm || 8,
-})
 
 // PostCard detail styles moved to PostCard component
 

@@ -12,11 +12,34 @@ interface PostCardProps {
   variant?: "compact" | "detailed"
 }
 
-export const PostCard = memo<PostCardProps>(({ 
-  post, 
-  onPress, 
-  variant = "compact" 
-}) => {
+export const PostCard = memo<PostCardProps>(({ post, onPress, variant = "compact" }) => {
+  // 디버깅: post 데이터 확인
+  console.log('🔍 [PostCard] Received props:', { 
+    post: post ? { id: post.id, title: post.title, hasTitle: !!post.title } : 'null/undefined',
+    onPress: typeof onPress,
+    variant 
+  })
+  
+  if (!post || typeof post !== 'object') {
+    console.error('❌ [PostCard] Invalid post data:', post)
+    return null
+  }
+
+  // 안전한 post 데이터 생성
+  const safePost = {
+    id: String(post.id || ''),
+    title: String(post.title || '제목 없음'),
+    production: String(post.production || '작품 정보 없음'),
+    organizationName: String(post.organizationName || '단체명 없음'),
+    location: String(post.location || '장소 미정'),
+    rehearsalSchedule: String(post.rehearsalSchedule || '일정 미정'),
+    status: String(post.status || 'closed'),
+    deadline: post.deadline ? String(post.deadline) : null,
+    totalApplicants: Number(post.totalApplicants || 0),
+    roles: Array.isArray(post.roles) ? post.roles : [],
+    tags: Array.isArray(post.tags) ? post.tags : []
+  }
+
   const {
     themed,
     theme: { colors, spacing, typography },
@@ -25,64 +48,64 @@ export const PostCard = memo<PostCardProps>(({
   return (
     <TouchableOpacity
       style={themed($postCard)}
-      onPress={() => onPress(post.id)}
+      onPress={() => onPress(safePost.id)}
       accessibilityRole="button"
-      accessibilityLabel={`${post.title} - ${post.production} 모집공고`}
+      accessibilityLabel={`${safePost.title} - ${safePost.production} 모집공고`}
       accessibilityHint="터치하여 상세정보 보기"
     >
       <View style={themed($postCardHeader)}>
         <View style={themed($postStatusRow)}>
           <StatusBadge
-            status={post.status === "active" ? "active" : "closed"}
-            text={post.status === "active" ? translate("bulletinBoard:status.recruiting") : translate("bulletinBoard:status.closed")}
+            status={safePost.status === "active" ? "active" : "closed"}
+            text={safePost.status === "active" ? translate("bulletinBoard:status.recruiting") : translate("bulletinBoard:status.closed")}
           />
-          {post.deadline && (
-            <Text text={translate("bulletinBoard:posts.deadline", { date: post.deadline })} style={themed($deadlineText)} />
-          )}
+          {safePost.deadline ? (
+            <Text text={translate("bulletinBoard:posts.deadline", { date: safePost.deadline })} style={themed($deadlineText)} />
+          ) : null}
         </View>
-        <Text preset="subheading" text={post.title} style={themed($postTitle)} />
-        <Text text={post.production} style={themed($production)} />
+        <Text preset="subheading" text={safePost.title} style={themed($postTitle)} />
+        <Text text={safePost.production} style={themed($production)} />
       </View>
       
       <View style={themed($postMeta)}>
         <View style={themed($organizationRow)}>
-          <Text text={post.organizationName} style={themed($organization)} />
-          {post.totalApplicants && (
-            <Text text={translate("bulletinBoard:posts.applicants", { count: post.totalApplicants })} style={themed($applicantCount)} />
-          )}
+          <Text text={safePost.organizationName} style={themed($organization)} />
+          {safePost.totalApplicants > 0 ? (
+            <Text text={translate("bulletinBoard:posts.applicants", { count: safePost.totalApplicants })} style={themed($applicantCount)} />
+          ) : null}
         </View>
-        <Text text={post.location} style={themed($location)} />
-        <Text text={post.rehearsalSchedule} style={themed($schedule)} />
+        <Text text={safePost.location} style={themed($location)} />
+        <Text text={safePost.rehearsalSchedule} style={themed($schedule)} />
       </View>
 
       {/* Role summary for quick scanning */}
-      {post.roles && post.roles.length > 0 && (
+      {safePost.roles && safePost.roles.length > 0 ? (
         <View style={themed($rolesPreview)}>
           <Text 
-            text={post.roles.slice(0, 2).map(role => `${role.name}(${role.count}명)`).join(", ")}
+            text={safePost.roles.slice(0, 2).map(role => `${role.name || "역할"}(${role.count || 0}명)`).join(", ") || "역할 정보"}
             style={themed($rolesPreviewText)}
             numberOfLines={1}
           />
-          {post.roles.length > 2 && (
-            <Text text={translate("bulletinBoard:posts.moreRoles", { count: post.roles.length - 2 })} style={themed($moreRoles)} />
-          )}
+          {safePost.roles.length > 2 ? (
+            <Text text={translate("bulletinBoard:posts.moreRoles", { count: safePost.roles.length - 2 })} style={themed($moreRoles)} />
+          ) : null}
         </View>
-      )}
+      ) : null}
 
-      {post.tags && post.tags.length > 0 && (
+      {safePost.tags && safePost.tags.length > 0 ? (
         <View style={themed($tagsContainer)}>
-          {post.tags.slice(0, 3).map((tag, tagIndex) => (
+          {safePost.tags.slice(0, 3).map((tag, tagIndex) => (
             <View key={tagIndex} style={themed($tag)}>
-              <Text text={tag} style={themed($tagText)} />
+              <Text text={tag || "태그"} style={themed($tagText)} />
             </View>
           ))}
-          {post.tags.length > 3 && (
+          {safePost.tags.length > 3 ? (
             <View style={themed($tag)}>
-              <Text text={`+${post.tags.length - 3}`} style={themed($tagText)} />
+              <Text text={`+${safePost.tags.length - 3}`} style={themed($tagText)} />
             </View>
-          )}
+          ) : null}
         </View>
-      )}
+      ) : null}
     </TouchableOpacity>
   )
 })

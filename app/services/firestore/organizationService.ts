@@ -143,6 +143,19 @@ export class OrganizationService {
       location: orgData.location,
       establishedDate: orgData.establishedDate || "",
       tags: orgData.tags || [],
+      // 소셜 미디어 링크
+      instagramUrl: orgData.instagramUrl || "",
+      youtubeUrl: orgData.youtubeUrl || "",
+      facebookUrl: orgData.facebookUrl || "",
+      twitterUrl: orgData.twitterUrl || "",
+      // 추가 상세 정보
+      foundingStory: orgData.foundingStory || "",
+      vision: orgData.vision || "",
+      specialties: orgData.specialties || [],
+      pastWorks: orgData.pastWorks || [],
+      facilities: orgData.facilities || "",
+      recruitmentInfo: orgData.recruitmentInfo || "",
+      // 기존 필드
       logoUrl: null,
       isVerified: false,
       ownerId: userId,

@@ -1,5 +1,6 @@
 import auth from "@react-native-firebase/auth"
 import firestore, { FirebaseFirestoreTypes } from "@react-native-firebase/firestore"
+import { collection, doc, where, orderBy, limit, onSnapshot, getDoc, getDocs, query, updateDoc, deleteDoc, setDoc, increment, serverTimestamp } from "@react-native-firebase/firestore"
 
 import { translate } from "@/i18n/translate"
 import { Post, CreatePost, UpdatePost } from "@/types/post"
@@ -35,7 +36,8 @@ export class PostService {
    */
   private async checkUserIsOrganizer(userId: string): Promise<boolean> {
     try {
-      const userDoc = await this.db.collection("users").doc(userId).get()
+      const userDocRef = doc(this.db, "users", userId)
+      const userDoc = await getDoc(userDocRef)
       if (!userDoc.exists) {
         console.error(`❌ [PostService] 사용자 문서를 찾을 수 없음: ${userId}`)
         return false
@@ -56,11 +58,12 @@ export class PostService {
    */
   private async getPostApplicantIds(postId: string): Promise<string[]> {
     try {
-      const applicationsSnapshot = await this.db
-        .collection("applications")
-        .where("postId", "==", postId)
-        .where("status", "!=", "withdrawn")
-        .get()
+      const q = query(
+        collection(this.db, "applications"),
+        where("postId", "==", postId),
+        where("status", "!=", "withdrawn")
+      )
+      const applicationsSnapshot = await getDocs(q)
 
       const applicantIds = applicationsSnapshot.docs.map(doc => {
         const data = doc.data()
@@ -79,7 +82,7 @@ export class PostService {
    * 서버 타임스탬프 생성
    */
   private getServerTimestamp(): FirebaseFirestoreTypes.FieldValue {
-    return firestore.FieldValue.serverTimestamp()
+    return serverTimestamp()
   }
 
   /**
@@ -87,7 +90,7 @@ export class PostService {
    */
   async createPost(postData: CreatePost, authorName: string, userOrganizationId?: string): Promise<string> {
     const userId = this.getCurrentUserId()
-    const docRef = this.db.collection("posts").doc()
+    const docRef = doc(collection(this.db, "posts"))
     
     const post = {
       title: postData.title,
@@ -119,7 +122,7 @@ export class PostService {
       userOrganizationId
     })
 
-    await docRef.set(post)
+    await setDoc(docRef, post)
     
     // 단체의 활성 공고 수 업데이트
     if (this.organizationService && post.organizationId) {
@@ -151,15 +154,16 @@ export class PostService {
    * 게시글 조회 (단일)
    */
   async getPost(postId: string): Promise<Post | null> {
-    const doc = await this.db.collection("posts").doc(postId).get()
+    const docRef = doc(this.db, "posts", postId)
+    const docSnap = await getDoc(docRef)
 
-    if (!doc.exists) {
+    if (!docSnap.exists()) {
       return null
     }
 
     return {
-      id: doc.id,
-      ...doc.data(),
+      id: docSnap.id,
+      ...docSnap.data(),
     } as Post
   }
 
@@ -168,11 +172,12 @@ export class PostService {
    */
   async getPosts(limit = 20): Promise<Post[]> {
     // 임시로 모든 게시글을 가져온 후 클라이언트에서 필터링
-    const snapshot = await this.db
-      .collection("posts")
-      .orderBy("createdAt", "desc")
-      .limit(limit * 2) // 여유분을 두고 가져옴
-      .get()
+    const q = query(
+      collection(this.db, "posts"),
+      orderBy("createdAt", "desc"),
+      limit(limit * 2) // 여유분을 두고 가져옴
+    )
+    const snapshot = await getDocs(q)
 
     const allPosts = snapshot.docs.map(doc => ({
       id: doc.id,
@@ -191,11 +196,12 @@ export class PostService {
   async getMyOrganizationPosts(): Promise<Post[]> {
     const userId = this.getCurrentUserId()
     
-    const snapshot = await this.db
-      .collection("posts")
-      .where("organizationId", "==", userId)
-      .orderBy("createdAt", "desc")
-      .get()
+    const q = query(
+      collection(this.db, "posts"),
+      where("organizationId", "==", userId),
+      orderBy("createdAt", "desc")
+    )
+    const snapshot = await getDocs(q)
 
     return snapshot.docs.map(doc => ({
       id: doc.id,
@@ -221,7 +227,8 @@ export class PostService {
       throw new Error("본인이 작성한 게시글만 수정할 수 있습니다.")
     }
 
-    await this.db.collection("posts").doc(postId).update({
+    const postRef = doc(this.db, "posts", postId)
+    await updateDoc(postRef, {
       ...updateData,
       updatedAt: this.getServerTimestamp(),
     })
@@ -272,7 +279,8 @@ export class PostService {
     }
 
     console.log(`🗑️ [PostService] 게시글 삭제 시작: ${postId} by ${userId}`)
-    await this.db.collection("posts").doc(postId).delete()
+    const postRef = doc(this.db, "posts", postId)
+    await deleteDoc(postRef)
 
     // 게시글 삭제 후 단체의 활성 공고 수 업데이트
     if (this.organizationService && post.organizationId) {
@@ -304,7 +312,8 @@ export class PostService {
       throw new Error("본인이 작성한 게시글만 상태를 변경할 수 있습니다.")
     }
 
-    await this.db.collection("posts").doc(postId).update({
+    const postRef = doc(this.db, "posts", postId)
+    await updateDoc(postRef, {
       status,
       updatedAt: this.getServerTimestamp(),
     })
@@ -342,8 +351,17 @@ export class PostService {
    */
   async incrementViewCount(postId: string): Promise<void> {
     try {
-      await this.db.collection("posts").doc(postId).update({
-        viewCount: firestore.FieldValue.increment(1),
+      const postRef = doc(this.db, "posts", postId)
+      
+      // 문서가 존재하는지 먼저 확인
+      const postSnap = await getDoc(postRef)
+      if (!postSnap.exists()) {
+        console.warn(`⚠️ [PostService] 게시글이 존재하지 않음: ${postId}`)
+        return
+      }
+      
+      await updateDoc(postRef, {
+        viewCount: increment(1),
         updatedAt: this.getServerTimestamp(),
       })
       console.log(`👁️ [PostService] 조회수 증가: ${postId}`)
@@ -364,7 +382,7 @@ export class PostService {
     
     // 기본 쿼리 테스트
     console.log('🔥 [PostService] Firestore 기본 연결 테스트 시작')
-    this.db.collection("posts").get()
+    getDocs(collection(this.db, "posts"))
       .then((snapshot) => {
         console.log('✅ [PostService] 기본 쿼리 성공:', snapshot.size, '개 문서')
       })
@@ -374,11 +392,13 @@ export class PostService {
     
     console.log('🔥 [PostService] orderBy 쿼리 시작')
     
-    return this.db
-      .collection("posts")
-      .orderBy("createdAt", "desc")
-      .limit(40) // 여유분을 두고 가져옴
-      .onSnapshot(
+    const q = query(
+      collection(this.db, "posts"),
+      orderBy("createdAt", "desc"),
+      limit(40) // 여유분을 두고 가져옴
+    )
+    
+    return onSnapshot(q,
         (snapshot) => {
           console.log('📊 [PostService] Firestore snapshot 받음')
           console.log(`📊 [PostService] 받은 문서 개수: ${snapshot.docs.length}`)
@@ -434,10 +454,12 @@ export class PostService {
   subscribeToOrganizationPosts(organizationId: string, callback: (posts: Post[]) => void): () => void {
     console.log(`🏢 [PostService] 단체별 게시글 구독 시작: ${organizationId}`)
     
-    return this.db
-      .collection("posts")
-      .where("organizationId", "==", organizationId)
-      .onSnapshot(
+    const q = query(
+      collection(this.db, "posts"),
+      where("organizationId", "==", organizationId)
+    )
+    
+    return onSnapshot(q,
         (snapshot) => {
           console.log(`🏢 [PostService] 단체 ${organizationId} 게시글 snapshot 받음`)
           console.log(`🏢 [PostService] 받은 문서 개수: ${snapshot.docs.length}`)
@@ -474,15 +496,14 @@ export class PostService {
    * 게시글 실시간 리스너 (단일)
    */
   subscribeToPost(postId: string, callback: (post: Post | null) => void): () => void {
-    return this.db
-      .collection("posts")
-      .doc(postId)
-      .onSnapshot(
-        (doc) => {
-          if (doc.exists) {
+    const docRef = doc(this.db, "posts", postId)
+    
+    return onSnapshot(docRef,
+        (docSnap) => {
+          if (docSnap.exists()) {
             callback({
-              id: doc.id,
-              ...doc.data(),
+              id: docSnap.id,
+              ...docSnap.data(),
             } as Post)
           } else {
             callback(null)
