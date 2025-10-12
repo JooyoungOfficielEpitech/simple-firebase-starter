@@ -1,4 +1,4 @@
-import { type FC, useState, useEffect, useRef } from "react"
+import { type FC, useState, useEffect, useRef, useCallback } from "react"
 import { View, type TextStyle, type ViewStyle, Alert, Animated, Dimensions } from "react-native"
 
 import { $styles } from "@/theme/styles"
@@ -7,27 +7,25 @@ import { Button } from "@/components/Button"
 import { Radio } from "@/components/Toggle/Radio"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
-import { TextField } from "@/components/TextField"
 import { ScreenHeader } from "@/components/ScreenHeader"
 import { ContentSection } from "@/components/Layout"
 import { useAuth } from "@/context/AuthContext"
-import { userService, organizationService } from "@/services/firestore"
+import { userService } from "@/services/firestore"
 import { UserProfile } from "@/types/user"
 import type { MainTabScreenProps } from "@/navigators/MainNavigator"
+import { useFocusEffect } from "@react-navigation/native"
 import { useAppTheme } from "@/theme/context"
 import { type ThemedStyle, type WickedCharacterTheme } from "@/theme/types"
 
 interface SettingsScreenProps extends MainTabScreenProps<"Settings"> {}
 
-export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen() {
+export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen({ navigation }) {
   const { themed, wickedCharacterTheme, setWickedCharacterTheme } = useAppTheme()
   const { logout } = useAuth()
   
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [converting, setConverting] = useState(false)
-  const [showOrgNameInput, setShowOrgNameInput] = useState(false)
-  const [organizationName, setOrganizationName] = useState("")
   
   // 커튼 효과를 위한 애니메이션 상태
   const screenWidth = Dimensions.get('window').width
@@ -37,9 +35,12 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
   const curtainScaleAnim = useRef(new Animated.Value(0.8)).current
   const [isThemeChanging, setIsThemeChanging] = useState(false)
 
-  useEffect(() => {
-    loadUserProfile()
-  }, [])
+  // 화면에 포커스가 올 때마다 프로필 새로고침
+  useFocusEffect(
+    useCallback(() => {
+      loadUserProfile()
+    }, [])
+  )
 
   const loadUserProfile = async () => {
     try {
@@ -126,8 +127,8 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
         [
           { text: "취소", style: "cancel" },
           { 
-            text: "새 단체 만들기", 
-            onPress: () => setShowOrgNameInput(true)
+            text: "새로운 운영자 계정 만들기", 
+            onPress: () => navigation.navigate("CreateOrganization", { isOrganizerConversion: true })
           },
           { 
             text: "이전 단체로 복귀", 
@@ -136,16 +137,11 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
         ]
       )
     } else {
-      Alert.alert(
-        "운영자로 전환",
-        "운영자로 전환하시겠습니까? 단체 정보를 입력해야 합니다.",
-        [
-          { text: "취소", style: "cancel" },
-          { text: "확인", onPress: () => setShowOrgNameInput(true) }
-        ]
-      )
+      // 운영자 계정 전환 화면으로 이동
+      navigation.navigate("CreateOrganization", { isOrganizerConversion: true })
     }
   }
+
 
   const handleAutoConversion = async () => {
     try {
@@ -174,84 +170,6 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
     }
   }
 
-  const handleConfirmConversion = async () => {
-    if (!organizationName.trim()) {
-      Alert.alert("오류", "단체명을 입력해주세요.")
-      return
-    }
-
-    try {
-      setConverting(true)
-      
-      // 단체명 중복 검증
-      await organizationService.validateUniqueOrganizationName(organizationName.trim())
-      
-      // Organizations 컬렉션에 새 단체 생성
-      console.log('🏢 [SettingsScreen] 단체 생성 시작:', {
-        name: organizationName.trim(),
-        userId: userProfile?.uid
-      })
-      
-      const organizationId = await organizationService.createOrganization({
-        name: organizationName.trim(),
-        description: `${organizationName.trim()} 공식 단체입니다.`,
-        contactEmail: userProfile?.email || "",
-        contactPhone: "", // 빈 문자열로 명시적 설정
-        website: "", // 빈 문자열로 명시적 설정
-        location: "",
-        establishedDate: "", // 빈 문자열로 명시적 설정
-        tags: []
-      }, userProfile?.name || "")
-      
-      console.log('✅ [SettingsScreen] 단체 생성 완료:', {
-        organizationId,
-        organizationName: organizationName.trim()
-      })
-      
-      // 생성된 단체가 실제로 존재하는지 확인
-      try {
-        const createdOrg = await organizationService.getOrganization(organizationId)
-        console.log('🔍 [SettingsScreen] 생성된 단체 확인:', createdOrg ? {
-          id: createdOrg.id,
-          name: createdOrg.name,
-          ownerId: createdOrg.ownerId
-        } : 'NULL')
-      } catch (error) {
-        console.error('❌ [SettingsScreen] 생성된 단체 확인 실패:', error)
-      }
-
-      // 사용자 타입을 운영자로 변환
-      const updateProfileData: any = {
-        userType: "organizer",
-        organizationId: organizationId,
-        organizationName: organizationName.trim(),
-        hasBeenOrganizer: true
-      }
-
-      // undefined 필드 제거
-      Object.keys(updateProfileData).forEach(key => {
-        if (updateProfileData[key] === undefined) {
-          delete updateProfileData[key]
-        }
-      })
-
-      await userService.updateUserProfile(updateProfileData)
-
-      // 프로필 새로고침
-      await loadUserProfile()
-      
-      setShowOrgNameInput(false)
-      setOrganizationName("")
-      
-      Alert.alert("성공", "운영자로 전환되었습니다!")
-    } catch (error) {
-      console.error("운영자 전환 오류:", error)
-      const errorMessage = error instanceof Error ? error.message : "운영자 전환에 실패했습니다."
-      Alert.alert("오류", errorMessage)
-    } finally {
-      setConverting(false)
-    }
-  }
 
   const handleRevertToGeneral = () => {
     Alert.alert(
@@ -281,49 +199,6 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
     }
   }
 
-  if (showOrgNameInput) {
-    return (
-      <Screen preset="scroll" safeAreaEdges={[]}>
-        <ScreenHeader 
-          title="단체명 입력"
-          showBackButton={false}
-        />
-        <View style={themed($container)}>
-          <View style={$styles.contentContainer}>
-            <ContentSection
-              title="운영할 단체명을 입력해주세요"
-              variant="default"
-            >
-              <TextField
-                value={organizationName}
-                onChangeText={setOrganizationName}
-                placeholder="예: 극단 봄날"
-                style={themed($orgNameInput)}
-              />
-              
-              <View style={$styles.buttonRow}>
-                <Button
-                  text="취소"
-                  preset="default"
-                  onPress={() => {
-                    setShowOrgNameInput(false)
-                    setOrganizationName("")
-                  }}
-                  style={themed($cancelButton)}
-                />
-                <Button
-                  text="확인"
-                  onPress={handleConfirmConversion}
-                  isLoading={converting}
-                  style={themed($confirmButton)}
-                />
-              </View>
-            </ContentSection>
-          </View>
-        </View>
-      </Screen>
-    )
-  }
 
   return (
     <Screen preset="scroll" safeAreaEdges={[]}>
@@ -347,7 +222,7 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen()
               
               {userProfile.userType === "general" ? (
                 <Button
-                  text="운영자로 전환"
+                  text="운영자 계정으로 만들기"
                   onPress={handleConvertToOrganizer}
                   isLoading={converting}
                   style={themed($convertButton)}
@@ -553,18 +428,6 @@ const $revertButton = (wickedCharacterTheme: WickedCharacterTheme): ViewStyle =>
   marginTop: 8,
 })
 
-const $orgNameInput: ThemedStyle<ViewStyle> = () => ({
-  marginVertical: 16,
-})
-
-const $cancelButton: ThemedStyle<ViewStyle> = () => ({
-  flex: 1,
-})
-
-const $confirmButton: ThemedStyle<ViewStyle> = (theme) => ({
-  flex: 1,
-  backgroundColor: theme.colors.tint,
-})
 
 
 const $radioGroup: ThemedStyle<ViewStyle> = () => ({

@@ -26,7 +26,7 @@ const es: Translations = {
     matchingButton: "Iniciar Coincidencia",
   },
   signInScreen: {
-    title: "Welcome to Amie",
+    title: "Welcome to Orphy",
     subtitle: "Sign in to your account",
     emailPlaceholder: "Email",
     passwordPlaceholder: "Password",
@@ -256,7 +256,7 @@ const es: Translations = {
 
     // Messages
     verificationComplete: "Email Verified!",
-    welcomeMessage: "Welcome to Amie! You can now use all features.",
+    welcomeMessage: "Welcome to Orphy! You can now use all features.",
     resendTitle: "Verification Email Sent",
     resendMessage: "We've sent a new verification email to {{email}}",
     emailChangeSuccess: "Email Changed",

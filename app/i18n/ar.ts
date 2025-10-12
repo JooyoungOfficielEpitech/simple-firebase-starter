@@ -27,7 +27,7 @@ const ar: Translations = {
     matchingButton: "بدء المطابقة",
   },
   signInScreen: {
-    title: "Welcome to Amie",
+    title: "Welcome to Orphy",
     subtitle: "Sign in to your account",
     emailPlaceholder: "Email",
     passwordPlaceholder: "Password",
@@ -257,7 +257,7 @@ const ar: Translations = {
 
     // Messages
     verificationComplete: "تم التحقق من البريد الإلكتروني!",
-    welcomeMessage: "أهلاً بك في Amie! يمكنك الآن استخدام جميع الميزات.",
+    welcomeMessage: "أهلاً بك في Orphy! يمكنك الآن استخدام جميع الميزات.",
     resendTitle: "تم إرسال بريد التحقق",
     resendMessage: "لقد أرسلنا بريد تحقق جديد إلى {{email}}",
     emailChangeSuccess: "تم تغيير البريد الإلكتروني",

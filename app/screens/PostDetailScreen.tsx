@@ -409,7 +409,7 @@ export const PostDetailScreen = () => {
                     disabled={post.status !== "active"}
                   >
                     <Text 
-                      text="💼 지원하기" 
+                      text="지원하기" 
                       style={themed($applyButtonText)} 
                     />
                   </TouchableOpacity>

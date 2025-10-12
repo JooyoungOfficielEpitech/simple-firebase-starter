@@ -143,8 +143,15 @@ export const CreateOrganizationScreen = () => {
       newErrors.location = "소재지를 입력해주세요"
     }
 
-    // setErrors(newErrors)  // TODO: 에러 표시 기능 추가 후 사용
-    return Object.keys(newErrors).length === 0
+    // 에러가 있으면 Alert으로 표시
+    const errorMessages = Object.values(newErrors)
+    if (errorMessages.length > 0) {
+      const errorText = errorMessages.join('\n')
+      Alert.alert("입력 확인", `다음 항목을 확인해주세요:\n\n${errorText}`)
+      return false
+    }
+
+    return true
   }
 
   const handleSubmit = async () => {

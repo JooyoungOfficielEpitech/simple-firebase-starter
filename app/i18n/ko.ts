@@ -27,7 +27,7 @@ const ko: Translations = {
     matchingButton: "매칭 시작",
   },
   signInScreen: {
-    title: "Amie에 오신 것을 환영합니다",
+    title: "Orphy에 오신 것을 환영합니다",
     subtitle: "계정에 로그인하세요",
     emailPlaceholder: "이메일",
     passwordPlaceholder: "비밀번호",
@@ -256,7 +256,7 @@ const ko: Translations = {
 
     // Messages
     verificationComplete: "이메일 인증 완료!",
-    welcomeMessage: "Amie에 오신 것을 환영합니다! 이제 모든 기능을 사용하실 수 있습니다.",
+    welcomeMessage: "Orphy에 오신 것을 환영합니다! 이제 모든 기능을 사용하실 수 있습니다.",
     resendTitle: "인증 이메일 발송 완료",
     resendMessage: "{{email}}로 새로운 인증 이메일을 보냈습니다",
     emailChangeSuccess: "이메일 변경 완료",
