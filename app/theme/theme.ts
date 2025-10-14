@@ -6,6 +6,8 @@ import { colors as colorsGlinda } from "./colorsGlinda"
 import { colors as colorsGlindaDark } from "./colorsGlindaDark"
 import { colors as colorsGwynplaine } from "./colorsGwynplaine"
 import { colors as colorsGwynplaineDark } from "./colorsGwynplaineDark"
+import { colors as colorsJohanna } from "./colorsJohanna"
+import { colors as colorsJohannaDark } from "./colorsJohannaDark"
 import { spacing as spacingLight } from "./spacing"
 import { spacing as spacingDark } from "./spacingDark"
 import { timing } from "./timing"
@@ -18,6 +20,8 @@ export const getThemeColors = (isDark: boolean, wickedCharacter: WickedCharacter
     return isDark ? colorsGlindaDark : colorsGlinda
   } else if (wickedCharacter === "gwynplaine") {
     return isDark ? colorsGwynplaineDark : colorsGwynplaine
+  } else if (wickedCharacter === "johanna") {
+    return isDark ? colorsJohannaDark : colorsJohanna
   } else {
     return isDark ? colorsElphabaDark : colorsElphaba
   }
@@ -97,4 +101,23 @@ export const darkGwynplaineTheme: Theme = {
   timing,
   isDark: true,
   wickedCharacter: "gwynplaine",
+}
+
+// Johanna themes (sky blue-based)
+export const lightJohannaTheme: Theme = {
+  colors: colorsJohanna,
+  spacing: spacingLight,
+  typography,
+  timing,
+  isDark: false,
+  wickedCharacter: "johanna",
+}
+
+export const darkJohannaTheme: Theme = {
+  colors: colorsJohannaDark,
+  spacing: spacingDark,
+  typography,
+  timing,
+  isDark: true,
+  wickedCharacter: "johanna",
 }

@@ -8,6 +8,8 @@ import { colors as colorsGlinda } from "./colorsGlinda"
 import { colors as colorsGlindaDark } from "./colorsGlindaDark"
 import { colors as colorsGwynplaine } from "./colorsGwynplaine"
 import { colors as colorsGwynplaineDark } from "./colorsGwynplaineDark"
+import { colors as colorsJohanna } from "./colorsJohanna"
+import { colors as colorsJohannaDark } from "./colorsJohannaDark"
 import { spacing as spacingLight } from "./spacing"
 import { spacing as spacingDark } from "./spacingDark"
 import { timing } from "./timing"
@@ -18,11 +20,11 @@ export type ImmutableThemeContextModeT = "light" | "dark"
 export type ThemeContextModeT = ImmutableThemeContextModeT | undefined
 
 // Wicked character themes
-export type WickedCharacterTheme = "elphaba" | "glinda" | "gwynplaine"
+export type WickedCharacterTheme = "elphaba" | "glinda" | "gwynplaine" | "johanna"
 
 // Because we have multiple themes, we need to define the types for each of them.
 // All color variants should have the same keys, but different values.
-export type Colors = typeof colorsLight | typeof colorsDark | typeof colorsElphaba | typeof colorsElphabaDark | typeof colorsGlinda | typeof colorsGlindaDark | typeof colorsGwynplaine | typeof colorsGwynplaineDark
+export type Colors = typeof colorsLight | typeof colorsDark | typeof colorsElphaba | typeof colorsElphabaDark | typeof colorsGlinda | typeof colorsGlindaDark | typeof colorsGwynplaine | typeof colorsGwynplaineDark | typeof colorsJohanna | typeof colorsJohannaDark
 // The spacing type needs to take into account the different spacing values for light and dark themes.
 export type Spacing = typeof spacingLight | typeof spacingDark
 

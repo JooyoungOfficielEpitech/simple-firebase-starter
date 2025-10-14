@@ -27,6 +27,8 @@ import {
   darkGlindaTheme,
   lightGwynplaineTheme,
   darkGwynplaineTheme,
+  lightJohannaTheme,
+  darkJohannaTheme,
   getThemeColors
 } from "./theme"
 import type {
@@ -131,6 +133,8 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
         return darkGlindaTheme
       } else if (wickedCharacterTheme === "gwynplaine") {
         return darkGwynplaineTheme
+      } else if (wickedCharacterTheme === "johanna") {
+        return darkJohannaTheme
       } else {
         return darkElphabaTheme
       }
@@ -139,6 +143,8 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
         return lightGlindaTheme
       } else if (wickedCharacterTheme === "gwynplaine") {
         return lightGwynplaineTheme
+      } else if (wickedCharacterTheme === "johanna") {
+        return lightJohannaTheme
       } else {
         return lightElphabaTheme
       }

@@ -283,7 +283,21 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen({
                 />
                 <View style={themed($radioLabelContainer)}>
                   <Text style={themed($radioLabel)}>🍷 그윈플렌 (Gwynplaine)</Text>
-                  <Text style={themed($radioDescription)}>그래, 내가 바꿀수 있어 (모두의 세상)</Text>
+                  <Text style={themed($radioDescription)}>부자들의 낙원은 가난한 자들의 지옥으로 세워진 것이니까요</Text>
+                </View>
+              </View>
+              
+              <View style={themed($radioOption)}>
+                <Radio
+                  value={wickedCharacterTheme === "johanna"}
+                  onValueChange={() => !isThemeChanging && handleCharacterThemeChange("johanna")}
+                  inputDetailStyle={$johannaRadioDetail}
+                  inputOuterStyle={wickedCharacterTheme === "johanna" ? $johannaRadioOuterSelected : undefined}
+                  disabled={isThemeChanging}
+                />
+                <View style={themed($radioLabelContainer)}>
+                  <Text style={themed($radioLabel)}>🕊️ 조안나 (Johanna)</Text>
+                  <Text style={themed($radioDescription)}>날 수 없는 난 노래해</Text>
                 </View>
               </View>
             </View>
@@ -384,6 +398,8 @@ const getCurtainColor = (theme: WickedCharacterTheme): string => {
       return "#C2185B" // 짙은 핑크
     case "gwynplaine":
       return "#8D6E63" // 짙은 갈색
+    case "johanna":
+      return "#3F7CAC" // 어두운 하늘색
     default:
       return "#424242" // 기본 회색
   }
@@ -398,6 +414,8 @@ const getCurtainFoldColor = (theme: WickedCharacterTheme): string => {
       return "#880E4F" // 더 짙은 핑크
     case "gwynplaine":
       return "#5D4037" // 더 짙은 갈색
+    case "johanna":
+      return "#2E5984" // 더 짙은 하늘색
     default:
       return "#212121" // 더 짙은 회색
   }
@@ -412,6 +430,8 @@ const getRevertButtonColor = (characterTheme: WickedCharacterTheme): string => {
       return "#F06292" // 글린다 테마: 부드러운 핑크 (우아한 전환)
     case "gwynplaine":
       return "#8D6E63" // 그윈플렌 테마: 갈색 (어두운 느낌)
+    case "johanna":
+      return "#5DADE2" // 조안나 테마: 밝은 하늘색 (우울하지만 희망적인 색감)
     default:
       return "#FF5722" // 기본: 주황빛 빨강
   }
@@ -500,6 +520,15 @@ const $gwynplaineRadioDetail: ViewStyle = {
 
 const $gwynplaineRadioOuterSelected: ViewStyle = {
   borderColor: "#AD1457", // Gwynplaine wine/burgundy border when selected
+}
+
+// Johanna (Sky Blue) Radio Button Styles
+const $johannaRadioDetail: ViewStyle = {
+  backgroundColor: "#3F7CAC", // Johanna dark sky blue
+}
+
+const $johannaRadioOuterSelected: ViewStyle = {
+  borderColor: "#3F7CAC", // Johanna dark sky blue border when selected
 }
 
 // 커튼 컨테이너
