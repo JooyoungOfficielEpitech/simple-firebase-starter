@@ -1,10 +1,12 @@
 import { FC, useCallback } from "react"
-import { Image, ImageStyle, TextStyle, View, ViewStyle, Alert } from "react-native"
+import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
 
+import { AlertModal } from "@/components/AlertModal"
 import { Button } from "@/components/Button"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { useAuth } from "@/context/AuthContext"
+import { useAlert } from "@/hooks/useAlert"
 import { isRTL } from "@/i18n"
 import { useAppTheme } from "@/theme/context"
 import { $styles } from "@/theme/styles"
@@ -17,6 +19,7 @@ const welcomeFace = require("@assets/images/welcome-face.png")
 export const WelcomeScreen: FC = function WelcomeScreen() {
   const { themed, theme } = useAppTheme()
   const { logout, user, isLoading } = useAuth()
+  const { alert, alertState, hideAlert } = useAlert()
 
   const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
 
@@ -25,7 +28,7 @@ export const WelcomeScreen: FC = function WelcomeScreen() {
       await logout()
     } catch (error) {
       console.warn("Logout failed in WelcomeScreen:", error)
-      Alert.alert("오류", "로그아웃에 실패했습니다")
+      alert("오류", "로그아웃에 실패했습니다")
     }
   }, [logout])
 
@@ -70,6 +73,14 @@ export const WelcomeScreen: FC = function WelcomeScreen() {
           disabled={isLoggingOut}
         />
       </View>
+      <AlertModal
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        buttons={alertState.buttons}
+        onDismiss={hideAlert}
+        dismissable={alertState.dismissable}
+      />
     </Screen>
   )
 }

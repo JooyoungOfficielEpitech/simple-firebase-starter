@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react"
-import { View, FlatList, TouchableOpacity, Alert, Linking, ScrollView } from "react-native"
+import { View, FlatList, TouchableOpacity, Linking, ScrollView } from "react-native"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import type { RouteProp } from "@react-navigation/native"
@@ -9,8 +9,10 @@ import { Screen } from "@/components/Screen"
 import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
 import { Icon } from "@/components/Icon"
+import { AlertModal } from "@/components/AlertModal"
 import { ApplicationService, Application, ApplicationStatus } from "@/services/firestore/applicationService"
 import { useAppTheme } from "@/theme/context"
+import { useAlert } from "@/hooks/useAlert"
 import { BulletinBoardStackParamList } from "@/navigators/BulletinBoardStackNavigator"
 
 type NavigationProp = NativeStackNavigationProp<BulletinBoardStackParamList>
@@ -40,6 +42,8 @@ export const ApplicationManagementScreen = () => {
     themed,
     theme: { colors, spacing },
   } = useAppTheme()
+
+  const { alertState, alert, hideAlert } = useAlert()
 
   const [applications, setApplications] = useState<Application[]>([])
   const [loading, setLoading] = useState(true)
@@ -90,7 +94,7 @@ export const ApplicationManagementScreen = () => {
 
   const handleStatusChange = useCallback(async (applicationId: string, newStatus: ApplicationStatus) => {
     if (!applicationId?.trim()) {
-      Alert.alert("오류", "잘못된 지원서 ID입니다.")
+      alert("오류", "잘못된 지원서 ID입니다.")
       return
     }
 
@@ -105,11 +109,11 @@ export const ApplicationManagementScreen = () => {
       }
       
       const statusText = statusLabels[newStatus]
-      Alert.alert("상태 변경 완료", `지원자 상태가 ${statusText}으로 변경되었습니다.`)
+      alert("상태 변경 완료", `지원자 상태가 ${statusText}으로 변경되었습니다.`)
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "상태 변경에 실패했습니다."
       console.error('ApplicationManagement - Status update error:', error)
-      Alert.alert("상태 변경 실패", errorMessage)
+      alert("상태 변경 실패", errorMessage)
     }
   }, [])
 
@@ -120,12 +124,12 @@ export const ApplicationManagementScreen = () => {
         if (supported) {
           return Linking.openURL(phoneUrl)
         } else {
-          Alert.alert("오류", "전화 앱을 열 수 없습니다.")
+          alert("오류", "전화 앱을 열 수 없습니다.")
         }
       })
       .catch(error => {
         console.error('ApplicationManagement - Phone call error:', error)
-        Alert.alert("오류", "전화를 걸 수 없습니다.")
+        alert("오류", "전화를 걸 수 없습니다.")
       })
   }, [])
 
@@ -135,12 +139,12 @@ export const ApplicationManagementScreen = () => {
         if (supported) {
           return Linking.openURL(url)
         } else {
-          Alert.alert("오류", "링크를 열 수 없습니다.")
+          alert("오류", "링크를 열 수 없습니다.")
         }
       })
       .catch(error => {
         console.error('ApplicationManagement - Portfolio URL error:', error)
-        Alert.alert("오류", "링크를 열 수 없습니다.")
+        alert("오류", "링크를 열 수 없습니다.")
       })
   }, [])
 
@@ -196,7 +200,7 @@ export const ApplicationManagementScreen = () => {
       withdrawn: "철회됨"
     }
 
-    Alert.alert(
+    alert(
       application.applicantName,
       `${application.applicantEmail}\n상태: ${statusLabels[application.status]}`,
       options
@@ -375,6 +379,14 @@ export const ApplicationManagementScreen = () => {
           )}
         </View>
       </View>
+      <AlertModal
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        buttons={alertState.buttons}
+        onDismiss={hideAlert}
+        dismissable={alertState.dismissable}
+      />
     </Screen>
   )
 }

@@ -206,13 +206,48 @@ export class ApplicationService {
         throw new Error("이미 해당 공고에 지원하셨습니다.")
       }
 
-      // 사용자 정보 조회
+      // 사용자 정보 조회 및 프로필 완성도 확인
       const userDoc = await this.db.collection("users").doc(userId).get()
       if (!userDoc.exists) {
         throw new Error("사용자 정보를 찾을 수 없습니다.")
       }
       
       const userData = userDoc.data()
+      
+      // 실시간 프로필 완성도 검증
+      const isProfileComplete = Boolean(
+        userData?.gender &&
+        userData?.birthday &&
+        typeof userData?.heightCm === "number"
+      )
+      
+      console.log("🔍 [ApplicationService] 지원 시 프로필 완성도 검증:", {
+        gender: userData?.gender,
+        birthday: userData?.birthday,
+        heightCm: userData?.heightCm,
+        heightCmType: typeof userData?.heightCm,
+        isProfileComplete,
+        storedComplete: userData?.requiredProfileComplete
+      })
+      
+      // 프로필이 완성되지 않은 경우에는 이미 화면에서 처리됨
+      // 여기서는 추가 로깅만 진행
+      
+      // 저장된 완성도 상태와 실제 상태가 다른 경우 업데이트
+      if (userData?.requiredProfileComplete !== isProfileComplete) {
+        console.log("🔄 [ApplicationService] 프로필 완성도 불일치, 즉시 업데이트")
+        try {
+          await this.db.collection("users").doc(userId).update({
+            requiredProfileComplete: isProfileComplete,
+            updatedAt: this.getServerTimestamp()
+          })
+          userData.requiredProfileComplete = isProfileComplete
+          console.log("✅ [ApplicationService] 프로필 완성도 업데이트 완료")
+        } catch (updateError) {
+          console.error("❌ [ApplicationService] 프로필 완성도 업데이트 실패:", updateError)
+          // 업데이트 실패해도 지원은 진행 (실제 완성도는 확인했으므로)
+        }
+      }
       const docRef = this.db.collection("applications").doc()
       
       // 기본 필수 필드들

@@ -294,6 +294,7 @@ const en = {
     },
     actions: {
       createFirstPost: "Create first recruitment post",
+      createPost: "Create new post",
       exploreOrganizations: "Explore other organizations",
       createOrganization: "Register new organization",
       addSampleData: "Add sample data",

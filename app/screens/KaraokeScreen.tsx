@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react"
-import { View, ViewStyle } from "react-native"
+import { View, ViewStyle, TextStyle } from "react-native"
 import { AVPlaybackStatus } from "expo-av"
 import { MMKV } from "react-native-mmkv"
 
@@ -80,13 +80,6 @@ export function KaraokeScreen({ route, navigation }: HomeStackScreenProps<"Karao
       <View style={themed($container)}>
         {/* 곡 정보 */}
         <View style={themed($songInfoContainer)}>
-          {testSong.artist && (
-            <Text 
-              text={testSong.artist} 
-              preset="subheading"
-              style={themed($artistName)} 
-            />
-          )}
         </View>
 
         {/* 오디오 플레이어 */}
@@ -149,12 +142,6 @@ const $songTitle: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   marginBottom: spacing.sm,
 })
 
-const $artistName: ThemedStyle<ViewStyle> = ({ colors, typography }) => ({
-  textAlign: "center",
-  color: colors.textDim,
-  fontSize: 18,
-  fontFamily: typography.primary.normal,
-})
 
 const $playerContainer: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
   backgroundColor: colors.palette.neutral100,
@@ -180,7 +167,7 @@ const $musicIcon: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   marginBottom: spacing.md,
 })
 
-const $noAudioText: ThemedStyle<ViewStyle> = ({ colors, typography }) => ({
+const $noAudioText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   textAlign: "center",
   color: colors.textDim,
   fontSize: 16,

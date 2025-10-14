@@ -296,6 +296,7 @@ const ar: Translations = {
     },
     actions: {
       createFirstPost: "إنشاء أول إعلان توظيف",
+      createPost: "إنشاء منشور جديد",
       exploreOrganizations: "استكشاف منظمات أخرى",
       createOrganization: "تسجيل منظمة جديدة",
       addSampleData: "إضافة بيانات تجريبية",

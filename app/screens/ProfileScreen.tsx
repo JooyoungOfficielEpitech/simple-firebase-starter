@@ -1,11 +1,13 @@
 import { FC, useEffect, useState, useMemo } from "react"
-import { View, ViewStyle, ScrollView, Alert, TouchableOpacity } from "react-native"
+import { View, ViewStyle, ScrollView, TouchableOpacity } from "react-native"
 import { Screen } from "@/components/Screen"
 import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
 import { Button } from "@/components/Button"
+import { AlertModal } from "@/components/AlertModal"
 import { useAppTheme } from "@/theme/context"
 import { useAuth } from "@/context/AuthContext"
+import { useAlert } from "@/hooks/useAlert"
 import { userService } from "@/services/firestore"
 import type { ThemedStyle } from "@/theme/types"
 import type { UserProfile } from "@/types/user"
@@ -18,6 +20,7 @@ interface ProfileScreenProps {
 export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
   const { themed } = useAppTheme()
   const { user, isEmailVerified, logout, sendEmailVerification, updateUserEmail } = useAuth()
+  const { alertState, alert, confirm, confirmDestructive, hideAlert } = useAlert()
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isUpdating, setIsUpdating] = useState(false)
@@ -75,9 +78,9 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
     try {
       setIsUpdating(true)
       await sendEmailVerification()
-      Alert.alert("알림", "인증 이메일이 발송되었습니다.")
+      alert("알림", "인증 이메일이 발송되었습니다.")
     } catch (error) {
-      Alert.alert("오류", "이메일 발송에 실패했습니다.")
+      alert("오류", "이메일 발송에 실패했습니다.")
     } finally {
       setIsUpdating(false)
     }
@@ -90,7 +93,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
     try {
       const hasOrganization = await userService.hasOwnedOrganization()
       if (hasOrganization) {
-        Alert.alert("알림", "이미 단체를 소유하고 있습니다. 계정당 하나의 단체만 소유할 수 있습니다.")
+        alert("알림", "이미 단체를 소유하고 있습니다. 계정당 하나의 단체만 소유할 수 있습니다.")
         return
       }
     } catch (error) {
@@ -102,7 +105,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
       const autoResult = await userService.attemptAutoOrganizerConversion()
       
       if (autoResult.success) {
-        Alert.alert("성공", `${autoResult.organizationName} 운영자로 전환되었습니다.`)
+        alert("성공", `${autoResult.organizationName} 운영자로 전환되었습니다.`)
         await loadUserProfile()
         return
       }
@@ -115,38 +118,32 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
   }
 
   const handleDeleteAccount = () => {
-    Alert.alert(
+    confirmDestructive(
       "회원 탈퇴",
       "정말로 계정 데이터를 모두 삭제하시겠습니까?\n\n⚠️ 다음 데이터가 모두 삭제됩니다:\n• 프로필 정보\n• 작성한 게시글\n• 제출한 지원서\n• 받은 알림\n• 소유한 단체 정보\n\n이 작업은 되돌릴 수 없습니다.",
-      [
-        { text: "취소", style: "cancel" },
-        {
-          text: "회원 탈퇴",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              setIsUpdating(true)
-              
-              // 모든 사용자 데이터 삭제
-              await userService.deleteUserAccount()
-              
-              // 데이터 삭제 후 로그아웃
-              await logout()
-              
-              Alert.alert("완료", "모든 데이터가 삭제되었습니다.")
-              
-            } catch (error) {
-              console.error("데이터 삭제 오류:", error)
-              Alert.alert(
-                "삭제 실패", 
-                error.message || "데이터 삭제에 실패했습니다. 다시 시도해주세요."
-              )
-            } finally {
-              setIsUpdating(false)
-            }
-          }
+      "회원 탈퇴",
+      async () => {
+        try {
+          setIsUpdating(true)
+          
+          // 모든 사용자 데이터 삭제
+          await userService.deleteUserAccount()
+          
+          // 데이터 삭제 후 로그아웃
+          await logout()
+          
+          alert("완료", "모든 데이터가 삭제되었습니다.")
+          
+        } catch (error) {
+          console.error("데이터 삭제 오류:", error)
+          alert(
+            "삭제 실패", 
+            error.message || "데이터 삭제에 실패했습니다. 다시 시도해주세요."
+          )
+        } finally {
+          setIsUpdating(false)
         }
-      ]
+      }
     )
   }
 
@@ -249,20 +246,17 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
     console.log("🎯 [ProfileScreen] 완성도 클릭 - missing:", missing.length, "completed:", completed.length, "percentage:", percentage)
     
     if (missing.length === 0) {
-      Alert.alert("프로필 완성!", "모든 프로필 정보가 완성되었습니다. 🎉")
+      alert("프로필 완성!", "모든 프로필 정보가 완성되었습니다. 🎉")
       return
     }
     
     const missingList = missing.map(item => `• ${item.label} (현재: ${item.value || '미설정'})`).join('\n')
     const completedList = completed.map(item => `• ${item.label} (현재: ${item.value})`).join('\n')
     
-    Alert.alert(
+    confirm(
       "프로필 완성도",
       `완성된 항목 (${completed.length}/4):\n${completedList || '없음'}\n\n아직 필요한 항목 (${missing.length}/4):\n${missingList}`,
-      [
-        { text: "닫기", style: "cancel" },
-        { text: "프로필 편집", onPress: () => navigation?.navigate("EditProfile") }
-      ]
+      () => navigation?.navigate("EditProfile")
     )
   }
 
@@ -375,7 +369,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
             text="비밀번호 변경"
             onPress={() => {
               // TODO: 비밀번호 변경 화면으로 이동
-              Alert.alert("알림", "비밀번호 변경 화면 구현 예정")
+              alert("알림", "비밀번호 변경 화면 구현 예정")
             }}
             style={themed($button)}
           />
@@ -389,7 +383,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
             text="이메일 변경"
             onPress={() => {
               // TODO: 이메일 변경 로직
-              Alert.alert("알림", "이메일 변경 기능 구현 예정")
+              alert("알림", "이메일 변경 기능 구현 예정")
             }}
             style={themed($button)}
           />
@@ -417,6 +411,16 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
             disabled={isUpdating}
           />
         </View>
+
+        {/* Alert Modal */}
+        <AlertModal
+          visible={alertState.visible}
+          title={alertState.title}
+          message={alertState.message}
+          buttons={alertState.buttons}
+          onDismiss={hideAlert}
+          dismissable={alertState.dismissable}
+        />
     </Screen>
   )
 }

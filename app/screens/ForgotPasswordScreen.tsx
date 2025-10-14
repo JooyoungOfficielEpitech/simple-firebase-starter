@@ -1,6 +1,6 @@
 // 비밀번호 찾기 화면
 import { type FC, useCallback, useState } from "react"
-import { View, Alert, type TextStyle, type ViewStyle } from "react-native"
+import { View, type TextStyle, type ViewStyle } from "react-native"
 import { zodResolver } from "@hookform/resolvers/zod"
 import auth from "@react-native-firebase/auth"
 import { useForm } from "react-hook-form"
@@ -16,6 +16,8 @@ import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { translate } from "@/i18n/translate"
 import type { AppStackScreenProps } from "@/navigators/AppNavigator"
+import { AlertModal } from "@/components/AlertModal"
+import { useAlert } from "@/hooks/useAlert"
 import { useAppTheme } from "@/theme/context"
 import { type ThemedStyle } from "@/theme/types"
 
@@ -34,6 +36,7 @@ export const ForgotPasswordScreen: FC<ForgotPasswordScreenProps> = function Forg
   const { themed } = useAppTheme()
   const [isLoading, setIsLoading] = useState(false)
   const [isEmailSent, setIsEmailSent] = useState(false)
+  const { alert, alertState, hideAlert } = useAlert()
 
   const forgotPasswordForm = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -67,9 +70,9 @@ export const ForgotPasswordScreen: FC<ForgotPasswordScreenProps> = function Forg
       const canResetPassword = await validateEmailForPasswordReset(data.email)
 
       if (!canResetPassword) {
-        Alert.alert(
+        alert(
           translate("forgotPasswordScreen:errorTitle"),
-          translate("forgotPasswordScreen:emailNotEligible"),
+          translate("forgotPasswordScreen:emailNotEligible")
         )
         return
       }
@@ -77,14 +80,14 @@ export const ForgotPasswordScreen: FC<ForgotPasswordScreenProps> = function Forg
       await auth().sendPasswordResetEmail(data.email)
 
       setIsEmailSent(true)
-      Alert.alert(
+      alert(
         translate("forgotPasswordScreen:successTitle"),
-        translate("forgotPasswordScreen:successMessage"),
+        translate("forgotPasswordScreen:successMessage")
       )
     } catch (error) {
-      Alert.alert(
+      alert(
         translate("forgotPasswordScreen:errorTitle"),
-        error instanceof Error ? error.message : translate("forgotPasswordScreen:sendFailed"),
+        error instanceof Error ? error.message : translate("forgotPasswordScreen:sendFailed")
       )
     } finally {
       setIsLoading(false)
@@ -150,6 +153,14 @@ export const ForgotPasswordScreen: FC<ForgotPasswordScreenProps> = function Forg
           buttonProps={{ preset: "default" }}
         />
       </View>
+
+      <AlertModal
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        buttons={alertState.buttons}
+        onDismiss={hideAlert}
+      />
     </Screen>
   )
 }

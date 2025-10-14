@@ -170,12 +170,12 @@ export class PostService {
   /**
    * 게시글 목록 조회 (활성 게시글만)
    */
-  async getPosts(limit = 20): Promise<Post[]> {
+  async getPosts(maxLimit = 20): Promise<Post[]> {
     // 임시로 모든 게시글을 가져온 후 클라이언트에서 필터링
     const q = query(
       collection(this.db, "posts"),
       orderBy("createdAt", "desc"),
-      limit(limit * 2) // 여유분을 두고 가져옴
+      limit(maxLimit * 2) // 여유분을 두고 가져옴
     )
     const snapshot = await getDocs(q)
 
@@ -187,7 +187,7 @@ export class PostService {
     // 클라이언트에서 active 상태만 필터링
     return allPosts
       .filter(post => post.status === "active")
-      .slice(0, limit)
+      .slice(0, maxLimit)
   }
 
   /**

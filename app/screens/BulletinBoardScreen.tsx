@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react"
-import { View, Alert, TouchableOpacity, FlatList } from "react-native"
+import { View, TouchableOpacity, FlatList } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useNavigation } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
+import { AlertModal } from "@/components/AlertModal"
 import { Button } from "@/components/Button"
 import { Icon } from "@/components/Icon"
 import { Screen } from "@/components/Screen"
@@ -14,6 +15,7 @@ import { postService, userService, organizationService } from "@/services/firest
 import firestore from "@react-native-firebase/firestore"
 import auth from "@react-native-firebase/auth"
 import { useAppTheme } from "@/theme/context"
+import { useAlert } from "@/hooks/useAlert"
 import { Post } from "@/types/post"
 import { UserProfile } from "@/types/user"
 import { Organization } from "@/types/organization"
@@ -31,6 +33,7 @@ export const BulletinBoardScreen = () => {
     themed,
     theme: { colors, spacing },
   } = useAppTheme()
+  const { alertState, alert, hideAlert } = useAlert()
   
   // State hooks - all called unconditionally
   const [posts, setPosts] = useState<Post[]>([])
@@ -132,7 +135,7 @@ export const BulletinBoardScreen = () => {
     
     if (!isOrganizer) {
       console.log('❌ [CreatePost] 권한 없음 - 알림 표시')
-      Alert.alert("권한 없음", "게시글 작성은 관리자만 가능합니다.")
+      alert("권한 없음", "게시글 작성은 관리자만 가능합니다.")
       return
     }
     
@@ -427,7 +430,7 @@ export const BulletinBoardScreen = () => {
       await organizationService.updateAllActivePostCounts()
       console.log('✅ [AddTestData] 활성 공고 수 업데이트 완료')
 
-      Alert.alert('성공', '테스트 데이터가 추가되었습니다!')
+      alert('성공', '테스트 데이터가 추가되었습니다!')
     } catch (error) {
       console.error('❌ [AddTestData] 데이터 추가 실패:', error)
       console.error('❌ [AddTestData] 에러 상세:', {
@@ -435,7 +438,7 @@ export const BulletinBoardScreen = () => {
         message: error.message,
         stack: error.stack
       })
-      Alert.alert('오류', '데이터 추가에 실패했습니다.')
+      alert('오류', '데이터 추가에 실패했습니다.')
     }
   }
   
@@ -701,6 +704,16 @@ export const BulletinBoardScreen = () => {
           )}
         </View>
       </View>
+
+      {/* Alert Modal */}
+      <AlertModal
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        buttons={alertState.buttons}
+        onDismiss={hideAlert}
+        dismissable={alertState.dismissable}
+      />
     </Screen>
   )
 }

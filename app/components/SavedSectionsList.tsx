@@ -1,8 +1,10 @@
 import React from "react"
-import { View, ViewStyle, TextStyle, TouchableOpacity, ScrollView, Alert } from "react-native"
+import { View, ViewStyle, TextStyle, TouchableOpacity, ScrollView } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 
+import { AlertModal } from "@/components/AlertModal"
 import { Text } from "@/components/Text"
+import { useAlert } from "@/hooks/useAlert"
 import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
 import type { SavedSection } from "@/components/AudioPlayer"
@@ -36,6 +38,7 @@ export function SavedSectionsList({
   style,
 }: SavedSectionsListProps) {
   const { themed } = useAppTheme()
+  const { alertState, confirmDestructive, hideAlert } = useAlert()
 
   // 시간 포맷 함수
   const formatTime = (milliseconds: number) => {
@@ -46,17 +49,10 @@ export function SavedSectionsList({
   }
 
   const handleDeleteSection = (sectionId: string, sectionName: string) => {
-    Alert.alert(
+    confirmDestructive(
       "삭제 확인",
       `"${sectionName}" 구간을 삭제하시겠습니까?`,
-      [
-        { text: "취소", style: "cancel" },
-        { 
-          text: "삭제", 
-          style: "destructive",
-          onPress: () => onDeleteSection(sectionId)
-        }
-      ]
+      () => onDeleteSection(sectionId)
     )
   }
 
@@ -116,6 +112,16 @@ export function SavedSectionsList({
           </View>
         ))}
       </ScrollView>
+
+      {/* Alert Modal */}
+      <AlertModal
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        buttons={alertState.buttons}
+        onDismiss={hideAlert}
+        dismissable={alertState.dismissable}
+      />
     </View>
   )
 }

@@ -1,10 +1,12 @@
 import { FC, useEffect, useState } from "react"
-import { View, ViewStyle, Alert } from "react-native"
+import { View, ViewStyle } from "react-native"
 import { Screen } from "@/components/Screen"
 import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
 import { Button } from "@/components/Button"
 import { TextField } from "@/components/TextField"
+import { AlertModal } from "@/components/AlertModal"
+import { useAlert } from "@/hooks/useAlert"
 import { useAppTheme } from "@/theme/context"
 import { useAuth } from "@/context/AuthContext"
 import { userService } from "@/services/firestore"
@@ -19,6 +21,7 @@ interface EditProfileScreenProps {
 export const EditProfileScreen: FC<EditProfileScreenProps> = ({ navigation }) => {
   const { themed } = useAppTheme()
   const { user } = useAuth()
+  const { alert } = useAlert()
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -49,7 +52,7 @@ export const EditProfileScreen: FC<EditProfileScreenProps> = ({ navigation }) =>
       }
     } catch (error) {
       console.error("프로필 로드 오류:", error)
-      Alert.alert("오류", "프로필을 불러올 수 없습니다.")
+      alert("오류", "프로필을 불러올 수 없습니다.")
     } finally {
       setIsLoading(false)
     }
@@ -57,7 +60,7 @@ export const EditProfileScreen: FC<EditProfileScreenProps> = ({ navigation }) =>
 
   const handleSave = async () => {
     if (!name.trim()) {
-      Alert.alert("알림", "이름을 입력해주세요.")
+      alert("알림", "이름을 입력해주세요.")
       return
     }
 
@@ -79,26 +82,26 @@ export const EditProfileScreen: FC<EditProfileScreenProps> = ({ navigation }) =>
       if (heightCm) {
         const height = parseInt(heightCm)
         if (isNaN(height) || height <= 0) {
-          Alert.alert("알림", "올바른 키를 입력해주세요.")
+          alert("알림", "올바른 키를 입력해주세요.")
           return
         }
         updateData.heightCm = height
       }
 
       await userService.updateUserProfile(updateData)
-      Alert.alert("성공", "프로필이 업데이트되었습니다.", [
+      alert("성공", "프로필이 업데이트되었습니다.", [
         { text: "확인", onPress: () => navigation.goBack() }
       ])
     } catch (error) {
       console.error("프로필 업데이트 오류:", error)
-      Alert.alert("오류", "프로필 업데이트에 실패했습니다.")
+      alert("오류", "프로필 업데이트에 실패했습니다.")
     } finally {
       setIsSaving(false)
     }
   }
 
   const handleGenderSelect = () => {
-    Alert.alert(
+    alert(
       "성별 선택",
       "성별을 선택해주세요.",
       [
@@ -197,6 +200,14 @@ export const EditProfileScreen: FC<EditProfileScreenProps> = ({ navigation }) =>
           />
         </View>
       </View>
+      <AlertModal
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        buttons={alertState.buttons}
+        onDismiss={hideAlert}
+        dismissable={alertState.dismissable}
+      />
     </Screen>
   )
 }

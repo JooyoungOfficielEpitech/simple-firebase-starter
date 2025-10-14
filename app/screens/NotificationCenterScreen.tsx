@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react"
-import { View, ViewStyle, TouchableOpacity, ActivityIndicator } from "react-native"
+import { View, ViewStyle, TextStyle, TouchableOpacity, ActivityIndicator } from "react-native"
 import { Screen } from "@/components/Screen"
 import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
@@ -229,7 +229,7 @@ const $emptyTitle: ThemedStyle<ViewStyle> = ({ colors }) => ({
   marginBottom: 8,
 })
 
-const $emptyMessage: ThemedStyle<ViewStyle> = ({ colors }) => ({
+const $emptyMessage: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 14,
   color: colors.textDim,
   textAlign: "center",
@@ -273,7 +273,7 @@ const $cardTime: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   marginLeft: spacing.xs,
 })
 
-const $cardMessage: ThemedStyle<ViewStyle> = ({ colors }) => ({
+const $cardMessage: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 15,
   color: colors.textDim,
   lineHeight: 22,

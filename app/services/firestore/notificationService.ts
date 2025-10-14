@@ -153,7 +153,7 @@ export class NotificationService {
 
       console.log(`🧹 [NotificationService] ${daysOld}일 이전 알림 정리 시작 (기준: ${cutoffDate.toISOString()})`)
 
-      let query = this.db.collection('notifications')
+      let query: FirebaseFirestoreTypes.Query<FirebaseFirestoreTypes.DocumentData> = this.db.collection('notifications')
       
       // 특정 사용자 지정된 경우
       if (userId) {

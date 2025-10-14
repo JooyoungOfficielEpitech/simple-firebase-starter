@@ -295,6 +295,7 @@ const es: Translations = {
     },
     actions: {
       createFirstPost: "Crear primer anuncio de reclutamiento",
+      createPost: "Crear nueva publicación",
       exploreOrganizations: "Explorar otras organizaciones",
       createOrganization: "Registrar nueva organización",
       addSampleData: "Agregar datos de muestra",

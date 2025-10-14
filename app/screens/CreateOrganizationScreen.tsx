@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from "react"
-import { View, Alert, TouchableOpacity } from "react-native"
+import { View, TouchableOpacity } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { Button } from "@/components/Button"
 import { Icon } from "@/components/Icon"
+import { AlertModal } from "@/components/AlertModal"
 import { Screen } from "@/components/Screen"
 import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
 import { TextField } from "@/components/TextField"
 import { organizationService, userService } from "@/services/firestore"
 import { useAppTheme } from "@/theme/context"
+import { useAlert } from "@/hooks/useAlert"
 import { CreateOrganization } from "@/types/organization"
 import { UserProfile } from "@/types/user"
 import { BulletinBoardStackParamList } from "@/navigators/BulletinBoardStackNavigator"
@@ -27,6 +29,8 @@ export const CreateOrganizationScreen = () => {
     themed,
     theme: { colors, spacing },
   } = useAppTheme()
+
+  const { alertState, alert, hideAlert } = useAlert()
 
   const { organizationId, isEdit = false, isOrganizerConversion = false } = route.params || {}
 
@@ -116,7 +120,7 @@ export const CreateOrganizationScreen = () => {
       }
     } catch (error) {
       console.error("단체 정보 로드 오류:", error)
-      Alert.alert("오류", "단체 정보를 불러오지 못했습니다.")
+      alert("오류", "단체 정보를 불러오지 못했습니다.")
     } finally {
       setLoading(false)
     }
@@ -147,7 +151,7 @@ export const CreateOrganizationScreen = () => {
     const errorMessages = Object.values(newErrors)
     if (errorMessages.length > 0) {
       const errorText = errorMessages.join('\n')
-      Alert.alert("입력 확인", `다음 항목을 확인해주세요:\n\n${errorText}`)
+      alert("입력 확인", `다음 항목을 확인해주세요:\n\n${errorText}`)
       return false
     }
 
@@ -160,7 +164,7 @@ export const CreateOrganizationScreen = () => {
     }
 
     if (!userProfile?.name) {
-      Alert.alert("오류", "사용자 프로필 정보가 필요합니다.")
+      alert("오류", "사용자 프로필 정보가 필요합니다.")
       return
     }
 
@@ -170,7 +174,7 @@ export const CreateOrganizationScreen = () => {
       if (isEdit && organizationId) {
         // 기존 단체 수정
         await organizationService.updateOrganization(organizationId, formData)
-        Alert.alert("성공", "단체 정보가 수정되었습니다.")
+        alert("성공", "단체 정보가 수정되었습니다.")
       } else if (isOrganizerConversion) {
         // 운영자 전환과 동시에 단체 생성
         const result = await userService.convertToOrganizerWithOrganization({
@@ -197,15 +201,15 @@ export const CreateOrganizationScreen = () => {
         })
 
         if (result.success) {
-          Alert.alert("성공", "운영자 계정으로 전환되고 단체가 등록되었습니다.")
+          alert("성공", "운영자 계정으로 전환되고 단체가 등록되었습니다.")
         } else {
-          Alert.alert("오류", result.error || "운영자 전환에 실패했습니다.")
+          alert("오류", result.error || "운영자 전환에 실패했습니다.")
           return
         }
       } else {
         // 일반 단체 등록 (이제 제거 예정)
         await organizationService.createOrganization(formData, userProfile.name)
-        Alert.alert("성공", "단체가 등록되었습니다.")
+        alert("성공", "단체가 등록되었습니다.")
       }
 
       navigation.goBack()
@@ -216,7 +220,7 @@ export const CreateOrganizationScreen = () => {
         : isEdit 
           ? "단체 수정에 실패했습니다." 
           : "단체 등록에 실패했습니다."
-      Alert.alert("오류", errorMessage)
+      alert("오류", errorMessage)
     } finally {
       // setSubmitting(false)  // TODO: 로딩 상태 표시 기능 추가 후 사용
     }
@@ -571,6 +575,14 @@ export const CreateOrganizationScreen = () => {
           />
         </View>
       </View>
+      <AlertModal
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        buttons={alertState.buttons}
+        onDismiss={hideAlert}
+        dismissable={alertState.dismissable}
+      />
     </Screen>
   )
 }

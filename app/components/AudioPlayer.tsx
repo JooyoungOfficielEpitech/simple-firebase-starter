@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from "react"
-import { View, ViewStyle, TextStyle, TouchableOpacity, TouchableOpacityProps, ScrollView, Alert, Animated, Modal, TextInput } from "react-native"
+import { View, ViewStyle, TextStyle, TouchableOpacity, TouchableOpacityProps, ScrollView, Animated, Modal, TextInput } from "react-native"
 import { Audio, AVPlaybackStatus } from "expo-av"
 import { Ionicons } from "@expo/vector-icons"
 import { PanGestureHandler, GestureHandlerRootView } from "react-native-gesture-handler"
 import { MMKV } from "react-native-mmkv"
 
+import { AlertModal } from "@/components/AlertModal"
 import { Icon } from "@/components/Icon"
 import { Text } from "@/components/Text"
+import { useAlert } from "@/hooks/useAlert"
 import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
 
@@ -108,6 +110,7 @@ export function AudioPlayer({
   loadSection,
 }: AudioPlayerProps) {
   const { themed } = useAppTheme()
+  const { alertState, alert, hideAlert } = useAlert()
   const [sound, setSound] = useState<Audio.Sound | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -290,7 +293,7 @@ export function AudioPlayer({
       setHasAutoSetB(true) // 외부 로드 시 자동 설정 방지
       userSetB.current = true // 외부 로드도 사용자 설정으로 간주
       onLoadSection?.(loadSection)
-      Alert.alert("로드 완료", `"${loadSection.name}" 구간이 로드되었습니다.`)
+      alert("로드 완료", `"${loadSection.name}" 구간이 로드되었습니다.`)
     }
   }, [loadSection, onLoadSection])
 
@@ -466,7 +469,7 @@ export function AudioPlayer({
         startPulseAnimation()
       } else if (sectionSettingStep === 'setting-b') {
         if (loopState.pointA !== null && timeInSeconds <= loopState.pointA) {
-          Alert.alert("오류", "B 지점은 A 지점보다 뒤에 있어야 합니다.")
+          alert("오류", "B 지점은 A 지점보다 뒤에 있어야 합니다.")
           return
         }
         setLoopState(prev => ({ ...prev, pointB: timeInSeconds }))
@@ -476,7 +479,7 @@ export function AudioPlayer({
         
         // 자동으로 저장 옵션 표시
         setTimeout(() => {
-          Alert.alert(
+          alert(
             "구간 설정 완료", 
             "A-B 구간이 무한 반복됩니다. 이 구간을 저장하시겠습니까?",
             [
@@ -551,7 +554,7 @@ export function AudioPlayer({
   const setPointBToCurrentTime = () => {
     const currentTime = position / 1000
     if (loopState.pointA !== null && currentTime <= loopState.pointA) {
-      Alert.alert("오류", "B 지점은 A 지점보다 뒤에 있어야 합니다.")
+      alert("오류", "B 지점은 A 지점보다 뒤에 있어야 합니다.")
       return
     }
     setLoopState(prev => {
@@ -616,7 +619,7 @@ export function AudioPlayer({
   // 구간 저장 - 사용자 입력 이름 사용
   const saveSection = (name: string) => {
     if (loopState.pointA === null || loopState.pointB === null) {
-      Alert.alert("오류", "A, B 구간을 먼저 설정해주세요.")
+      alert("오류", "A, B 구간을 먼저 설정해주세요.")
       return
     }
 
@@ -634,7 +637,7 @@ export function AudioPlayer({
     // 로컬 스토리지에 자동 저장
     saveSectionsToStorage(updatedSections)
     
-    Alert.alert("저장 완료!", `"${newSection.name}" 구간이 저장되었습니다.`)
+    alert("저장 완료!", `"${newSection.name}" 구간이 저장되었습니다.`)
   }
 
 
@@ -855,6 +858,16 @@ export function AudioPlayer({
         {isLoading && (
           <Text text="로딩 중..." style={themed($statusText)} />
         )}
+
+        {/* Alert Modal */}
+        <AlertModal
+          visible={alertState.visible}
+          title={alertState.title}
+          message={alertState.message}
+          buttons={alertState.buttons}
+          onDismiss={hideAlert}
+          dismissable={alertState.dismissable}
+        />
       </View>
     </GestureHandlerRootView>
   )

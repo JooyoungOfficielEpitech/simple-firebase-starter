@@ -1,10 +1,11 @@
 // 로그인 화면
 import { type FC, useCallback } from "react"
-import { View, Alert, type TextStyle, type ViewStyle } from "react-native"
+import { View, type TextStyle, type ViewStyle } from "react-native"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+import { AlertModal } from "@/components/AlertModal"
 import { GoogleSignInButton } from "@/components/GoogleSignInButton"
 import { $styles } from "@/theme/styles"
 import { $authHeaderContainer, $authTitle, $authSubtitle, $authFormContainer } from "@/theme/authStyles"
@@ -14,6 +15,7 @@ import { FormTextField } from "@/components/FormTextField"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { useAuth } from "@/context/AuthContext"
+import { useAlert } from "@/hooks/useAlert"
 import { translate } from "@/i18n/translate"
 import type { AppStackScreenProps } from "@/navigators/AppNavigator"
 import { useAppTheme } from "@/theme/context"
@@ -31,6 +33,7 @@ interface SignInScreenProps extends AppStackScreenProps<"SignIn"> {}
 export const SignInScreen: FC<SignInScreenProps> = function SignInScreen({ navigation }) {
   const { themed } = useAppTheme()
   const { signInWithEmail, signInWithGoogle, clearAuthError, isLoading } = useAuth()
+  const { alert, alertState, hideAlert } = useAlert()
 
   const signinForm = useForm<SignInFormData>({
     resolver: zodResolver(signinSchema),
@@ -49,13 +52,13 @@ export const SignInScreen: FC<SignInScreenProps> = function SignInScreen({ navig
 
       if (!validation.success) {
         const firstError = validation.error.issues[0]
-        Alert.alert(translate("signInScreen:errorTitle"), firstError.message)
+        alert(translate("signInScreen:errorTitle"), firstError.message)
         return
       }
 
       await signInWithEmail(data.email, data.password)
     } catch (error) {
-      Alert.alert(
+      alert(
         translate("signInScreen:errorTitle"),
         error instanceof Error ? error.message : translate("signInScreen:authFailed"),
       )
@@ -66,7 +69,7 @@ export const SignInScreen: FC<SignInScreenProps> = function SignInScreen({ navig
     try {
       await signInWithGoogle()
     } catch (error) {
-      Alert.alert(
+      alert(
         translate("signInScreen:errorTitle"),
         error instanceof Error ? error.message : translate("signInScreen:googleFailed"),
       )
@@ -133,6 +136,14 @@ export const SignInScreen: FC<SignInScreenProps> = function SignInScreen({ navig
           disabled={isLoading}
         />
       </View>
+      
+      <AlertModal
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        buttons={alertState.buttons}
+        onDismiss={hideAlert}
+      />
     </Screen>
   )
 }

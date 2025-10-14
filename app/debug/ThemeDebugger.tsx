@@ -1,39 +1,37 @@
 import React from 'react'
-import { View, Text, TouchableOpacity, Alert } from 'react-native'
+import { View, Text, TouchableOpacity } from 'react-native'
 import { useAppTheme } from '@/theme/context'
+import { useAlert } from '@/hooks/useAlert'
 import { storage } from '@/utils/storage'
+import { AlertModal } from '@/components/AlertModal'
 
 export const ThemeDebugger = () => {
   const { theme, themeContext, wickedCharacterTheme, setWickedCharacterTheme } = useAppTheme()
+  const { alertState, alert, hideAlert } = useAlert()
 
   const showThemeInfo = () => {
     const storageKeys = storage.getAllKeys()
     const themeScheme = storage.getString('ignite.themeScheme')
     const wickedScheme = storage.getString('ignite.wickedCharacterScheme')
     
-    Alert.alert('Theme Debug Info', 
-      `Current Theme: ${themeContext}
-Wicked Character: ${wickedCharacterTheme}
-Background Color: ${theme.colors.background}
-Storage Theme: ${themeScheme || 'undefined'}
-Storage Wicked: ${wickedScheme || 'undefined'}
-All Keys: ${storageKeys.join(', ')}`)
+    alert('Theme Debug Info', 
+      `Current Theme: ${themeContext}\nWicked Character: ${wickedCharacterTheme}\nBackground Color: ${theme.colors.background}\nStorage Theme: ${themeScheme || 'undefined'}\nStorage Wicked: ${wickedScheme || 'undefined'}\nAll Keys: ${storageKeys.join(', ')}`)
   }
 
   const switchToGlinda = () => {
     setWickedCharacterTheme('glinda')
-    Alert.alert('Switched to Glinda Theme')
+    alert('Switched to Glinda Theme')
   }
 
   const switchToElphaba = () => {
     setWickedCharacterTheme('elphaba')
-    Alert.alert('Switched to Elphaba Theme')
+    alert('Switched to Elphaba Theme')
   }
 
   const clearStorage = () => {
     storage.delete('ignite.themeScheme')
     storage.delete('ignite.wickedCharacterScheme')
-    Alert.alert('Storage Cleared', 'App restart required')
+    alert('Storage Cleared', 'App restart required')
   }
 
   return (
@@ -61,6 +59,16 @@ All Keys: ${storageKeys.join(', ')}`)
       <TouchableOpacity onPress={clearStorage}>
         <Text style={{ color: 'white', fontSize: 12 }}>🗑️ Clear</Text>
       </TouchableOpacity>
+      
+      {/* Alert Modal */}
+      <AlertModal
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        buttons={alertState.buttons}
+        onDismiss={hideAlert}
+        dismissable={alertState.dismissable}
+      />
     </View>
   )
 }

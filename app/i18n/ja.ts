@@ -295,6 +295,7 @@ const ja: Translations = {
     },
     actions: {
       createFirstPost: "最初の募集投稿を作成",
+      createPost: "新しい投稿を作成",
       exploreOrganizations: "他の団体を探す",
       createOrganization: "新しい団体を登録",
       addSampleData: "サンプルデータを追加",

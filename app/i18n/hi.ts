@@ -295,6 +295,7 @@ const hi: Translations = {
     },
     actions: {
       createFirstPost: "पहली भर्ती पोस्ट बनाएं",
+      createPost: "नई पोस्ट बनाएं",
       exploreOrganizations: "अन्य संगठनों का अन्वेषण करें",
       createOrganization: "नया संगठन पंजीकृत करें",
       addSampleData: "नमूना डेटा जोड़ें",

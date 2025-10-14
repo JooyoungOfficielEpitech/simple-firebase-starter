@@ -1,5 +1,5 @@
 import { type FC, useCallback, useEffect } from "react"
-import { View, Alert, type TextStyle, type ViewStyle } from "react-native"
+import { View, type TextStyle, type ViewStyle } from "react-native"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -7,12 +7,14 @@ import { z } from "zod"
 import { $styles } from "@/theme/styles"
 import { $authHeaderContainer, $authTitle, $authSubtitle, $authFormContainer, $authErrorText } from "@/theme/authStyles"
 
+import { AlertModal } from "@/components/AlertModal"
 import { BackButton } from "@/components/BackButton"
 import { Button } from "@/components/Button"
 import { FormTextField } from "@/components/FormTextField"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { useAuth } from "@/context/AuthContext"
+import { useAlert } from "@/hooks/useAlert"
 import { translate } from "@/i18n/translate"
 import type { AppStackScreenProps } from "@/navigators/AppNavigator"
 import { useAppTheme } from "@/theme/context"
@@ -43,6 +45,7 @@ interface SignUpScreenProps extends AppStackScreenProps<"SignUp"> {}
 export const SignUpScreen: FC<SignUpScreenProps> = function SignUpScreen({ navigation }) {
   const { themed } = useAppTheme()
   const { signUpWithEmail, signInWithGoogle, authError, clearAuthError, isLoading } = useAuth()
+  const { alert, alertState, hideAlert } = useAlert()
 
   const signUpForm = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
@@ -73,13 +76,13 @@ export const SignUpScreen: FC<SignUpScreenProps> = function SignUpScreen({ navig
       const data = signUpForm.getValues()
       await signUpWithEmail(data.email, data.password)
 
-      Alert.alert(
+      alert(
         translate("signUpScreen:signUpSuccess"),
         translate("signUpScreen:emailVerificationMessage"),
         [{ text: translate("common:ok") }],
       )
     } catch (error) {
-      Alert.alert(
+      alert(
         translate("signUpScreen:errorTitle"),
         error instanceof Error ? error.message : translate("signUpScreen:signUpFailed"),
       )
@@ -90,7 +93,7 @@ export const SignUpScreen: FC<SignUpScreenProps> = function SignUpScreen({ navig
     try {
       await signInWithGoogle()
     } catch (error) {
-      Alert.alert(
+      alert(
         translate("signUpScreen:errorTitle"),
         error instanceof Error ? error.message : translate("signUpScreen:googleFailed"),
       )
@@ -154,6 +157,14 @@ export const SignUpScreen: FC<SignUpScreenProps> = function SignUpScreen({ navig
           disabled={isLoading}
         />
       </View>
+      <AlertModal
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        buttons={alertState.buttons}
+        onDismiss={hideAlert}
+        dismissable={alertState.dismissable}
+      />
     </Screen>
   )
 }

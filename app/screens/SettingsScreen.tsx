@@ -1,16 +1,18 @@
 import { type FC, useState, useEffect, useRef, useCallback } from "react"
-import { View, type TextStyle, type ViewStyle, Alert, Animated, Dimensions } from "react-native"
+import { View, type TextStyle, type ViewStyle, Animated, Dimensions } from "react-native"
 
 import { $styles } from "@/theme/styles"
 
 import { Button } from "@/components/Button"
 import { Radio } from "@/components/Toggle/Radio"
+import { AlertModal } from "@/components/AlertModal"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { ScreenHeader } from "@/components/ScreenHeader"
 import { ContentSection } from "@/components/Layout"
 import { useAuth } from "@/context/AuthContext"
 import { userService } from "@/services/firestore"
+import { useAlert } from "@/hooks/useAlert"
 import { UserProfile } from "@/types/user"
 import type { MainTabScreenProps } from "@/navigators/MainNavigator"
 import { useFocusEffect } from "@react-navigation/native"
@@ -22,6 +24,7 @@ interface SettingsScreenProps extends MainTabScreenProps<"Settings"> {}
 export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen({ navigation }) {
   const { themed, wickedCharacterTheme, setWickedCharacterTheme } = useAppTheme()
   const { logout } = useAuth()
+  const { alertState, alert, confirm, hideAlert } = useAlert()
   
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
@@ -121,7 +124,7 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen({
   const handleConvertToOrganizer = async () => {
     // 이전 운영자 경험이 있는지 확인
     if (userProfile?.hasBeenOrganizer && userProfile?.previousOrganizationName) {
-      Alert.alert(
+      alert(
         "운영자로 전환",
         `이전에 운영했던 "${userProfile.previousOrganizationName}" 단체로 복귀하시겠습니까?`,
         [
@@ -151,20 +154,20 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen({
       
       if (result.success) {
         await loadUserProfile()
-        Alert.alert("성공", `"${result.organizationName}" 단체의 운영자로 복귀했습니다!`)
+        alert("성공", `"${result.organizationName}" 단체의 운영자로 복귀했습니다!`)
       } else {
-        Alert.alert(
+        alert(
           "복귀 실패", 
           result.error + "\n새로운 단체를 만드시겠습니까?",
           [
             { text: "취소", style: "cancel" },
-            { text: "새 단체 만들기", onPress: () => setShowOrgNameInput(true) }
+            { text: "새 단체 만들기", onPress: () => navigation.navigate("CreateOrganization", { isOrganizerConversion: true }) }
           ]
         )
       }
     } catch (error) {
       console.error("자동 운영자 전환 오류:", error)
-      Alert.alert("오류", "자동 전환에 실패했습니다.")
+      alert("오류", "자동 전환에 실패했습니다.")
     } finally {
       setConverting(false)
     }
@@ -172,13 +175,10 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen({
 
 
   const handleRevertToGeneral = () => {
-    Alert.alert(
+    confirm(
       "일반 사용자로 전환",
       "일반 사용자로 전환하시겠습니까? 운영자 권한이 사라집니다.",
-      [
-        { text: "취소", style: "cancel" },
-        { text: "확인", onPress: confirmRevertToGeneral }
-      ]
+      confirmRevertToGeneral
     )
   }
 
@@ -190,10 +190,10 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen({
 
       await loadUserProfile()
       
-      Alert.alert("성공", "일반 사용자로 전환되었습니다!")
+      alert("성공", "일반 사용자로 전환되었습니다!")
     } catch (error) {
       console.error("일반 사용자 전환 오류:", error)
-      Alert.alert("오류", "일반 사용자 전환에 실패했습니다.")
+      alert("오류", "일반 사용자 전환에 실패했습니다.")
     } finally {
       setConverting(false)
     }
@@ -363,6 +363,14 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen({
         {/* 커튼 봉 */}
         <View style={themed($curtainRod)} />
       </Animated.View>
+      <AlertModal
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        buttons={alertState.buttons}
+        onDismiss={hideAlert}
+        dismissable={alertState.dismissable}
+      />
     </Screen>
   )
 }

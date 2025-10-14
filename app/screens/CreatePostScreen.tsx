@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { View, ScrollView, Alert, TouchableOpacity, TextInput, Modal, Switch, Platform } from "react-native"
+import { View, ScrollView, TouchableOpacity, TextInput, Modal, Switch, Platform } from "react-native"
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useNavigation, useRoute } from "@react-navigation/native"
@@ -10,9 +10,11 @@ import { Button } from "@/components/Button"
 import { Screen } from "@/components/Screen"
 import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
+import { AlertModal } from "@/components/AlertModal"
 import { postService, userService, organizationService } from "@/services/firestore"
 import firestore from "@react-native-firebase/firestore"
 import { useAppTheme } from "@/theme/context"
+import { useAlert } from "@/hooks/useAlert"
 import { CreatePost, UpdatePost } from "@/types/post"
 import { UserProfile } from "@/types/user"
 import { BulletinBoardStackParamList } from "@/navigators/BulletinBoardStackNavigator"
@@ -31,6 +33,8 @@ export const CreatePostScreen = () => {
     themed,
     theme: { colors, spacing, typography },
   } = useAppTheme()
+
+  const { alertState, alert, hideAlert } = useAlert()
 
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(false)
@@ -154,7 +158,7 @@ export const CreatePostScreen = () => {
         }
       } catch (error) {
         console.error("사용자 프로필 로드 오류:", error)
-        Alert.alert("오류", "사용자 정보를 불러올 수 없습니다.")
+        alert("오류", "사용자 정보를 불러올 수 없습니다.")
         navigation.goBack()
       }
     }
@@ -208,7 +212,7 @@ export const CreatePostScreen = () => {
           }
         } catch (error) {
           console.error("게시글 로드 오류:", error)
-          Alert.alert("오류", "게시글을 불러올 수 없습니다.")
+          alert("오류", "게시글을 불러올 수 없습니다.")
           navigation.goBack()
         }
       }
@@ -220,42 +224,42 @@ export const CreatePostScreen = () => {
   const handleSave = async () => {
     // 유효성 검증
     if (!formData.title.trim()) {
-      Alert.alert("오류", "제목을 입력해주세요.")
+      alert("오류", "제목을 입력해주세요.")
       return
     }
     if (!formData.production.trim()) {
-      Alert.alert("오류", "작품명을 입력해주세요.")
+      alert("오류", "작품명을 입력해주세요.")
       return
     }
     if (!formData.organizationName.trim()) {
-      Alert.alert("오류", "단체명을 입력해주세요.")
+      alert("오류", "단체명을 입력해주세요.")
       return
     }
     if (!formData.rehearsalSchedule.trim()) {
-      Alert.alert("오류", "연습 일정을 입력해주세요.")
+      alert("오류", "연습 일정을 입력해주세요.")
       return
     }
     if (!formData.location.trim()) {
-      Alert.alert("오류", "장소를 입력해주세요.")
+      alert("오류", "장소를 입력해주세요.")
       return
     }
     if (!formData.description.trim()) {
-      Alert.alert("오류", "상세 설명을 입력해주세요.")
+      alert("오류", "상세 설명을 입력해주세요.")
       return
     }
     if (!formData.contactEmail.trim()) {
-      Alert.alert("오류", "담당자 이메일을 입력해주세요.")
+      alert("오류", "담당자 이메일을 입력해주세요.")
       return
     }
     // 이메일 형식 검증
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(formData.contactEmail)) {
-      Alert.alert("오류", "올바른 이메일 형식을 입력해주세요.")
+      alert("오류", "올바른 이메일 형식을 입력해주세요.")
       return
     }
 
     if (!userProfile) {
-      Alert.alert("오류", "사용자 정보가 없습니다.")
+      alert("오류", "사용자 정보가 없습니다.")
       return
     }
 
@@ -323,7 +327,7 @@ export const CreatePostScreen = () => {
         }
 
         await postService.updatePost(postId, updateData)
-        Alert.alert("성공", "게시글이 수정되었습니다.")
+        alert("성공", "게시글이 수정되었습니다.")
       } else {
         // 생성 모드
         const createData: CreatePost = {
@@ -389,13 +393,13 @@ export const CreatePostScreen = () => {
 
         console.log('📝 [CreatePostScreen] 최종 사용할 organizationId:', validOrganizationId)
         await postService.createPost(createData, userProfile.name, validOrganizationId)
-        Alert.alert("성공", "게시글이 작성되었습니다.")
+        alert("성공", "게시글이 작성되었습니다.")
       }
 
       navigation.goBack()
     } catch (error) {
       console.error("게시글 저장 오류:", error)
-      Alert.alert("오류", "게시글 저장 중 오류가 발생했습니다.")
+      alert("오류", "게시글 저장 중 오류가 발생했습니다.")
     } finally {
       setLoading(false)
     }
@@ -1266,6 +1270,15 @@ export const CreatePostScreen = () => {
         </TouchableOpacity>
       </Modal>
 
+      {/* Alert Modal */}
+      <AlertModal
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        buttons={alertState.buttons}
+        onDismiss={hideAlert}
+        dismissable={alertState.dismissable}
+      />
     </Screen>
   )
 }

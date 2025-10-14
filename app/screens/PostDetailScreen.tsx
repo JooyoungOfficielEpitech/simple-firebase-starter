@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { View, Alert, TouchableOpacity, Share, Modal, ScrollView } from "react-native"
+import { View, TouchableOpacity, Share, Modal, ScrollView } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -10,10 +10,12 @@ import { Screen } from "@/components/Screen"
 import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
 import { TextField } from "@/components/TextField"
+import { AlertModal } from "@/components/AlertModal"
 import { translate } from "@/i18n"
 import { postService, userService } from "@/services/firestore"
 import { ApplicationService } from "@/services/firestore/applicationService"
 import { useAppTheme } from "@/theme/context"
+import { useAlert } from "@/hooks/useAlert"
 import { Post } from "@/types/post"
 import { UserProfile } from "@/types/user"
 import { Application } from "@/services/firestore/applicationService"
@@ -35,6 +37,8 @@ export const PostDetailScreen = () => {
     themed,
     theme: { colors, spacing },
   } = useAppTheme()
+
+  const { alertState, alert, confirm, confirmDestructive, hideAlert } = useAlert()
 
   const [post, setPost] = useState<Post | null>(null)
   const [loading, setLoading] = useState(true)
@@ -74,7 +78,7 @@ export const PostDetailScreen = () => {
       } catch (error) {
         console.error("❌ [PostDetailScreen] 사용자 프로필 로드 오류:", error)
         // 프로필 로드 실패 시 더 구체적인 오류 메시지
-        Alert.alert(
+        alert(
           "프로필 오류", 
           "사용자 프로필을 불러오는데 실패했습니다. 프로필을 먼저 설정해주세요.",
           [
@@ -144,85 +148,67 @@ export const PostDetailScreen = () => {
   }, [post, userProfile, postId])
 
   const handleDelete = () => {
-    Alert.alert(
+    confirmDestructive(
       "게시글 삭제",
       "정말로 이 게시글을 삭제하시겠습니까?",
-      [
-        {
-          text: "취소",
-          style: "cancel",
-        },
-        {
-          text: "삭제",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await postService.deletePost(postId)
-              Alert.alert("삭제 완료", "게시글이 삭제되었습니다.", [
-                {
-                  text: "확인",
-                  onPress: () => navigation.goBack(),
-                },
-              ])
-            } catch (error) {
-              const errorMessage = error.message || "게시글 삭제에 실패했습니다."
-              Alert.alert("삭제 실패", errorMessage)
-            }
-          },
-        },
-      ],
+      "삭제",
+      async () => {
+        try {
+          await postService.deletePost(postId)
+          alert("삭제 완료", "게시글이 삭제되었습니다.", [
+            {
+              text: "확인",
+              onPress: () => navigation.goBack(),
+            },
+          ])
+        } catch (error) {
+          const errorMessage = error.message || "게시글 삭제에 실패했습니다."
+          alert("삭제 실패", errorMessage)
+        }
+      }
     )
   }
 
-  const handleApply = async () => {
+  const handleApplyButtonClick = () => {
+    // 프로필 완성도를 먼저 체크
     if (!userProfile) {
-      Alert.alert(
+      alert(
         "프로필 설정 필요", 
-        "지원하려면 프로필을 먼저 설정해주세요.",
-        [
-          { text: "취소", style: "cancel" },
-          { text: "프로필 편집", onPress: () => {
-            // 지원 팝업 닫고 프로필 편집 화면으로 이동
-            setShowApplicationModal(false)
-            navigation.navigate("EditProfile")
-          }}
-        ]
+        "지원하려면 프로필을 먼저 설정해주세요."
       )
       return
     }
 
     // 필수 프로필 정보 완성도 확인
     if (!userProfile.requiredProfileComplete) {
-      Alert.alert(
+      alert(
         "프로필 완성 필요",
-        "지원하려면 프로필 정보를 완성해주세요.\n(성별, 생년월일, 키 정보가 필요합니다)",
-        [
-          { text: "취소", style: "cancel" },
-          { text: "프로필 편집", onPress: () => {
-            // 지원 팝업 닫고 프로필 편집 화면으로 이동
-            setShowApplicationModal(false)
-            navigation.navigate("EditProfile")
-          }}
-        ]
+        "지원하려면 프로필 정보를 완성해주세요.\n(성별, 생년월일, 키 정보가 필요합니다)"
       )
       return
     }
 
+    // 프로필이 완성된 경우에만 지원 모달 열기
+    setShowApplicationModal(true)
+  }
+
+  const handleApply = async () => {
+    // 프로필 체크는 이미 handleApplyButtonClick에서 수행됨
     if (hasApplied) {
-      Alert.alert("이미 지원함", "이미 해당 공고에 지원하셨습니다.")
+      alert("이미 지원함", "이미 해당 공고에 지원하셨습니다.")
       return
     }
 
     // 필수 필드 검증
     if (!applicationPhoneNumber.trim()) {
-      Alert.alert("입력 확인", "연락처를 입력해주세요.")
+      alert("입력 확인", "연락처를 입력해주세요.")
       return
     }
 
     // 전화번호 형식 간단 검증
     const phoneRegex = /^[0-9-+\s()]{10,}$/
     if (!phoneRegex.test(applicationPhoneNumber.trim())) {
-      Alert.alert("입력 확인", "올바른 전화번호 형식을 입력해주세요.")
+      alert("입력 확인", "올바른 전화번호 형식을 입력해주세요.")
       return
     }
 
@@ -260,10 +246,10 @@ export const PostDetailScreen = () => {
       setApplicationRolePreference("")
       setApplicationPortfolio("")
       
-      Alert.alert("지원 완료", "지원이 완료되었습니다. 결과를 기다려주세요!")
+      alert("지원 완료", "지원이 완료되었습니다. 결과를 기다려주세요!")
     } catch (error) {
       const errorMessage = error.message || "지원에 실패했습니다."
-      Alert.alert("지원 실패", errorMessage)
+      alert("지원 실패", errorMessage)
     } finally {
       setSubmittingApplication(false)
     }
@@ -271,45 +257,39 @@ export const PostDetailScreen = () => {
 
   const handleWithdrawApplication = () => {
     if (!myApplication) {
-      Alert.alert("오류", "지원서 정보를 찾을 수 없습니다.")
+      alert("오류", "지원서 정보를 찾을 수 없습니다.")
       return
     }
 
-    Alert.alert(
+    confirmDestructive(
       "지원 철회",
       "정말로 지원을 철회하시겠습니까?\n철회 후에는 다시 지원할 수 있습니다.",
-      [
-        { text: "취소", style: "cancel" },
-        {
-          text: "철회",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              setSubmittingApplication(true)
-              await applicationService.withdrawApplication(myApplication.id)
-              
-              Alert.alert("철회 완료", "지원이 철회되었습니다.\n다시 지원하실 수 있습니다.")
-              
-              // 상태 초기화 - 다시 지원 가능하도록
-              setHasApplied(false)
-              setMyApplication(null)
-              setShowApplicationModal(false)
-              
-              // 폼 초기화
-              setApplicationMessage("")
-              setApplicationPhoneNumber("")
-              setApplicationExperience("")
-              setApplicationRolePreference("")
-              setApplicationPortfolio("")
-            } catch (error) {
-              console.error("❌ [PostDetailScreen] 지원 철회 오류:", error)
-              Alert.alert("철회 실패", error.message || "지원 철회에 실패했습니다.")
-            } finally {
-              setSubmittingApplication(false)
-            }
-          }
+      "철회",
+      async () => {
+        try {
+          setSubmittingApplication(true)
+          await applicationService.withdrawApplication(myApplication.id)
+          
+          alert("철회 완료", "지원이 철회되었습니다.\n다시 지원하실 수 있습니다.")
+          
+          // 상태 초기화 - 다시 지원 가능하도록
+          setHasApplied(false)
+          setMyApplication(null)
+          setShowApplicationModal(false)
+          
+          // 폼 초기화
+          setApplicationMessage("")
+          setApplicationPhoneNumber("")
+          setApplicationExperience("")
+          setApplicationRolePreference("")
+          setApplicationPortfolio("")
+        } catch (error) {
+          console.error("❌ [PostDetailScreen] 지원 철회 오류:", error)
+          alert("철회 실패", error.message || "지원 철회에 실패했습니다.")
+        } finally {
+          setSubmittingApplication(false)
         }
-      ]
+      }
     )
   }
 
@@ -405,7 +385,7 @@ export const PostDetailScreen = () => {
                 {!hasApplied || !myApplication ? (
                   <TouchableOpacity 
                     style={themed($applyButton)}
-                    onPress={() => setShowApplicationModal(true)}
+                    onPress={handleApplyButtonClick}
                     disabled={post.status !== "active"}
                   >
                     <Text 
@@ -859,6 +839,16 @@ export const PostDetailScreen = () => {
           </View>
         </Modal>
       </View>
+
+      {/* Alert Modal */}
+      <AlertModal
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        buttons={alertState.buttons}
+        onDismiss={hideAlert}
+        dismissable={alertState.dismissable}
+      />
     </Screen>
   )
 }
