@@ -9,12 +9,12 @@ const elphabaSpecific = {
   primary500: "#28A745", // Strong emerald (WCAG AA compliant)
   primary600: "#1E7E34", // Deep forest green
 
-  // Coral (secondary) - Modern warm accent
-  secondary100: "#FFF5F5",
-  secondary200: "#FED7D7",
-  secondary300: "#FEB2B2", 
-  secondary400: "#FC8181",
-  secondary500: "#E53E3E", // Modern coral red
+  // Black (secondary) - Dark elegant accent
+  secondary100: "#F7F7F7",
+  secondary200: "#E1E1E1",
+  secondary300: "#CFCFCF", 
+  secondary400: "#6B6B6B",
+  secondary500: "#2D2D2D", // Elegant black
 
   // Gold accent colors
   accent100: baseColors.goldAccent100,
@@ -64,6 +64,22 @@ export const colors = {
    * The inactive tinting color.
    */
   tintInactive: palette.neutral300,
+  /**
+   * Primary action color (main CTA buttons, active tabs).
+   */
+  primaryAction: palette.primary500,
+  /**
+   * Secondary action color (secondary buttons, highlights, icons).
+   */
+  secondaryAction: palette.secondary500,
+  /**
+   * Selected/focused item color.
+   */
+  selected: palette.secondary400,
+  /**
+   * Icon accent color.
+   */
+  iconAccent: palette.secondary500,
   /**
    * A subtle color used for lines.
    */

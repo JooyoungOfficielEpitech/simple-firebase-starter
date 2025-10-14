@@ -9,12 +9,12 @@ const glindaDarkSpecific = {
   primary200: "#FF1493", // Hot pink - main color
   primary100: "#DC143C", // Deeper pink
 
-  // Green (darker variants for dark theme)
-  secondary500: "#E8F5E8",
-  secondary400: "#C3E6C3",
-  secondary300: "#9DD69D",
-  secondary200: "#76C676",
-  secondary100: "#4FB84F", // Supporting green
+  // Blonde (darker variants for dark theme)
+  secondary500: "#FFFDF7",
+  secondary400: "#FFF9E6",
+  secondary300: "#F5E6A3",
+  secondary200: "#E6CC5A",
+  secondary100: "#D4AF37", // Golden blonde
 
   // Gold accent colors
   accent500: baseDarkColors.goldAccent500,
@@ -38,6 +38,10 @@ export const colors = {
   border: palette.neutral400,
   tint: palette.primary500,
   tintInactive: palette.neutral300,
+  primaryAction: palette.primary200,
+  secondaryAction: palette.secondary100,
+  selected: palette.secondary200,
+  iconAccent: palette.secondary100,
   separator: palette.neutral300,
   error: palette.angry500,
   errorBackground: palette.angry100,

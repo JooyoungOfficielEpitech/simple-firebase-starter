@@ -893,14 +893,14 @@ const $activeTabText = ({ colors }) => ({
   fontWeight: "500" as const,
 })
 
-// 단체 카드 스타일들
+// 단체 카드 스타일들 - BOLD: Using secondary color theme for organization cards
 const $organizationCard = ({ colors, spacing }) => ({
-  backgroundColor: colors.background,
+  backgroundColor: colors.secondaryAction + '20', // Secondary color background
   borderRadius: 12,
   padding: spacing?.md || 12,
   marginBottom: spacing?.md || 12,
-  borderWidth: 1,
-  borderColor: colors.border,
+  borderWidth: 2, // Thicker border for emphasis
+  borderColor: colors.secondaryAction + '60', // Secondary color border
 })
 
 const $organizationHeader = ({ spacing }) => ({
@@ -911,9 +911,10 @@ const $organizationHeader = ({ spacing }) => ({
 })
 
 const $organizationName = ({ colors, spacing }) => ({
-  color: colors.text,
+  color: colors.secondaryAction, // BOLD: Organization name in secondary color
   flex: 1,
   marginRight: spacing?.xs || 4,
+  fontWeight: "600" as const, // Make it bolder
 })
 
 const $verifiedBadge = ({ colors, spacing }) => ({

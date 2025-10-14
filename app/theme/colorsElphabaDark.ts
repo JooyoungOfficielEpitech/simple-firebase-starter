@@ -9,12 +9,12 @@ const elphabaDarkSpecific = {
   primary200: "#4FB84F", // Main green
   primary100: "#228B22", // Forest green
 
-  // Pink (darker variants for dark theme)
-  secondary500: "#FFF0F5",
-  secondary400: "#FFCCE0",
-  secondary300: "#FF99CC",
-  secondary200: "#FF66B8",
-  secondary100: "#FF1493", // Supporting pink
+  // Black (darker variants for dark theme)
+  secondary500: "#F7F7F7",
+  secondary400: "#E1E1E1",
+  secondary300: "#CFCFCF",
+  secondary200: "#6B6B6B",
+  secondary100: "#2D2D2D", // Elegant black
 
   // Gold accent colors
   accent500: baseDarkColors.goldAccent500,
@@ -38,6 +38,10 @@ export const colors = {
   border: palette.neutral400,
   tint: palette.primary500,
   tintInactive: palette.neutral300,
+  primaryAction: palette.primary200,
+  secondaryAction: palette.secondary100,
+  selected: palette.secondary200,
+  iconAccent: palette.secondary100,
   separator: palette.neutral300,
   error: palette.angry500,
   errorBackground: palette.angry100,

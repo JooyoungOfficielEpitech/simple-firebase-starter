@@ -110,14 +110,14 @@ export const PostCard = memo<PostCardProps>(({ post, onPress, variant = "compact
   )
 })
 
-// Styles
+// Styles - BOLD: Using secondary color theme for organization posts
 const $postCard = ({ colors, spacing }) => ({
-  backgroundColor: colors.background,
+  backgroundColor: colors.secondaryAction + '20', // Stronger secondary color background
   borderRadius: 12,
   padding: spacing?.md || 12,
   marginBottom: spacing?.md || 12,
-  borderWidth: 1,
-  borderColor: colors.border,
+  borderWidth: 2, // Thicker border for emphasis
+  borderColor: colors.secondaryAction + '60', // Stronger secondary color border
 })
 
 const $postCardHeader = ({ spacing }) => ({
@@ -165,16 +165,18 @@ const $organizationRow = ({ spacing }) => ({
 })
 
 const $organization = ({ colors, spacing }) => ({
-  color: colors.tint,
+  color: colors.secondaryAction, // BOLD: Organization name in secondary color
   fontSize: 14,
+  fontWeight: "600" as const, // Make it bolder
   marginBottom: spacing?.sm || 8,
 })
 
 const $applicantCount = ({ colors, typography }) => ({
   fontSize: 12,
   lineHeight: 18,
-  color: colors.palette.primary500,
+  color: colors.secondaryAction, // BOLD: Applicant count in secondary color
   fontFamily: typography.primary.medium,
+  fontWeight: "600" as const, // Make it stand out
 })
 
 const $location = ({ colors }) => ({

@@ -52,19 +52,19 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   )
 }
 
-// Styles
+// Styles - BOLD: Using secondary colors
 const $activeBadge = ({ colors, spacing }) => ({
   paddingHorizontal: spacing?.xs || 4,
   paddingVertical: 4,
   borderRadius: 6,
-  backgroundColor: colors.tint + "20",
+  backgroundColor: colors.secondaryAction, // BOLD: Full secondary color for active badges
 })
 
 const $verifiedBadge = ({ colors, spacing }) => ({
   paddingHorizontal: spacing?.xs || 4,
   paddingVertical: 4,
   borderRadius: 6,
-  backgroundColor: colors.tint + "20",
+  backgroundColor: colors.secondaryAction + "80", // Secondary color with 80% opacity
 })
 
 const $inactiveBadge = ({ colors, spacing }) => ({
@@ -77,13 +77,13 @@ const $inactiveBadge = ({ colors, spacing }) => ({
 const $activeText = ({ colors }) => ({
   fontSize: 12,
   fontWeight: "bold" as const,
-  color: colors.tint,
+  color: "#FFFFFF", // BOLD: White text on secondary background
 })
 
 const $verifiedText = ({ colors }) => ({
   fontSize: 12,
   fontWeight: "bold" as const,
-  color: colors.tint,
+  color: "#FFFFFF", // BOLD: White text for better contrast
 })
 
 const $inactiveText = ({ colors }) => ({

@@ -155,15 +155,16 @@ const $searchContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
 const $sectionHeader: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
   paddingHorizontal: spacing.lg,
   paddingVertical: spacing.sm,
-  backgroundColor: colors.palette.neutral200,
-  borderTopWidth: 1,
-  borderBottomWidth: 1,
-  borderColor: colors.separator,
+  backgroundColor: colors.primaryAction + "10", // BOLD: Section header with primary color background
+  borderTopWidth: 2, // Thicker border
+  borderBottomWidth: 2,
+  borderColor: colors.primaryAction + "30", // Primary color border
 })
 
 const $sectionTitle: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
-  color: colors.text,
-  fontFamily: typography.primary.medium, // Consistent with subheading preset
+  color: colors.primaryAction, // BOLD: Section title in primary color
+  fontFamily: typography.primary.medium,
+  fontWeight: "700" as const, // Make it bolder
 })
 
 const $songListContainer: ThemedStyle<ViewStyle> = ({ colors }) => ({

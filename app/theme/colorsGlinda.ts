@@ -9,12 +9,12 @@ const glindaSpecific = {
   primary500: "#EC4899", // Strong rose (WCAG AA compliant)
   primary600: "#BE185D", // Deep rose
 
-  // Sage (secondary) - Sophisticated green accent
-  secondary100: "#F7FAF7",
-  secondary200: "#E8F5E8",
-  secondary300: "#A7C7AC", 
-  secondary400: "#7BA082",
-  secondary500: "#52796F", // Sage green
+  // Blonde (secondary) - Golden blonde hair color
+  secondary100: "#FFFDF7",
+  secondary200: "#FFF9E6",
+  secondary300: "#F5E6A3",
+  secondary400: "#E6CC5A",
+  secondary500: "#D4AF37", // Golden blonde
 
   // Gold accent colors
   accent100: baseColors.goldAccent100,
@@ -64,6 +64,22 @@ export const colors = {
    * The inactive tinting color.
    */
   tintInactive: palette.neutral300,
+  /**
+   * Primary action color (main CTA buttons, active tabs).
+   */
+  primaryAction: palette.primary500,
+  /**
+   * Secondary action color (secondary buttons, highlights, icons).
+   */
+  secondaryAction: palette.secondary500,
+  /**
+   * Selected/focused item color.
+   */
+  selected: palette.secondary400,
+  /**
+   * Icon accent color.
+   */
+  iconAccent: palette.secondary500,
   /**
    * A subtle color used for lines.
    */

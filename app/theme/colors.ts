@@ -77,6 +77,22 @@ export const colors = {
    */
   tintInactive: palette.neutral300,
   /**
+   * Primary action color (main CTA buttons, active tabs).
+   */
+  primaryAction: palette.primary500,
+  /**
+   * Secondary action color (secondary buttons, highlights, icons).
+   */
+  secondaryAction: palette.primary300,
+  /**
+   * Selected/focused item color.
+   */
+  selected: palette.primary300,
+  /**
+   * Icon accent color.
+   */
+  iconAccent: palette.primary300,
+  /**
    * A subtle color used for lines.
    */
   separator: palette.neutral300,

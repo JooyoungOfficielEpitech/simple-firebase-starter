@@ -1,20 +1,20 @@
 import { baseDarkColors, createDarkOverlays, createDarkThemeColors } from "./colorsBaseDark"
 
 const gwynplaineDarkSpecific = {
-  // Gwynplaine Wine/Burgundy (darker variants for dark theme)
-  primary600: "#FCE4EC",
-  primary500: "#F8BBD9",
-  primary400: "#F48FB1",
-  primary300: "#F06292",
-  primary200: "#AD1457", // Deep wine/burgundy - main color
-  primary100: "#880E4F", // Dark burgundy
+  // Gwynplaine Wine (darker variants for dark theme)
+  primary600: "#FDF2F8",
+  primary500: "#FCE7F3",
+  primary400: "#F687B3",
+  primary300: "#ED64A6",
+  primary200: "#722F37", // Deep wine red - main color
+  primary100: "#4A1E22", // Dark wine
 
-  // Brown/Tan (darker variants for dark theme)
-  secondary500: "#EFEBE9",
-  secondary400: "#D7CCC8",
-  secondary300: "#BCAAA4",
-  secondary200: "#A1887F",
-  secondary100: "#8D6E63", // Medium brown
+  // Brown (darker variants for dark theme)
+  secondary500: "#FEFDFB",
+  secondary400: "#F7F3E9",
+  secondary300: "#D4B887",
+  secondary200: "#A0522D",
+  secondary100: "#8B4513", // Rich brown
 
   // Silver accent colors
   accent500: baseDarkColors.silverAccent500,
@@ -38,6 +38,10 @@ export const colors = {
   border: palette.neutral400,
   tint: palette.primary500,
   tintInactive: palette.neutral300,
+  primaryAction: palette.primary200,
+  secondaryAction: palette.secondary100,
+  selected: palette.secondary200,
+  iconAccent: palette.secondary100,
   separator: palette.neutral300,
   error: palette.angry500,
   errorBackground: palette.angry100,

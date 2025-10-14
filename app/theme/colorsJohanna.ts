@@ -1,13 +1,13 @@
 import { baseColors, createOverlays, createThemeColors } from "./colorsBase"
 
 const johannaSpecific = {
-  // Johanna Dark Sky Blue (primary) - Melancholy blue tones for the caged bird
-  primary100: "#F0F8FF", // Alice blue - very light sky
-  primary200: "#D6EAF8", // Light sky blue
-  primary300: "#85C1E9", // Medium sky blue
-  primary400: "#5DADE2", // Bright sky blue
-  primary500: "#3F7CAC", // Dark sky blue (WCAG AA compliant) - main theme color
-  primary600: "#2E5984", // Deep navy blue
+  // Johanna Darker Sky Blue (primary) - Deep melancholy blue tones for the caged bird
+  primary100: "#E8F0F8", // Very light steel blue
+  primary200: "#C7D9E8", // Light steel blue
+  primary300: "#6B8CAE", // Medium steel blue
+  primary400: "#4A6B8A", // Dark steel blue
+  primary500: "#2C4B6B", // Very dark sky blue (WCAG AA compliant) - main theme color
+  primary600: "#1E3649", // Deep midnight blue
 
   // Dark Gold (secondary) - Tarnished gold for broken dreams
   secondary100: "#FDF6E3",
@@ -24,7 +24,7 @@ const johannaSpecific = {
   accent500: baseColors.silverAccent500,
 
   // Blue-tinted overlays for melancholy atmosphere
-  ...createOverlays(63, 124, 172), // RGB for dark sky blue
+  ...createOverlays(44, 75, 107), // RGB for darker sky blue
 }
 
 const palette = createThemeColors(johannaSpecific)
@@ -51,19 +51,35 @@ export const colors = {
   /**
    * The default color of the screen background.
    */
-  background: palette.primary100, // Light sky blue background
+  background: palette.primary100, // Very light steel blue background
   /**
    * The default border color.
    */
   border: palette.neutral400,
   /**
-   * The main tinting color - Dark sky blue.
+   * The main tinting color - Very dark sky blue.
    */
   tint: palette.primary500,
   /**
    * The inactive tinting color.
    */
   tintInactive: palette.neutral300,
+  /**
+   * Primary action color (main CTA buttons, active tabs).
+   */
+  primaryAction: palette.primary500,
+  /**
+   * Secondary action color (secondary buttons, highlights, icons).
+   */
+  secondaryAction: palette.secondary500,
+  /**
+   * Selected/focused item color.
+   */
+  selected: palette.secondary400,
+  /**
+   * Icon accent color.
+   */
+  iconAccent: palette.secondary500,
   /**
    * A subtle color used for lines.
    */

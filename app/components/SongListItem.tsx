@@ -112,10 +112,10 @@ const $playIconBackground: ThemedStyle<ViewStyle> = ({ colors }) => ({
   width: 36,
   height: 36,
   borderRadius: 18,
-  backgroundColor: colors.palette.primary500, // Korean karaoke blue
+  backgroundColor: colors.secondaryAction, // BOLD: Play buttons in secondary color
   justifyContent: "center",
   alignItems: "center",
-  shadowColor: colors.palette.primary600,
+  shadowColor: colors.secondaryAction + "80",
   shadowOffset: { width: 0, height: 2 },
   shadowOpacity: 0.3,
   shadowRadius: 4,

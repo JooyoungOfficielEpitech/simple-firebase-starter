@@ -249,8 +249,8 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen({
                 <Radio
                   value={wickedCharacterTheme === "elphaba"}
                   onValueChange={() => !isThemeChanging && handleCharacterThemeChange("elphaba")}
-                  inputDetailStyle={$elphabaRadioDetail}
-                  inputOuterStyle={wickedCharacterTheme === "elphaba" ? $elphabaRadioOuterSelected : undefined}
+                  inputDetailStyle={themed($elphabaRadioDetail)}
+                  inputOuterStyle={wickedCharacterTheme === "elphaba" ? themed($elphabaRadioOuterSelected) : undefined}
                   disabled={isThemeChanging}
                 />
                 <View style={themed($radioLabelContainer)}>
@@ -263,8 +263,8 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen({
                 <Radio
                   value={wickedCharacterTheme === "glinda"}
                   onValueChange={() => !isThemeChanging && handleCharacterThemeChange("glinda")}
-                  inputDetailStyle={$glindaRadioDetail}
-                  inputOuterStyle={wickedCharacterTheme === "glinda" ? $glindaRadioOuterSelected : undefined}
+                  inputDetailStyle={themed($glindaRadioDetail)}
+                  inputOuterStyle={wickedCharacterTheme === "glinda" ? themed($glindaRadioOuterSelected) : undefined}
                   disabled={isThemeChanging}
                 />
                 <View style={themed($radioLabelContainer)}>
@@ -277,8 +277,8 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen({
                 <Radio
                   value={wickedCharacterTheme === "gwynplaine"}
                   onValueChange={() => !isThemeChanging && handleCharacterThemeChange("gwynplaine")}
-                  inputDetailStyle={$gwynplaineRadioDetail}
-                  inputOuterStyle={wickedCharacterTheme === "gwynplaine" ? $gwynplaineRadioOuterSelected : undefined}
+                  inputDetailStyle={themed($gwynplaineRadioDetail)}
+                  inputOuterStyle={wickedCharacterTheme === "gwynplaine" ? themed($gwynplaineRadioOuterSelected) : undefined}
                   disabled={isThemeChanging}
                 />
                 <View style={themed($radioLabelContainer)}>
@@ -291,8 +291,8 @@ export const SettingsScreen: FC<SettingsScreenProps> = function SettingsScreen({
                 <Radio
                   value={wickedCharacterTheme === "johanna"}
                   onValueChange={() => !isThemeChanging && handleCharacterThemeChange("johanna")}
-                  inputDetailStyle={$johannaRadioDetail}
-                  inputOuterStyle={wickedCharacterTheme === "johanna" ? $johannaRadioOuterSelected : undefined}
+                  inputDetailStyle={themed($johannaRadioDetail)}
+                  inputOuterStyle={wickedCharacterTheme === "johanna" ? themed($johannaRadioOuterSelected) : undefined}
                   disabled={isThemeChanging}
                 />
                 <View style={themed($radioLabelContainer)}>
@@ -447,7 +447,7 @@ const $currentUserType: ThemedStyle<TextStyle> = (theme) => ({
 })
 
 const $convertButton: ThemedStyle<ViewStyle> = (theme) => ({
-  backgroundColor: theme.colors.tint,
+  backgroundColor: theme.colors.primaryAction,
   marginTop: 8,
 })
 
@@ -495,41 +495,41 @@ const $container: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   paddingHorizontal: spacing.lg,
 })
 
-// Elphaba (Green) Radio Button Styles
-const $elphabaRadioDetail: ViewStyle = {
-  backgroundColor: "#4FB84F", // Elphaba green
-}
+// Elphaba (Green) Radio Button Styles - using secondary action color
+const $elphabaRadioDetail: ThemedStyle<ViewStyle> = (theme) => ({
+  backgroundColor: theme.colors.secondaryAction,
+})
 
-const $elphabaRadioOuterSelected: ViewStyle = {
-  borderColor: "#4FB84F", // Elphaba green border when selected
-}
+const $elphabaRadioOuterSelected: ThemedStyle<ViewStyle> = (theme) => ({
+  borderColor: theme.colors.secondaryAction,
+})
 
-// Glinda (Pink) Radio Button Styles  
-const $glindaRadioDetail: ViewStyle = {
-  backgroundColor: "#FF1493", // Glinda pink
-}
+// Glinda (Pink) Radio Button Styles - using secondary action color
+const $glindaRadioDetail: ThemedStyle<ViewStyle> = (theme) => ({
+  backgroundColor: theme.colors.secondaryAction,
+})
 
-const $glindaRadioOuterSelected: ViewStyle = {
-  borderColor: "#FF1493", // Glinda pink border when selected
-}
+const $glindaRadioOuterSelected: ThemedStyle<ViewStyle> = (theme) => ({
+  borderColor: theme.colors.secondaryAction,
+})
 
-// Gwynplaine (Wine/Burgundy) Radio Button Styles
-const $gwynplaineRadioDetail: ViewStyle = {
-  backgroundColor: "#AD1457", // Gwynplaine wine/burgundy
-}
+// Gwynplaine (Wine/Burgundy) Radio Button Styles - using secondary action color
+const $gwynplaineRadioDetail: ThemedStyle<ViewStyle> = (theme) => ({
+  backgroundColor: theme.colors.secondaryAction,
+})
 
-const $gwynplaineRadioOuterSelected: ViewStyle = {
-  borderColor: "#AD1457", // Gwynplaine wine/burgundy border when selected
-}
+const $gwynplaineRadioOuterSelected: ThemedStyle<ViewStyle> = (theme) => ({
+  borderColor: theme.colors.secondaryAction,
+})
 
-// Johanna (Sky Blue) Radio Button Styles
-const $johannaRadioDetail: ViewStyle = {
-  backgroundColor: "#3F7CAC", // Johanna dark sky blue
-}
+// Johanna (Sky Blue) Radio Button Styles - using secondary action color
+const $johannaRadioDetail: ThemedStyle<ViewStyle> = (theme) => ({
+  backgroundColor: theme.colors.secondaryAction,
+})
 
-const $johannaRadioOuterSelected: ViewStyle = {
-  borderColor: "#3F7CAC", // Johanna dark sky blue border when selected
-}
+const $johannaRadioOuterSelected: ThemedStyle<ViewStyle> = (theme) => ({
+  borderColor: theme.colors.secondaryAction,
+})
 
 // 커튼 컨테이너
 const $curtainContainer: ViewStyle = {

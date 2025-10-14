@@ -54,8 +54,8 @@ export function MainNavigator() {
         headerShown: false,
         tabBarHideOnKeyboard: true,
         tabBarStyle: themed([$tabBar, { height: bottom + 70 }]),
-        tabBarActiveTintColor: colors.text,
-        tabBarInactiveTintColor: colors.text,
+        tabBarActiveTintColor: colors.secondaryAction, // BOLD: Active tabs in secondary color
+        tabBarInactiveTintColor: colors.tintInactive,
         tabBarLabelStyle: themed($tabBarLabel),
         tabBarItemStyle: themed($tabBarItem),
       }}
@@ -66,7 +66,7 @@ export function MainNavigator() {
         options={{
           tabBarLabel: "홈",
           tabBarIcon: ({ focused }) => (
-            <Icon icon="heart" color={focused ? colors.tint : colors.tintInactive} size={30} />
+            <Icon icon="heart" color={focused ? colors.secondaryAction : colors.tintInactive} size={30} />
           ),
         }}
       />
@@ -77,7 +77,7 @@ export function MainNavigator() {
         options={{
           tabBarLabel: "게시판",
           tabBarIcon: ({ focused }) => (
-            <Icon icon="menu" color={focused ? colors.tint : colors.tintInactive} size={30} />
+            <Icon icon="menu" color={focused ? colors.secondaryAction : colors.tintInactive} size={30} />
           ),
         }}
       />
@@ -88,7 +88,7 @@ export function MainNavigator() {
         options={{
           tabBarLabel: "설정",
           tabBarIcon: ({ focused }) => (
-            <Icon icon="settings" color={focused ? colors.tint : colors.tintInactive} size={30} />
+            <Icon icon="settings" color={focused ? colors.secondaryAction : colors.tintInactive} size={30} />
           ),
         }}
       />
@@ -99,7 +99,7 @@ export function MainNavigator() {
         options={{
           tabBarLabel: "프로필",
           tabBarIcon: ({ focused }) => (
-            <Icon icon="user" color={focused ? colors.tint : colors.tintInactive} size={30} />
+            <Icon icon="user" color={focused ? colors.secondaryAction : colors.tintInactive} size={30} />
           ),
         }}
       />
