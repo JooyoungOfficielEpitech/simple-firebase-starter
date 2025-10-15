@@ -1,4 +1,4 @@
-import { View, TouchableOpacity } from "react-native"
+import { View, TouchableOpacity, Image } from "react-native"
 import { memo } from "react"
 import { Text } from "@/components/Text"
 import { StatusBadge } from "@/components/StatusBadge"
@@ -37,7 +37,9 @@ export const PostCard = memo<PostCardProps>(({ post, onPress, variant = "compact
     deadline: post.deadline ? String(post.deadline) : null,
     totalApplicants: Number(post.totalApplicants || 0),
     roles: Array.isArray(post.roles) ? post.roles : [],
-    tags: Array.isArray(post.tags) ? post.tags : []
+    tags: Array.isArray(post.tags) ? post.tags : [],
+    postType: post.postType || 'text',
+    images: Array.isArray(post.images) ? post.images : []
   }
 
   const {
@@ -64,6 +66,23 @@ export const PostCard = memo<PostCardProps>(({ post, onPress, variant = "compact
           ) : null}
         </View>
         <Text preset="subheading" text={safePost.title} style={themed($postTitle)} />
+        
+        {/* 이미지 프리뷰 (Images 모드인 경우) */}
+        {(safePost.postType === 'images' || safePost.images.length > 0) && safePost.images.length > 0 && (
+          <View style={themed($imagePreview)}>
+            <Image
+              source={{ uri: safePost.images[0] }}
+              style={themed($previewImage)}
+              resizeMode="cover"
+            />
+            {safePost.images.length > 1 && (
+              <View style={themed($imageCountBadge)}>
+                <Text text={`+${safePost.images.length - 1}`} style={themed($imageCountText)} />
+              </View>
+            )}
+          </View>
+        )}
+        
         <Text text={safePost.production} style={themed($production)} />
       </View>
       
@@ -231,4 +250,33 @@ const $tag = ({ colors, spacing }) => ({
 const $tagText = ({ colors }) => ({
   color: colors.palette.neutral600,
   fontSize: 12,
+})
+
+// 이미지 프리뷰 스타일들
+const $imagePreview = ({ spacing }) => ({
+  marginVertical: spacing?.sm || 8,
+  borderRadius: 8,
+  overflow: "hidden" as const,
+  position: "relative" as const,
+})
+
+const $previewImage = {
+  width: "100%" as const,
+  height: 120,
+}
+
+const $imageCountBadge = ({ colors, spacing }) => ({
+  position: "absolute" as const,
+  top: spacing?.xs || 4,
+  right: spacing?.xs || 4,
+  backgroundColor: "rgba(0, 0, 0, 0.7)",
+  paddingHorizontal: spacing?.xs || 4,
+  paddingVertical: 2,
+  borderRadius: 8,
+})
+
+const $imageCountText = ({ colors, typography }) => ({
+  color: colors.palette.neutral100,
+  fontSize: 10,
+  fontFamily: typography.primary.medium,
 })

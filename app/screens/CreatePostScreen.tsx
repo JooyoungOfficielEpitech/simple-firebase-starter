@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
-import { View, ScrollView, TouchableOpacity, TextInput, Modal, Switch, Platform } from "react-native"
+import { View, ScrollView, TouchableOpacity, TextInput, Modal, Switch, Platform, Image } from "react-native"
 import DateTimePicker from '@react-native-community/datetimepicker'
+import * as ImagePicker from 'expo-image-picker'
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -14,9 +15,10 @@ import { AlertModal } from "@/components/AlertModal"
 import { Dropdown, type DropdownOption } from "@/components/Dropdown"
 import { postService, userService, organizationService } from "@/services/firestore"
 import firestore from "@react-native-firebase/firestore"
+import storage from "@react-native-firebase/storage"
 import { useAppTheme } from "@/theme/context"
 import { useAlert } from "@/hooks/useAlert"
-import { CreatePost, UpdatePost } from "@/types/post"
+import { CreatePost, UpdatePost, PostType } from "@/types/post"
 import { UserProfile } from "@/types/user"
 import { BulletinBoardStackParamList } from "@/navigators/BulletinBoardStackNavigator"
 import { POST_TEMPLATES, PostTemplate } from "@/utils/postTemplates"
@@ -45,6 +47,11 @@ export const CreatePostScreen = () => {
   const [showAuditionDatePicker, setShowAuditionDatePicker] = useState(false)
   const [showAuditionResultPicker, setShowAuditionResultPicker] = useState(false)
   const [showPerformanceDatePicker, setShowPerformanceDatePicker] = useState(false)
+  
+  // 모드 관련 상태
+  const [postMode, setPostMode] = useState<PostType>('text')
+  const [selectedImages, setSelectedImages] = useState<string[]>([])
+  const [uploadingImages, setUploadingImages] = useState(false)
   const [formData, setFormData] = useState({
     title: "",
     production: "",
@@ -228,35 +235,55 @@ export const CreatePostScreen = () => {
       alert("오류", "제목을 입력해주세요.")
       return
     }
-    if (!formData.production.trim()) {
-      alert("오류", "작품명을 입력해주세요.")
-      return
-    }
-    if (!formData.organizationName.trim()) {
-      alert("오류", "단체명을 입력해주세요.")
-      return
-    }
-    if (!formData.rehearsalSchedule.trim()) {
-      alert("오류", "연습 일정을 입력해주세요.")
-      return
-    }
-    if (!formData.location.trim()) {
-      alert("오류", "장소를 입력해주세요.")
-      return
-    }
-    if (!formData.description.trim()) {
-      alert("오류", "상세 설명을 입력해주세요.")
-      return
-    }
-    if (!formData.contactEmail.trim()) {
-      alert("오류", "담당자 이메일을 입력해주세요.")
-      return
-    }
-    // 이메일 형식 검증
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(formData.contactEmail)) {
-      alert("오류", "올바른 이메일 형식을 입력해주세요.")
-      return
+    
+    // Images 모드인 경우 간소화된 검증
+    if (postMode === 'images') {
+      if (selectedImages.length === 0) {
+        alert("오류", "최소 1개의 이미지를 선택해주세요.")
+        return
+      }
+      if (!formData.contactEmail.trim()) {
+        alert("오류", "담당자 이메일을 입력해주세요.")
+        return
+      }
+      // 이메일 형식 검증
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(formData.contactEmail)) {
+        alert("오류", "올바른 이메일 형식을 입력해주세요.")
+        return
+      }
+    } else {
+      // Text 모드인 경우 기존 검증
+      if (!formData.production.trim()) {
+        alert("오류", "작품명을 입력해주세요.")
+        return
+      }
+      if (!formData.organizationName.trim()) {
+        alert("오류", "단체명을 입력해주세요.")
+        return
+      }
+      if (!formData.rehearsalSchedule.trim()) {
+        alert("오류", "연습 일정을 입력해주세요.")
+        return
+      }
+      if (!formData.location.trim()) {
+        alert("오류", "장소를 입력해주세요.")
+        return
+      }
+      if (!formData.description.trim()) {
+        alert("오류", "상세 설명을 입력해주세요.")
+        return
+      }
+      if (!formData.contactEmail.trim()) {
+        alert("오류", "담당자 이메일을 입력해주세요.")
+        return
+      }
+      // 이메일 형식 검증
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(formData.contactEmail)) {
+        alert("오류", "올바른 이메일 형식을 입력해주세요.")
+        return
+      }
     }
 
     if (!userProfile) {
@@ -333,11 +360,11 @@ export const CreatePostScreen = () => {
         // 생성 모드
         const createData: CreatePost = {
           title: formData.title.trim(),
-          production: formData.production.trim(),
+          production: postMode === 'images' ? (formData.production || "이미지 게시글") : formData.production.trim(),
           organizationName: formData.organizationName.trim(),
-          rehearsalSchedule: formData.rehearsalSchedule.trim(),
-          location: formData.location.trim(),
-          description: formData.description.trim(),
+          rehearsalSchedule: postMode === 'images' ? (formData.rehearsalSchedule || "상세 문의") : formData.rehearsalSchedule.trim(),
+          location: postMode === 'images' ? (formData.location || "상세 문의") : formData.location.trim(),
+          description: postMode === 'images' ? (formData.description || "자세한 내용은 이미지를 확인해주세요.") : formData.description.trim(),
           tags,
           status: formData.status,
           deadline: formData.deadline,
@@ -346,6 +373,9 @@ export const CreatePostScreen = () => {
           performance: performanceInfo,
           benefits: benefitsInfo,
           contact: contactInfo,
+          // 이미지 모드인 경우 이미지 URL 추가
+          images: postMode === 'images' ? selectedImages : undefined,
+          postType: postMode,
           createdAt: firestore.FieldValue.serverTimestamp(),
           updatedAt: firestore.FieldValue.serverTimestamp(),
         }
@@ -411,6 +441,90 @@ export const CreatePostScreen = () => {
       ...prev,
       [field]: value,
     }))
+  }
+
+  // 이미지 선택 기능
+  const pickImages = async () => {
+    try {
+      // 권한 요청
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
+      if (status !== 'granted') {
+        alert("권한 필요", "이미지 선택을 위해 갤러리 접근 권한이 필요합니다.")
+        return
+      }
+
+      // 이미지 선택
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsMultipleSelection: true,
+        selectionLimit: 5,
+        quality: 0.8,
+        exif: false,
+      })
+
+      if (!result.canceled && result.assets) {
+        setUploadingImages(true)
+        
+        try {
+          const uploadedUrls: string[] = []
+          
+          console.log("Firebase Storage 업로드 시작...")
+          
+          for (const asset of result.assets) {
+            console.log("이미지 업로드 시작:", asset.uri)
+            
+            // Firebase Storage에 업로드
+            const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`
+            const imageRef = storage().ref(`posts/${fileName}`)
+            
+            console.log("Storage reference 경로:", imageRef.fullPath)
+            
+            // 파일 업로드
+            console.log("파일 업로드 중...")
+            const task = imageRef.putFile(asset.uri)
+            
+            // 업로드 완료 대기
+            await task
+            console.log("파일 업로드 완료")
+            
+            // 다운로드 URL 가져오기
+            const downloadUrl = await imageRef.getDownloadURL()
+            console.log("다운로드 URL 획득:", downloadUrl)
+            
+            uploadedUrls.push(downloadUrl)
+          }
+          
+          setSelectedImages(prev => [...prev, ...uploadedUrls])
+          alert("성공", `${uploadedUrls.length}개의 이미지가 Firebase Storage에 업로드되었습니다!`)
+        } catch (error) {
+          console.error("이미지 업로드 오류:", error)
+          
+          // 구체적인 오류 메시지 제공
+          let errorMessage = "이미지 업로드 중 오류가 발생했습니다."
+          if (error.code === 'storage/object-not-found') {
+            errorMessage = "Firebase Storage 버킷을 찾을 수 없습니다."
+          } else if (error.code === 'storage/unauthorized') {
+            errorMessage = "Firebase Storage 업로드 권한이 없습니다. 로그인 상태를 확인해주세요."
+          } else if (error.code === 'storage/unknown') {
+            errorMessage = "Firebase Storage 연결 오류가 발생했습니다."
+          } else if (error.code === 'storage/invalid-format') {
+            errorMessage = "지원하지 않는 이미지 형식입니다."
+          }
+          
+          alert("업로드 실패", errorMessage)
+        } finally {
+          setUploadingImages(false)
+        }
+      }
+    } catch (error) {
+      console.error("이미지 선택 오류:", error)
+      alert("오류", "이미지 선택 중 오류가 발생했습니다.")
+    }
+  }
+
+  // 이미지 삭제 기능
+  const removeImage = (index: number) => {
+    setSelectedImages(prev => prev.filter((_, i) => i !== index))
   }
 
   // 날짜 포맷 헬퍼 함수
@@ -589,36 +703,120 @@ export const CreatePostScreen = () => {
         title={isEdit ? "게시글 수정" : "게시글 작성"}
       />
       <View style={themed($container)}>
-        {/* 템플릿 선택 섹션 */}
-        <View style={themed($templateSection)}>
-          <Text text="⚡ 빠른 작성" style={themed($sectionHeader)} />
-          <TouchableOpacity 
-            style={themed($templateButton)}
-            onPress={() => setShowTemplateModal(true)}
-            activeOpacity={0.7}
-            accessibilityRole="button"
-            accessibilityLabel="템플릿 선택"
-            accessibilityHint="미리 만들어진 양식을 선택합니다"
+        {/* 모드 선택 탭 */}
+        <View style={themed($modeTabContainer)}>
+          <TouchableOpacity
+            style={[themed($modeTab), postMode === 'text' && themed($activeTab)]}
+            onPress={() => setPostMode('text')}
+            accessibilityRole="tab"
+            accessibilityLabel="텍스트 모드"
           >
-            <View style={themed($templateButtonContent)}>
-              <Text text="📝 템플릿 선택하기" style={themed($templateButtonText)} />
-              <Text text=">" style={themed($templateButtonArrow)} />
-            </View>
-            <Text text="미리 만들어진 양식으로 쉽게 작성하세요" style={themed($templateButtonSubText)} />
+            <Text 
+              text="📝 Text" 
+              style={[themed($modeTabText), postMode === 'text' && themed($activeTabText)]} 
+            />
           </TouchableOpacity>
-          
-          {selectedTemplate && (
-            <View style={themed($selectedTemplateIndicator)}>
-              <Text text={`${selectedTemplate.icon} ${selectedTemplate.name} 적용됨`} style={themed($selectedTemplateText)} />
-              <TouchableOpacity onPress={() => {
-                setSelectedTemplate(null)
-                // 기본값으로 초기화 (필요시)
-              }}>
-                <Text text="✖" style={themed($removeTemplateButton)} />
-              </TouchableOpacity>
-            </View>
-          )}
+          <TouchableOpacity
+            style={[themed($modeTab), postMode === 'images' && themed($activeTab)]}
+            onPress={() => setPostMode('images')}
+            accessibilityRole="tab"
+            accessibilityLabel="이미지 모드"
+          >
+            <Text 
+              text="📸 Images" 
+              style={[themed($modeTabText), postMode === 'images' && themed($activeTabText)]} 
+            />
+          </TouchableOpacity>
         </View>
+
+        {/* 모드 설명 */}
+        <View style={themed($modeDescription)}>
+          <Text 
+            text={postMode === 'text' 
+              ? "📝 상세한 정보로 모집공고를 작성하세요" 
+              : "📸 이미지로 쉽고 빠르게 모집공고를 작성하세요"
+            } 
+            style={themed($modeDescriptionText)} 
+          />
+        </View>
+
+        {/* 템플릿 선택 섹션 - Text 모드에서만 표시 */}
+        {postMode === 'text' && (
+          <View style={themed($templateSection)}>
+            <Text text="⚡ 빠른 작성" style={themed($sectionHeader)} />
+            <TouchableOpacity 
+              style={themed($templateButton)}
+              onPress={() => setShowTemplateModal(true)}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel="템플릿 선택"
+              accessibilityHint="미리 만들어진 양식을 선택합니다"
+            >
+              <View style={themed($templateButtonContent)}>
+                <Text text="📝 템플릿 선택하기" style={themed($templateButtonText)} />
+                <Text text=">" style={themed($templateButtonArrow)} />
+              </View>
+              <Text text="미리 만들어진 양식으로 쉽게 작성하세요" style={themed($templateButtonSubText)} />
+            </TouchableOpacity>
+            
+            {selectedTemplate && (
+              <View style={themed($selectedTemplateIndicator)}>
+                <Text text={`${selectedTemplate.icon} ${selectedTemplate.name} 적용됨`} style={themed($selectedTemplateText)} />
+                <TouchableOpacity onPress={() => {
+                  setSelectedTemplate(null)
+                  // 기본값으로 초기화 (필요시)
+                }}>
+                  <Text text="✖" style={themed($removeTemplateButton)} />
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* 이미지 모드 UI */}
+        {postMode === 'images' && (
+          <View style={themed($imageSection)}>
+            <Text text="📸 이미지 업로드" style={themed($sectionHeader)} />
+            
+            {/* 이미지 업로드 버튼 */}
+            <TouchableOpacity
+              style={themed($imageUploadButton)}
+              onPress={pickImages}
+              disabled={uploadingImages || selectedImages.length >= 5}
+              accessibilityRole="button"
+              accessibilityLabel="이미지 선택"
+            >
+              <Text text="📷" style={themed($imageUploadIcon)} />
+              <Text 
+                text={uploadingImages ? "업로드 중..." : `이미지 선택 (${selectedImages.length}/5)`} 
+                style={themed($imageUploadText)} 
+              />
+            </TouchableOpacity>
+            
+            {/* 선택된 이미지 미리보기 */}
+            {selectedImages.length > 0 && (
+              <View style={themed($imagePreviewContainer)}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  {selectedImages.map((imageUrl, index) => (
+                    <View key={index} style={themed($imagePreviewItem)}>
+                      <Image source={{ uri: imageUrl }} style={themed($imagePreview)} />
+                      <TouchableOpacity
+                        style={themed($imageRemoveButton)}
+                        onPress={() => removeImage(index)}
+                        accessibilityRole="button"
+                        accessibilityLabel={`이미지 ${index + 1} 삭제`}
+                      >
+                        <Text text="✖" style={themed($imageRemoveText)} />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
+            
+            <Text text="💡 최대 5개까지 선택 가능합니다" style={themed($hintText)} />
+          </View>
+        )}
 
         {/* 작성 진행률 표시기 */}
         <View style={themed($progressSection)}>
@@ -658,7 +856,7 @@ export const CreatePostScreen = () => {
               style={themed($textInput)}
               value={formData.title}
               onChangeText={(text) => updateFormData("title", text)}
-              placeholder="예: [테스트] 레미제라블 양상블 모집"
+              placeholder={postMode === 'images' ? "예: 햄릿 주연 모집" : "예: [테스트] 레미제라블 양상블 모집"}
               placeholderTextColor={colors.textDim}
               accessibilityLabel="모집공고 제목"
               accessibilityHint="모집공고의 제목을 입력하세요"
@@ -666,21 +864,38 @@ export const CreatePostScreen = () => {
             <Text text="💡 구체적이고 매력적인 제목을 작성해주세요" style={themed($hintText)} />
           </View>
           
-          {/* 작품명 */}
-          <View style={themed($inputSection)}>
-            <View style={themed($labelRow)}>
-              <Text text="작품명" style={themed($label) as any} />
-              <Text text="*" style={themed($required)} />
+          {/* 작품명 - Text 모드에서만 필수 */}
+          {postMode === 'text' && (
+            <View style={themed($inputSection)}>
+              <View style={themed($labelRow)}>
+                <Text text="작품명" style={themed($label) as any} />
+                <Text text="*" style={themed($required)} />
+              </View>
+              <TextInput
+                style={themed($textInput)}
+                value={formData.production}
+                onChangeText={(text) => updateFormData("production", text)}
+                placeholder="햄릿"
+                placeholderTextColor={colors.textDim}
+                accessibilityLabel="작품명"
+              />
             </View>
-            <TextInput
-              style={themed($textInput)}
-              value={formData.production}
-              onChangeText={(text) => updateFormData("production", text)}
-              placeholder="햄릿"
-              placeholderTextColor={colors.textDim}
-              accessibilityLabel="작품명"
-            />
-          </View>
+          )}
+          
+          {/* Images 모드에서는 선택적 */}
+          {postMode === 'images' && (
+            <View style={themed($inputSection)}>
+              <Text text="작품명 (선택사항)" style={themed($label) as any} />
+              <TextInput
+                style={themed($textInput)}
+                value={formData.production}
+                onChangeText={(text) => updateFormData("production", text)}
+                placeholder="작품명을 입력하세요"
+                placeholderTextColor={colors.textDim}
+                accessibilityLabel="작품명"
+              />
+            </View>
+          )}
           
           {/* 장르 */}
           <View style={themed($inputSection)}>
@@ -708,34 +923,35 @@ export const CreatePostScreen = () => {
           </View>
         </View>
 
-        {/* 추가 기본 정보 섹션 */}
-        <View style={themed($formSection)}>
-          {/* 연습 일정 */}
-          <View style={themed($inputSection)}>
-            <Text text="연습 일정 *" style={themed($label) as any} />
-            <TextInput
-              style={themed($textInput)}
-              value={formData.rehearsalSchedule}
-              onChangeText={(text) => updateFormData("rehearsalSchedule", text)}
-              placeholder="예: 매주 일요일 오후 2시-6시"
-              placeholderTextColor={colors.textDim}
-            />
-          </View>
-
-          {/* 장소 */}
-          <View style={themed($inputSection)}>
-            <View style={themed($labelRow)}>
-              <Text text="장소" style={themed($label) as any} />
-              <Text text="*" style={themed($required)} />
+        {/* 추가 기본 정보 섹션 - Text 모드에서만 상세 표시 */}
+        {postMode === 'text' && (
+          <View style={themed($formSection)}>
+            {/* 연습 일정 */}
+            <View style={themed($inputSection)}>
+              <Text text="연습 일정 *" style={themed($label) as any} />
+              <TextInput
+                style={themed($textInput)}
+                value={formData.rehearsalSchedule}
+                onChangeText={(text) => updateFormData("rehearsalSchedule", text)}
+                placeholder="예: 매주 일요일 오후 2시-6시"
+                placeholderTextColor={colors.textDim}
+              />
             </View>
-            <TextInput
-              style={themed($textInput)}
-              value={formData.location}
-              onChangeText={(text) => updateFormData("location", text)}
-              placeholder="예: 대학로 소극장"
-              placeholderTextColor={colors.textDim}
-            />
-          </View>
+
+            {/* 장소 */}
+            <View style={themed($inputSection)}>
+              <View style={themed($labelRow)}>
+                <Text text="장소" style={themed($label) as any} />
+                <Text text="*" style={themed($required)} />
+              </View>
+              <TextInput
+                style={themed($textInput)}
+                value={formData.location}
+                onChangeText={(text) => updateFormData("location", text)}
+                placeholder="예: 대학로 소극장"
+                placeholderTextColor={colors.textDim}
+              />
+            </View>
 
           {/* 마감일 */}
           <View style={themed($inputSection)}>
@@ -793,11 +1009,13 @@ export const CreatePostScreen = () => {
               />
             )}
           </View>
-        </View>
+          </View>
+        )}
 
-        {/* 모집 역할 섹션 */}
-        <View style={themed($formSection)}>
-          <Text text="🎭 모집 역할" style={themed($sectionHeader)} />
+        {/* 모집 역할 섹션 - Text 모드에서만 표시 */}
+        {postMode === 'text' && (
+          <View style={themed($formSection)}>
+            <Text text="🎭 모집 역할" style={themed($sectionHeader)} />
           
           <View style={themed($inputSection)}>
             <Text text="역할명" style={themed($label) as any} />
@@ -864,11 +1082,13 @@ export const CreatePostScreen = () => {
               textAlignVertical="top"
             />
           </View>
-        </View>
+          </View>
+        )}
 
-        {/* 오디션 정보 섹션 */}
-        <View style={themed($formSection)}>
-          <Text text="🎯 오디션 정보" style={themed($sectionHeader)} />
+        {/* 오디션 정보 섹션 - Text 모드에서만 표시 */}
+        {postMode === 'text' && (
+          <View style={themed($formSection)}>
+            <Text text="🎯 오디션 정보" style={themed($sectionHeader)} />
           
           <View style={themed($inputSection)}>
             <Text text="오디션 일정" style={themed($label) as any} />
@@ -1004,11 +1224,13 @@ export const CreatePostScreen = () => {
             />
             <Text text="💡 쉼표로 구분해서 입력해주세요" style={themed($hintText)} />
           </View>
-        </View>
+          </View>
+        )}
 
-        {/* 혜택 정보 섹션 */}
-        <View style={themed($formSection)}>
-          <Text text="💰 혜택 정보" style={themed($sectionHeader)} />
+        {/* 혜택 정보 섹션 - Text 모드에서만 표시 */}
+        {postMode === 'text' && (
+          <View style={themed($formSection)}>
+            <Text text="💰 혜택 정보" style={themed($sectionHeader)} />
           
           <View style={themed($inputSection)}>
             <Text text="출연료/활동비" style={themed($label) as any} />
@@ -1072,9 +1294,10 @@ export const CreatePostScreen = () => {
               />
             </View>
           </View>
-        </View>
+          </View>
+        )}
 
-        {/* 연락처 정보 섹션 */}
+        {/* 연락처 정보 섹션 - 두 모드 모두 표시 */}
         <View style={themed($formSection)}>
           <Text text="📞 연락처 정보" style={themed($sectionHeader)} />
           
@@ -1119,26 +1342,36 @@ export const CreatePostScreen = () => {
           </View>
         </View>
 
-        {/* 상세 설명 섹션 */}
+        {/* 상세 설명 섹션 - Images 모드에서는 선택사항 */}
         <View style={themed($formSection)}>
           <Text text="📝 상세 설명" style={themed($sectionHeader)} />
           
           <View style={themed($inputSection)}>
             <View style={themed($labelRow)}>
               <Text text="상세 설명" style={themed($label) as any} />
-              <Text text="*" style={themed($required)} />
+              {postMode === 'text' && <Text text="*" style={themed($required)} />}
+              {postMode === 'images' && <Text text="(선택사항)" style={themed($optionalLabel)} />}
             </View>
             <TextInput
               style={[themed($textInput), themed($textArea)]}
               value={formData.description}
               onChangeText={(text) => updateFormData("description", text)}
-              placeholder="🎵 레미제라블 양상블을 모집합니다!&#10;&#10;자세한 모집 내용과 요구사항을 입력해주세요."
+              placeholder={postMode === 'images' 
+                ? "추가 설명이 필요한 경우 입력해주세요" 
+                : "🎵 레미제라블 양상블을 모집합니다!&#10;&#10;자세한 모집 내용과 요구사항을 입력해주세요."
+              }
               placeholderTextColor={colors.textDim}
               multiline
-              numberOfLines={6}
+              numberOfLines={postMode === 'images' ? 3 : 6}
               textAlignVertical="top"
             />
-            <Text text="💡 매력적인 설명으로 지원자들의 관심을 끌어보세요!" style={themed($hintText)} />
+            <Text 
+              text={postMode === 'images' 
+                ? "💡 이미지에 모든 정보가 포함되어 있다면 비워두셔도 됩니다" 
+                : "💡 매력적인 설명으로 지원자들의 관심을 끌어보세요!"
+              } 
+              style={themed($hintText)} 
+            />
           </View>
 
           {/* 태그 */}
@@ -1728,5 +1961,123 @@ const $dateModalDoneText = ({ colors, typography }) => ({
 
 const $datePicker = () => ({
   height: 200,
+})
+
+// 모드 탭 스타일들
+const $modeTabContainer = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  marginBottom: spacing?.md || 12,
+  backgroundColor: "rgba(0,0,0,0.05)",
+  borderRadius: 8,
+  padding: spacing?.xs || 4,
+})
+
+const $modeTab = ({ spacing }) => ({
+  flex: 1,
+  paddingVertical: spacing?.sm || 8,
+  paddingHorizontal: spacing?.md || 12,
+  borderRadius: 6,
+  alignItems: "center" as const,
+})
+
+const $activeTab = ({ colors }) => ({
+  backgroundColor: colors.palette.primary500,
+})
+
+const $modeTabText = ({ colors, typography }) => ({
+  fontSize: 14,
+  fontFamily: typography.primary.medium,
+  color: colors.textDim,
+})
+
+const $activeTabText = ({ colors }) => ({
+  color: colors.palette.neutral100,
+})
+
+const $modeDescription = ({ spacing }) => ({
+  marginBottom: spacing?.lg || 16,
+  paddingVertical: spacing?.sm || 8,
+  paddingHorizontal: spacing?.md || 12,
+  backgroundColor: "rgba(0,100,200,0.05)",
+  borderRadius: 8,
+  borderLeftWidth: 3,
+  borderLeftColor: "#0064C8",
+})
+
+const $modeDescriptionText = ({ colors, typography }) => ({
+  fontSize: 14,
+  fontFamily: typography.primary.normal,
+  color: colors.palette.primary600,
+  textAlign: "center" as const,
+})
+
+// 이미지 관련 스타일들
+const $imageSection = ({ spacing }) => ({
+  marginBottom: spacing?.lg || 16,
+})
+
+const $imageUploadButton = ({ colors, spacing }) => ({
+  borderWidth: 2,
+  borderColor: colors.palette.primary500,
+  borderRadius: 12,
+  paddingVertical: spacing?.lg || 16,
+  paddingHorizontal: spacing?.md || 12,
+  backgroundColor: colors.background,
+  alignItems: "center" as const,
+  borderStyle: "dashed" as const,
+})
+
+const $imageUploadIcon = {
+  fontSize: 24,
+  marginBottom: 8,
+}
+
+const $imageUploadText = ({ colors, typography }) => ({
+  fontSize: 16,
+  fontFamily: typography.primary.medium,
+  color: colors.palette.primary500,
+})
+
+const $imagePreviewContainer = ({ spacing }) => ({
+  marginTop: spacing?.md || 12,
+  marginBottom: spacing?.sm || 8,
+})
+
+const $imagePreviewItem = ({ spacing }) => ({
+  marginRight: spacing?.sm || 8,
+  position: "relative" as const,
+})
+
+const $imagePreview = {
+  width: 100,
+  height: 100,
+  borderRadius: 8,
+  backgroundColor: "#f0f0f0",
+}
+
+const $imageRemoveButton = ({ colors, spacing }) => ({
+  position: "absolute" as const,
+  top: -spacing?.xs || -4,
+  right: -spacing?.xs || -4,
+  backgroundColor: colors.palette.angry500,
+  borderRadius: 12,
+  width: 24,
+  height: 24,
+  alignItems: "center" as const,
+  justifyContent: "center" as const,
+})
+
+const $imageRemoveText = ({ colors }) => ({
+  fontSize: 12,
+  color: colors.palette.neutral100,
+  fontWeight: "bold" as const,
+})
+
+const $optionalLabel = ({ colors, typography }) => ({
+  color: colors.textDim,
+  marginLeft: 4,
+  fontSize: 12,
+  fontFamily: typography.primary.normal,
+  fontStyle: "italic" as const,
 })
 

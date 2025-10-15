@@ -113,13 +113,25 @@ export class PostService {
       ...(postData.performance && { performance: postData.performance }),
       ...(postData.benefits && { benefits: postData.benefits }),
       ...(postData.contact && { contact: postData.contact }),
+      // 이미지 관련 필드 추가
+      ...(postData.postType && { postType: postData.postType }),
+      ...(postData.images && postData.images.length > 0 && { images: postData.images }),
     }
 
     console.log('📝 [PostService] 게시글 생성:', {
       organizationId: post.organizationId,
       organizationName: post.organizationName,
       authorId: post.authorId,
-      userOrganizationId
+      userOrganizationId,
+      postType: postData.postType,
+      imagesCount: postData.images ? postData.images.length : 0,
+      hasImages: !!(postData.images && postData.images.length > 0)
+    })
+
+    console.log('🔍 [PostService] 전달받은 postData:', {
+      postType: postData.postType,
+      images: postData.images,
+      imagesLength: postData.images ? postData.images.length : 'no images'
     })
 
     await setDoc(docRef, post)

@@ -3,6 +3,9 @@ import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore"
 // 게시글 상태
 export type PostStatus = "active" | "closed"
 
+// 게시글 타입
+export type PostType = "text" | "images"
+
 // 모집 역할 정보
 export interface Role {
   name: string              // 역할명 (햄릿, 오필리어)
@@ -65,6 +68,8 @@ export interface Post {
   tags: string[]            // 태그 ['뮤지컬', '남성역할', '여성역할']
   
   // 새로운 필드들
+  postType?: PostType       // 게시글 타입 (text | images)
+  images?: string[]         // 이미지 URLs (images 모드용)
   roles?: Role[]            // 모집 역할들
   audition?: AuditionInfo   // 오디션 정보
   performance?: PerformanceInfo // 공연 정보
@@ -90,6 +95,8 @@ export type CreatePost = {
   tags: string[]
   
   // 새로운 필드들 (선택적)
+  postType?: PostType       // 게시글 타입 (text | images)
+  images?: string[]         // 이미지 URLs (images 모드용)
   roles?: Role[]
   audition?: AuditionInfo
   performance?: PerformanceInfo
@@ -109,7 +116,7 @@ export type UpdatePost = Partial<
   Pick<
     Post,
     "title" | "description" | "production" | "rehearsalSchedule" | "location" | "organizationName" | "status" | "tags" |
-    "roles" | "audition" | "performance" | "benefits" | "contact" | "deadline" | "totalApplicants" | "viewCount"
+    "postType" | "images" | "roles" | "audition" | "performance" | "benefits" | "contact" | "deadline" | "totalApplicants" | "viewCount"
   >
 > & {
   updatedAt: FirebaseFirestoreTypes.FieldValue

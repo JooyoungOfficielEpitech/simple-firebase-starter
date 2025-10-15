@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { View, TouchableOpacity, Share, Modal, ScrollView } from "react-native"
+import { View, TouchableOpacity, Share, Modal, ScrollView, Image, Dimensions } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -26,6 +26,73 @@ type RoutePropType = RouteProp<BulletinBoardStackParamList, "PostDetail">
 
 // ApplicationService 인스턴스 생성
 const applicationService = new ApplicationService(firestore())
+
+// 화면 크기 가져오기
+const { width: screenWidth } = Dimensions.get('window')
+
+// 이미지 갤러리 컴포넌트
+const ImageGallery = ({ images }: { images: string[] }) => {
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const {
+    themed,
+    theme: { colors, spacing },
+  } = useAppTheme()
+
+  const handleScroll = (event: any) => {
+    const contentOffsetX = event.nativeEvent.contentOffset.x
+    const index = Math.round(contentOffsetX / screenWidth)
+    setCurrentIndex(index)
+  }
+
+  return (
+    <View style={themed($imageGalleryContainer)}>
+      <ScrollView
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        style={themed($imageScrollView)}
+        contentContainerStyle={{ alignItems: 'flex-start' }}
+        bounces={false}
+      >
+        {images.map((imageUrl, index) => (
+          <View key={index} style={themed($imageContainer)}>
+            <Image
+              source={{ uri: imageUrl }}
+              style={themed($galleryImage)}
+              resizeMode="cover"
+            />
+          </View>
+        ))}
+      </ScrollView>
+      
+      {/* 이미지 인디케이터 */}
+      {images.length > 1 && (
+        <View style={themed($indicatorContainer)}>
+          {images.map((_, index) => (
+            <View
+              key={index}
+              style={themed(
+                index === currentIndex ? $activeIndicator : $inactiveIndicator
+              )}
+            />
+          ))}
+        </View>
+      )}
+      
+      {/* 이미지 카운터 */}
+      {images.length > 1 && (
+        <View style={themed($counterContainer)}>
+          <Text
+            text={`${currentIndex + 1} / ${images.length}`}
+            style={themed($counterText)}
+          />
+        </View>
+      )}
+    </View>
+  )
+}
 
 export const PostDetailScreen = () => {
   const { top } = useSafeAreaInsets()
@@ -440,6 +507,14 @@ export const PostDetailScreen = () => {
           </View>
         </View>
         
+
+        {/* 이미지 갤러리 (Images 모드인 경우) - 전체 화면 너비 */}
+        {(post.postType === 'images' || post.images?.length > 0) && post.images && post.images.length > 0 && (
+          <View style={themed($fullWidthImageSection)}>
+            <ImageGallery images={post.images} />
+          </View>
+        )}
+
         {/* 상세 설명 */}
         <View style={themed($section)}>
           <Text preset="subheading" text="상세 설명" style={themed($sectionTitle)} />
@@ -1751,6 +1826,83 @@ const $tag = ({ colors, spacing }) => ({
 
 const $tagText = ({ colors, typography }) => ({
   color: colors.palette.primary600,
+  fontSize: 12,
+  fontFamily: typography.primary.medium,
+})
+
+// 전체 너비 이미지 섹션
+const $fullWidthImageSection = ({ spacing }) => ({
+  marginHorizontal: -(spacing?.lg || 16), // container의 padding을 정확히 상쇄
+  marginVertical: spacing?.md || 12,
+})
+
+// 이미지 갤러리 스타일들 (인스타그램 스타일)
+const $imageGalleryContainer = {
+  position: "relative" as const,
+  width: screenWidth,
+  height: screenWidth,
+}
+
+const $imageScrollView = {
+  flex: 1,
+}
+
+const $imageContainer = {
+  width: screenWidth,
+  height: screenWidth,
+  overflow: "hidden" as const,
+}
+
+const $galleryImage = {
+  width: screenWidth,
+  height: screenWidth,
+  resizeMode: "cover" as const,
+}
+
+const $indicatorContainer = ({ spacing }) => ({
+  flexDirection: "row" as const,
+  justifyContent: "center" as const,
+  alignItems: "center" as const,
+  position: "absolute" as const,
+  bottom: 16,
+  left: 0,
+  right: 0,
+  zIndex: 10,
+})
+
+const $activeIndicator = ({ colors }) => ({
+  width: 8,
+  height: 8,
+  borderRadius: 4,
+  backgroundColor: "rgba(255, 255, 255, 0.9)",
+  marginHorizontal: 3,
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.3,
+  shadowRadius: 2,
+})
+
+const $inactiveIndicator = ({ colors }) => ({
+  width: 8,
+  height: 8,
+  borderRadius: 4,
+  backgroundColor: "rgba(255, 255, 255, 0.4)",
+  marginHorizontal: 3,
+})
+
+const $counterContainer = ({ colors, spacing }) => ({
+  position: "absolute" as const,
+  top: 16,
+  right: 16,
+  backgroundColor: "rgba(0, 0, 0, 0.7)",
+  paddingHorizontal: 10,
+  paddingVertical: 6,
+  borderRadius: 16,
+  zIndex: 10,
+})
+
+const $counterText = ({ colors, typography }) => ({
+  color: colors.palette.neutral100,
   fontSize: 12,
   fontFamily: typography.primary.medium,
 })
