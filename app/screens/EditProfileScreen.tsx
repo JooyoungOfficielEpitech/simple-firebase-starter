@@ -6,6 +6,7 @@ import { Text } from "@/components/Text"
 import { Button } from "@/components/Button"
 import { TextField } from "@/components/TextField"
 import { AlertModal } from "@/components/AlertModal"
+import { Dropdown } from "@/components/Dropdown"
 import { useAlert } from "@/hooks/useAlert"
 import { useAppTheme } from "@/theme/context"
 import { useAuth } from "@/context/AuthContext"
@@ -21,7 +22,7 @@ interface EditProfileScreenProps {
 export const EditProfileScreen: FC<EditProfileScreenProps> = ({ navigation }) => {
   const { themed } = useAppTheme()
   const { user } = useAuth()
-  const { alert } = useAlert()
+  const { alert, alertState, hideAlert } = useAlert()
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -100,22 +101,6 @@ export const EditProfileScreen: FC<EditProfileScreenProps> = ({ navigation }) =>
     }
   }
 
-  const handleGenderSelect = () => {
-    alert(
-      "성별 선택",
-      "성별을 선택해주세요.",
-      [
-        { text: "취소", style: "cancel" },
-        { text: "남성", onPress: () => setGender("male") },
-        { text: "여성", onPress: () => setGender("female") }
-      ]
-    )
-  }
-
-  const formatGender = (gender?: string) => {
-    if (!gender) return "선택하세요"
-    return gender === "male" ? "남성" : "여성"
-  }
 
   if (isLoading) {
     return (
@@ -158,12 +143,14 @@ export const EditProfileScreen: FC<EditProfileScreenProps> = ({ navigation }) =>
 
         <View style={themed($fieldContainer)}>
           <Text style={themed($label)}>성별</Text>
-          <Button
-            text={formatGender(gender)}
-            onPress={handleGenderSelect}
-            preset="default"
-            style={themed($genderButton)}
-            textStyle={themed($genderButtonText)}
+          <Dropdown
+            value={gender}
+            options={[
+              { label: "남성", value: "male" },
+              { label: "여성", value: "female" }
+            ]}
+            placeholder="성별을 선택하세요"
+            onSelect={(value) => setGender(value as any)}
           />
         </View>
 
@@ -261,17 +248,6 @@ const $label: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
   marginBottom: spacing.xs,
 })
 
-const $genderButton: ThemedStyle<ViewStyle> = ({ colors }) => ({
-  backgroundColor: colors.background,
-  borderWidth: 1,
-  borderColor: colors.border,
-  justifyContent: "flex-start",
-})
-
-const $genderButtonText: ThemedStyle<TextStyle> = ({ colors }) => ({
-  color: colors.text,
-  textAlign: "left",
-})
 
 const $buttonContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   marginTop: spacing.lg,

@@ -1,5 +1,7 @@
 export { AlertModal } from "./AlertModal"
 export type { AlertModalProps, AlertButton } from "./AlertModal"
+export { Dropdown } from "./Dropdown"
+export type { DropdownProps, DropdownOption } from "./Dropdown"
 export { AutoImage } from "./AutoImage"
 export { Button } from "./Button"
 export type { ButtonProps } from "./Button"

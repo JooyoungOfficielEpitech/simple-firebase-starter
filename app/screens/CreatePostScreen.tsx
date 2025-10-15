@@ -11,6 +11,7 @@ import { Screen } from "@/components/Screen"
 import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
 import { AlertModal } from "@/components/AlertModal"
+import { Dropdown, type DropdownOption } from "@/components/Dropdown"
 import { postService, userService, organizationService } from "@/services/firestore"
 import firestore from "@react-native-firebase/firestore"
 import { useAppTheme } from "@/theme/context"
@@ -684,21 +685,17 @@ export const CreatePostScreen = () => {
           {/* 장르 */}
           <View style={themed($inputSection)}>
             <Text text="장르" style={themed($label) as any} />
-            <TouchableOpacity 
-              style={themed($dropdownButton)}
-              onPress={() => {
-                const genres = ["연극", "뮤지컬", "창작", "기타"]
-                const currentIndex = genres.indexOf(formData.genre)
-                const nextIndex = (currentIndex + 1) % genres.length
-                updateFormData("genre", genres[nextIndex] as any)
-              }}
-              accessibilityRole="button"
-              accessibilityLabel="장르 선택"
-              accessibilityHint="터치하면 장르가 순환됩니다"
-            >
-              <Text text={formData.genre} style={themed($dropdownText)} />
-              <Text text="▼" style={themed($dropdownArrow)} />
-            </TouchableOpacity>
+            <Dropdown
+              value={formData.genre}
+              options={[
+                { label: "연극", value: "연극" },
+                { label: "뮤지컬", value: "뮤지컬" },
+                { label: "창작", value: "창작" },
+                { label: "기타", value: "기타" }
+              ]}
+              placeholder="장르를 선택하세요"
+              onSelect={(value) => updateFormData("genre", value as any)}
+            />
           </View>
 
           {/* 단체명 - read only */}
@@ -760,10 +757,8 @@ export const CreatePostScreen = () => {
 {/* 마감일 선택 모달 */}
             {showDeadlinePicker && Platform.OS === 'ios' && (
               <Modal transparent animationType="slide">
-                <TouchableOpacity 
+                <View 
                   style={themed($dateModalOverlay)}
-                  activeOpacity={1}
-                  onPress={() => setShowDeadlinePicker(false)}
                 >
                   <View style={themed($dateModalContainer)}>
                     <View style={themed($dateModalHeader)}>
@@ -784,7 +779,7 @@ export const CreatePostScreen = () => {
                       style={themed($datePicker)}
                     />
                   </View>
-                </TouchableOpacity>
+                </View>
               </Modal>
             )}
             
@@ -821,27 +816,20 @@ export const CreatePostScreen = () => {
 
           <View style={themed($inputSection)}>
             <Text text="성별 조건" style={themed($label) as any} />
-            <TouchableOpacity 
-              style={themed($dropdownButton)} 
-              onPress={() => {
-                const genders = ["any", "male", "female"]
-                const currentIndex = genders.indexOf(formData.roles[0]?.gender || "any")
-                const nextIndex = (currentIndex + 1) % genders.length
+            <Dropdown
+              value={formData.roles[0]?.gender || "any"}
+              options={[
+                { label: "무관", value: "any" },
+                { label: "남성", value: "male" },
+                { label: "여성", value: "female" }
+              ]}
+              placeholder="성별 조건을 선택하세요"
+              onSelect={(value) => {
                 const newRoles = [...formData.roles]
-                newRoles[0] = { ...newRoles[0], gender: genders[nextIndex] as any }
+                newRoles[0] = { ...newRoles[0], gender: value as any }
                 setFormData(prev => ({ ...prev, roles: newRoles }))
               }}
-              accessibilityRole="button"
-              accessibilityLabel="성별 조건 선택"
-              accessibilityHint="모집하는 역할의 성별 조건을 변경합니다"
-            >
-              <Text 
-                text={formData.roles[0]?.gender === "male" ? "남성" : 
-                      formData.roles[0]?.gender === "female" ? "여성" : "무관"} 
-                style={themed($dropdownText)} 
-              />
-              <Text text="▼" style={themed($dropdownArrow)} />
-            </TouchableOpacity>
+            />
           </View>
           
           <View style={themed($inputSection)}>
@@ -901,10 +889,8 @@ export const CreatePostScreen = () => {
 {/* 오디션 일정 선택 모달 */}
             {showAuditionDatePicker && Platform.OS === 'ios' && (
               <Modal transparent animationType="slide">
-                <TouchableOpacity 
+                <View 
                   style={themed($dateModalOverlay)}
-                  activeOpacity={1}
-                  onPress={() => setShowAuditionDatePicker(false)}
                 >
                   <View style={themed($dateModalContainer)}>
                     <View style={themed($dateModalHeader)}>
@@ -925,7 +911,7 @@ export const CreatePostScreen = () => {
                       style={themed($datePicker)}
                     />
                   </View>
-                </TouchableOpacity>
+                </View>
               </Modal>
             )}
             
@@ -959,10 +945,8 @@ export const CreatePostScreen = () => {
 {/* 결과 발표일 선택 모달 */}
             {showAuditionResultPicker && Platform.OS === 'ios' && (
               <Modal transparent animationType="slide">
-                <TouchableOpacity 
+                <View 
                   style={themed($dateModalOverlay)}
-                  activeOpacity={1}
-                  onPress={() => setShowAuditionResultPicker(false)}
                 >
                   <View style={themed($dateModalContainer)}>
                     <View style={themed($dateModalHeader)}>
@@ -983,7 +967,7 @@ export const CreatePostScreen = () => {
                       style={themed($datePicker)}
                     />
                   </View>
-                </TouchableOpacity>
+                </View>
               </Modal>
             )}
             
@@ -1219,10 +1203,8 @@ export const CreatePostScreen = () => {
         animationType="slide"
         onRequestClose={() => setShowTemplateModal(false)}
       >
-        <TouchableOpacity 
-          style={themed($modalOverlay)} 
-          activeOpacity={1}
-          onPress={() => setShowTemplateModal(false)}
+        <View 
+          style={themed($modalOverlay)}
         >
           <TouchableOpacity 
             style={themed($modalContainer)}
@@ -1267,7 +1249,7 @@ export const CreatePostScreen = () => {
               )}
             </ScrollView>
           </TouchableOpacity>
-        </TouchableOpacity>
+        </View>
       </Modal>
 
       {/* Alert Modal */}
@@ -1398,15 +1380,6 @@ const $labelRow = ({ spacing }) => ({
   marginBottom: spacing?.xs || 4,
 })
 
-const $twoColumnRow = ({ spacing }) => ({
-  flexDirection: "row" as const,
-  gap: spacing?.md || 12,
-})
-
-const $halfWidth = {
-  flex: 1,
-}
-
 const $required = ({ colors, typography }) => ({
   color: colors.palette.angry500,
   marginLeft: 2,
@@ -1414,29 +1387,6 @@ const $required = ({ colors, typography }) => ({
   fontFamily: typography.primary.normal,
 })
 
-const $dropdownButton = ({ colors, spacing }) => ({
-  borderWidth: 1,
-  borderColor: colors.border,
-  borderRadius: 8,
-  paddingHorizontal: spacing?.md || 12,
-  paddingVertical: spacing?.sm || 8,
-  flexDirection: "row" as const,
-  justifyContent: "space-between" as const,
-  alignItems: "center" as const,
-  backgroundColor: colors.background,
-  minHeight: 48,
-})
-
-const $dropdownText = ({ colors, typography }) => ({
-  fontSize: 16,
-  color: colors.text,
-  fontFamily: typography.primary.normal,
-})
-
-const $dropdownArrow = ({ colors }) => ({
-  fontSize: 12,
-  color: colors.textDim,
-})
 
 // Switch 스타일들
 const $switchContainer = ({ spacing }) => ({

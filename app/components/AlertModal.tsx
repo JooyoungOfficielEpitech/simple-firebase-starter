@@ -42,7 +42,7 @@ export interface AlertModalProps {
    */
   onDismiss?: () => void
   /**
-   * Whether the modal can be dismissed by tapping outside (default: true)
+   * Whether the modal can be dismissed by tapping outside (default: false)
    */
   dismissable?: boolean
   /**
@@ -70,7 +70,7 @@ export function AlertModal(props: AlertModalProps) {
     message,
     buttons = [{ text: "확인", onPress: () => {} }],
     onDismiss,
-    dismissable = true,
+    dismissable = false,
     style: $containerStyleOverride,
     titleStyle: $titleStyleOverride,
     messageStyle: $messageStyleOverride,

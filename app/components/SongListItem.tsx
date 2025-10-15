@@ -85,21 +85,14 @@ export function SongListItem({
 const $container: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   flexDirection: "row",
   alignItems: "center",
-  paddingVertical: spacing.lg, // Increased for better touch target
-  paddingHorizontal: spacing.lg,
-  backgroundColor: colors.palette.neutral100,
+  padding: spacing?.md || 12, // Match PostCard padding
+  backgroundColor: colors.secondaryAction + '20', // Secondary color background to match PostCard
   minHeight: 72, // Minimum touch target for Korean UX patterns
   borderRadius: 12, // More rounded for Korean app aesthetics
   marginHorizontal: spacing.sm,
-  marginVertical: spacing.xxxs,
-  borderWidth: 1,
-  borderColor: colors.palette.neutral300,
-  // Subtle shadow for depth (Korean UX likes layered design)
-  shadowColor: colors.palette.neutral500,
-  shadowOffset: { width: 0, height: 1 },
-  shadowOpacity: 0.1,
-  shadowRadius: 2,
-  elevation: 2, // Android shadow
+  marginBottom: spacing?.md || 12, // Match PostCard marginBottom
+  borderWidth: 2, // Thicker border to match PostCard
+  borderColor: colors.secondaryAction + '60', // Secondary color border to match PostCard
 })
 
 const $playIconContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
@@ -150,7 +143,7 @@ const $arrowContainer: ThemedStyle<ViewStyle> = () => ({
 })
 
 const $separator: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-  height: 8, // More spacing between items for Korean UX
+  height: 4, // Reduced spacing to match PostCard style
   backgroundColor: colors.background, // Match screen background
   marginHorizontal: spacing.sm, // Consistent with container margins
 })
