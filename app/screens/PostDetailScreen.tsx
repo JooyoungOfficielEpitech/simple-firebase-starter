@@ -437,12 +437,10 @@ export const PostDetailScreen = () => {
               <Text text="👁️" style={themed($statIcon)} />
               <Text text={`조회 ${post.viewCount || 0}`} style={themed($statText)} />
             </View>
-            {isMyPost && (
-              <View style={themed($statItem)}>
-                <Text text="👥" style={themed($statIcon)} />
-                <Text text={`지원자 ${applications.length}`} style={themed($statText)} />
-              </View>
-            )}
+            <View style={themed($statItem)}>
+              <Text text="👥" style={themed($statIcon)} />
+              <Text text={`지원자 ${isMyPost ? applications.length : 0}`} style={themed($statText)} />
+            </View>
           </View>
           
           {/* 액션 버튼들 */}
@@ -1103,7 +1101,8 @@ const $deadlineText = ({ colors, typography }) => ({
 
 const $keyInfoRow = ({ spacing }) => ({
   flexDirection: "row" as const,
-  gap: spacing?.lg || 16,
+  justifyContent: "space-around" as const,
+  alignItems: "center" as const,
   marginTop: spacing?.sm || 8,
   marginBottom: spacing?.md || 12,
 })
@@ -1112,6 +1111,7 @@ const $infoItem = ({ spacing }) => ({
   flexDirection: "row" as const,
   alignItems: "center" as const,
   flex: 1,
+  justifyContent: "center" as const,
 })
 
 const $infoIcon = {
@@ -1277,7 +1277,7 @@ const $closedText = ({ colors, typography }) => ({
 // 새로운 스타일들
 const $statsRow = ({ spacing }) => ({
   flexDirection: "row" as const,
-  justifyContent: "space-between" as const,
+  justifyContent: "space-around" as const,
   alignItems: "center" as const,
   marginTop: spacing?.sm || 8,
   marginBottom: spacing?.md || 12,
@@ -1286,6 +1286,8 @@ const $statsRow = ({ spacing }) => ({
 const $statItem = ({ spacing }) => ({
   flexDirection: "row" as const,
   alignItems: "center" as const,
+  flex: 1,
+  justifyContent: "center" as const,
 })
 
 const $statIcon = {

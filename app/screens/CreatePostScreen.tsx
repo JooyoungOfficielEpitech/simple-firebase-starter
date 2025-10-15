@@ -14,8 +14,8 @@ import { Text } from "@/components/Text"
 import { AlertModal } from "@/components/AlertModal"
 import { Dropdown, type DropdownOption } from "@/components/Dropdown"
 import { postService, userService, organizationService } from "@/services/firestore"
-import firestore from "@react-native-firebase/firestore"
-import storage from "@react-native-firebase/storage"
+import firestore, { getFirestore } from "@react-native-firebase/firestore"
+import { getStorage } from "@react-native-firebase/storage"
 import { useAppTheme } from "@/theme/context"
 import { useAlert } from "@/hooks/useAlert"
 import { CreatePost, UpdatePost, PostType } from "@/types/post"
@@ -179,6 +179,15 @@ export const CreatePostScreen = () => {
         try {
           const post = await postService.getPost(postId)
           if (post) {
+            // 게시글 타입에 따라 모드 자동 설정
+            const postType = post.postType || 'text'
+            setPostMode(postType)
+            
+            // 이미지 모드인 경우 기존 이미지 로드
+            if (postType === 'images' && post.images && post.images.length > 0) {
+              setSelectedImages(post.images)
+            }
+            
             setFormData({
               title: post.title,
               production: post.production,
@@ -338,20 +347,24 @@ export const CreatePostScreen = () => {
         // 수정 모드
         const updateData: UpdatePost = {
           title: formData.title.trim(),
-          production: formData.production.trim(),
+          production: postMode === 'images' ? (formData.production || "이미지 게시글") : formData.production.trim(),
           organizationName: formData.organizationName.trim(),
-          rehearsalSchedule: formData.rehearsalSchedule.trim(),
-          location: formData.location.trim(),
-          description: formData.description.trim(),
+          rehearsalSchedule: postMode === 'images' ? (formData.rehearsalSchedule || "상세 문의") : formData.rehearsalSchedule.trim(),
+          location: postMode === 'images' ? (formData.location || "상세 문의") : formData.location.trim(),
+          description: postMode === 'images' ? (formData.description || "자세한 내용은 이미지를 확인해주세요.") : formData.description.trim(),
           tags,
           status: formData.status,
           deadline: formData.deadline,
-          roles: roles.length > 0 ? roles : undefined,
-          audition: auditionInfo,
-          performance: performanceInfo,
-          benefits: benefitsInfo,
-          contact: contactInfo,
+          postType: postMode,
           updatedAt: firestore.FieldValue.serverTimestamp(),
+          // 조건부로 필드 추가 (undefined 방지)
+          ...(roles.length > 0 && { roles }),
+          ...(auditionInfo && Object.keys(auditionInfo).length > 0 && { audition: auditionInfo }),
+          ...(performanceInfo && Object.keys(performanceInfo).length > 0 && { performance: performanceInfo }),
+          ...(benefitsInfo && Object.keys(benefitsInfo).length > 0 && { benefits: benefitsInfo }),
+          ...(contactInfo && Object.keys(contactInfo).length > 0 && { contact: contactInfo }),
+          // 이미지 필드 처리
+          ...(postMode === 'images' && selectedImages.length > 0 ? { images: selectedImages } : {}),
         }
 
         await postService.updatePost(postId, updateData)
@@ -368,16 +381,17 @@ export const CreatePostScreen = () => {
           tags,
           status: formData.status,
           deadline: formData.deadline,
-          roles: roles.length > 0 ? roles : undefined,
-          audition: auditionInfo,
-          performance: performanceInfo,
-          benefits: benefitsInfo,
-          contact: contactInfo,
-          // 이미지 모드인 경우 이미지 URL 추가
-          images: postMode === 'images' ? selectedImages : undefined,
           postType: postMode,
           createdAt: firestore.FieldValue.serverTimestamp(),
           updatedAt: firestore.FieldValue.serverTimestamp(),
+          // 조건부로 필드 추가 (undefined 방지)
+          ...(roles.length > 0 && { roles }),
+          ...(auditionInfo && Object.keys(auditionInfo).length > 0 && { audition: auditionInfo }),
+          ...(performanceInfo && Object.keys(performanceInfo).length > 0 && { performance: performanceInfo }),
+          ...(benefitsInfo && Object.keys(benefitsInfo).length > 0 && { benefits: benefitsInfo }),
+          ...(contactInfo && Object.keys(contactInfo).length > 0 && { contact: contactInfo }),
+          // 이미지 모드인 경우에만 images 필드 추가
+          ...(postMode === 'images' && selectedImages.length > 0 && { images: selectedImages }),
         }
 
         console.log('📝 [CreatePostScreen] 게시글 생성 시작:', {
@@ -475,7 +489,7 @@ export const CreatePostScreen = () => {
             
             // Firebase Storage에 업로드
             const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`
-            const imageRef = storage().ref(`posts/${fileName}`)
+            const imageRef = getStorage().ref(`posts/${fileName}`)
             
             console.log("Storage reference 경로:", imageRef.fullPath)
             
@@ -523,7 +537,69 @@ export const CreatePostScreen = () => {
   }
 
   // 이미지 삭제 기능
-  const removeImage = (index: number) => {
+  const removeImage = async (index: number) => {
+    const imageToRemove = selectedImages[index]
+    
+    console.log('🔍 [CreatePostScreen] 이미지 삭제 시도:', { 
+      index, 
+      imageUrl: imageToRemove,
+      isEdit,
+      isFirebaseUrl: imageToRemove.startsWith('https://firebasestorage.googleapis.com')
+    })
+    
+    // 편집 모드이고 Firebase Storage URL인 경우 Storage에서도 삭제
+    if (isEdit && imageToRemove.startsWith('https://firebasestorage.googleapis.com')) {
+      try {
+        // Firebase Storage URL에서 파일 경로 추출 (개선된 방식)
+        const url = new URL(imageToRemove)
+        console.log('🔍 [CreatePostScreen] URL 분석:', {
+          pathname: url.pathname,
+          searchParams: url.searchParams.toString()
+        })
+        
+        // URL 형태: https://firebasestorage.googleapis.com/v0/b/bucket/o/path%2Fto%2Ffile.jpg?alt=media&token=...
+        let filePath = ''
+        
+        if (url.pathname.includes('/o/')) {
+          // 표준 Firebase Storage URL 형태
+          const pathStart = url.pathname.indexOf('/o/') + 3
+          const pathEnd = url.searchParams.has('alt') ? url.pathname.length : url.pathname.indexOf('?')
+          filePath = decodeURIComponent(url.pathname.substring(pathStart, pathEnd === -1 ? url.pathname.length : pathEnd))
+        } else {
+          // 다른 형태의 URL이라면 전체 pathname에서 추출
+          filePath = decodeURIComponent(url.pathname.substring(1)) // 맨 앞의 / 제거
+        }
+        
+        console.log('🔍 [CreatePostScreen] 추출된 파일 경로:', filePath)
+        
+        if (filePath) {
+          await getStorage().ref(filePath).delete()
+          console.log('🗑️ [CreatePostScreen] Firebase Storage에서 이미지 삭제 완료:', filePath)
+        } else {
+          console.warn('⚠️ [CreatePostScreen] 파일 경로를 추출할 수 없습니다:', imageToRemove)
+        }
+      } catch (error) {
+        console.error('⚠️ [CreatePostScreen] Firebase Storage 이미지 삭제 실패:', error)
+        console.log('🔍 [CreatePostScreen] 오류 상세:', {
+          message: error.message,
+          code: error.code,
+          imageUrl: imageToRemove
+        })
+        
+        // 오류 타입에 따른 처리
+        if (error.code === 'storage/object-not-found') {
+          console.log('ℹ️ [CreatePostScreen] 이미지가 이미 삭제되었거나 존재하지 않습니다.')
+        } else if (error.code === 'storage/unauthorized') {
+          console.warn('⚠️ [CreatePostScreen] 이미지 삭제 권한이 없습니다.')
+        } else {
+          console.error('❌ [CreatePostScreen] 예상치 못한 삭제 오류:', error.code)
+        }
+        
+        // Storage 삭제가 실패해도 UI에서는 제거 (이미 삭제되었거나 권한 문제일 수 있음)
+      }
+    }
+    
+    // UI에서 이미지 제거
     setSelectedImages(prev => prev.filter((_, i) => i !== index))
   }
 
@@ -707,24 +783,26 @@ export const CreatePostScreen = () => {
         <View style={themed($modeTabContainer)}>
           <TouchableOpacity
             style={[themed($modeTab), postMode === 'text' && themed($activeTab)]}
-            onPress={() => setPostMode('text')}
+            onPress={() => !isEdit && setPostMode('text')}
+            disabled={isEdit}
             accessibilityRole="tab"
             accessibilityLabel="텍스트 모드"
           >
             <Text 
               text="📝 Text" 
-              style={[themed($modeTabText), postMode === 'text' && themed($activeTabText)]} 
+              style={[themed($modeTabText), postMode === 'text' && themed($activeTabText), isEdit && themed($disabledTabText)]} 
             />
           </TouchableOpacity>
           <TouchableOpacity
             style={[themed($modeTab), postMode === 'images' && themed($activeTab)]}
-            onPress={() => setPostMode('images')}
+            onPress={() => !isEdit && setPostMode('images')}
+            disabled={isEdit}
             accessibilityRole="tab"
             accessibilityLabel="이미지 모드"
           >
             <Text 
               text="📸 Images" 
-              style={[themed($modeTabText), postMode === 'images' && themed($activeTabText)]} 
+              style={[themed($modeTabText), postMode === 'images' && themed($activeTabText), isEdit && themed($disabledTabText)]} 
             />
           </TouchableOpacity>
         </View>
@@ -1992,6 +2070,10 @@ const $modeTabText = ({ colors, typography }) => ({
 
 const $activeTabText = ({ colors }) => ({
   color: colors.palette.neutral100,
+})
+const $disabledTabText = ({ colors }) => ({
+  color: colors.textDim,
+  opacity: 0.5,
 })
 
 const $modeDescription = ({ spacing }) => ({
