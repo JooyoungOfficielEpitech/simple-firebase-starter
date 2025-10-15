@@ -14,8 +14,8 @@ import { Text } from "@/components/Text"
 import { AlertModal } from "@/components/AlertModal"
 import { Dropdown, type DropdownOption } from "@/components/Dropdown"
 import { postService, userService, organizationService } from "@/services/firestore"
-import firestore, { getFirestore } from "@react-native-firebase/firestore"
 import { getStorage } from "@react-native-firebase/storage"
+import firestore from "@react-native-firebase/firestore"
 import { useAppTheme } from "@/theme/context"
 import { useAlert } from "@/hooks/useAlert"
 import { CreatePost, UpdatePost, PostType } from "@/types/post"
@@ -487,15 +487,47 @@ export const CreatePostScreen = () => {
           for (const asset of result.assets) {
             console.log("이미지 업로드 시작:", asset.uri)
             
-            // Firebase Storage에 업로드
-            const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`
-            const imageRef = getStorage().ref(`posts/${fileName}`)
+            // 🔒 파일 타입 검증 (클라이언트 사이드)
+            // ImagePicker에서 asset.type은 'image' | 'video' 형태이므로 mimeType 사용
+            const mimeType = asset.mimeType || 'image/jpeg'
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+            if (!allowedTypes.includes(mimeType)) {
+              throw new Error(`지원하지 않는 파일 형식입니다: ${mimeType}`)
+            }
+            
+            // 🔒 파일 크기 검증 (5MB 제한)
+            const maxSize = 5 * 1024 * 1024 // 5MB
+            if (asset.fileSize && asset.fileSize > maxSize) {
+              throw new Error(`파일 크기가 너무 큽니다. 최대 5MB까지 업로드 가능합니다.`)
+            }
+            
+            // 🔒 안전한 파일명 생성 (영문, 숫자, 하이픈, 언더스코어만)
+            const timestamp = Date.now()
+            const randomId = Math.random().toString(36).substring(7)
+            const fileExtension = mimeType === 'image/png' ? 'png' : 
+                                 mimeType === 'image/webp' ? 'webp' : 'jpg'
+            const safeFileName = `${timestamp}_${randomId}.${fileExtension}`
+            
+            // Firebase Storage 참조 생성
+            const imageRef = getStorage().ref(`posts/${safeFileName}`)
             
             console.log("Storage reference 경로:", imageRef.fullPath)
+            console.log("파일 타입:", mimeType, "→", fileExtension)
+            
+            // 🔒 업로드 메타데이터 설정 (보안 규칙에서 활용)
+            const metadata = {
+              contentType: mimeType,
+              customMetadata: {
+                uploadedBy: userProfile.uid,
+                uploadedAt: new Date().toISOString(),
+                originalFileName: asset.fileName || 'unknown',
+                source: 'create-post-screen'
+              }
+            }
             
             // 파일 업로드
             console.log("파일 업로드 중...")
-            const task = imageRef.putFile(asset.uri)
+            const task = imageRef.putFile(asset.uri, metadata)
             
             // 업로드 완료 대기
             await task

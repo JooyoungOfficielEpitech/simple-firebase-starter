@@ -10,6 +10,8 @@ import { NotificationBadge } from "./NotificationBadge"
 import { useAppTheme } from "@/theme/context"
 import { useAuth } from "@/context/AuthContext"
 import { notificationService } from "@/services/firestore/notificationService"
+import { useSingleFirebaseListener } from "@/hooks/useFirebaseListener"
+import { firebaseCleanupManager } from "@/utils/firebaseCleanup"
 import { type ThemedStyle } from "@/theme/types"
 
 export interface ScreenHeaderProps {
@@ -104,6 +106,7 @@ export const ScreenHeader: FC<ScreenHeaderProps> = function ScreenHeader({
   const route = useRoute()
   const { user } = useAuth()
   const [unreadCount, setUnreadCount] = useState(0)
+  const { setListener: setNotificationListener, cleanup: cleanupNotificationListener } = useSingleFirebaseListener()
 
   const displayTitle = useMemo(() => titleTx ? titleTx : title, [titleTx, title])
 
@@ -131,29 +134,34 @@ export const ScreenHeader: FC<ScreenHeaderProps> = function ScreenHeader({
 
   // 읽지 않은 알림 수 구독
   useEffect(() => {
-    let unsubscribe: (() => void) | null = null
-    
     if (user && shouldShowNotificationIcon) {
       console.log('🔔 [ScreenHeader] 읽지 않은 알림 수 구독 시작:', user.uid)
       
-      unsubscribe = notificationService.subscribeToUnreadCount(
+      const unsubscribe = notificationService.subscribeToUnreadCount(
         user.uid,
         (count) => {
           console.log('🔔 [ScreenHeader] 읽지 않은 알림 수 업데이트:', count)
           setUnreadCount(count)
         }
       )
+      
+      // 안전한 리스너 등록
+      setNotificationListener(unsubscribe)
+      firebaseCleanupManager.registerListener(
+        `unreadCount_${user.uid}`,
+        unsubscribe,
+        { component: 'ScreenHeader', description: 'Unread Notification Count Listener' }
+      )
     } else {
       setUnreadCount(0)
+      cleanupNotificationListener()
     }
 
     return () => {
-      if (unsubscribe) {
-        console.log('🔔 [ScreenHeader] 읽지 않은 알림 수 구독 해제')
-        unsubscribe()
-      }
+      console.log('🔔 [ScreenHeader] 읽지 않은 알림 수 구독 해제')
+      cleanupNotificationListener()
     }
-  }, [user, shouldShowNotificationIcon])
+  }, [user, shouldShowNotificationIcon, setNotificationListener, cleanupNotificationListener])
 
   const handleNotificationPress = useCallback(() => {
     navigation.navigate("NotificationCenter")

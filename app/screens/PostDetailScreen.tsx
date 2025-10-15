@@ -4,16 +4,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import type { RouteProp } from "@react-navigation/native"
-import firestore from "@react-native-firebase/firestore"
-
 import { Screen } from "@/components/Screen"
 import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
 import { TextField } from "@/components/TextField"
 import { AlertModal } from "@/components/AlertModal"
 import { translate } from "@/i18n"
-import { postService, userService } from "@/services/firestore"
-import { ApplicationService } from "@/services/firestore/applicationService"
+import { postService, userService, applicationService } from "@/services/firestore"
 import { useAppTheme } from "@/theme/context"
 import { useAlert } from "@/hooks/useAlert"
 import { Post } from "@/types/post"
@@ -23,9 +20,6 @@ import { BulletinBoardStackParamList } from "@/navigators/BulletinBoardStackNavi
 
 type NavigationProp = NativeStackNavigationProp<BulletinBoardStackParamList>
 type RoutePropType = RouteProp<BulletinBoardStackParamList, "PostDetail">
-
-// ApplicationService 인스턴스 생성
-const applicationService = new ApplicationService(firestore())
 
 // 화면 크기 가져오기
 const { width: screenWidth } = Dimensions.get('window')

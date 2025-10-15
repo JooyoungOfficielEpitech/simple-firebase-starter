@@ -3,7 +3,7 @@ import { BottomTabScreenProps, createBottomTabNavigator } from "@react-navigatio
 import { CompositeScreenProps } from "@react-navigation/native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
-import { Icon } from "@/components/Icon"
+import { TabBarIcon } from "@/components/TabBarIcon"
 import { SettingsScreen } from "@/screens/SettingsScreen"
 import { WelcomeScreen } from "@/screens/WelcomeScreen"
 import { ProfileScreen } from "@/screens/ProfileScreen"
@@ -65,9 +65,7 @@ export function MainNavigator() {
         component={HomeStackNavigator}
         options={{
           tabBarLabel: "홈",
-          tabBarIcon: ({ focused }) => (
-            <Icon icon="heart" color={focused ? colors.secondaryAction : colors.tintInactive} size={30} />
-          ),
+          tabBarIcon: ({ focused }) => <TabBarIcon icon="heart" focused={focused} />,
         }}
       />
 
@@ -76,9 +74,7 @@ export function MainNavigator() {
         component={BulletinBoardStackNavigator}
         options={{
           tabBarLabel: "게시판",
-          tabBarIcon: ({ focused }) => (
-            <Icon icon="menu" color={focused ? colors.secondaryAction : colors.tintInactive} size={30} />
-          ),
+          tabBarIcon: ({ focused }) => <TabBarIcon icon="menu" focused={focused} />,
         }}
       />
 
@@ -87,9 +83,7 @@ export function MainNavigator() {
         component={SettingsScreen}
         options={{
           tabBarLabel: "설정",
-          tabBarIcon: ({ focused }) => (
-            <Icon icon="settings" color={focused ? colors.secondaryAction : colors.tintInactive} size={30} />
-          ),
+          tabBarIcon: ({ focused }) => <TabBarIcon icon="settings" focused={focused} />,
         }}
       />
 
@@ -98,9 +92,7 @@ export function MainNavigator() {
         component={ProfileScreen}
         options={{
           tabBarLabel: "프로필",
-          tabBarIcon: ({ focused }) => (
-            <Icon icon="user" color={focused ? colors.secondaryAction : colors.tintInactive} size={30} />
-          ),
+          tabBarIcon: ({ focused }) => <TabBarIcon icon="user" focused={focused} />,
         }}
       />
     </Tab.Navigator>

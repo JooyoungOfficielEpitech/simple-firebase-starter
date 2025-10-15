@@ -3,22 +3,21 @@ import { View, FlatList, TouchableOpacity, Linking, ScrollView } from "react-nat
 import { useNavigation, useRoute } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import type { RouteProp } from "@react-navigation/native"
-import firestore, { FirebaseFirestoreTypes } from "@react-native-firebase/firestore"
+import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore"
 
 import { Screen } from "@/components/Screen"
 import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
 import { Icon } from "@/components/Icon"
 import { AlertModal } from "@/components/AlertModal"
-import { ApplicationService, Application, ApplicationStatus } from "@/services/firestore/applicationService"
+import { applicationService } from "@/services/firestore"
+import { Application, ApplicationStatus } from "@/services/firestore/applicationService"
 import { useAppTheme } from "@/theme/context"
 import { useAlert } from "@/hooks/useAlert"
 import { BulletinBoardStackParamList } from "@/navigators/BulletinBoardStackNavigator"
 
 type NavigationProp = NativeStackNavigationProp<BulletinBoardStackParamList>
 type RoutePropType = RouteProp<BulletinBoardStackParamList, "ApplicationManagement">
-
-const applicationService = new ApplicationService(firestore())
 
 // Helper function to safely format Firestore Timestamp
 const formatApplicationDate = (timestamp: FirebaseFirestoreTypes.Timestamp | undefined): string => {

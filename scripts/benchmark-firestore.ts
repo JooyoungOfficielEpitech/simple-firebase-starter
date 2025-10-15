@@ -129,65 +129,54 @@ class FirestoreBenchmark {
 
     const suites: BenchmarkSuite[] = []
 
-    // 1. 기본 게시글 목록 조회
+    // 1. 기본 게시글 목록 조회 (최적화된 버전)
     const getPostsResults = await this.benchmarkOperation(
-      'getPosts (활성 게시글 20개)',
-      () => this.postService.getPosts({ limit: 20, status: 'active' })
+      'getPosts (활성 게시글 20개) - 최적화됨',
+      async () => {
+        const result = await this.postService.getPosts(20)
+        return Array.isArray(result) ? result : result.posts
+      }
     )
     suites.push(this.analyzeBenchmarkResults(getPostsResults))
 
-    // 2. 페이지네이션 테스트
+    // 2. 페이지네이션 테스트 (최적화된 버전)
     const paginationResults = await this.benchmarkOperation(
-      'getPosts 페이지네이션',
+      'getPosts 페이지네이션 - 최적화됨',
       async () => {
-        const firstPage = await this.postService.getPosts({ limit: 10, status: 'active' })
+        const firstPage = await this.postService.getPosts(10)
         if (firstPage.hasMore && firstPage.lastDoc) {
-          const secondPage = await this.postService.getPosts({ 
-            limit: 10, 
-            startAfter: firstPage.lastDoc,
-            status: 'active'
-          })
-          return { first: firstPage.data, second: secondPage.data }
+          const secondPage = await this.postService.getPosts(10, firstPage.lastDoc)
+          return { first: firstPage.posts, second: secondPage.posts }
         }
-        return firstPage
+        return firstPage.posts
       }
     )
     suites.push(this.analyzeBenchmarkResults(paginationResults))
 
-    // 3. 태그별 검색
-    const tagSearchResults = await this.benchmarkOperation(
-      'getPostsByTag (뮤지컬)',
-      () => this.postService.getPostsByTag('뮤지컬', { limit: 15, status: 'active' })
+    // 3. 경량화된 게시글 조회 테스트
+    const lightPostsResults = await this.benchmarkOperation(
+      'getPostsLight (경량화) - 최적화됨',
+      async () => {
+        const result = await this.postService.getPostsLight(15)
+        return result.posts
+      }
     )
-    suites.push(this.analyzeBenchmarkResults(tagSearchResults))
+    suites.push(this.analyzeBenchmarkResults(lightPostsResults))
 
-    // 4. 인기 게시글 조회
-    const popularPostsResults = await this.benchmarkOperation(
-      'getPopularPosts (조회수 기준)',
-      () => this.postService.getPopularPosts({ limit: 10, status: 'active' })
-    )
-    suites.push(this.analyzeBenchmarkResults(popularPostsResults))
-
-    // 5. 단일 게시글 조회 (캐시 테스트)
+    // 4. 단일 게시글 조회
     let testPostId: string | null = null
     const singlePostResults = await this.benchmarkOperation(
       'getPost (단일 조회)',
       async () => {
         if (!testPostId) {
-          const posts = await this.postService.getPosts({ limit: 1, status: 'active' })
-          testPostId = posts.data[0]?.id
+          const result = await this.postService.getPosts(1)
+          const posts = Array.isArray(result) ? result : result.posts
+          testPostId = posts[0]?.id
         }
-        return testPostId ? await this.postService.getPost(testPostId, false) : null
+        return testPostId ? await this.postService.getPost(testPostId) : null
       }
     )
     suites.push(this.analyzeBenchmarkResults(singlePostResults))
-
-    // 6. 복합 검색
-    const searchResults = await this.benchmarkOperation(
-      'searchPosts (복합 검색)',
-      () => this.postService.searchPosts('공연', { limit: 20, status: 'active' })
-    )
-    suites.push(this.analyzeBenchmarkResults(searchResults))
 
     return suites
   }
@@ -202,8 +191,9 @@ class FirestoreBenchmark {
 
     // 테스트용 데이터 확인
     let testPostId: string | null = null
-    const posts = await this.postService.getPosts({ limit: 1, status: 'active' })
-    testPostId = posts.data[0]?.id
+    const result = await this.postService.getPosts(1)
+    const posts = Array.isArray(result) ? result : result.posts
+    testPostId = posts[0]?.id
 
     if (!testPostId) {
       console.warn('⚠️ 테스트할 게시글이 없어 지원서 벤치마크를 건너뜁니다.')
@@ -278,7 +268,10 @@ class FirestoreBenchmark {
     console.log('첫 번째 요청 (캐시 미스):')
     const firstRequest = await this.benchmarkOperation(
       'getPosts (캐시 미스)',
-      () => this.postService.getPosts({ limit: 10, status: 'active' }),
+      async () => {
+        const result = await this.postService.getPosts(10)
+        return Array.isArray(result) ? result : result.posts
+      },
       1
     )
 
@@ -286,7 +279,10 @@ class FirestoreBenchmark {
     console.log('\n두 번째 요청 (캐시 히트 예상):')
     const secondRequest = await this.benchmarkOperation(
       'getPosts (캐시 히트)',
-      () => this.postService.getPosts({ limit: 10, status: 'active' }),
+      async () => {
+        const result = await this.postService.getPosts(10)
+        return Array.isArray(result) ? result : result.posts
+      },
       1
     )
 

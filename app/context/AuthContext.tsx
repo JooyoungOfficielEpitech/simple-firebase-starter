@@ -17,22 +17,14 @@ import {
 } from "@react-native-google-signin/google-signin"
 
 import { translate } from "@/i18n/translate"
-import { userService } from "@/services/firestore"
-import { type CreateUserProfile } from "@/types/user"
-import { NotificationCleanupUtils } from "@/utils/notificationCleanup"
+import { useSingleFirebaseListener } from "@/hooks/useFirebaseListener"
+import { firebaseCleanupManager } from "@/utils/firebaseCleanup"
 
 export type AuthContextType = {
   isAuthenticated: boolean
   isLoading: boolean
   user: FirebaseAuthTypes.User | null
   isEmailVerified: boolean
-
-  // 프로필 완성 상태 관리
-  isProfileComplete: boolean
-  profileCheckLoading: boolean
-  shouldShowProfilePrompt: boolean
-  checkProfileCompletion: () => Promise<void>
-  dismissProfilePrompt: () => void
 
   signInWithEmail: (email: string, password: string) => Promise<void>
   signUpWithEmail: (email: string, password: string) => Promise<void>
@@ -60,11 +52,8 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({ childre
   const [authError, setAuthError] = useState<string | null>(null)
   const [isEmailVerified, setIsEmailVerified] = useState(false)
   
-  // 프로필 완성 상태 관리
-  const [isProfileComplete, setIsProfileComplete] = useState(true) // 기본값을 true로 설정하여 로딩 중일 때 방해하지 않음
-  const [profileCheckLoading, setProfileCheckLoading] = useState(false)
-  const [shouldShowProfilePrompt, setShouldShowProfilePrompt] = useState(false) // 프로필 안내 표시 여부
-  const [hasCompletedFirstCheck, setHasCompletedFirstCheck] = useState(false) // 첫 번째 프로필 체크 완료 여부
+  // Firebase 리스너 관리
+  const { setListener: setAuthListener, cleanup: cleanupAuthListener } = useSingleFirebaseListener()
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -75,37 +64,31 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({ childre
   }, [])
 
   useEffect(() => {
+    console.log('🔐 [AuthContext] Auth 상태 리스너 설정 시작')
+    
     const unsubscribe = auth().onAuthStateChanged(async (user) => {
       setUser(user)
       setIsEmailVerified(user?.emailVerified || false)
       setIsLoading(false)
 
-      // 사용자 로그인 시 알림 정리 및 프로필 체크 실행
-      if (user) {
-        try {
-          await NotificationCleanupUtils.cleanupUserNotificationsOnLogin(user.uid)
-          
-          // 로그인/앱 시작 시 프로필 완성도 자동 체크
-          console.log("🚀 [AuthContext] 로그인 감지 - 프로필 완성도 체크 시작")
-          setTimeout(async () => {
-            try {
-              await autoCheckProfileOnLogin(user.uid)
-            } catch (error) {
-              console.error('❌ [AuthContext] 자동 프로필 체크 실패:', error)
-            }
-          }, 2000) // 로그인 완료 후 2초 지연
-        } catch (error) {
-          console.error('❌ [AuthContext] 로그인 시 초기화 실패:', error)
-        }
-      } else {
-        // 로그아웃 시 프로필 관련 상태 리셋
-        setIsProfileComplete(true)
-        setShouldShowProfilePrompt(false)
-        setHasCompletedFirstCheck(false)
+      if (!user) {
+        // 로그아웃 시 Firebase 리스너 정리
+        firebaseCleanupManager.cleanupByComponent('AuthContext')
       }
     })
 
-    return unsubscribe
+    // 리스너를 안전하게 등록
+    setAuthListener(unsubscribe)
+    firebaseCleanupManager.registerListener(
+      'authStateChanged',
+      unsubscribe,
+      { component: 'AuthContext', description: 'Firebase Auth State Listener' }
+    )
+
+    return () => {
+      console.log('🔐 [AuthContext] Auth 상태 리스너 정리')
+      cleanupAuthListener()
+    }
   }, [])
 
   const signInWithEmail = useCallback(async (email: string, password: string) => {
@@ -231,69 +214,6 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({ childre
     setAuthError(null)
   }, [])
 
-  // 로그인/앱 시작 시 자동 프로필 체크 함수
-  const autoCheckProfileOnLogin = useCallback(async (userId: string) => {
-    if (profileCheckLoading) {
-      return
-    }
-
-    try {
-      setProfileCheckLoading(true)
-      console.log("🔍 [AuthContext] 로그인 시 프로필 완성도 체크 시작")
-      
-      const profile = await userService.getUserProfile(userId)
-      
-      // 실제 프로필 완성도 확인
-      const isComplete = Boolean(
-        profile?.gender &&
-        profile?.birthday &&
-        typeof profile?.heightCm === "number"
-      )
-      
-      console.log("📊 [AuthContext] 프로필 완성도 결과:", {
-        name: profile?.name,
-        gender: profile?.gender,
-        birthday: profile?.birthday,
-        heightCm: profile?.heightCm,
-        isComplete
-      })
-      
-      setIsProfileComplete(isComplete)
-      setHasCompletedFirstCheck(true) // 첫 번째 체크 완료 표시
-      
-      // 프로필이 미완성인 경우에만 안내 모달 표시 (첫 번째 체크 완료 후)
-      if (!isComplete) {
-        console.log("🎭 [AuthContext] 프로필 미완성 - 안내 모달 활성화")
-        setShouldShowProfilePrompt(true)
-      } else {
-        console.log("✅ [AuthContext] 프로필 완성됨 - 모달 표시하지 않음")
-        setShouldShowProfilePrompt(false)
-      }
-      
-    } catch (error) {
-      console.error("❌ [AuthContext] 프로필 완성도 체크 실패:", error)
-      // 에러 발생 시 기본값을 true로 설정하여 앱 사용에 지장이 없도록 함
-      setIsProfileComplete(true)
-      setHasCompletedFirstCheck(true)
-      setShouldShowProfilePrompt(false)
-    } finally {
-      setProfileCheckLoading(false)
-    }
-  }, [profileCheckLoading])
-
-  // 수동 프로필 완성도 체크 함수 (기존 API 호환성 유지)
-  const checkProfileCompletion = useCallback(async () => {
-    if (!user) {
-      return
-    }
-    await autoCheckProfileOnLogin(user.uid)
-  }, [user, autoCheckProfileOnLogin])
-
-  // 프로필 안내 모달 닫기 함수
-  const dismissProfilePrompt = useCallback(() => {
-    setShouldShowProfilePrompt(false)
-    console.log("⏭️ [AuthContext] 프로필 안내 모달 닫기")
-  }, [])
 
   // 이메일 검증 메일 발송
   const sendEmailVerification = useCallback(async () => {
@@ -380,11 +300,6 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({ childre
     isLoading,
     user,
     isEmailVerified,
-    isProfileComplete,
-    profileCheckLoading,
-    shouldShowProfilePrompt,
-    checkProfileCompletion,
-    dismissProfilePrompt,
     signInWithEmail,
     signUpWithEmail,
     signInWithGoogle,
