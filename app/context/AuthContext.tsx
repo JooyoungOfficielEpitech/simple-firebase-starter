@@ -151,7 +151,11 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({ childre
         }
 
         const googleCredential = auth.GoogleAuthProvider.credential(idToken)
-        await auth().signInWithCredential(googleCredential)
+        const result = await auth().signInWithCredential(googleCredential)
+        
+        // 즉시 사용자 상태 업데이트 (onAuthStateChanged 이벤트 보완)
+        setUser(result.user)
+        setIsEmailVerified(result.user?.emailVerified || false)
       }
     } catch (error) {
       // Handle specific Google Sign-in errors

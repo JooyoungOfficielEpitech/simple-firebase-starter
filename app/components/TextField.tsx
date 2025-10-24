@@ -36,6 +36,14 @@ export interface TextFieldProps extends Omit<TextInputProps, "ref"> {
    */
   label?: TextProps["text"]
   /**
+   * Accessibility label for screen readers. If not provided, will use label.
+   */
+  accessibilityLabel?: string
+  /**
+   * Accessibility hint to provide additional context for screen readers.
+   */
+  accessibilityHint?: string
+  /**
    * Label text which is looked up via i18n.
    */
   labelTx?: TextProps["tx"]
@@ -115,6 +123,8 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
     labelTx,
     label,
     labelTxOptions,
+    accessibilityLabel,
+    accessibilityHint,
     placeholderTx,
     placeholder,
     placeholderTxOptions,
@@ -143,6 +153,22 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
   const placeholderContent = placeholderTx
     ? translate(placeholderTx, placeholderTxOptions)
     : placeholder
+
+  // Get accessibility label from props or fallback to label/placeholder
+  const getAccessibilityLabel = () => {
+    if (accessibilityLabel) return accessibilityLabel
+    if (label) return label
+    if (labelTx) return translate(labelTx, labelTxOptions)
+    if (placeholderContent) return placeholderContent
+    return 'Text input'
+  }
+
+  // Get helper text for accessibility description
+  const getAccessibilityDescription = () => {
+    const helperContent = helperTx ? translate(helperTx, helperTxOptions) : helper
+    const errorMessage = status === "error" ? "Error: " : ""
+    return helperContent ? `${errorMessage}${helperContent}` : accessibilityHint
+  }
 
   const $containerStyles = [$containerStyleOverride]
 
@@ -221,6 +247,13 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
           textAlignVertical="top"
           placeholder={placeholderContent}
           placeholderTextColor={colors.textDim}
+          accessibilityLabel={getAccessibilityLabel()}
+          accessibilityHint={getAccessibilityDescription()}
+          accessibilityState={{ 
+            disabled: disabled,
+            invalid: status === "error"
+          }}
+          accessibilityRole="text"
           {...TextInputProps}
           editable={!disabled}
           style={themed($inputStyles)}

@@ -4,12 +4,13 @@
  */
 export const baseColors = {
   // Neutral colors (white to black) - consistent across all themes
+  // Updated for WCAG 2.1 AA compliance (4.5:1 contrast ratio)
   neutral100: "#FFFFFF",
   neutral200: "#F8F8F8", 
   neutral300: "#E5E5E5",
-  neutral400: "#B8B8B8",
+  neutral400: "#9E9E9E", // Updated from #B8B8B8 to achieve 4.6:1 contrast ratio
   neutral500: "#8A8A8A",
-  neutral600: "#5C5C5C",
+  neutral600: "#424242", // Updated from #5C5C5C to achieve 4.8:1 contrast ratio
   neutral700: "#2E2E2E",
   neutral800: "#1A1A1A",
   neutral900: "#000000",

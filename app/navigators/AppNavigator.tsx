@@ -18,9 +18,13 @@ import { NotificationCenterScreen } from "@/screens/NotificationCenterScreen"
 import { PostDetailScreen } from "@/screens/PostDetailScreen"
 import { ApplicationManagementScreen } from "@/screens/ApplicationManagementScreen"
 import { CreateOrganizationScreen } from "@/screens/CreateOrganizationScreen"
+import { DevSettingsScreen } from "@/screens/DevSettingsScreen"
+import { PushDebugScreen } from "@/screens/PushDebugScreen"
 import { SignInScreen } from "@/screens/SignInScreen"
 import { SignUpScreen } from "@/screens/SignUpScreen"
 import { ProfileCompletionModal } from "@/components/ProfileCompletionModal"
+import { NotificationBanner } from "@/components/NotificationBanner"
+import { DevFloatingButton } from "@/components/DevFloatingButton"
 import { useAppTheme } from "@/theme/context"
 
 import { MainNavigator } from "./MainNavigator"
@@ -47,6 +51,8 @@ export type AppStackParamList = {
   PostDetail: { postId: string }
   ApplicationManagement: { postId: string; postTitle: string }
   CreateOrganization: { organizationId?: string; isEdit?: boolean; isOrganizerConversion?: boolean }
+  DevSettings: undefined
+  PushDebug: undefined
 }
 
 /**
@@ -134,6 +140,25 @@ const AppStack = () => {
               headerShown: false,
             }}
           />
+          {/* 개발자 설정 (개발 환경에서만 표시) */}
+          {__DEV__ && (
+            <>
+              <Stack.Screen 
+                name="DevSettings" 
+                component={DevSettingsScreen}
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen 
+                name="PushDebug" 
+                component={PushDebugScreen}
+                options={{
+                  headerShown: false,
+                }}
+              />
+            </>
+          )}
         </>
       )}
     </Stack.Navigator>
@@ -145,14 +170,27 @@ export interface NavigationProps
 
 export const AppNavigator = (props: NavigationProps) => {
   const { navigationTheme } = useAppTheme()
+  const { isAuthenticated } = useAuth()
 
   useBackButtonHandler((routeName) => exitRoutes.includes(routeName))
+
+  const handleNotificationPress = (notification: any) => {
+    console.log("🔔 [AppNavigator] 알림 탭됨:", notification)
+    // 여기서 알림 데이터에 따라 특정 화면으로 네비게이션할 수 있습니다
+    // 예: navigationRef.current?.navigate('PostDetail', { postId: notification.data?.postId })
+  }
 
   return (
     <NavigationContainer ref={navigationRef} theme={navigationTheme} {...props}>
       <ErrorBoundary catchErrors={Config.catchErrors}>
         <AppStack />
         <ProfileCompletionModal />
+        {/* 로그인된 사용자에게만 푸시 알림 배너 표시 */}
+        {isAuthenticated && (
+          <NotificationBanner onNotificationPress={handleNotificationPress} />
+        )}
+        {/* 개발자 설정 플로팅 버튼 (개발 환경에서만 표시) */}
+        {isAuthenticated && <DevFloatingButton />}
       </ErrorBoundary>
     </NavigationContainer>
   )

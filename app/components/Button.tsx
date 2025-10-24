@@ -38,6 +38,14 @@ export interface ButtonProps extends PressableProps {
    */
   txOptions?: TextProps["txOptions"]
   /**
+   * Accessibility label for screen readers. If not provided, will use text/tx.
+   */
+  accessibilityLabel?: string
+  /**
+   * Accessibility hint to provide additional context for screen readers.
+   */
+  accessibilityHint?: string
+  /**
    * An optional style override useful for padding & margin.
    */
   style?: StyleProp<ViewStyle>
@@ -109,6 +117,8 @@ export function Button(props: ButtonProps) {
     tx,
     text,
     txOptions,
+    accessibilityLabel,
+    accessibilityHint,
     style: $viewStyleOverride,
     pressedStyle: $pressedViewStyleOverride,
     textStyle: $textStyleOverride,
@@ -157,10 +167,20 @@ export function Button(props: ButtonProps) {
     ]
   }
 
+  // Get accessibility label from props or fallback to text content
+  const getAccessibilityLabel = () => {
+    if (accessibilityLabel) return accessibilityLabel
+    if (text) return text
+    if (typeof children === 'string') return children
+    return 'Button'
+  }
+
   return (
     <Pressable
       style={$viewStyle}
       accessibilityRole="button"
+      accessibilityLabel={getAccessibilityLabel()}
+      accessibilityHint={accessibilityHint}
       accessibilityState={{ disabled: !!disabled || !!isLoading }}
       {...rest}
       disabled={disabled || isLoading}

@@ -11,6 +11,8 @@ import { useAuth } from "./AuthContext"
 const ProfileNotificationProvider: FC<PropsWithChildren> = ({ children }) => {
   const { user } = useAuth()
   
+  // 항상 ProfileProvider와 NotificationProvider를 제공하되
+  // user가 null일 때도 안전하게 처리하도록 함
   return (
     <ProfileProvider user={user}>
       <NotificationProvider user={user}>
