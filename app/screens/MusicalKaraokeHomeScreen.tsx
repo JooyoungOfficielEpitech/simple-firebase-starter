@@ -19,29 +19,63 @@ export function MusicalKaraokeHomeScreen({ navigation }: HomeStackScreenProps<"H
   const [songs, setSongs] = useState<Song[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [timeoutReached, setTimeoutReached] = useState(false)
 
   // Initialize and load songs from Firebase
   useEffect(() => {
-    initializeAndLoadSongs()
+    // 15초 후 timeout
+    const timeoutId = setTimeout(() => {
+      console.log('🚨 Loading timeout - 15초 초과')
+      setTimeoutReached(true)
+      setLoading(false)
+      setError('로딩 시간이 초과되었습니다. 네트워크를 확인해주세요.')
+    }, 15000)
+
+    initializeAndLoadSongs().finally(() => {
+      clearTimeout(timeoutId)
+    })
+
+    return () => clearTimeout(timeoutId)
   }, [])
 
   const initializeAndLoadSongs = async () => {
     try {
       setLoading(true)
       setError(null)
+      setTimeoutReached(false)
+      
+      console.log("🎵 Firebase 초기화 시작...")
       
       // Initialize sample data if needed (only runs once)
       await SongService.initializeSampleData()
+      console.log("✅ Firebase 샘플 데이터 초기화 완료")
       
       // Load songs from Firestore
       const songsData = await SongService.getAllSongs()
       setSongs(songsData)
       
       console.log("🎵 Loaded songs from Firebase:", songsData.length)
+      
+      if (songsData.length === 0) {
+        setError("곡 목록이 비어있습니다. 데이터를 다시 불러와주세요.")
+      }
     } catch (err) {
-      console.error("Failed to load songs:", err)
-      setError("곡 목록을 불러오는데 실패했습니다.")
+      console.error("❌ Failed to load songs:", err)
+      
+      // 구체적인 오류 메시지 제공
+      let errorMessage = "곡 목록을 불러오는데 실패했습니다."
+      
+      if (err.message?.includes('network')) {
+        errorMessage = "네트워크 연결을 확인해주세요."
+      } else if (err.message?.includes('permission')) {
+        errorMessage = "Firebase 권한 오류입니다. 관리자에게 문의하세요."
+      } else if (err.message?.includes('quota')) {
+        errorMessage = "Firebase 할당량이 초과되었습니다."
+      }
+      
+      setError(`${errorMessage}\n\n오류 상세: ${err.message}`)
     } finally {
+      console.log("🏁 Firebase 초기화 완료 (성공/실패 무관)")
       setLoading(false)
     }
   }
@@ -52,13 +86,24 @@ export function MusicalKaraokeHomeScreen({ navigation }: HomeStackScreenProps<"H
   }, [navigation])
 
   const handleRetry = useCallback(() => {
+    console.log("🔄 사용자가 재시도 요청")
+    setError(null)
+    setTimeoutReached(false)
     initializeAndLoadSongs()
   }, [])
 
   if (loading) {
     return (
       <Screen preset="fixed">
-        <LoadingOverlay visible={true} />
+        <LoadingOverlay 
+          visible={true} 
+          message={timeoutReached ? "로딩 중... 터치하면 취소됩니다" : "데이터를 불러오는 중..."}
+          onRequestClose={() => {
+            console.log('🚨 사용자가 로딩을 강제 취소')
+            setLoading(false)
+            setError('로딩이 취소되었습니다. 다시 시도해주세요.')
+          }}
+        />
       </Screen>
     )
   }

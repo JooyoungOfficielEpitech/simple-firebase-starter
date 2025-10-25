@@ -22,6 +22,9 @@ export type { TabBarIconProps } from "./TabBarIcon"
 export { AudioPlayer } from "./AudioPlayer"
 // export { PitchAnalyzer } from "./PitchAnalyzer"
 export { SavedSectionsList } from "./SavedSectionsList"
+export { MusicPlayer } from "./MusicPlayer"
+export { DebugInfo } from "./DebugInfo"
+export { DevFloatingButton } from "./DevFloatingButton"
 
 // Layout components
 export * from "./Layout"

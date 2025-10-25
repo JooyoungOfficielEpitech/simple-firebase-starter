@@ -1,5 +1,5 @@
 import React, { FC, ReactNode } from "react"
-import { View, Modal, ViewStyle, ModalProps } from "react-native"
+import { View, Modal, ViewStyle, ModalProps, TouchableOpacity } from "react-native"
 import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
 
@@ -54,11 +54,19 @@ export const BaseModal: FC<BaseModalProps> = React.memo(({
       onRequestClose={handleRequestClose}
       {...modalProps}
     >
-      <View style={[themed($modalOverlay), overlayStyle]}>
-        <View style={[themed($modalContainer(maxWidth)), containerStyle]}>
+      <TouchableOpacity 
+        style={[themed($modalOverlay), overlayStyle]}
+        activeOpacity={1}
+        onPress={handleRequestClose}
+      >
+        <TouchableOpacity 
+          style={[themed($modalContainer(maxWidth)), containerStyle]}
+          activeOpacity={1}
+          onPress={(e) => e.stopPropagation()} // 모달 내부 클릭 시 닫히지 않도록
+        >
           {children}
-        </View>
-      </View>
+        </TouchableOpacity>
+      </TouchableOpacity>
     </Modal>
   )
 })

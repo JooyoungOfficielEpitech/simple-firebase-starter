@@ -254,6 +254,18 @@ export function AudioPlayer({
     }
   }, [position, loopState.pointA, loopState.pointB, sound, isJumping])
 
+  // service.js와 A-B 루프 상태 동기화
+  useEffect(() => {
+    if (typeof global.setABLoop === 'function' && loopState.pointA !== null && loopState.pointB !== null) {
+      console.log('🔄 AudioPlayer → service.js A-B 동기화:', {
+        A: loopState.pointA,
+        B: loopState.pointB,
+        enabled: loopState.isLooping
+      });
+      global.setABLoop(loopState.isLooping, loopState.pointA, loopState.pointB);
+    }
+  }, [loopState.pointA, loopState.pointB, loopState.isLooping]);
+
   // A-B 구간 변경 시 자동 이동 처리
   useEffect(() => {
     if (sound && loopState.pointA !== null && loopState.pointB !== null && !isJumping) {

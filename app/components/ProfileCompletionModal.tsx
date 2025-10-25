@@ -1,5 +1,5 @@
-import React, { FC } from "react"
-import { View, ViewStyle, TextStyle } from "react-native"
+import React, { FC, useEffect, useState } from "react"
+import { View, ViewStyle, TextStyle, TouchableOpacity } from "react-native"
 import { useProfile } from "@/context/AppContextProvider"
 import { Text } from "@/components/Text"
 import { Button } from "@/components/Button"
@@ -17,6 +17,7 @@ import { navigationRef } from "@/navigators/navigationUtilities"
 export const ProfileCompletionModal: FC = React.memo(() => {
   const { themed } = useAppTheme()
   const { shouldShowProfilePrompt, dismissProfilePrompt, profileCheckLoading } = useProfile()
+  const [timeoutReached, setTimeoutReached] = useState(false)
 
   const handleNavigateToProfile = () => {
     dismissProfilePrompt()
@@ -33,6 +34,23 @@ export const ProfileCompletionModal: FC = React.memo(() => {
     dismissProfilePrompt()
     console.log("⏭️ [ProfileCompletionModal] 프로필 완성 안내 닫기")
   }
+
+  // 프로필 모달 타임아웃 처리 (20초)
+  useEffect(() => {
+    if (shouldShowProfilePrompt) {
+      console.log('⏰ ProfileCompletionModal 20초 타임아웃 시작')
+      const timeoutId = setTimeout(() => {
+        console.log('🚨 ProfileCompletionModal 20초 타임아웃 - 강제 닫기')
+        setTimeoutReached(true)
+        dismissProfilePrompt()
+      }, 20000)
+
+      return () => {
+        clearTimeout(timeoutId)
+        setTimeoutReached(false)
+      }
+    }
+  }, [shouldShowProfilePrompt, dismissProfilePrompt])
 
   // 프로필 체크가 진행 중이거나 완료되지 않았으면 모달 표시하지 않음
   const shouldShowModal = shouldShowProfilePrompt && !profileCheckLoading
@@ -65,6 +83,17 @@ export const ProfileCompletionModal: FC = React.memo(() => {
           style={themed($secondaryButton)}
           textStyle={themed($secondaryButtonText)}
         />
+        
+        {timeoutReached && (
+          <TouchableOpacity
+            onPress={handleDismiss}
+            style={themed($emergencyButton)}
+          >
+            <Text style={themed($emergencyButtonText)}>
+              🚨 응급 닫기 (터치 불응 해결)
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </BaseModal>
   )
@@ -102,4 +131,21 @@ const $secondaryButton: ThemedStyle<ViewStyle> = ({ colors }) => ({
 
 const $secondaryButtonText: ThemedStyle<TextStyle> = ({ colors }) => ({
   color: colors.textDim,
+})
+
+const $emergencyButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  marginTop: spacing.md,
+  backgroundColor: colors.error,
+  paddingHorizontal: spacing.md,
+  paddingVertical: spacing.sm,
+  borderRadius: 8,
+  borderWidth: 2,
+  borderColor: colors.errorBackground,
+})
+
+const $emergencyButtonText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
+  fontSize: 14,
+  fontFamily: typography.primary.bold,
+  color: colors.errorBackground,
+  textAlign: "center",
 })

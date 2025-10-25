@@ -1,5 +1,5 @@
 import { type FC } from "react"
-import { ActivityIndicator, Modal, type TextStyle, View, type ViewStyle } from "react-native"
+import { ActivityIndicator, Modal, type TextStyle, View, type ViewStyle, TouchableOpacity } from "react-native"
 
 import { Text } from "./Text"
 import { useAppTheme } from "@/theme/context"
@@ -48,11 +48,13 @@ export const LoadingOverlay: FC<LoadingOverlayProps> = function LoadingOverlay({
       accessibilityViewIsModal
       testID={testID}
     >
-      <View
+      <TouchableOpacity
         style={themed($overlay)}
         accessibilityRole="alert"
         accessibilityLabel={accessibilityLabel}
         accessibilityLiveRegion="polite"
+        onPress={onRequestClose}
+        activeOpacity={1}
       >
         <View style={themed($container)}>
           <ActivityIndicator
@@ -64,8 +66,20 @@ export const LoadingOverlay: FC<LoadingOverlayProps> = function LoadingOverlay({
           <Text style={themed($message)} accessibilityRole="text" accessibilityLiveRegion="polite">
             {message}
           </Text>
+          {onRequestClose && (
+            <TouchableOpacity
+              style={themed($emergencyButton)}
+              onPress={onRequestClose}
+              accessibilityRole="button"
+              accessibilityLabel="Cancel loading"
+            >
+              <Text style={themed($emergencyButtonText)}>
+                🚨 응급 취소
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
-      </View>
+      </TouchableOpacity>
     </Modal>
   )
 }
@@ -107,6 +121,23 @@ const $message: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   fontSize: 16,
   fontFamily: typography.primary.medium,
   color: colors.text,
+  textAlign: "center",
+})
+
+const $emergencyButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  marginTop: spacing.md,
+  backgroundColor: colors.error,
+  paddingHorizontal: spacing.md,
+  paddingVertical: spacing.sm,
+  borderRadius: 8,
+  borderWidth: 2,
+  borderColor: colors.errorBackground,
+})
+
+const $emergencyButtonText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
+  fontSize: 14,
+  fontFamily: typography.primary.bold,
+  color: colors.errorBackground,
   textAlign: "center",
 })
 

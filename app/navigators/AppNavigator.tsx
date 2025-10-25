@@ -20,11 +20,13 @@ import { ApplicationManagementScreen } from "@/screens/ApplicationManagementScre
 import { CreateOrganizationScreen } from "@/screens/CreateOrganizationScreen"
 import { DevSettingsScreen } from "@/screens/DevSettingsScreen"
 import { PushDebugScreen } from "@/screens/PushDebugScreen"
+import { MusicPlayerScreen } from "@/screens/MusicPlayerScreen"
+import { DebugScreen } from "@/screens/DebugScreen"
 import { SignInScreen } from "@/screens/SignInScreen"
 import { SignUpScreen } from "@/screens/SignUpScreen"
 import { ProfileCompletionModal } from "@/components/ProfileCompletionModal"
 import { NotificationBanner } from "@/components/NotificationBanner"
-import { DevFloatingButton } from "@/components/DevFloatingButton"
+import { DevFloatingButton } from "@/components"
 import { useAppTheme } from "@/theme/context"
 
 import { MainNavigator } from "./MainNavigator"
@@ -53,6 +55,8 @@ export type AppStackParamList = {
   CreateOrganization: { organizationId?: string; isEdit?: boolean; isOrganizerConversion?: boolean }
   DevSettings: undefined
   PushDebug: undefined
+  MusicPlayer: undefined
+  Debug: undefined
 }
 
 /**
@@ -140,25 +144,37 @@ const AppStack = () => {
               headerShown: false,
             }}
           />
-          {/* 개발자 설정 (개발 환경에서만 표시) */}
-          {__DEV__ && (
-            <>
-              <Stack.Screen 
-                name="DevSettings" 
-                component={DevSettingsScreen}
-                options={{
-                  headerShown: false,
-                }}
-              />
-              <Stack.Screen 
-                name="PushDebug" 
-                component={PushDebugScreen}
-                options={{
-                  headerShown: false,
-                }}
-              />
-            </>
-          )}
+          {/* 개발자 설정 (TestFlight에서도 표시) */}
+          <>
+            <Stack.Screen 
+              name="DevSettings" 
+              component={DevSettingsScreen}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen 
+              name="PushDebug" 
+              component={PushDebugScreen}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen 
+              name="MusicPlayer" 
+              component={MusicPlayerScreen}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen 
+              name="Debug" 
+              component={DebugScreen}
+              options={{
+                headerShown: false,
+              }}
+            />
+          </>
         </>
       )}
     </Stack.Navigator>
@@ -189,8 +205,8 @@ export const AppNavigator = (props: NavigationProps) => {
         {isAuthenticated && (
           <NotificationBanner onNotificationPress={handleNotificationPress} />
         )}
-        {/* 개발자 설정 플로팅 버튼 (개발 환경에서만 표시) */}
-        {isAuthenticated && <DevFloatingButton />}
+        {/* 개발자 설정 플로팅 버튼 (테스트를 위해 항상 표시) */}
+        <DevFloatingButton />
       </ErrorBoundary>
     </NavigationContainer>
   )

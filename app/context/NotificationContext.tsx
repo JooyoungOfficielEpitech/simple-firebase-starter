@@ -205,17 +205,34 @@ export const NotificationProvider: FC<PropsWithChildren<NotificationProviderProp
     setLatestNotification(null)
   }, [])
 
-  // 사용자 로그인 시 알림 정리 및 푸시 알림 초기화
+  // 앱 시작 시 무조건 푸시 알림 초기화 (로그인 여부 무관)
+  useEffect(() => {
+    console.log("🚀 [NotificationContext] 앱 시작 - 푸시 알림 무조건 초기화 시작")
+    initializePushNotifications()
+  }, [initializePushNotifications])
+
+  // 사용자 로그인 시 알림 정리 및 토큰 등록
   useEffect(() => {
     if (user) {
-      console.log("🚀 [NotificationContext] 사용자 로그인 감지 - 알림 정리 및 푸시 알림 초기화 시작")
+      console.log("🚀 [NotificationContext] 사용자 로그인 감지 - 알림 정리 시작")
       cleanupUserNotifications(user.uid)
-      initializePushNotifications()
+      
+      // FCM 토큰이 있으면 서버에 등록
+      if (fcmToken) {
+        console.log('🔄 [NotificationContext] 로그인 후 FCM 토큰 서버 등록 중...')
+        fcmTokenService.registerToken(user.uid, fcmToken).then(success => {
+          if (success) {
+            console.log('✅ [NotificationContext] 로그인 후 FCM 토큰 서버 등록 성공')
+          } else {
+            console.log('❌ [NotificationContext] 로그인 후 FCM 토큰 서버 등록 실패')
+          }
+        })
+      }
     } else {
       // 로그아웃 시 알림 관련 상태 리셋
       resetNotificationState()
     }
-  }, [user?.uid, cleanupUserNotifications, resetNotificationState, initializePushNotifications])
+  }, [user?.uid, fcmToken, cleanupUserNotifications, resetNotificationState])
 
   const value = {
     isCleanupLoading,

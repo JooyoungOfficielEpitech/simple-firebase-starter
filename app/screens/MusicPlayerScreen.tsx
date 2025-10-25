@@ -1,6 +1,6 @@
 import React from 'react'
 import { Screen } from '@/components'
-import { MusicPlayer } from '@/src/components/MusicPlayer'
+import { MusicPlayer } from '@/components/MusicPlayer'
 
 export const MusicPlayerScreen = () => {
   return (

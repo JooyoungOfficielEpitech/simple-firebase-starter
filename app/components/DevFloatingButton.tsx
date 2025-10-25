@@ -9,9 +9,10 @@ export const DevFloatingButton: FC<DevFloatingButtonProps> = () => {
   const navigation = useNavigation()
   const insets = useSafeAreaInsets()
 
-  if (!__DEV__) {
-    return null
-  }
+  // TestFlight에서도 보이도록 항상 표시
+  // if (!__DEV__) {
+  //   return null
+  // }
 
   const handlePress = () => {
     // @ts-ignore - DevSettings는 개발 환경에서만 존재
@@ -23,23 +24,25 @@ export const DevFloatingButton: FC<DevFloatingButtonProps> = () => {
       onPress={handlePress}
       style={{
         position: 'absolute',
-        bottom: insets.bottom + 100,
+        bottom: insets.bottom + 80,
         right: 20,
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        backgroundColor: '#FF6B35',
+        width: 70,
+        height: 70,
+        borderRadius: 35,
+        backgroundColor: '#FF0000',
         justifyContent: 'center',
         alignItems: 'center',
+        borderWidth: 3,
+        borderColor: '#FFFFFF',
         shadowColor: '#000',
         shadowOffset: {
           width: 0,
-          height: 2,
+          height: 4,
         },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
-        zIndex: 9998,
+        shadowOpacity: 0.5,
+        shadowRadius: 6,
+        elevation: 10,
+        zIndex: 99999,
       }}
     >
       <Text style={{ fontSize: 20 }}>🛠️</Text>
