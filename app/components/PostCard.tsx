@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, Image } from "react-native"
-import { memo } from "react"
+import { memo, useMemo } from "react"
 import { Text } from "@/components/Text"
 import { StatusBadge } from "@/components/StatusBadge"
 import { useAppTheme } from "@/theme/context"
@@ -13,119 +13,122 @@ interface PostCardProps {
 }
 
 export const PostCard = memo<PostCardProps>(({ post, onPress, variant = "compact" }) => {
-  // 디버깅: post 데이터 확인
-  console.log('🔍 [PostCard] Received props:', { 
-    post: post ? { id: post.id, title: post.title, hasTitle: !!post.title } : 'null/undefined',
-    onPress: typeof onPress,
-    variant 
-  })
-  
-  if (!post || typeof post !== 'object') {
-    console.error('❌ [PostCard] Invalid post data:', post)
-    return null
-  }
-
-  // 안전한 post 데이터 생성
-  const safePost = {
-    id: String(post.id || ''),
-    title: String(post.title || '제목 없음'),
-    production: String(post.production || '작품 정보 없음'),
-    organizationName: String(post.organizationName || '단체명 없음'),
-    location: String(post.location || '장소 미정'),
-    rehearsalSchedule: String(post.rehearsalSchedule || '일정 미정'),
-    status: String(post.status || 'closed'),
-    deadline: post.deadline ? String(post.deadline) : null,
-    totalApplicants: Number(post.totalApplicants || 0),
-    roles: Array.isArray(post.roles) ? post.roles : [],
-    tags: Array.isArray(post.tags) ? post.tags : [],
-    postType: post.postType || 'text',
-    images: Array.isArray(post.images) ? post.images : []
-  }
-
   const {
     themed,
     theme: { colors, spacing, typography },
   } = useAppTheme()
 
+  // Memoized style objects
+  const postCardStyle = useMemo(() => themed($postCard), [themed])
+  const postCardHeaderStyle = useMemo(() => themed($postCardHeader), [themed])
+  const postStatusRowStyle = useMemo(() => themed($postStatusRow), [themed])
+  const deadlineTextStyle = useMemo(() => themed($deadlineText), [themed])
+  const postTitleStyle = useMemo(() => themed($postTitle), [themed])
+  const imagePreviewStyle = useMemo(() => themed($imagePreview), [themed])
+  const previewImageStyle = useMemo(() => themed($previewImage), [themed])
+  const imageCountBadgeStyle = useMemo(() => themed($imageCountBadge), [themed])
+  const imageCountTextStyle = useMemo(() => themed($imageCountText), [themed])
+  const productionStyle = useMemo(() => themed($production), [themed])
+  const postMetaStyle = useMemo(() => themed($postMeta), [themed])
+  const organizationRowStyle = useMemo(() => themed($organizationRow), [themed])
+  const organizationStyle = useMemo(() => themed($organization), [themed])
+  const applicantCountStyle = useMemo(() => themed($applicantCount), [themed])
+  const locationStyle = useMemo(() => themed($location), [themed])
+  const scheduleStyle = useMemo(() => themed($schedule), [themed])
+  const rolesPreviewStyle = useMemo(() => themed($rolesPreview), [themed])
+  const rolesPreviewTextStyle = useMemo(() => themed($rolesPreviewText), [themed])
+  const moreRolesStyle = useMemo(() => themed($moreRoles), [themed])
+  const tagsContainerStyle = useMemo(() => themed($tagsContainer), [themed])
+  const tagStyle = useMemo(() => themed($tag), [themed])
+  const tagTextStyle = useMemo(() => themed($tagText), [themed])
+
   return (
     <TouchableOpacity
-      style={themed($postCard)}
-      onPress={() => onPress(safePost.id)}
+      style={postCardStyle}
+      onPress={() => onPress(post.id)}
       accessibilityRole="button"
-      accessibilityLabel={`${safePost.title} - ${safePost.production} 모집공고`}
+      accessibilityLabel={`${post.title} - ${post.production} 모집공고`}
       accessibilityHint="터치하여 상세정보 보기"
     >
-      <View style={themed($postCardHeader)}>
-        <View style={themed($postStatusRow)}>
+      <View style={postCardHeaderStyle}>
+        <View style={postStatusRowStyle}>
           <StatusBadge
-            status={safePost.status === "active" ? "active" : "closed"}
-            text={safePost.status === "active" ? translate("bulletinBoard:status.recruiting") : translate("bulletinBoard:status.closed")}
+            status={post.status === "active" ? "active" : "closed"}
+            text={post.status === "active" ? translate("bulletinBoard:status.recruiting") : translate("bulletinBoard:status.closed")}
           />
-          {safePost.deadline ? (
-            <Text text={translate("bulletinBoard:posts.deadline", { date: safePost.deadline })} style={themed($deadlineText)} />
+          {post.deadline ? (
+            <Text text={translate("bulletinBoard:posts.deadline", { date: post.deadline })} style={deadlineTextStyle} />
           ) : null}
         </View>
-        <Text preset="subheading" text={safePost.title} style={themed($postTitle)} />
-        
+        <Text preset="subheading" text={post.title} style={postTitleStyle} />
+
         {/* 이미지 프리뷰 (Images 모드인 경우) */}
-        {(safePost.postType === 'images' || safePost.images.length > 0) && safePost.images.length > 0 && (
-          <View style={themed($imagePreview)}>
+        {(post.postType === 'images' || post.images?.length > 0) && post.images?.length > 0 && (
+          <View style={imagePreviewStyle}>
             <Image
-              source={{ uri: safePost.images[0] }}
-              style={themed($previewImage)}
+              source={{ uri: post.images[0] }}
+              style={previewImageStyle}
               resizeMode="cover"
             />
-            {safePost.images.length > 1 && (
-              <View style={themed($imageCountBadge)}>
-                <Text text={`+${safePost.images.length - 1}`} style={themed($imageCountText)} />
+            {post.images.length > 1 && (
+              <View style={imageCountBadgeStyle}>
+                <Text text={`+${post.images.length - 1}`} style={imageCountTextStyle} />
               </View>
             )}
           </View>
         )}
-        
-        <Text text={safePost.production} style={themed($production)} />
+
+        <Text text={post.production} style={productionStyle} />
       </View>
-      
-      <View style={themed($postMeta)}>
-        <View style={themed($organizationRow)}>
-          <Text text={safePost.organizationName} style={themed($organization)} />
-          {safePost.totalApplicants > 0 ? (
-            <Text text={translate("bulletinBoard:posts.applicants", { count: safePost.totalApplicants })} style={themed($applicantCount)} />
+
+      <View style={postMetaStyle}>
+        <View style={organizationRowStyle}>
+          <Text text={post.organizationName} style={organizationStyle} />
+          {post.totalApplicants > 0 ? (
+            <Text text={translate("bulletinBoard:posts.applicants", { count: post.totalApplicants })} style={applicantCountStyle} />
           ) : null}
         </View>
-        <Text text={safePost.location} style={themed($location)} />
-        <Text text={safePost.rehearsalSchedule} style={themed($schedule)} />
+        <Text text={post.location} style={locationStyle} />
+        <Text text={post.rehearsalSchedule} style={scheduleStyle} />
       </View>
 
       {/* Role summary for quick scanning */}
-      {safePost.roles && safePost.roles.length > 0 ? (
-        <View style={themed($rolesPreview)}>
-          <Text 
-            text={safePost.roles.slice(0, 2).map(role => `${role.name || "역할"}(${role.count || 0}명)`).join(", ") || "역할 정보"}
-            style={themed($rolesPreviewText)}
+      {post.roles?.length > 0 ? (
+        <View style={rolesPreviewStyle}>
+          <Text
+            text={post.roles.slice(0, 2).map(role => `${role.name}(${role.count}명)`).join(", ")}
+            style={rolesPreviewTextStyle}
             numberOfLines={1}
           />
-          {safePost.roles.length > 2 ? (
-            <Text text={translate("bulletinBoard:posts.moreRoles", { count: safePost.roles.length - 2 })} style={themed($moreRoles)} />
+          {post.roles.length > 2 ? (
+            <Text text={translate("bulletinBoard:posts.moreRoles", { count: post.roles.length - 2 })} style={moreRolesStyle} />
           ) : null}
         </View>
       ) : null}
 
-      {safePost.tags && safePost.tags.length > 0 ? (
-        <View style={themed($tagsContainer)}>
-          {safePost.tags.slice(0, 3).map((tag, tagIndex) => (
-            <View key={tagIndex} style={themed($tag)}>
-              <Text text={tag || "태그"} style={themed($tagText)} />
+      {post.tags?.length > 0 ? (
+        <View style={tagsContainerStyle}>
+          {post.tags.slice(0, 3).map((tag, tagIndex) => (
+            <View key={tagIndex} style={tagStyle}>
+              <Text text={tag} style={tagTextStyle} />
             </View>
           ))}
-          {safePost.tags.length > 3 ? (
-            <View style={themed($tag)}>
-              <Text text={`+${safePost.tags.length - 3}`} style={themed($tagText)} />
+          {post.tags.length > 3 ? (
+            <View style={tagStyle}>
+              <Text text={`+${post.tags.length - 3}`} style={tagTextStyle} />
             </View>
           ) : null}
         </View>
       ) : null}
     </TouchableOpacity>
+  )
+}, (prevProps, nextProps) => {
+  // Custom comparison for memo optimization
+  return (
+    prevProps.post.id === nextProps.post.id &&
+    prevProps.post.status === nextProps.post.status &&
+    prevProps.post.totalApplicants === nextProps.post.totalApplicants &&
+    prevProps.variant === nextProps.variant
   )
 })
 

@@ -1,6 +1,7 @@
 import { TextStyle, ViewStyle } from "react-native"
 import { BottomTabScreenProps, createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { CompositeScreenProps } from "@react-navigation/native"
+import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { TabBarIcon } from "@/components/TabBarIcon"
@@ -10,25 +11,21 @@ import { ProfileScreen } from "@/screens/ProfileScreen"
 import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
 
-import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
 import { BulletinBoardStackNavigator } from "./BulletinBoardStackNavigator"
 import { HomeStackNavigator } from "./HomeStackNavigator"
+import type { AppStackParamList, MainTabParamList } from "./types"
+import { NAVIGATION_ACCESSIBILITY_LABELS } from "./types"
 
-export type MainTabParamList = {
-  Home: undefined
-  BulletinBoard: undefined
-  Settings: undefined
-  Profile: undefined
-}
+// Re-export for other files that depend on it
+export type { MainTabParamList } from "./types"
+
 
 /**
  * Helper for automatically generating navigation prop types for each route.
- *
- * More info: https://reactnavigation.org/docs/typescript/#organizing-types
  */
 export type MainTabScreenProps<T extends keyof MainTabParamList> = CompositeScreenProps<
   BottomTabScreenProps<MainTabParamList, T>,
-  AppStackScreenProps<keyof AppStackParamList>
+  NativeStackScreenProps<AppStackParamList>
 >
 
 const Tab = createBottomTabNavigator<MainTabParamList>()
@@ -64,8 +61,10 @@ export function MainNavigator() {
         name="Home"
         component={HomeStackNavigator}
         options={{
-          tabBarLabel: "홈",
+          tabBarLabel: NAVIGATION_ACCESSIBILITY_LABELS.Home.label.replace(" 탭", ""),
           tabBarIcon: ({ focused }) => <TabBarIcon icon="heart" focused={focused} />,
+          tabBarAccessibilityLabel: NAVIGATION_ACCESSIBILITY_LABELS.Home.label,
+          tabBarButtonTestID: "home-tab",
         }}
       />
 
@@ -73,8 +72,10 @@ export function MainNavigator() {
         name="BulletinBoard"
         component={BulletinBoardStackNavigator}
         options={{
-          tabBarLabel: "게시판",
+          tabBarLabel: NAVIGATION_ACCESSIBILITY_LABELS.BulletinBoard.label.replace(" 탭", ""),
           tabBarIcon: ({ focused }) => <TabBarIcon icon="menu" focused={focused} />,
+          tabBarAccessibilityLabel: NAVIGATION_ACCESSIBILITY_LABELS.BulletinBoard.label,
+          tabBarButtonTestID: "bulletin-board-tab",
         }}
       />
 
@@ -82,8 +83,10 @@ export function MainNavigator() {
         name="Settings"
         component={SettingsScreen}
         options={{
-          tabBarLabel: "설정",
+          tabBarLabel: NAVIGATION_ACCESSIBILITY_LABELS.Settings.label.replace(" 탭", ""),
           tabBarIcon: ({ focused }) => <TabBarIcon icon="settings" focused={focused} />,
+          tabBarAccessibilityLabel: NAVIGATION_ACCESSIBILITY_LABELS.Settings.label,
+          tabBarButtonTestID: "settings-tab",
         }}
       />
 
@@ -91,8 +94,10 @@ export function MainNavigator() {
         name="Profile"
         component={ProfileScreen}
         options={{
-          tabBarLabel: "프로필",
+          tabBarLabel: NAVIGATION_ACCESSIBILITY_LABELS.Profile.label.replace(" 탭", ""),
           tabBarIcon: ({ focused }) => <TabBarIcon icon="user" focused={focused} />,
+          tabBarAccessibilityLabel: NAVIGATION_ACCESSIBILITY_LABELS.Profile.label,
+          tabBarButtonTestID: "profile-tab",
         }}
       />
     </Tab.Navigator>

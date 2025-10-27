@@ -43,6 +43,6 @@ export const colors = {
   selected: palette.secondary200,
   iconAccent: palette.secondary100,
   separator: palette.neutral300,
-  error: palette.angry500,
-  errorBackground: palette.angry100,
+  error: palette.error500,
+  errorBackground: palette.error100,
 } as const

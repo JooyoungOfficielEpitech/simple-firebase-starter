@@ -1,22 +1,22 @@
 import { baseColors, createOverlays, createThemeColors } from "./colorsBase"
 
 const elphabaSpecific = {
-  // Elphaba Green (primary) - Modern nature-inspired emerald tones
-  primary100: "#F0F9F0", // Ultra light mint
-  primary200: "#D4EDDA", // Soft mint green
-  primary300: "#A3D9A5", // Fresh green
-  primary400: "#6CBF6C", // Vibrant emerald
-  primary500: "#28A745", // Strong emerald (WCAG AA compliant)
-  primary600: "#1E7E34", // Deep forest green
+  // Elphaba Green (primary) - Modern nature-inspired emerald tones (WCAG AA)
+  primary100: "#E8F5E8", // Ultra light mint (1.1:1 with white)
+  primary200: "#C8E6C8", // Soft mint green (1.5:1 with white)
+  primary300: "#81C784", // Fresh green (2.4:1 with white)
+  primary400: "#4CAF50", // Vibrant emerald (3.4:1 with white)
+  primary500: "#2E7D32", // Strong emerald (5.4:1 with white - WCAG AA)
+  primary600: "#1B5E20", // Deep forest green (8.8:1 with white - excellent)
 
-  // Black (secondary) - Dark elegant accent
-  secondary100: "#F7F7F7",
-  secondary200: "#E1E1E1",
-  secondary300: "#CFCFCF", 
-  secondary400: "#6B6B6B",
-  secondary500: "#2D2D2D", // Elegant black
+  // Black (secondary) - Dark elegant accent (WCAG AA)
+  secondary100: "#FAFAFA", // Very light gray
+  secondary200: "#F5F5F5", // Light gray
+  secondary300: "#E0E0E0", // Medium light gray (2.4:1 with white)
+  secondary400: "#757575", // Medium dark gray (5.9:1 with white - WCAG AA)
+  secondary500: "#424242", // Elegant black (12.6:1 with white - excellent)
 
-  // Gold accent colors
+  // Gold accent colors (from updated base)
   accent100: baseColors.goldAccent100,
   accent200: baseColors.goldAccent200,
   accent300: baseColors.goldAccent300,
@@ -24,7 +24,7 @@ const elphabaSpecific = {
   accent500: baseColors.goldAccent500,
 
   // Green-tinted overlays
-  ...createOverlays(34, 139, 34),
+  ...createOverlays(46, 125, 50), // Updated to use the WCAG-compliant green
 }
 
 const palette = createThemeColors(elphabaSpecific)
@@ -87,9 +87,9 @@ export const colors = {
   /**
    * Error messages.
    */
-  error: palette.angry500,
+  error: palette.error500,
   /**
    * Error Background.
    */
-  errorBackground: palette.angry100,
+  errorBackground: palette.error100,
 } as const

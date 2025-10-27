@@ -35,10 +35,28 @@ export function KaraokeScreen({ route, navigation }: HomeStackScreenProps<"Karao
   // 로드할 구간 상태
   const [sectionToLoad, setSectionToLoad] = useState<SavedSection | null>(null)
 
-  // 🧪 임시 테스트: "This is the Moment" 곡에 오디오 파일 강제 설정
+  // 🧪 임시 테스트: 여러 곡에 오디오 파일 설정
   const testSong = {
     ...song,
-    localMrFile: song.title === "This is the Moment" ? "sample.mp3" : song.localMrFile,
+    // 로컬 파일 설정 (assets/audio/ 폴더에 있는 파일들)
+    localMrFile: (() => {
+      switch (song.title) {
+        case "This is the Moment":
+          return "sample.mp3"
+        // 다른 곡들도 sample.mp3 사용하도록 설정
+        case "지킬 앤 하이드":
+        case "Jekyll & Hyde":
+          return "sample.mp3"
+        // 모든 곡에 sample.mp3 사용하고 싶다면 아래 주석 해제
+        // default:
+        //   return "sample.mp3"
+        default:
+          return song.localMrFile || "sample.mp3" // 기본값으로 sample.mp3 사용
+      }
+    })(),
+    
+    // 또는 URL로 테스트하고 싶다면 아래 주석 해제
+    // mrUrl: song.title === "This is the Moment" ? "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" : song.mrUrl,
   }
 
   console.log("🎯 MusicPlayer - Test song:", testSong)
@@ -86,8 +104,8 @@ export function KaraokeScreen({ route, navigation }: HomeStackScreenProps<"Karao
         <View style={themed($playerContainer)}>
           {hasAudio ? (
             <AudioPlayer
-              audioFile={testSong.localMrFile}
-              audioUrl={testSong.mrUrl}
+              audioFile={typeof testSong.localMrFile === 'string' ? testSong.localMrFile : undefined}
+              audioUrl={typeof testSong.mrUrl === 'string' ? testSong.mrUrl : undefined}
               onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
               savedSections={savedSections}
               onSavedSectionsChange={handleSavedSectionsChange}

@@ -9,9 +9,88 @@ import {
 
 export class NotificationService {
   private db: FirebaseFirestoreTypes.Module
+  private unreadCountCache: Map<string, { count: number; timestamp: number }> = new Map()
+  private notificationListCache: Map<string, { notifications: Notification[]; timestamp: number }> = new Map()
+  private readonly UNREAD_COUNT_CACHE_TTL = 1 * 60 * 1000 // 1분 (실시간성 중요)
+  private readonly LIST_CACHE_TTL = 2 * 60 * 1000 // 2분
 
   constructor(firestoreInstance = firestore()) {
     this.db = firestoreInstance
+  }
+
+  /**
+   * 캐시에서 읽지 않은 알림 수 조회
+   */
+  private getCachedUnreadCount(userId: string): number | null {
+    const cached = this.unreadCountCache.get(userId)
+    if (cached && Date.now() - cached.timestamp < this.UNREAD_COUNT_CACHE_TTL) {
+      console.log(`💾 [NotificationService] 읽지 않은 알림 수 캐시 조회: ${userId}`)
+      return cached.count
+    }
+    return null
+  }
+
+  /**
+   * 캐시에 읽지 않은 알림 수 저장
+   */
+  private setCachedUnreadCount(userId: string, count: number): void {
+    this.unreadCountCache.set(userId, {
+      count,
+      timestamp: Date.now()
+    })
+  }
+
+  /**
+   * 캐시에서 알림 목록 조회
+   */
+  private getCachedNotificationList(cacheKey: string): Notification[] | null {
+    const cached = this.notificationListCache.get(cacheKey)
+    if (cached && Date.now() - cached.timestamp < this.LIST_CACHE_TTL) {
+      console.log(`💾 [NotificationService] 알림 목록 캐시 조회: ${cacheKey}`)
+      return cached.notifications
+    }
+    return null
+  }
+
+  /**
+   * 캐시에 알림 목록 저장
+   */
+  private setCachedNotificationList(cacheKey: string, notifications: Notification[]): void {
+    this.notificationListCache.set(cacheKey, {
+      notifications,
+      timestamp: Date.now()
+    })
+  }
+
+  /**
+   * 읽지 않은 알림 수 캐시 무효화
+   */
+  private invalidateUnreadCountCache(userId: string): void {
+    this.unreadCountCache.delete(userId)
+    console.log(`🗑️ [NotificationService] 읽지 않은 알림 수 캐시 무효화: ${userId}`)
+  }
+
+  /**
+   * 알림 목록 캐시 무효화
+   */
+  private invalidateNotificationListCache(userId: string): void {
+    // userId를 포함하는 모든 캐시 키 삭제
+    const keysToDelete: string[] = []
+    this.notificationListCache.forEach((_, key) => {
+      if (key.includes(userId)) {
+        keysToDelete.push(key)
+      }
+    })
+    keysToDelete.forEach(key => this.notificationListCache.delete(key))
+    console.log(`🗑️ [NotificationService] 알림 목록 캐시 무효화: ${userId}`)
+  }
+
+  /**
+   * 모든 캐시 무효화
+   */
+  private invalidateAllCaches(userId: string): void {
+    this.invalidateUnreadCountCache(userId)
+    this.invalidateNotificationListCache(userId)
   }
 
   /**
@@ -24,7 +103,10 @@ export class NotificationService {
         createdAt: firestore.FieldValue.serverTimestamp(),
         updatedAt: firestore.FieldValue.serverTimestamp()
       })
-      
+
+      // 캐시 무효화 (새 알림 생성)
+      this.invalidateAllCaches(data.userId)
+
       console.log('🔔 [NotificationService] 알림 생성됨:', docRef.id)
       return docRef.id
     } catch (error) {
@@ -34,44 +116,38 @@ export class NotificationService {
   }
 
   /**
-   * 사용자별 알림 목록 실시간 구독
+   * 사용자별 알림 목록 실시간 구독 - 서버 사이드 최적화
    */
   subscribeToUserNotifications(
     userId: string, 
-    callback: (notifications: Notification[]) => void
+    callback: (notifications: Notification[]) => void,
+    maxLimit = 50
   ): () => void {
-    console.log('🔔 [NotificationService] 사용자 알림 구독 시작:', userId)
+    console.log('🔥 [NotificationService] 서버 사이드 최적화된 알림 구독 시작:', { userId: '로그인 상태', maxLimit })
     
     return this.db
       .collection('notifications')
       .where('userId', '==', userId)
+      .orderBy('createdAt', 'desc') // 서버에서 정렬
+      .limit(maxLimit) // 서버에서 제한
       .onSnapshot(
         (snapshot) => {
-          const notifications: Notification[] = []
+          console.log(`📊 [NotificationService] 서버 사이드 필터링된 알림 수: ${snapshot.docs.length}`)
           
-          snapshot.forEach((doc) => {
-            const data = doc.data()
-            notifications.push({
-              id: doc.id,
-              ...data,
-            } as Notification)
-          })
+          const notifications: Notification[] = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          } as Notification))
           
-          // 클라이언트에서 정렬 및 제한
-          notifications.sort((a, b) => {
-            const aTime = a.createdAt?.toDate?.() || new Date(0)
-            const bTime = b.createdAt?.toDate?.() || new Date(0)
-            return bTime.getTime() - aTime.getTime() // 최신순
-          })
-          
-          // 최근 50개만 유지
-          const limitedNotifications = notifications.slice(0, 50)
-          
-          console.log(`🔔 [NotificationService] 알림 업데이트됨: ${limitedNotifications.length}개`)
-          callback(limitedNotifications)
+          console.log(`✅ [NotificationService] 서버 사이드 최적화 완료: 클라이언트 정렬/제한 제거`)
+          callback(notifications)
         },
         (error) => {
-          console.error('❌ [NotificationService] 알림 구독 오류:', error)
+          if (error.code === 'firestore/failed-precondition' && error.message.includes('index')) {
+            console.warn("⏳ [NotificationService] 인덱스 생성 중 - 잠시 후 다시 시도하세요")
+          } else {
+            console.error('❌ [NotificationService] 알림 구독 오류:', error.code || error.message)
+          }
           callback([])
         }
       )
@@ -80,14 +156,19 @@ export class NotificationService {
   /**
    * 알림 읽음 처리
    */
-  async markAsRead(notificationId: string): Promise<void> {
+  async markAsRead(notificationId: string, userId?: string): Promise<void> {
     try {
       await this.db.collection('notifications').doc(notificationId).update({
         isRead: true,
         readAt: firestore.FieldValue.serverTimestamp(),
         updatedAt: firestore.FieldValue.serverTimestamp()
       })
-      
+
+      // 캐시 무효화
+      if (userId) {
+        this.invalidateAllCaches(userId)
+      }
+
       console.log('✅ [NotificationService] 알림 읽음 처리됨:', notificationId)
     } catch (error) {
       console.error('❌ [NotificationService] 알림 읽음 처리 실패:', error)
@@ -96,47 +177,95 @@ export class NotificationService {
   }
 
   /**
-   * 읽지 않은 알림 수 조회
+   * 여러 알림 읽음 처리 - 배치 처리
+   */
+  async markMultipleAsRead(notificationIds: string[], userId?: string): Promise<void> {
+    try {
+      if (notificationIds.length === 0) return
+
+      // Firestore 배치 쓰기 (최대 500개)
+      const batch = this.db.batch()
+
+      notificationIds.forEach(id => {
+        const docRef = this.db.collection('notifications').doc(id)
+        batch.update(docRef, {
+          isRead: true,
+          readAt: firestore.FieldValue.serverTimestamp(),
+          updatedAt: firestore.FieldValue.serverTimestamp()
+        })
+      })
+
+      await batch.commit()
+
+      // 캐시 무효화
+      if (userId) {
+        this.invalidateCache(userId)
+      }
+
+      console.log(`✅ [NotificationService] ${notificationIds.length}개 알림 일괄 읽음 처리 완료`)
+    } catch (error) {
+      console.error('❌ [NotificationService] 일괄 읽음 처리 실패:', error)
+      throw error
+    }
+  }
+
+  /**
+   * 읽지 않은 알림 수 조회 - 서버 사이드 필터링 + 캐싱
    */
   async getUnreadCount(userId: string): Promise<number> {
     try {
+      // 캐시 확인
+      const cached = this.getCachedUnreadCount(userId)
+      if (cached !== null) {
+        return cached
+      }
+
+      console.log('🔥 [NotificationService] 서버 사이드 읽지 않은 알림 수 조회')
+
       const snapshot = await this.db
         .collection('notifications')
         .where('userId', '==', userId)
+        .where('isRead', '==', false) // 서버에서 필터링
         .get()
-      
-      // 클라이언트에서 읽지 않은 알림만 필터링
-      const unreadCount = snapshot.docs.filter(doc => {
-        const data = doc.data()
-        return data.isRead === false
-      }).length
-      
-      return unreadCount
+
+      const count = snapshot.size
+      console.log(`✅ [NotificationService] 서버 사이드 필터링 완료: ${count}개 읽지 않은 알림`)
+
+      // 캐시 저장
+      this.setCachedUnreadCount(userId, count)
+
+      return count
     } catch (error) {
-      console.error('❌ [NotificationService] 읽지 않은 알림 수 조회 실패:', error)
+      if (error.code === 'firestore/failed-precondition' && error.message.includes('index')) {
+        console.warn("⏳ [NotificationService] 인덱스 생성 중 - 0 반환")
+        return 0
+      }
+      console.error('❌ [NotificationService] 읽지 않은 알림 수 조회 실패:', error.code || error.message)
       return 0
     }
   }
 
   /**
-   * 읽지 않은 알림 수 실시간 구독
+   * 읽지 않은 알림 수 실시간 구독 - 서버 사이드 필터링
    */
   subscribeToUnreadCount(userId: string, callback: (count: number) => void): () => void {
+    console.log('🔥 [NotificationService] 서버 사이드 읽지 않은 알림 수 구독 시작')
+    
     return this.db
       .collection('notifications')
       .where('userId', '==', userId)
+      .where('isRead', '==', false) // 서버에서 필터링
       .onSnapshot(
         (snapshot) => {
-          // 클라이언트에서 읽지 않은 알림만 필터링
-          const unreadCount = snapshot.docs.filter(doc => {
-            const data = doc.data()
-            return data.isRead === false
-          }).length
-          
-          callback(unreadCount)
+          console.log(`📊 [NotificationService] 서버 사이드 필터링된 읽지 않은 알림: ${snapshot.size}개`)
+          callback(snapshot.size)
         },
         (error) => {
-          console.error('❌ [NotificationService] 읽지 않은 알림 수 구독 오류:', error)
+          if (error.code === 'firestore/failed-precondition' && error.message.includes('index')) {
+            console.warn("⏳ [NotificationService] 인덱스 생성 중 - 0 반환")
+          } else {
+            console.error('❌ [NotificationService] 읽지 않은 알림 수 구독 오류:', error.code || error.message)
+          }
           callback(0)
         }
       )
@@ -402,7 +531,7 @@ export class NotificationService {
   }
 
   /**
-   * 공고 상태 변경 알림 (해당 공고 지원자들에게)
+   * 공고 상태 변경 알림 (해당 공고 지원자들에게) - 배치 처리 최적화
    */
   async notifyPostStatusChanged(params: {
     postId: string
@@ -415,9 +544,16 @@ export class NotificationService {
       params.newStatus
     )
 
-    // 모든 지원자에게 알림 발송
-    const promises = params.applicantIds.map(applicantId =>
-      this.createNotification({
+    if (params.applicantIds.length === 0) return
+
+    // 배치 쓰기로 최적화 (최대 500개)
+    const batch = this.db.batch()
+    const timestamp = firestore.FieldValue.serverTimestamp()
+
+    // 필수 필드만 전송하여 데이터 전송량 최소화
+    params.applicantIds.forEach(applicantId => {
+      const docRef = this.db.collection('notifications').doc()
+      batch.set(docRef, {
         userId: applicantId,
         type: 'post_status_changed',
         title,
@@ -425,12 +561,15 @@ export class NotificationService {
         postId: params.postId,
         postTitle: params.postTitle,
         isRead: false,
-        createdAt: firestore.FieldValue.serverTimestamp(),
-        updatedAt: firestore.FieldValue.serverTimestamp()
+        createdAt: timestamp,
+        updatedAt: timestamp
       })
-    )
+    })
 
-    await Promise.all(promises)
+    await batch.commit()
+
+    // 캐시 무효화
+    params.applicantIds.forEach(id => this.invalidateCache(id))
 
     console.log('🔔 [NotificationService] 공고 상태 변경 알림 발송:', {
       post: params.postTitle,
@@ -440,7 +579,7 @@ export class NotificationService {
   }
 
   /**
-   * 공고 수정 알림 (해당 공고 지원자들에게)
+   * 공고 수정 알림 (해당 공고 지원자들에게) - 배치 처리 최적화
    */
   async notifyPostUpdated(params: {
     postId: string
@@ -449,9 +588,16 @@ export class NotificationService {
   }): Promise<void> {
     const { title, message } = NotificationTemplates.postUpdated(params.postTitle)
 
-    // 모든 지원자에게 알림 발송
-    const promises = params.applicantIds.map(applicantId =>
-      this.createNotification({
+    if (params.applicantIds.length === 0) return
+
+    // 배치 쓰기로 최적화 (최대 500개)
+    const batch = this.db.batch()
+    const timestamp = firestore.FieldValue.serverTimestamp()
+
+    // 필수 필드만 전송하여 데이터 전송량 최소화
+    params.applicantIds.forEach(applicantId => {
+      const docRef = this.db.collection('notifications').doc()
+      batch.set(docRef, {
         userId: applicantId,
         type: 'post_updated',
         title,
@@ -459,12 +605,15 @@ export class NotificationService {
         postId: params.postId,
         postTitle: params.postTitle,
         isRead: false,
-        createdAt: firestore.FieldValue.serverTimestamp(),
-        updatedAt: firestore.FieldValue.serverTimestamp()
+        createdAt: timestamp,
+        updatedAt: timestamp
       })
-    )
+    })
 
-    await Promise.all(promises)
+    await batch.commit()
+
+    // 캐시 무효화
+    params.applicantIds.forEach(id => this.invalidateCache(id))
 
     console.log('🔔 [NotificationService] 공고 수정 알림 발송:', {
       post: params.postTitle,

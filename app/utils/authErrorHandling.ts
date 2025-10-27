@@ -36,48 +36,50 @@ export function showAuthError(error: unknown, config: AuthErrorConfig): void {
 }
 
 /**
+ * 인증 에러 핸들러 생성 유틸리티
+ * 중복 코드를 제거하고 일관성 있는 에러 처리를 제공
+ */
+function createAuthErrorHandler(titleKey: string, defaultMessageKey: string) {
+  return (error: unknown, showAlert?: (title: string, message: string, buttons?: AlertButton[]) => void): void => {
+    showAuthError(error, {
+      title: translate(titleKey),
+      defaultMessage: translate(defaultMessageKey),
+      showAlert,
+    })
+  }
+}
+
+/**
  * 로그인 에러 처리
  */
-export function handleSignInError(error: unknown, showAlert?: (title: string, message: string, buttons?: AlertButton[]) => void): void {
-  showAuthError(error, {
-    title: translate("signInScreen:errorTitle"),
-    defaultMessage: translate("signInScreen:authFailed"),
-    showAlert,
-  })
-}
+export const handleSignInError = createAuthErrorHandler(
+  "signInScreen:errorTitle",
+  "signInScreen:authFailed"
+)
 
 /**
  * 회원가입 에러 처리
  */
-export function handleSignUpError(error: unknown, showAlert?: (title: string, message: string, buttons?: AlertButton[]) => void): void {
-  showAuthError(error, {
-    title: translate("signUpScreen:errorTitle"),
-    defaultMessage: translate("signUpScreen:signUpFailed"),
-    showAlert,
-  })
-}
+export const handleSignUpError = createAuthErrorHandler(
+  "signUpScreen:errorTitle",
+  "signUpScreen:signUpFailed"
+)
 
 /**
  * Google 로그인 에러 처리
  */
-export function handleGoogleSignInError(error: unknown, showAlert?: (title: string, message: string, buttons?: AlertButton[]) => void): void {
-  showAuthError(error, {
-    title: translate("signInScreen:errorTitle"),
-    defaultMessage: translate("signInScreen:googleFailed"),
-    showAlert,
-  })
-}
+export const handleGoogleSignInError = createAuthErrorHandler(
+  "signInScreen:errorTitle",
+  "signInScreen:googleFailed"
+)
 
 /**
  * 비밀번호 재설정 에러 처리
  */
-export function handleForgotPasswordError(error: unknown, showAlert?: (title: string, message: string, buttons?: AlertButton[]) => void): void {
-  showAuthError(error, {
-    title: translate("forgotPasswordScreen:errorTitle"),
-    defaultMessage: translate("forgotPasswordScreen:sendFailed"),
-    showAlert,
-  })
-}
+export const handleForgotPasswordError = createAuthErrorHandler(
+  "forgotPasswordScreen:errorTitle",
+  "forgotPasswordScreen:sendFailed"
+)
 
 /**
  * 폼 유효성 검사 에러 처리

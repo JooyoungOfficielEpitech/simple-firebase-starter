@@ -71,7 +71,14 @@ export const SignUpScreen: FC<SignUpScreenProps> = function SignUpScreen({ navig
   const handleEmailSignUp = useCallback(async () => {
     try {
       const isValid = await signUpForm.trigger()
-      if (!isValid) return
+      if (!isValid) {
+        // 폼이 유효하지 않은 경우 사용자에게 알림
+        alert(
+          translate("signUpScreen:errorTitle"),
+          translate("auth:validation.fillAllFields"),
+        )
+        return
+      }
 
       const data = signUpForm.getValues()
       await signUpWithEmail(data.email, data.password)
@@ -87,7 +94,7 @@ export const SignUpScreen: FC<SignUpScreenProps> = function SignUpScreen({ navig
         error instanceof Error ? error.message : translate("signUpScreen:signUpFailed"),
       )
     }
-  }, [signUpForm, signUpWithEmail])
+  }, [signUpForm, signUpWithEmail, alert])
 
   const handleGoogleAuth = useCallback(async () => {
     try {
@@ -145,7 +152,7 @@ export const SignUpScreen: FC<SignUpScreenProps> = function SignUpScreen({ navig
           tx="signUpScreen:signUpButton"
           onPress={handleEmailSignUp}
           isLoading={isLoading || signUpForm.formState.isSubmitting}
-          disabled={!signUpForm.formState.isValid}
+          disabled={isLoading || signUpForm.formState.isSubmitting}
         />
 
         <Button tx="signUpScreen:googleButton" onPress={handleGoogleAuth} disabled={isLoading} />

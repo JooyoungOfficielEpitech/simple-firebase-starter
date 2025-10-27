@@ -6,12 +6,9 @@ import { MusicalKaraokeHomeScreen } from "@/screens/MusicalKaraokeHomeScreen"
 import { useAppTheme } from "@/theme/context"
 import type { Song } from "@/types/song"
 
-import { MainTabParamList, MainTabScreenProps } from "./MainNavigator"
+import type { MainTabParamList, HomeStackParamList } from "./types"
+import type { MainTabScreenProps } from "./MainNavigator"
 
-export type HomeStackParamList = {
-  HomeMain: undefined
-  KaraokeScreen: { song: Song }
-}
 
 /**
  * Helper for automatically generating navigation prop types for each route.

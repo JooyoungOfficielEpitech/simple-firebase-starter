@@ -31,33 +31,10 @@ import { useAppTheme } from "@/theme/context"
 
 import { MainNavigator } from "./MainNavigator"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
+import type { AppStackParamList } from "./types"
 
-/**
- * This type allows TypeScript to know what routes are defined in this navigator
- * as well as what properties (if any) they might take when navigating to them.
- *
- * For more information, see this documentation:
- *   https://reactnavigation.org/docs/params/
- *   https://reactnavigation.org/docs/typescript#type-checking-the-navigator
- *   https://reactnavigation.org/docs/typescript/#organizing-types
- */
-export type AppStackParamList = {
-  Main: undefined
-  Welcome: undefined
-  SignIn: undefined
-  SignUp: undefined
-  ForgotPassword: undefined
-  Profile: undefined
-  EditProfile: undefined
-  NotificationCenter: undefined
-  PostDetail: { postId: string }
-  ApplicationManagement: { postId: string; postTitle: string }
-  CreateOrganization: { organizationId?: string; isEdit?: boolean; isOrganizerConversion?: boolean }
-  DevSettings: undefined
-  PushDebug: undefined
-  MusicPlayer: undefined
-  Debug: undefined
-}
+// Re-export for other files that depend on it
+export type { AppStackParamList } from "./types"
 
 /**
  * This is a list of all the route names that will exit the app if the back button
@@ -144,37 +121,39 @@ const AppStack = () => {
               headerShown: false,
             }}
           />
-          {/* 개발자 설정 (TestFlight에서도 표시) */}
-          <>
-            <Stack.Screen 
-              name="DevSettings" 
-              component={DevSettingsScreen}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen 
-              name="PushDebug" 
-              component={PushDebugScreen}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen 
-              name="MusicPlayer" 
-              component={MusicPlayerScreen}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen 
-              name="Debug" 
-              component={DebugScreen}
-              options={{
-                headerShown: false,
-              }}
-            />
-          </>
+          {/* 개발 전용 화면들 - 개발 환경에서만 표시 */}
+          {__DEV__ && (
+            <>
+              <Stack.Screen 
+                name="DevSettings" 
+                component={DevSettingsScreen}
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen 
+                name="PushDebug" 
+                component={PushDebugScreen}
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen 
+                name="MusicPlayer" 
+                component={MusicPlayerScreen}
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen 
+                name="Debug" 
+                component={DebugScreen}
+                options={{
+                  headerShown: false,
+                }}
+              />
+            </>
+          )}
         </>
       )}
     </Stack.Navigator>
@@ -205,8 +184,8 @@ export const AppNavigator = (props: NavigationProps) => {
         {isAuthenticated && (
           <NotificationBanner onNotificationPress={handleNotificationPress} />
         )}
-        {/* 개발자 설정 플로팅 버튼 (테스트를 위해 항상 표시) */}
-        <DevFloatingButton />
+        {/* 개발자 설정 플로팅 버튼 (개발 환경에서만 표시) */}
+        {__DEV__ && <DevFloatingButton />}
       </ErrorBoundary>
     </NavigationContainer>
   )

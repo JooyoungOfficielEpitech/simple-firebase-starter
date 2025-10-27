@@ -82,42 +82,81 @@ class FCMTokenService {
   }
 
   /**
-   * 토큰 갱신 (새 토큰으로 업데이트)
+   * 토큰 갱신 (새 토큰으로 업데이트) - 자동 재시도 기능 포함
    */
   async updateToken(userId: string, oldToken: string, newToken: string): Promise<boolean> {
-    try {
-      logger.info('🔄 [FCMTokenService] FCM 토큰 갱신 시작', { 
-        userId, 
-        oldTokenPrefix: oldToken.substring(0, 10),
-        newTokenPrefix: newToken.substring(0, 10)
-      })
-
-      // 기존 토큰을 가진 문서를 찾아서 새 토큰으로 업데이트
-      const querySnapshot = await firestore()
-        .collection(this.COLLECTION)
-        .where('userId', '==', userId)
-        .where('fcmToken', '==', oldToken)
-        .limit(1)
-        .get()
-
-      if (!querySnapshot.empty) {
-        const doc = querySnapshot.docs[0]
-        await doc.ref.update({
-          fcmToken: newToken,
-          lastUsed: new Date(),
+    return this.retryTokenOperation(
+      async () => {
+        logger.info('🔄 [FCMTokenService] FCM 토큰 갱신 시작', {
+          userId,
+          oldTokenPrefix: oldToken.substring(0, 10),
+          newTokenPrefix: newToken.substring(0, 10)
         })
-        logger.info('✅ [FCMTokenService] 기존 토큰 업데이트 성공')
-      } else {
-        // 기존 토큰을 찾지 못한 경우 새로 등록
-        logger.info('🆕 [FCMTokenService] 기존 토큰을 찾지 못해 새로 등록')
-        await this.registerToken(userId, newToken)
-      }
 
-      return true
-    } catch (error) {
-      logger.error('❌ [FCMTokenService] FCM 토큰 갱신 실패:', error)
-      return false
+        // 기존 토큰을 가진 문서를 찾아서 새 토큰으로 업데이트
+        const querySnapshot = await firestore()
+          .collection(this.COLLECTION)
+          .where('userId', '==', userId)
+          .where('fcmToken', '==', oldToken)
+          .limit(1)
+          .get()
+
+        if (!querySnapshot.empty) {
+          const doc = querySnapshot.docs[0]
+          await doc.ref.update({
+            fcmToken: newToken,
+            lastUsed: new Date(),
+          })
+          logger.info('✅ [FCMTokenService] 기존 토큰 업데이트 성공')
+        } else {
+          // 기존 토큰을 찾지 못한 경우 새로 등록
+          logger.info('🆕 [FCMTokenService] 기존 토큰을 찾지 못해 새로 등록')
+          await this.registerToken(userId, newToken)
+        }
+
+        return true
+      },
+      'FCM 토큰 갱신'
+    )
+  }
+
+  /**
+   * 재시도 가능한 토큰 작업 실행 (지수 백오프)
+   */
+  private async retryTokenOperation<T>(
+    operation: () => Promise<T>,
+    operationName: string,
+    maxRetries = 3
+  ): Promise<T> {
+    let lastError: any
+
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        return await operation()
+      } catch (error) {
+        lastError = error
+        const errorCode = error?.code || 'unknown'
+
+        // 네트워크 에러인 경우 재시도
+        const isNetworkError =
+          errorCode === 'firestore/unavailable' ||
+          errorCode === 'firestore/deadline-exceeded' ||
+          errorCode === 'firestore/cancelled' ||
+          error?.message?.includes('network')
+
+        if (!isNetworkError || attempt === maxRetries - 1) {
+          logger.error(`❌ [FCMTokenService] ${operationName} 실패:`, error)
+          throw error
+        }
+
+        // 지수 백오프로 재시도
+        const delay = Math.min(1000 * Math.pow(2, attempt), 10000)
+        logger.warn(`🔄 [FCMTokenService] ${operationName} - 네트워크 에러, ${delay}ms 후 재시도 (${attempt + 1}/${maxRetries})`)
+        await new Promise(resolve => setTimeout(resolve, delay))
+      }
     }
+
+    throw lastError
   }
 
   /**

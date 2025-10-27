@@ -1,15 +1,19 @@
-import React, { useState, useEffect, useRef } from "react"
-import { View, ViewStyle, TextStyle, TouchableOpacity, TouchableOpacityProps, ScrollView, Animated, Modal, TextInput } from "react-native"
-import { Audio, AVPlaybackStatus } from "expo-av"
+import React, { useEffect, useRef, useCallback, useMemo, useState } from "react"
+import { View, ViewStyle, TouchableOpacity, Modal, TextInput, TouchableOpacityProps, TextStyle } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
-import { PanGestureHandler, GestureHandlerRootView } from "react-native-gesture-handler"
+import TrackPlayer, { usePlaybackState, useProgress, State } from 'react-native-track-player'
 import { MMKV } from "react-native-mmkv"
 
 import { AlertModal } from "@/components/AlertModal"
-import { Icon } from "@/components/Icon"
 import { Text } from "@/components/Text"
+import { Icon } from "@/components/Icon"
+import { PlayerControls } from "@/components/PlayerControls"
+import { TrackInfo } from "@/components/TrackInfo"
+import { ProgressBar } from "@/components/ProgressBar"
+import { SaveSectionModal } from "@/components/SaveSectionModal"
 import { useAlert } from "@/hooks/useAlert"
 import { useAppTheme } from "@/theme/context"
+import { useAudioPlayerState } from "@/components/hooks/useAudioPlayerState"
 import type { ThemedStyle } from "@/theme/types"
 
 // MMKV 스토리지 인스턴스
@@ -77,7 +81,7 @@ export interface AudioPlayerProps {
   /**
    * 재생 상태 변경 콜백
    */
-  onPlaybackStatusUpdate?: (status: AVPlaybackStatus) => void
+  onPlaybackStatusUpdate?: (status: any) => void
   /**
    * 저장된 구간들
    */
@@ -97,7 +101,7 @@ export interface AudioPlayerProps {
 }
 
 /**
- * Expo AV 기반 오디오 플레이어 컴포넌트
+ * TrackPlayer 기반 오디오 플레이어 컴포넌트
  */
 export function AudioPlayer({
   audioFile,
@@ -109,136 +113,225 @@ export function AudioPlayer({
   onLoadSection,
   loadSection,
 }: AudioPlayerProps) {
+  // Validate props to prevent text rendering errors
+  if (typeof audioFile !== 'string' && audioFile !== undefined) {
+    return null
+  }
+  if (typeof audioUrl !== 'string' && audioUrl !== undefined) {
+    return null
+  }
+
   const { themed } = useAppTheme()
   const { alertState, alert, hideAlert } = useAlert()
-  const [sound, setSound] = useState<Audio.Sound | null>(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [duration, setDuration] = useState<number>(0)
-  const [position, setPosition] = useState<number>(0)
-  const [error, setError] = useState<string | null>(null)
-
-  // A-B 구간 반복 상태 - 기본값으로 A=0, B=끝지점 설정
-  const [loopState, setLoopState] = useState<LoopState>({
-    pointA: 0, // 항상 0초부터 시작
-    pointB: null, // duration을 알게 되면 설정
-    isLooping: true, // 항상 무한 반복
-    currentSection: null,
-  })
+  const playbackState = usePlaybackState()
+  const progress = useProgress()
+  const { state, actions } = useAudioPlayerState()
   
-  // B 지점 자동 설정 여부를 추적
-  const [hasAutoSetB, setHasAutoSetB] = useState(false)
   const isInitialLoad = useRef(true)
   const userSetB = useRef(false) // 사용자가 수동으로 B를 설정했는지 추적
-  
-  // 구간 저장 모달
-  const [showSaveModal, setShowSaveModal] = useState(false)
-  const [sectionName, setSectionName] = useState("")
-  
-  // A-B 루프 제어용 플래그
-  const [isJumping, setIsJumping] = useState(false)
-  
-  // 새로운 UX 상태들
-  const [uiMode, setUIMode] = useState<UIMode>('normal')
-  const [sectionSettingStep, setSectionSettingStep] = useState<SectionSettingStep>('none')
-  const [progressBarWidth, setProgressBarWidth] = useState(200)
-  
-  // 애니메이션 관련
-  const pulseAnim = useRef(new Animated.Value(1)).current
   const progressBarRef = useRef<View>(null)
+  // const pulseAnim = useRef(new Animated.Value(1)).current // Removed - not used
 
-  // 🎯 디버깅 로그
-  console.log("🎵 AudioPlayer Props:", { audioFile, audioUrl })
+  // TrackPlayer 초기화
+  useEffect(() => {
+    const initializeTrackPlayer = async () => {
+      try {
+        // 이미 초기화되었는지 확인 (중복 방지)
+        if (typeof global.state.isPlayerInitialized === 'function' && global.state.isPlayerInitialized()) {
+          actions.setPlayerInitialized(true);
+          return;
+        }
+
+        // TrackPlayer 초기화
+        await TrackPlayer.setupPlayer({
+          waitForBuffer: true,
+        });
+
+        // 초기화 상태 업데이트
+        if (typeof global.setPlayerInitialized === 'function') {
+          global.setPlayerInitialized(true);
+        }
+        
+        actions.setPlayerInitialized(true);
+      } catch (error) {
+        actions.setError('TrackPlayer 초기화에 실패했습니다.');
+        actions.setPlayerInitialized(false);
+      }
+    };
+
+    // service.js가 로드될 때까지 1초 대기 후 초기화
+    setTimeout(() => {
+      initializeTrackPlayer();
+    }, 1000);
+  }, []);
 
   // 컴포넌트 초기화 시 로컬 스토리지에서 저장된 구간 로드
   useEffect(() => {
     const loadedSections = loadSavedSections()
     if (loadedSections.length > 0) {
-      console.log("📂 로컬 스토리지에서 구간 로드:", loadedSections.length, "개")
       onSavedSectionsChange?.(loadedSections)
     }
   }, [])
 
-  // 오디오 소스 결정
-  const getAudioSource = () => {
-    console.log("🔍 getAudioSource - audioFile:", audioFile, "audioUrl:", audioUrl)
+  // TrackPlayer용 오디오 소스 결정
+  const getAudioSource = useCallback(() => {
+    // URL이 있으면 우선적으로 사용
+    if (audioUrl) {
+      return audioUrl
+    }
     
     if (audioFile) {
-      // 로컬 파일의 경우 Asset 형태로 로드
+      // 로컬 파일의 경우 require로 로드
       try {
-        switch (audioFile) {
-          case "sample.mp3":
-            console.log("✅ Loading sample.mp3 from assets")
-            return require("../../assets/audio/sample.mp3")
-          default:
-            console.log("❌ Unknown audio file:", audioFile)
-            return null
+        // 동적으로 assets/audio/ 폴더에서 파일 찾기
+        const audioAssets = {
+          "sample.mp3": require("../../assets/audio/sample.mp3"),
+          // 새 파일을 추가할 때 여기에 추가하세요
+          // "my-song.mp3": require("../../assets/audio/my-song.mp3"),
+          // "another-song.mp3": require("../../assets/audio/another-song.mp3"),
+        }
+        
+        if (audioAssets[audioFile]) {
+          return audioAssets[audioFile]
+        } else {
+          return null
         }
       } catch (error) {
-        console.error("❌ 오디오 파일 로드 오류:", audioFile, error)
         return null
       }
     }
-    if (audioUrl) {
-      console.log("✅ Loading from URL:", audioUrl)
-      return { uri: audioUrl }
-    }
     
-    console.log("❌ No audio source available")
     return null
+  }, [audioFile, audioUrl])
+
+  const audioSource = useMemo(() => {
+    return getAudioSource()
+  }, [getAudioSource])
+
+  // TrackPlayer용 오디오 로드 함수
+  const loadAudio = async () => {
+    try {
+      if (!audioSource) {
+        actions.setError("오디오 파일을 준비 중입니다")
+        return
+      }
+
+      actions.setLoading(true)
+      actions.setError(null)
+
+      // 기존 트랙들 클리어
+      try {
+        await TrackPlayer.reset()
+      } catch (resetError) {
+        // 빈 큐일 때는 무시
+      }
+
+      // 새 트랙 추가
+      let trackToAdd;
+      if (audioSource) {
+        trackToAdd = {
+          id: 'audioplayerTrack',
+          url: audioSource, // getAudioSource()에서 반환한 실제 소스 사용
+          title: audioFile || 'Audio Track',
+          artist: 'AudioPlayer',
+        }
+      }
+
+      if (trackToAdd) {
+        await TrackPlayer.add(trackToAdd)
+        console.log('🎵 TrackPlayer 트랙 추가 완료')
+      }
+
+      actions.setLoading(false)
+      console.log("🎵 AudioPlayer TrackPlayer 오디오 로드 완료")
+    } catch (err) {
+      console.error("❌ AudioPlayer TrackPlayer 오디오 로드 실패:", err)
+      actions.setError("오디오 파일을 로드할 수 없습니다")
+      actions.setLoading(false)
+    }
   }
 
-  const audioSource = getAudioSource()
-  console.log("🎼 Final audioSource:", audioSource)
+  const unloadAudio = async () => {
+    try {
+      await TrackPlayer.reset()
+      console.log('🧹 AudioPlayer TrackPlayer 언로드 완료')
+    } catch (error) {
+      console.error('❌ AudioPlayer TrackPlayer 언로드 오류:', error)
+    }
+  }
 
-  // 오디오 로드
+  // 오디오 로드 - TrackPlayer 초기화 후에만 실행
+  const audioLoadRef = useRef({ audioFile: '', audioUrl: '' })
   useEffect(() => {
+    if (!state.isPlayerInitialized) {
+      console.log('⏳ TrackPlayer 초기화 대기 중...');
+      return;
+    }
+
+    // 실제로 오디오 파일이 변경되었는지 확인
+    const currentAudio = { audioFile: audioFile || '', audioUrl: audioUrl || '' }
+    
+    if (audioLoadRef.current.audioFile === currentAudio.audioFile && 
+        audioLoadRef.current.audioUrl === currentAudio.audioUrl) {
+      return
+    }
+    audioLoadRef.current = currentAudio
+
     // 새로운 오디오 로드 시 상태 초기화
-    setHasAutoSetB(false)
+    actions.setHasAutoSetB(false)
     isInitialLoad.current = true
     userSetB.current = false // 새 파일 로드 시 사용자 설정 플래그 리셋
     
     // 새로운 파일이 로드될 때만 A, B 초기화
-    setLoopState(prev => {
-      console.log("🔄 오디오 로드 - 상태 초기화:", {
-        이전_A: prev.pointA,
-        이전_B: prev.pointB,
-        새_A: 0,
-        새_B: null,
-      })
-      return {
-        ...prev,
-        pointA: 0,
-        pointB: null,
-        currentSection: null,
-      }
+    console.log("🔄 오디오 로드 - 상태 초기화:", {
+      이전_A: state.loopState.pointA,
+      이전_B: state.loopState.pointB,
+      새_A: 0,
+      새_B: null,
+    })
+    actions.setLoopState({
+      pointA: 0,
+      pointB: null,
+      currentSection: null,
+      isLooping: false,
     })
     
     loadAudio()
     return () => {
       unloadAudio()
     }
-  }, [audioFile, audioUrl])
+  }, [audioFile, audioUrl, state.isPlayerInitialized])
 
-  // A-B 구간 무한 반복 로직 - 단순화된 버전
+  // A-B 구간 무한 반복 로직 - TrackPlayer 버전
   useEffect(() => {
-    // A와 B가 설정되어 있으면 자동으로 무한 반복
-    if (loopState.pointA !== null && loopState.pointB !== null && sound && !isJumping) {
-      const currentTimeSeconds = position / 1000
-      const pointASeconds = loopState.pointA
-      const pointBSeconds = loopState.pointB
+    // A와 B가 설정되어 있으면 자동으로 무한 반복 (재생 중일 때만)
+    const isPlaying = playbackState?.state === 'playing' || playbackState?.state === 'buffering'
+    if (state.loopState.pointA !== null && state.loopState.pointB !== null && state.isPlayerInitialized && !state.isJumping && progress.position !== undefined && isPlaying) {
+      const currentTimeSeconds = progress.position || 0
+      const pointASeconds = state.loopState.pointA
+      const pointBSeconds = state.loopState.pointB
+      const durationSeconds = progress.duration || 0
       
-      // B 지점에 도달하거나 넘어선 경우 A로 즉시 이동
-      if (currentTimeSeconds >= pointBSeconds) {
+      // 재생이 끝났으면 루프 중지
+      if (currentTimeSeconds >= durationSeconds) {
+        console.log("🛑 재생 완료, A-B 루프 중지:", {
+          현재시간: currentTimeSeconds.toFixed(2),
+          곡길이: durationSeconds.toFixed(2)
+        })
+        return
+      }
+      
+      // B 지점에 도달하거나 넘어선 경우 A로 즉시 이동 (단, 곡이 끝나지 않은 경우만)
+      if (currentTimeSeconds >= pointBSeconds && currentTimeSeconds < durationSeconds) {
         console.log("🔄 B 지점 도달, A로 무한 반복:", {
           현재시간: currentTimeSeconds.toFixed(2),
           A지점: pointASeconds.toFixed(2),
           B지점: pointBSeconds.toFixed(2),
         })
         
-        setIsJumping(true)
+        actions.setIsJumping(true)
         
-        sound.setPositionAsync(pointASeconds * 1000)
+        TrackPlayer.seekTo(pointASeconds * 1000)
           .then(() => {
             console.log("✅ A 지점으로 이동 완료 - 무한 반복 계속")
           })
@@ -247,35 +340,52 @@ export function AudioPlayer({
           })
           .finally(() => {
             setTimeout(() => {
-              setIsJumping(false)
+              actions.setIsJumping(false)
             }, 500)
           })
       }
     }
-  }, [position, loopState.pointA, loopState.pointB, sound, isJumping])
+  }, [progress.position, progress.duration, state.loopState.pointA, state.loopState.pointB, state.isPlayerInitialized, state.isJumping, playbackState?.state])
 
   // service.js와 A-B 루프 상태 동기화
   useEffect(() => {
-    if (typeof global.setABLoop === 'function' && loopState.pointA !== null && loopState.pointB !== null) {
-      console.log('🔄 AudioPlayer → service.js A-B 동기화:', {
-        A: loopState.pointA,
-        B: loopState.pointB,
-        enabled: loopState.isLooping
-      });
-      global.setABLoop(loopState.isLooping, loopState.pointA, loopState.pointB);
+    if (typeof global.setABLoop === 'function' && state.isPlayerInitialized) {
+      if (state.loopState.pointA !== null && state.loopState.pointB !== null) {
+        console.log('🔄 AudioPlayer → service.js A-B 동기화:', {
+          A: state.loopState.pointA,
+          B: state.loopState.pointB,
+          enabled: state.loopState.isLooping
+        });
+        global.setABLoop(state.loopState.isLooping, state.loopState.pointA, state.loopState.pointB);
+        
+        // 백그라운드 A-B 루프 체크 시작
+        if (typeof global.startABLoopCheck === 'function') {
+          global.startABLoopCheck();
+        }
+      } else {
+        // A-B 설정이 없으면 루프 비활성화
+        console.log('🛑 A-B 루프 비활성화');
+        global.setABLoop(false, null, null);
+        
+        // 백그라운드 A-B 루프 체크 중지
+        if (typeof global.stopABLoopCheck === 'function') {
+          global.stopABLoopCheck();
+        }
+      }
     }
-  }, [loopState.pointA, loopState.pointB, loopState.isLooping]);
+  }, [state.loopState.pointA, state.loopState.pointB, state.loopState.isLooping, state.isPlayerInitialized]);
 
-  // A-B 구간 변경 시 자동 이동 처리
+  // A-B 구간 변경 시 자동 이동 처리 - TrackPlayer 버전 (재생 중일 때만)
   useEffect(() => {
-    if (sound && loopState.pointA !== null && loopState.pointB !== null && !isJumping) {
-      const currentTimeSeconds = position / 1000
+    const isPlaying = playbackState?.state === 'playing' || playbackState?.state === 'buffering'
+    if (state.isPlayerInitialized && state.loopState.pointA !== null && state.loopState.pointB !== null && !state.isJumping && progress.position !== undefined && isPlaying) {
+      const currentTimeSeconds = progress.position || 0
       
       // 현재 위치가 A-B 범위 밖에 있으면 A 지점으로 이동
-      if (currentTimeSeconds < loopState.pointA || currentTimeSeconds > loopState.pointB) {
-        console.log(`📍 A-B 구간 변경으로 인한 자동 이동: ${currentTimeSeconds.toFixed(1)}s → ${loopState.pointA.toFixed(1)}s`)
-        setIsJumping(true)
-        sound.setPositionAsync(loopState.pointA * 1000)
+      if (currentTimeSeconds < state.loopState.pointA || currentTimeSeconds > state.loopState.pointB) {
+        console.log(`📍 A-B 구간 변경으로 인한 자동 이동: ${currentTimeSeconds.toFixed(1)}s → ${state.loopState.pointA.toFixed(1)}s`)
+        actions.setIsJumping(true)
+        TrackPlayer.seekTo(state.loopState.pointA * 1000)
           .then(() => {
             console.log("✅ A-B 구간 변경으로 A 지점 이동 완료")
           })
@@ -284,264 +394,237 @@ export function AudioPlayer({
           })
           .finally(() => {
             setTimeout(() => {
-              setIsJumping(false)
+              actions.setIsJumping(false)
             }, 300)
           })
       }
     }
-  }, [loopState.pointA, loopState.pointB, position, sound, isJumping])
+  }, [state.loopState.pointA, state.loopState.pointB, progress.position, state.isPlayerInitialized, state.isJumping, playbackState?.state])
 
   // 외부에서 구간 로드 요청 처리
   useEffect(() => {
-    if (loadSection) {
+    if (loadSection && state.isPlayerInitialized) {
       console.log("🎯 External load section request:", loadSection.name)
-      setLoopState(prev => ({
-        ...prev,
+      actions.setLoopState({
         pointA: loadSection.pointA,
         pointB: loadSection.pointB,
         currentSection: loadSection,
         isLooping: false,
-      }))
-      setHasAutoSetB(true) // 외부 로드 시 자동 설정 방지
+      })
+      actions.setHasAutoSetB(true) // 외부 로드 시 자동 설정 방지
       userSetB.current = true // 외부 로드도 사용자 설정으로 간주
+      
+      // TrackPlayer로 해당 지점으로 이동
+      TrackPlayer.seekTo(loadSection.pointA * 1000)
+        .then(() => {
+          console.log("✅ 로드된 구간 A 지점으로 이동 완료")
+        })
+        .catch(error => {
+          console.error("❌ 구간 로드 시 이동 실패:", error)
+        })
+      
       onLoadSection?.(loadSection)
       alert("로드 완료", `"${loadSection.name}" 구간이 로드되었습니다.`)
     }
-  }, [loadSection, onLoadSection])
+  }, [loadSection, onLoadSection, state.isPlayerInitialized])
 
-  const loadAudio = async () => {
-    try {
-      if (!audioSource) {
-        setError("오디오 파일을 준비 중입니다")
-        return
-      }
+  // initializeTrackPlayer function removed - functionality moved to loadAudio
 
-      setIsLoading(true)
-      setError(null)
-
-      // 기존 사운드 언로드
-      if (sound) {
-        await sound.unloadAsync()
-      }
-
-      // 새 사운드 로드
-      const { sound: newSound } = await Audio.Sound.createAsync(
-        audioSource,
-        { shouldPlay: false },
-        handlePlaybackStatusUpdate
-      )
-
-      setSound(newSound)
-      setIsLoading(false)
-
-      console.log("🎵 Audio loaded successfully")
-    } catch (err) {
-      console.error("Failed to load audio:", err)
-      setError("오디오 파일을 준비 중입니다")
-      setIsLoading(false)
-    }
-  }
-
-  const unloadAudio = async () => {
-    if (sound) {
-      await sound.unloadAsync()
-      setSound(null)
-    }
-  }
-
-  const handlePlaybackStatusUpdate = (status: AVPlaybackStatus) => {
-    if (status.isLoaded) {
-      const currentPosition = status.positionMillis || 0
-      const currentDuration = status.durationMillis || 0
+  // TrackPlayer progress 모니터링
+  useEffect(() => {
+    const currentPosition = (progress.position || 0) * 1000 // ms로 변환
+    const currentDuration = (progress.duration || 0) * 1000 // ms로 변환
+    
+    // 초기 로드 시에만 pointB를 자동으로 끝지점으로 설정 (사용자가 설정하지 않은 경우만)
+    if (currentDuration > 0 && state.loopState.pointB === null && !state.hasAutoSetB && isInitialLoad.current && !userSetB.current) {
+      console.log("🎵 자동 B 설정 조건 체크:", {
+        duration: currentDuration,
+        pointB: state.loopState.pointB,
+        hasAutoSetB: state.hasAutoSetB,
+        isInitialLoad: isInitialLoad.current,
+        userSetB: userSetB.current,
+      })
       
-      setPosition(currentPosition)
-      setDuration(currentDuration)
-      setIsPlaying(status.isPlaying)
-      
-      // 초기 로드 시에만 pointB를 자동으로 끝지점으로 설정 (사용자가 설정하지 않은 경우만)
-      if (currentDuration > 0 && loopState.pointB === null && !hasAutoSetB && isInitialLoad.current && !userSetB.current) {
-        console.log("🎵 자동 B 설정 조건 체크:", {
-          duration: currentDuration,
-          pointB: loopState.pointB,
-          hasAutoSetB,
-          isInitialLoad: isInitialLoad.current,
-          userSetB: userSetB.current,
-        })
-        
-        setLoopState(prev => ({ 
-          ...prev, 
-          pointB: currentDuration / 1000 // 초 단위로 변환
-        }))
-        setHasAutoSetB(true)
-        isInitialLoad.current = false
-        console.log("✅ Auto-set B point to end:", (currentDuration / 1000).toFixed(1), "seconds")
-      } else if (currentDuration > 0 && userSetB.current) {
-        console.log("🚫 자동 B 설정 건너뜀 - 사용자가 이미 설정함")
-      }
+      actions.setLoopState({ 
+        pointA: state.loopState.pointA,
+        pointB: currentDuration / 1000, // 초 단위로 변환
+        currentSection: state.loopState.currentSection,
+        isLooping: state.loopState.isLooping,
+      })
+      actions.setHasAutoSetB(true)
+      isInitialLoad.current = false
+      console.log("✅ Auto-set B point to end:", (currentDuration / 1000).toFixed(1), "seconds")
+    } else if (currentDuration > 0 && userSetB.current) {
+      console.log("🚫 자동 B 설정 건너뜀 - 사용자가 이미 설정함")
     }
     
     if (onPlaybackStatusUpdate) {
-      onPlaybackStatusUpdate(status)
+      onPlaybackStatusUpdate({
+        isLoaded: true,
+        positionMillis: currentPosition,
+        durationMillis: currentDuration,
+        isPlaying: playbackState && 
+                  playbackState.state !== undefined && 
+                  String(playbackState.state) === "playing"
+      })
     }
-  }
+  }, [progress.position, progress.duration, playbackState, state.loopState.pointB, state.hasAutoSetB, onPlaybackStatusUpdate])
 
   const togglePlayback = async () => {
-    if (!sound) return
+    if (!state.isPlayerInitialized) return
 
     console.log("🎵 재생 버튼 클릭 - 현재 상태:", {
-      isPlaying,
-      pointA: loopState.pointA,
-      pointB: loopState.pointB,
-      currentPosition: (position / 1000).toFixed(2)
+      playbackState,
+      pointA: state.loopState.pointA,
+      pointB: state.loopState.pointB,
+      currentPosition: (progress.position || 0).toFixed(2),
+      duration: (progress.duration || 0).toFixed(2)
     })
 
     try {
-      // A-B 구간이 설정되어 있으면 위치 확인 (재생 중이든 아니든)
-      if (loopState.pointA !== null && loopState.pointB !== null) {
-        // 실제 사운드 객체에서 현재 위치를 가져옴
-        const status = await sound.getStatusAsync()
-        const actualCurrentTime = status.isLoaded ? (status.positionMillis || 0) / 1000 : position / 1000
+      // TrackPlayer 기본 상태 확인
+      const queue = await TrackPlayer.getQueue()
+      const currentTrack = await TrackPlayer.getActiveTrack()
+      const trackPlayerState = await TrackPlayer.getPlaybackState()
+      
+      console.log("🔍 TrackPlayer 기본 상태:", {
+        queueLength: queue.length,
+        hasCurrentTrack: !!currentTrack,
+        trackPlayerState,
+        playbackStateFromHook: playbackState
+      })
+      
+      // 큐가 비어있으면 오디오를 다시 로드
+      if (queue.length === 0) {
+        console.log("⚠️ TrackPlayer 큐가 비어있음, 오디오 재로드 시도")
+        await loadAudio()
+        return
+      }
+      
+      const isCurrentlyPlaying = playbackState && 
+                                playbackState.state !== undefined && 
+                                String(playbackState.state) === "playing"
+      
+      const currentTime = progress.position || 0
+      const duration = progress.duration || 0
+      
+      // 곡이 끝난 상태면 처음부터 다시 재생
+      if (currentTime >= duration && duration > 0) {
+        console.log("🔄 곡이 끝난 상태, 처음부터 다시 재생")
         
-        const pointASeconds = loopState.pointA
-        const pointBSeconds = loopState.pointB
+        // TrackPlayer 상태 상세 확인
+        const trackPlayerState = await TrackPlayer.getPlaybackState()
+        const queue = await TrackPlayer.getQueue()
+        const currentTrack = await TrackPlayer.getActiveTrack()
+        
+        console.log("🔍 TrackPlayer 상태 상세:", {
+          trackPlayerState,
+          queueLength: queue.length,
+          currentTrack: currentTrack?.title,
+          currentTrackId: currentTrack?.id
+        })
+        
+        // 0초로 이동 시도
+        console.log("🎯 0초로 이동 시도...")
+        await TrackPlayer.seekTo(0) // 0은 * 1000해도 0이므로 그대로
+        
+        // 재생 시도
+        console.log("▶️ 재생 시도...")
+        await TrackPlayer.play()
+        
+        // 상태 재확인
+        setTimeout(async () => {
+          const newState = await TrackPlayer.getPlaybackState()
+          const newProgress = await TrackPlayer.getProgress()
+          console.log("🔍 재생 시도 후 상태:", {
+            state: newState,
+            position: newProgress.position,
+            duration: newProgress.duration
+          })
+        }, 500)
+        
+        return
+      }
+      
+      // A-B 구간이 설정되어 있으면 위치 확인
+      if (state.loopState.pointA !== null && state.loopState.pointB !== null) {
+        const currentTimeSeconds = progress.position || 0
+        const pointASeconds = state.loopState.pointA
+        const pointBSeconds = state.loopState.pointB
         
         console.log("🔍 위치 체크:", {
-          재생중: isPlaying,
-          state위치: (position / 1000).toFixed(2),
-          실제위치: actualCurrentTime.toFixed(2),
+          재생중: isCurrentlyPlaying,
+          현재위치: currentTimeSeconds.toFixed(2),
           A지점: pointASeconds.toFixed(2),
           B지점: pointBSeconds.toFixed(2),
-          구간내: actualCurrentTime >= pointASeconds && actualCurrentTime <= pointBSeconds
+          구간내: currentTimeSeconds >= pointASeconds && currentTimeSeconds <= pointBSeconds
         })
         
         // 현재 위치가 A-B 구간 밖에 있으면 A 지점으로 이동
-        if (actualCurrentTime < pointASeconds || actualCurrentTime > pointBSeconds) {
+        if (currentTimeSeconds < pointASeconds || currentTimeSeconds > pointBSeconds) {
           console.log("🎯 현재 위치가 A-B 구간 밖에 있음, A 지점으로 이동")
           
-          // 재생 중이었는지 기억
-          const wasPlaying = isPlaying
-          
-          // 재생 중이면 먼저 일시정지
-          if (wasPlaying) {
-            await sound.pauseAsync()
-          }
-          
           // A 지점으로 이동
-          await sound.setPositionAsync(pointASeconds * 1000)
+          await TrackPlayer.seekTo(pointASeconds * 1000)
           console.log("✅ A 지점으로 이동 완료")
           
-          // 이전에 재생 중이었거나 일시정지 상태에서 재생 시작하려는 경우 재생
-          if (wasPlaying || !isPlaying) {
-            await sound.playAsync()
+          // 재생 시작 (이전 상태와 관계없이)
+          if (!isCurrentlyPlaying) {
+            await TrackPlayer.play()
           }
         } else {
           // A-B 구간 내에 있는 경우 일반적인 재생/일시정지 토글
-          if (isPlaying) {
-            await sound.pauseAsync()
+          if (isCurrentlyPlaying) {
+            await TrackPlayer.pause()
           } else {
-            await sound.playAsync()
+            await TrackPlayer.play()
           }
         }
       } else {
         // A-B 구간이 설정되지 않은 경우 일반적인 재생/일시정지 토글
-        if (isPlaying) {
-          await sound.pauseAsync()
+        if (isCurrentlyPlaying) {
+          await TrackPlayer.pause()
         } else {
-          await sound.playAsync()
+          await TrackPlayer.play()
         }
       }
     } catch (err) {
       console.error("Playback error:", err)
-      setError("재생 오류")
+      actions.setError("재생 오류")
     }
   }
 
-  const seekToPosition = async (progress: number) => {
-    if (!sound || duration === 0) return
+  const seekToPosition = async (seekProgress: number) => {
+    if (!state.isPlayerInitialized || !progress.duration || progress.duration === 0) return
 
     try {
-      const seekPosition = progress * duration
-      await sound.setPositionAsync(seekPosition)
+      const seekPosition = seekProgress * (progress.duration || 0)
+      console.log("🎯 seekToPosition:", { seekProgress, seekPosition })
+      await TrackPlayer.seekTo(seekPosition * 1000) // 초 단위를 밀리초로 변환
     } catch (err) {
       console.error("Seek error:", err)
     }
   }
 
-  const handleProgressPress = (event: any) => {
-    const { locationX } = event.nativeEvent
-    const progress = Math.max(0, Math.min(1, locationX / progressBarWidth))
-    
-    // 구간 설정 모드일 때
-    if (uiMode === 'setting-sections') {
-      const timeInSeconds = progress * (duration / 1000)
-      
-      if (sectionSettingStep === 'setting-a') {
-        setLoopState(prev => ({ ...prev, pointA: timeInSeconds }))
-        setSectionSettingStep('setting-b')
-        startPulseAnimation()
-      } else if (sectionSettingStep === 'setting-b') {
-        if (loopState.pointA !== null && timeInSeconds <= loopState.pointA) {
-          alert("오류", "B 지점은 A 지점보다 뒤에 있어야 합니다.")
-          return
-        }
-        setLoopState(prev => ({ ...prev, pointB: timeInSeconds }))
-        setSectionSettingStep('complete')
-        setUIMode('normal')
-        stopPulseAnimation()
-        
-        // 자동으로 저장 옵션 표시
-        setTimeout(() => {
-          alert(
-            "구간 설정 완료", 
-            "A-B 구간이 무한 반복됩니다. 이 구간을 저장하시겠습니까?",
-            [
-              { text: "나중에", style: "cancel" },
-              { text: "저장하기", onPress: () => setShowSaveModal(true) }
-            ]
-          )
-        }, 500)
-      }
-    } else {
-      // 일반 모드에서는 기존처럼 시크
-      seekToPosition(progress)
-    }
-  }
+  // handleProgressPress function removed - functionality moved to touch handlers
   
   // 진행바 레이아웃 측정
   const handleProgressBarLayout = (event: any) => {
     const { width } = event.nativeEvent.layout
-    setProgressBarWidth(width)
+    actions.setProgressBarWidth(width)
   }
   
-  // 펄스 애니메이션
-  const startPulseAnimation = () => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1.2,
-          duration: 800,
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulseAnim, {
-          toValue: 1,
-          duration: 800,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start()
-  }
-  
-  const stopPulseAnimation = () => {
-    pulseAnim.stopAnimation()
-    Animated.timing(pulseAnim, {
-      toValue: 1,
-      duration: 200,
-      useNativeDriver: true,
-    }).start()
-  }
+  // 펄스 애니메이션 기능은 현재 사용되지 않음
+  // const startPulseAnimation = () => { ... }
+  // const stopPulseAnimation = () => { ... }
 
 
   const formatTime = (milliseconds: number) => {
+    // Handle invalid or undefined values
+    if (!milliseconds || isNaN(milliseconds) || milliseconds < 0) {
+      return "0:00"
+    }
+    
     const seconds = Math.floor(milliseconds / 1000)
     const minutes = Math.floor(seconds / 60)
     const remainingSeconds = seconds % 60
@@ -549,88 +632,282 @@ export function AudioPlayer({
   }
 
   const getProgress = () => {
-    return duration > 0 ? position / duration : 0
+    const duration = progress.duration || 0
+    const position = progress.position || 0
+    
+    if (!duration || duration <= 0) return 0
+    
+    const progressValue = position / duration
+    
+    // Ensure we return a valid number between 0 and 1
+    if (isNaN(progressValue) || !isFinite(progressValue)) return 0
+    
+    return Math.max(0, Math.min(1, progressValue))
   }
 
-  // A-B 구간 관련 함수들 - 단순화된 버전
+  // Safe percentage calculation for markers
+  const getPercentage = (value: number | null, total: number | null): string => {
+    if (value === null || total === null || total <= 0 || isNaN(value) || isNaN(total)) {
+      return "0%"
+    }
+    const percentage = (value / total) * 100
+    if (isNaN(percentage) || !isFinite(percentage)) {
+      return "0%"
+    }
+    return `${Math.max(0, Math.min(100, percentage))}%`
+  }
+
+  // A-B 구간 관련 함수들 - TrackPlayer 버전
   const setPointAToCurrentTime = () => {
-    const currentTime = position / 1000
+    const currentTime = progress.position || 0
     console.log("🅰️ A 버튼 클릭 - 현재 시간:", currentTime.toFixed(1), "초")
-    setLoopState(prev => {
-      console.log("🅰️ A 지점 설정 전 상태:", { 이전A: prev.pointA, 이전B: prev.pointB })
-      return { ...prev, pointA: currentTime }
+    console.log("🅰️ A 지점 설정 전 상태:", { 이전A: state.loopState.pointA, 이전B: state.loopState.pointB })
+    actions.setLoopState({ 
+      pointA: currentTime,
+      pointB: state.loopState.pointB,
+      currentSection: state.loopState.currentSection,
+      isLooping: state.loopState.isLooping,
     })
-    console.log("🅰️ A 지점 설정 완료:", currentTime.toFixed(1), "초")
+    console.log("🅰️ A 지점 설정 완룈:", currentTime.toFixed(1), "초")
   }
 
   const setPointBToCurrentTime = () => {
-    const currentTime = position / 1000
-    if (loopState.pointA !== null && currentTime <= loopState.pointA) {
+    const currentTime = progress.position || 0
+    if (state.loopState.pointA !== null && currentTime <= state.loopState.pointA) {
       alert("오류", "B 지점은 A 지점보다 뒤에 있어야 합니다.")
       return
     }
-    setLoopState(prev => {
-      console.log("🅱️ B 지점 수동 설정 - 이전 상태:", prev.pointB, "→ 새 값:", currentTime.toFixed(1))
-      return { ...prev, pointB: currentTime }
+    console.log("🅱️ B 지점 수동 설정 - 이전 상태:", state.loopState.pointB, "→ 새 값:", currentTime.toFixed(1))
+    actions.setLoopState({ 
+      pointA: state.loopState.pointA,
+      pointB: currentTime,
+      currentSection: state.loopState.currentSection,
+      isLooping: state.loopState.isLooping,
     })
-    setHasAutoSetB(true) // 수동 설정 시 자동 설정 방지
+    actions.setHasAutoSetB(true) // 수동 설정 시 자동 설정 방지
     userSetB.current = true // 사용자가 수동으로 설정했음을 기록
     console.log("🅱️ B 지점 설정 완료:", currentTime.toFixed(1), "초")
   }
 
-  // A/B 마커 드래그 함수들
-  const dragStartPosition = useRef(0)
-  const dragStartTime = useRef(0)
+  // A/B 마커 드래그 상태 관리
+  const [isDragging, setIsDragging] = useState<'A' | 'B' | null>(null)
   
-  const createMarkerHandlers = (marker: 'A' | 'B') => {
-    const onGestureEvent = (event: any) => {
-      const { translationX } = event.nativeEvent
-      
-      // 드래그 시작 시점의 시간에서 translationX만큼 이동한 새로운 시간 계산
-      const dragDistance = translationX / progressBarWidth * (duration / 1000)
-      const newTime = Math.max(0, Math.min(duration / 1000, dragStartTime.current + dragDistance))
-      
-      // 유효성 검사 및 상태 업데이트
-      if (marker === 'A') {
-        if (loopState.pointB !== null && newTime >= loopState.pointB) {
-          return // A는 B보다 앞에 있어야 함
-        }
-        setLoopState(prev => ({ ...prev, pointA: newTime }))
-      } else {
-        if (loopState.pointA !== null && newTime <= loopState.pointA) {
-          return // B는 A보다 뒤에 있어야 함
-        }
-        setLoopState(prev => ({ ...prev, pointB: newTime }))
-        setHasAutoSetB(true) // 드래그로 설정 시 자동 설정 방지
-        userSetB.current = true // 사용자가 드래그로 설정했음을 기록
-      }
-    }
-    
-    const onHandlerStateChange = (event: any) => {
-      const { state } = event.nativeEvent
-      
-      // 드래그 시작 시 초기 위치 저장
-      if (state === 2) { // State.BEGAN
-        dragStartTime.current = marker === 'A' 
-          ? (loopState.pointA || 0) 
-          : (loopState.pointB || duration / 1000)
-        console.log(`🎯 ${marker} 마커 드래그 시작:`, dragStartTime.current.toFixed(1), "초")
-      }
-      
-      // 드래그 종료 시 로그
-      if (state === 5) { // State.END
-        const finalTime = marker === 'A' ? loopState.pointA : loopState.pointB
-        console.log(`✅ ${marker} 마커 드래그 완료:`, finalTime?.toFixed(1), "초")
-      }
-    }
-    
-    return { onGestureEvent, onHandlerStateChange }
+  // 진행바에서 위치를 시간으로 변환
+  const getTimeFromPosition = (x: number): number => {
+    const ratio = Math.max(0, Math.min(1, x / state.progressBarWidth))
+    return ratio * (progress.duration || 0)
   }
+  
+  // A 마커 터치 핸들러 - 즉시 현재 위치로 이동
+  const handleAMarkerPress = () => {
+    console.log('🅰️ A 마커 터치 - 현재 위치로 설정')
+    const currentTime = progress.position || 0
+    
+    if (state.loopState.pointB !== null && currentTime >= state.loopState.pointB) {
+      alert("오류", "A 지점은 B 지점보다 앞에 있어야 합니다.")
+      return
+    }
+    
+    actions.setLoopState({ 
+      pointA: currentTime,
+      pointB: state.loopState.pointB,
+      currentSection: state.loopState.currentSection,
+      isLooping: state.loopState.isLooping,
+    })
+    
+    // A 마커 설정 시 재생 위치를 A로 이동
+    TrackPlayer.seekTo(currentTime * 1000)
+      .then(() => {
+        console.log('✅ A 지점으로 재생 위치 이동:', currentTime.toFixed(2))
+      })
+      .catch((error) => {
+        console.error('❌ A 지점 이동 실패:', error)
+      })
+  }
+  
+  // B 마커 터치 핸들러 - 즉시 현재 위치로 이동
+  const handleBMarkerPress = () => {
+    console.log('🅱️ B 마커 터치 - 현재 위치로 설정')
+    const currentTime = progress.position || 0
+    
+    if (state.loopState.pointA !== null && currentTime <= state.loopState.pointA) {
+      alert("오류", "B 지점은 A 지점보다 뒤에 있어야 합니다.")
+      return
+    }
+    
+    actions.setLoopState({ 
+      pointA: state.loopState.pointA,
+      pointB: currentTime,
+      currentSection: state.loopState.currentSection,
+      isLooping: state.loopState.isLooping,
+    })
+    actions.setHasAutoSetB(true)
+    userSetB.current = true
+    console.log('✅ B 지점 설정 완료:', currentTime.toFixed(2))
+  }
+  
+  // 진행바에서 마커 드래그 감지 및 처리
+  const detectMarkerAtPosition = (x: number): 'A' | 'B' | null => {
+    if (!progress.duration || progress.duration <= 0 || state.progressBarWidth <= 0) return null
+    
+    const tolerance = 30 // 30px 허용 범위 (더 넓게)
+    
+    // A 마커 위치 계산
+    if (state.loopState.pointA !== null) {
+      const aPosition = (state.loopState.pointA / progress.duration) * state.progressBarWidth
+      const distance = Math.abs(x - aPosition)
+      console.log('🎯 A 마커 감지 체크:', {
+        x,
+        aPosition: aPosition.toFixed(1),
+        distance: distance.toFixed(1),
+        tolerance,
+        detected: distance <= tolerance
+      })
+      if (distance <= tolerance) {
+        return 'A'
+      }
+    }
+    
+    // B 마커 위치 계산
+    if (state.loopState.pointB !== null) {
+      const bPosition = (state.loopState.pointB / progress.duration) * state.progressBarWidth
+      const distance = Math.abs(x - bPosition)
+      console.log('🎯 B 마커 감지 체크:', {
+        x,
+        bPosition: bPosition.toFixed(1),
+        distance: distance.toFixed(1),
+        tolerance,
+        detected: distance <= tolerance
+      })
+      if (distance <= tolerance) {
+        return 'B'
+      }
+    }
+    
+    return null
+  }
+  
+  // 진행바 터치 시작 핸들러
+  const handleProgressPressIn = (event: any) => {
+    const { locationX } = event.nativeEvent
+    console.log('🎵 Progress press in - locationX:', locationX, 'state.progressBarWidth:', state.progressBarWidth)
+    console.log('🎵 Current markers:', {
+      pointA: state.loopState.pointA,
+      pointB: state.loopState.pointB,
+      duration: progress.duration
+    })
+    
+    // 마커 근처에서 터치했는지 확인
+    const nearMarker = detectMarkerAtPosition(locationX)
+    if (nearMarker) {
+      console.log(`🎯 ${nearMarker} 마커 드래그 시작!`)
+      setIsDragging(nearMarker)
+      // 드래그 시작 위치 기록 (필요시 복원 가능)
+      // setDragStartX(locationX)
+      // setDragStartTime(nearMarker === 'A' ? (state.loopState.pointA || 0) : (state.loopState.pointB || 0))
+      
+      // 즉시 현재 터치 위치로 마커 이동
+      const newTime = getTimeFromPosition(locationX)
+      if (nearMarker === 'A') {
+        if (state.loopState.pointB === null || newTime < state.loopState.pointB) {
+          actions.setLoopState({ 
+            pointA: newTime,
+            pointB: state.loopState.pointB,
+            currentSection: state.loopState.currentSection,
+            isLooping: state.loopState.isLooping,
+          })
+          TrackPlayer.seekTo(newTime * 1000)
+            .then(() => console.log('✅ A 지점 즉시 이동:', newTime.toFixed(2)))
+            .catch(error => console.error('❌ A 지점 이동 실패:', error))
+        }
+      } else if (nearMarker === 'B') {
+        if (state.loopState.pointA === null || newTime > state.loopState.pointA) {
+          actions.setLoopState({ 
+            pointA: state.loopState.pointA,
+            pointB: newTime,
+            currentSection: state.loopState.currentSection,
+            isLooping: state.loopState.isLooping,
+          })
+          actions.setHasAutoSetB(true)
+          userSetB.current = true
+          console.log('✅ B 지점 즉시 이동:', newTime.toFixed(2))
+        }
+      }
+    } else {
+      console.log('🎵 마커 근처가 아님, 일반 터치')
+    }
+  }
+  
+  // 진행바 터치 핸들러
+  const handleProgressTouch = (event: any) => {
+    const { locationX } = event.nativeEvent
+    console.log('🎵 Progress touch - locationX:', locationX, 'isDragging:', isDragging)
+    
+    const newTime = getTimeFromPosition(locationX)
+    
+    if (isDragging === 'A') {
+      // A 마커 드래그 중
+      console.log('🅰️ A 마커 드래그 위치 업데이트:', newTime.toFixed(2))
+      if (state.loopState.pointB !== null && newTime >= state.loopState.pointB) {
+        console.log('⚠️ A는 B보다 앞에 있어야 함')
+        return
+      }
+      
+      actions.setLoopState({ 
+        pointA: newTime,
+        pointB: state.loopState.pointB,
+        currentSection: state.loopState.currentSection,
+        isLooping: state.loopState.isLooping,
+      })
+      
+      // A 마커 드래그 시 재생 위치도 함께 이동
+      TrackPlayer.seekTo(newTime * 1000)
+        .then(() => {
+          console.log('✅ A 지점으로 재생 위치 이동:', newTime.toFixed(2))
+        })
+        .catch((error) => {
+          console.error('❌ A 지점 이동 실패:', error)
+        })
+      
+    } else if (isDragging === 'B') {
+      // B 마커 드래그 중
+      console.log('🅱️ B 마커 드래그 위치 업데이트:', newTime.toFixed(2))
+      if (state.loopState.pointA !== null && newTime <= state.loopState.pointA) {
+        console.log('⚠️ B는 A보다 뒤에 있어야 함')
+        return
+      }
+      
+      actions.setLoopState({ 
+        pointA: state.loopState.pointA,
+        pointB: newTime,
+        currentSection: state.loopState.currentSection,
+        isLooping: state.loopState.isLooping,
+      })
+      actions.setHasAutoSetB(true)
+      userSetB.current = true
+      
+    } else {
+      // 일반 진행바 터치 (구간 설정 모드가 아닐 때만)
+      console.log('🎵 일반 진행바 터치:', newTime.toFixed(2))
+      if (state.uiMode !== 'setting-sections') {
+        seekToPosition(locationX / state.progressBarWidth)
+      }
+    }
+  }
+  
+  // 진행바 터치 종료 핸들러
+  const handleProgressPressOut = () => {
+    if (isDragging) {
+      console.log(`✅ ${isDragging} 마커 드래그 완료`)
+      setIsDragging(null)
+    }
+  }
+
 
 
   // 구간 저장 - 사용자 입력 이름 사용
   const saveSection = (name: string) => {
-    if (loopState.pointA === null || loopState.pointB === null) {
+    if (state.loopState.pointA === null || state.loopState.pointB === null) {
       alert("오류", "A, B 구간을 먼저 설정해주세요.")
       return
     }
@@ -638,8 +915,8 @@ export function AudioPlayer({
     const newSection: SavedSection = {
       id: Date.now().toString(),
       name: name,
-      pointA: loopState.pointA,
-      pointB: loopState.pointB,
+      pointA: state.loopState.pointA,
+      pointB: state.loopState.pointB,
       createdAt: new Date(),
     }
 
@@ -653,28 +930,42 @@ export function AudioPlayer({
   }
 
 
-  if (error) {
+  if (state.error) {
     return (
       <View style={themed([$container, style])}>
-        <Text text={`❌ ${error}`} style={themed($errorText)} />
+        <Text text={`❌ ${state.error}`} style={themed($errorText)} />
+      </View>
+    )
+  }
+
+  // TrackPlayer 초기화 대기 중
+  if (!state.isPlayerInitialized) {
+    return (
+      <View style={themed([$container, style])}>
+        <Text text="🎵 플레이어 초기화 중..." style={themed($statusText)} />
       </View>
     )
   }
 
   // 상태별 가이드 메시지
   const getGuideMessage = () => {
-    if (loopState.pointA !== null && loopState.pointB !== null) {
-      const aTime = formatTime(loopState.pointA * 1000)
-      const bTime = formatTime(loopState.pointB * 1000)
-      console.log("🔄 A-B 구간 활성:", { A: aTime, B: bTime })
-      return `🔁 ${aTime} ~ ${bTime} 무한 반복 중`
+    try {
+      if (state.loopState.pointA !== null && state.loopState.pointB !== null) {
+        const aTime = formatTime((state.loopState.pointA || 0) * 1000)
+        const bTime = formatTime((state.loopState.pointB || 0) * 1000)
+        console.log("🔄 A-B 구간 활성:", { A: aTime, B: bTime })
+        return `🔁 ${aTime} ~ ${bTime} 무한 반복 중`
+      }
+      console.log("ℹ️ A-B 구간 없음:", { pointA: state.loopState.pointA, pointB: state.loopState.pointB })
+      return "🎵 전체 곡 재생 중"
+    } catch (error) {
+      console.error("getGuideMessage error:", error)
+      return "🎵 재생 중"
     }
-    console.log("ℹ️ A-B 구간 없음:", { pointA: loopState.pointA, pointB: loopState.pointB })
-    return "🎵 전체 곡 재생 중"
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
       <View style={themed([$container, style])}>
         {/* 상태 표시 */}
         <View style={themed($statusBar)}>
@@ -684,7 +975,7 @@ export function AudioPlayer({
       {/* 시간 표시 */}
       <View style={themed($timeContainer)}>
         <Text 
-          text={formatTime(position)} 
+          text={formatTime((progress.position || 0) * 1000)} 
           style={themed($timeText)} 
         />
         <Text 
@@ -692,7 +983,7 @@ export function AudioPlayer({
           style={themed($timeSeparator)} 
         />
         <Text 
-          text={formatTime(duration)} 
+          text={formatTime((progress.duration || 0) * 1000)} 
           style={themed($timeText)} 
         />
       </View>
@@ -702,61 +993,105 @@ export function AudioPlayer({
         <TouchableOpacity 
           ref={progressBarRef}
           style={themed($progressTrack)}
-          onPress={handleProgressPress}
-          onLayout={handleProgressBarLayout}
+          onPressIn={(event) => {
+            console.log("🎵 Progress bar onPressIn")
+            handleProgressPressIn(event)
+          }}
+          onPress={(event) => {
+            console.log("🎵 Progress bar onPress, isDragging:", isDragging)
+            handleProgressTouch(event)
+          }}
+          onPressOut={() => {
+            console.log("🎵 Progress bar onPressOut")
+            handleProgressPressOut()
+          }}
+          onLayout={(event) => {
+            console.log("🎵 Progress bar onLayout")
+            handleProgressBarLayout(event)
+          }}
           activeOpacity={1}
+          delayPressOut={100}
         >
           {/* 기본 진행바 */}
           <View 
-            style={themed([$progressBar, { width: `${getProgress() * 100}%` }])} 
+            style={[
+              themed($progressBar), 
+              { width: (() => {
+                const progressValue = getProgress()
+                const widthValue = `${progressValue * 100}%` as any
+                console.log("🎵 Progress calculation:", { progressValue, widthValue })
+                return widthValue
+              })() }
+            ]} 
           />
           
           {/* A-B 구간 하이라이트 */}
-          {loopState.pointA !== null && loopState.pointB !== null && (
-            <View 
-              style={themed([
-                $loopHighlight,
-                {
-                  left: `${(loopState.pointA / (duration / 1000)) * 100}%`,
-                  width: `${((loopState.pointB - loopState.pointA) / (duration / 1000)) * 100}%`
-                }
-              ])} 
-            />
-          )}
+          {(() => {
+            const shouldShow = state.loopState.pointA !== null && state.loopState.pointB !== null && progress.duration && progress.duration > 0
+            console.log("🎵 A-B highlight condition:", { 
+              pointA: state.loopState.pointA, 
+              pointB: state.loopState.pointB, 
+              duration: progress.duration, 
+              shouldShow 
+            })
+            return shouldShow ? (
+              <View 
+                style={[
+                  themed($loopHighlight),
+                  {
+                    left: getPercentage(state.loopState.pointA!, progress.duration!) as any,
+                    width: getPercentage(state.loopState.pointB! - state.loopState.pointA!, progress.duration!) as any
+                  }
+                ]} 
+              />
+            ) : null
+          })()}
           
           {/* A 마커 - 드래그 가능 */}
-          {loopState.pointA !== null && (
-            <PanGestureHandler 
-              {...createMarkerHandlers('A')}
-            >
-              <Animated.View 
-                style={themed([
-                  $marker, 
-                  $markerA,
-                  { left: `${(loopState.pointA / (duration / 1000)) * 100}%` }
-                ])}
+          {(() => {
+            console.log("🎵 A marker rendering check:", { 
+              pointA: state.loopState.pointA, 
+              duration: progress.duration,
+              shouldRender: state.loopState.pointA !== null && progress.duration && progress.duration > 0
+            })
+            return state.loopState.pointA !== null && progress.duration && progress.duration > 0 ? (
+              <TouchableOpacity
+                style={[
+                  themed($marker), 
+                  themed($markerA),
+                  isDragging === 'A' && themed($markerDragging),
+                  { left: getPercentage(state.loopState.pointA!, progress.duration!) as any }
+                ]}
+                onPress={handleAMarkerPress}
+                activeOpacity={0.8}
               >
                 <Text text="A" style={themed($markerText)} />
-              </Animated.View>
-            </PanGestureHandler>
-          )}
+              </TouchableOpacity>
+            ) : null
+          })()}
           
           {/* B 마커 - 드래그 가능 */}
-          {loopState.pointB !== null && (
-            <PanGestureHandler 
-              {...createMarkerHandlers('B')}
-            >
-              <Animated.View 
-                style={themed([
-                  $marker, 
-                  $markerB,
-                  { left: `${(loopState.pointB / (duration / 1000)) * 100}%` }
-                ])}
+          {(() => {
+            console.log("🎵 B marker rendering check:", { 
+              pointB: state.loopState.pointB, 
+              duration: progress.duration,
+              shouldRender: state.loopState.pointB !== null && progress.duration && progress.duration > 0
+            })
+            return state.loopState.pointB !== null && progress.duration && progress.duration > 0 ? (
+              <TouchableOpacity
+                style={[
+                  themed($marker), 
+                  themed($markerB),
+                  isDragging === 'B' && themed($markerDragging),
+                  { left: getPercentage(state.loopState.pointB!, progress.duration!) as any }
+                ]}
+                onPress={handleBMarkerPress}
+                activeOpacity={0.8}
               >
                 <Text text="B" style={themed($markerText)} />
-              </Animated.View>
-            </PanGestureHandler>
-          )}
+              </TouchableOpacity>
+            ) : null
+          })()}
         </TouchableOpacity>
       </View>
 
@@ -766,7 +1101,10 @@ export function AudioPlayer({
         <View style={themed($positionButtonsRow)}>
           <TouchableOpacity 
             style={themed($positionButton)} 
-            onPress={setPointAToCurrentTime}
+            onPress={() => {
+              console.log("🎵 A button TouchableOpacity pressed")
+              setPointAToCurrentTime()
+            }}
           >
             <Ionicons name="play-skip-back" size={18} color="#007AFF" />
             <Text text="A 여기로" style={themed($positionButtonText)} />
@@ -774,21 +1112,29 @@ export function AudioPlayer({
 
           <TouchableOpacity 
             style={themed($positionButton)} 
-            onPress={setPointBToCurrentTime}
+            onPress={() => {
+              console.log("🎵 B button TouchableOpacity pressed")
+              setPointBToCurrentTime()
+            }}
           >
             <Ionicons name="play-skip-forward" size={18} color="#007AFF" />
             <Text text="B 여기로" style={themed($positionButtonText)} />
           </TouchableOpacity>
+        </View>
+        
+        {/* 사용법 안내 */}
+        <View style={themed($usageGuideContainer)}>
+          <Text text="💡 진행바에서 A, B 마커 근처를 드래그하거나 마커를 터치하여 구간을 설정하세요" style={themed($usageGuideText)} />
         </View>
 
       </View>
 
       {/* 간단한 저장 모달 */}
       <Modal
-        visible={showSaveModal}
+        visible={state.showSaveModal}
         transparent={true}
         animationType="fade"
-        onRequestClose={() => setShowSaveModal(false)}
+        onRequestClose={() => actions.setShowSaveModal(false)}
       >
         <View style={themed($modalOverlay)}>
           <View style={themed($modalContainer)}>
@@ -796,7 +1142,7 @@ export function AudioPlayer({
               <Ionicons name="bookmark" size={24} color="#007AFF" />
               <Text text="구간 저장" style={themed($modalTitle)} />
               <TouchableOpacity 
-                onPress={() => setShowSaveModal(false)}
+                onPress={() => actions.setShowSaveModal(false)}
                 style={themed($modalCloseButton)}
               >
                 <Ionicons name="close" size={20} color="#666" />
@@ -808,8 +1154,8 @@ export function AudioPlayer({
             {/* 이름 입력 필드 */}
             <TextInput
               style={themed($nameInput)}
-              value={sectionName}
-              onChangeText={setSectionName}
+              value={state.sectionName}
+              onChangeText={actions.setSectionName}
               placeholder="예: 어려운 구간, 연습할 부분..."
               placeholderTextColor="#999"
               autoFocus={true}
@@ -821,23 +1167,23 @@ export function AudioPlayer({
               <TouchableOpacity 
                 style={themed($cancelButton)} 
                 onPress={() => {
-                  setShowSaveModal(false)
-                  setSectionName("")
+                  actions.setShowSaveModal(false)
+                  actions.setSectionName("")
                 }}
               >
                 <Text text="취소" style={themed($cancelButtonText)} />
               </TouchableOpacity>
 
               <TouchableOpacity 
-                style={themed([$saveButton, { opacity: sectionName.trim() ? 1 : 0.5 }])} 
+                style={themed([$saveButton, { opacity: state.sectionName.trim() ? 1 : 0.5 }])} 
                 onPress={() => {
-                  if (sectionName.trim()) {
-                    saveSection(sectionName.trim())
-                    setShowSaveModal(false)
-                    setSectionName("")
+                  if (state.sectionName.trim()) {
+                    saveSection(state.sectionName.trim())
+                    actions.setShowSaveModal(false)
+                    actions.setSectionName("")
                   }
                 }}
-                disabled={!sectionName.trim()}
+                disabled={!state.sectionName.trim()}
               >
                 <Text text="저장" style={themed($saveButtonText)} />
               </TouchableOpacity>
@@ -849,9 +1195,37 @@ export function AudioPlayer({
       {/* 재생 컨트롤 및 저장 버튼 */}
       <View style={themed($controlsContainer)}>
         <AudioButton
-          icon={isPlaying ? "pause" : "play"}
+          icon={(() => {
+            try {
+              console.log("🎵 PlaybackState Check:", { 
+                playbackState, 
+                state: playbackState?.state, 
+                stateType: typeof playbackState?.state,
+                StateEnumValue: State?.Playing,
+                StateEnumType: typeof State?.Playing
+              })
+              
+              // Ultra-safe comparison
+              if (!playbackState || playbackState.state === undefined || playbackState.state === null) {
+                console.log("🎵 No valid playbackState, defaulting to play")
+                return "play"
+              }
+              
+              // String comparison instead of enum comparison
+              const isPlaying = String(playbackState.state) === "playing"
+              console.log("🎵 String comparison result:", { 
+                stateString: String(playbackState.state), 
+                isPlaying 
+              })
+              
+              return isPlaying ? "pause" : "play"
+            } catch (error) {
+              console.error("🎵 PlaybackState error:", error)
+              return "play"
+            }
+          })()}
           onPress={togglePlayback}
-          disabled={!sound || isLoading}
+          disabled={!state.isPlayerInitialized || state.isLoading}
           size={32}
           style={themed($playButton)}
         />
@@ -859,7 +1233,10 @@ export function AudioPlayer({
         {/* 저장 버튼을 Play 버튼과 같은 라인에 배치 */}
         <TouchableOpacity 
           style={themed($saveButtonAligned)} 
-          onPress={() => setShowSaveModal(true)}
+          onPress={() => {
+            console.log("🎵 Save button TouchableOpacity pressed")
+            actions.setShowSaveModal(true)
+          }}
         >
           <Text text="구간 저장하기" style={themed($saveButtonTextOnly)} />
         </TouchableOpacity>
@@ -867,7 +1244,7 @@ export function AudioPlayer({
 
 
         {/* 상태 표시 */}
-        {isLoading && (
+        {state.isLoading && (
           <Text text="로딩 중..." style={themed($statusText)} />
         )}
 
@@ -881,7 +1258,7 @@ export function AudioPlayer({
           dismissable={alertState.dismissable}
         />
       </View>
-    </GestureHandlerRootView>
+    </View>
   )
 }
 
@@ -893,6 +1270,18 @@ interface AudioButtonProps extends TouchableOpacityProps {
 
 function AudioButton({ icon, size = 24, style, ...props }: AudioButtonProps) {
   const { themed, theme } = useAppTheme()
+  
+  console.log("🎵 AudioButton props:", { icon, size, disabled: props.disabled })
+  
+  // Validate icon prop
+  if (typeof icon !== 'string') {
+    console.error("AudioButton: icon must be a string, received:", typeof icon, icon)
+    return (
+      <TouchableOpacity style={themed([$button, style])} {...props}>
+        <Text text="?" />
+      </TouchableOpacity>
+    )
+  }
   
   // Ionicons 아이콘 매핑
   const getIoniconName = (iconName: string): keyof typeof Ionicons.glyphMap => {
@@ -909,6 +1298,7 @@ function AudioButton({ icon, size = 24, style, ...props }: AudioButtonProps) {
   }
   
   const isAudioIcon = ["play", "pause", "stop"].includes(icon)
+  console.log("🎵 AudioButton render:", { icon, isAudioIcon, ioniconName: getIoniconName(icon) })
   
   return (
     <TouchableOpacity
@@ -938,10 +1328,6 @@ const $container: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   backgroundColor: colors.background,
   padding: spacing.lg,
   borderRadius: 16,
-  alignItems: "center",
-})
-
-const $integratedContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   alignItems: "center",
 })
 
@@ -1445,5 +1831,30 @@ const $cancelButtonText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   fontSize: 16,
   fontFamily: typography.primary.medium,
   color: colors.text,
+})
+
+// 사용법 안내 스타일
+const $usageGuideContainer: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
+  backgroundColor: colors.palette.accent100,
+  paddingHorizontal: spacing.md,
+  paddingVertical: spacing.sm,
+  borderRadius: 8,
+  marginTop: spacing.md,
+})
+
+const $usageGuideText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
+  fontSize: 12,
+  fontFamily: typography.primary.normal,
+  color: colors.textDim,
+  textAlign: "center",
+})
+
+// 드래그 중 마커 스타일
+const $markerDragging: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  shadowOpacity: 0.5,
+  shadowRadius: 6,
+  borderWidth: 3,
+  borderColor: colors.background,
+  // Note: transform with scale is applied separately via Animated.View if needed
 })
 

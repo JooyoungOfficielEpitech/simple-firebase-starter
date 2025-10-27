@@ -39,6 +39,20 @@ class Logger {
     return true
   }
 
+  private getConsoleMethod(level: LogLevel): (...args: any[]) => void {
+    switch (level) {
+      case 'debug':
+      case 'info':
+        return console.log
+      case 'warn':
+        return console.warn
+      case 'error':
+        return console.error
+      default:
+        return console.log
+    }
+  }
+
   private log(logMessage: LogMessage): void {
     if (!this.shouldLog(logMessage.level)) return
 
@@ -48,29 +62,12 @@ class Logger {
       logMessage.message
     )
 
-    switch (logMessage.level) {
-      case 'debug':
-      case 'info':
-        if (logMessage.data) {
-          console.log(formattedMessage, logMessage.data)
-        } else {
-          console.log(formattedMessage)
-        }
-        break
-      case 'warn':
-        if (logMessage.data) {
-          console.warn(formattedMessage, logMessage.data)
-        } else {
-          console.warn(formattedMessage)
-        }
-        break
-      case 'error':
-        if (logMessage.data) {
-          console.error(formattedMessage, logMessage.data)
-        } else {
-          console.error(formattedMessage)
-        }
-        break
+    const consoleMethod = this.getConsoleMethod(logMessage.level)
+
+    if (logMessage.data) {
+      consoleMethod(formattedMessage, logMessage.data)
+    } else {
+      consoleMethod(formattedMessage)
     }
   }
 

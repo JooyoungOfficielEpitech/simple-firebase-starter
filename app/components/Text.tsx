@@ -1,6 +1,6 @@
-import { ReactNode, forwardRef, ForwardedRef } from "react"
+import { ReactNode, forwardRef, Ref } from "react"
 // eslint-disable-next-line no-restricted-imports
-import { StyleProp, Text as RNText, TextProps as RNTextProps, TextStyle } from "react-native"
+import { Platform, StyleProp, Text as RNText, TextProps as RNTextProps, TextStyle } from "react-native"
 import { TOptions } from "i18next"
 
 import { isRTL, TxKeyPath } from "@/i18n"
@@ -56,7 +56,7 @@ export interface TextProps extends RNTextProps {
  * @param {TextProps} props - The props for the `Text` component.
  * @returns {JSX.Element} The rendered `Text` component.
  */
-export const Text = forwardRef(function Text(props: TextProps, ref: ForwardedRef<RNText>) {
+export const Text = forwardRef<RNText, TextProps>(function Text(props, ref) {
   const { weight, size, tx, txOptions, text, children, style: $styleOverride, ...rest } = props
   const { themed } = useAppTheme()
 
@@ -79,14 +79,16 @@ export const Text = forwardRef(function Text(props: TextProps, ref: ForwardedRef
   )
 })
 
+// 한국어 폰트 최적화: 한글 자모의 높이를 고려한 lineHeight 조정
+// 한글은 자음+모음 결합 구조로 인해 영문보다 약간 더 높은 line height가 필요
 const $sizeStyles = {
-  xxl: { fontSize: 36, lineHeight: 46 } satisfies TextStyle, // Increased line height for Korean text
-  xl: { fontSize: 24, lineHeight: 36 } satisfies TextStyle,  // Better readability
-  lg: { fontSize: 20, lineHeight: 32 } satisfies TextStyle,
-  md: { fontSize: 18, lineHeight: 28 } satisfies TextStyle,  // Improved spacing
-  sm: { fontSize: 16, lineHeight: 26 } satisfies TextStyle,  // Better for Korean characters
-  xs: { fontSize: 14, lineHeight: 22 } satisfies TextStyle,  // Improved readability
-  xxs: { fontSize: 12, lineHeight: 20 } satisfies TextStyle, // Better small text spacing
+  xxl: { fontSize: 36, lineHeight: 48 } satisfies TextStyle, // 1.33 ratio for Korean readability
+  xl: { fontSize: 24, lineHeight: 34 } satisfies TextStyle,  // 1.42 ratio for optimal spacing
+  lg: { fontSize: 20, lineHeight: 30 } satisfies TextStyle,  // 1.5 ratio for body text
+  md: { fontSize: 18, lineHeight: 27 } satisfies TextStyle,  // 1.5 ratio for medium text
+  sm: { fontSize: 16, lineHeight: 24 } satisfies TextStyle,  // 1.5 ratio for small text
+  xs: { fontSize: 14, lineHeight: 21 } satisfies TextStyle,  // 1.5 ratio for extra small
+  xxs: { fontSize: 12, lineHeight: 18 } satisfies TextStyle, // 1.5 ratio for minimal text
 }
 
 const $fontWeightStyles = Object.entries(typography.primary).reduce((acc, [weight, fontFamily]) => {
@@ -113,4 +115,17 @@ const $presets: Record<Presets, ThemedStyleArray<TextStyle>> = {
   formLabel: [$baseStyle, { ...$fontWeightStyles.medium }],
   formHelper: [$baseStyle, { ...$sizeStyles.sm, ...$fontWeightStyles.normal }],
 }
-const $rtlStyle: TextStyle = isRTL ? { writingDirection: "rtl" } : {}
+
+// RTL 지원: 아랍어, 히브리어 등 오른쪽에서 왼쪽으로 읽는 언어 지원
+// textAlign도 RTL 방향에 맞춰 조정
+const $rtlStyle: TextStyle = isRTL
+  ? {
+      writingDirection: "rtl",
+      textAlign: "right",
+      // Android에서 RTL 렌더링 개선
+      ...(Platform.OS === "android" && { textAlignVertical: "center" })
+    }
+  : {
+      writingDirection: "ltr",
+      textAlign: "left",
+    }

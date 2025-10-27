@@ -4,20 +4,11 @@ import { CompositeScreenProps } from "@react-navigation/native"
 import { BulletinBoardScreen } from "@/screens/BulletinBoardScreen"
 import { BulletinBoardScreenSimple } from "@/screens/BulletinBoardScreenSimple"
 import { CreatePostScreen } from "@/screens/CreatePostScreen"
-import { PostDetailScreen } from "@/screens/PostDetailScreen"
-import { CreateOrganizationScreen } from "@/screens/CreateOrganizationScreen"
-import { ApplicationManagementScreen } from "@/screens/ApplicationManagementScreen"
 import { useAppTheme } from "@/theme/context"
 
-import { MainTabParamList, MainTabScreenProps } from "./MainNavigator"
+import type { MainTabParamList, BulletinBoardStackParamList } from "./types"
+import type { MainTabScreenProps } from "./MainNavigator"
 
-export type BulletinBoardStackParamList = {
-  BulletinBoardMain: undefined
-  PostDetail: { postId: string }
-  CreatePost: { postId?: string; isEdit?: boolean }
-  CreateOrganization: { organizationId?: string; isEdit?: boolean; isOrganizerConversion?: boolean }
-  ApplicationManagement: { postId: string; postTitle: string }
-}
 
 /**
  * Helper for automatically generating navigation prop types for each route.
@@ -31,7 +22,8 @@ const Stack = createNativeStackNavigator<BulletinBoardStackParamList>()
 
 /**
  * 게시판 탭 내부의 Stack Navigator
- * BulletinBoardMain (게시글 목록) → PostDetail (게시글 상세) → CreatePost (게시글 작성/수정)
+ * BulletinBoardMain (게시글 목록) → CreatePost (게시글 작성/수정)
+ * PostDetail, CreateOrganization, ApplicationManagement는 AppNavigator에서 처리
  */
 export function BulletinBoardStackNavigator() {
   const {
@@ -60,34 +52,10 @@ export function BulletinBoardStackNavigator() {
       />
       
       <Stack.Screen
-        name="PostDetail"
-        component={PostDetailScreen}
-        options={{
-          headerShown: false, // 게시글 상세 화면은 커스텀 헤더 사용
-        }}
-      />
-
-      <Stack.Screen
         name="CreatePost"
         component={CreatePostScreen}
         options={{
           headerShown: false, // 게시글 작성 화면은 커스텀 헤더 사용
-        }}
-      />
-
-      <Stack.Screen
-        name="CreateOrganization"
-        component={CreateOrganizationScreen}
-        options={{
-          headerShown: false, // 단체 등록 화면은 커스텀 헤더 사용
-        }}
-      />
-
-      <Stack.Screen
-        name="ApplicationManagement"
-        component={ApplicationManagementScreen}
-        options={{
-          headerShown: false, // 지원자 관리 화면은 커스텀 헤더 사용
         }}
       />
     </Stack.Navigator>

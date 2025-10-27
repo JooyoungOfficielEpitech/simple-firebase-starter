@@ -13,9 +13,96 @@ export class PostService {
   private db: FirebaseFirestoreTypes.Module
   private organizationService: any // OrganizationService 순환 참조 방지
 
+  // 캐시 저장소
+  private postCache: Map<string, { data: Post; timestamp: number }> = new Map()
+  private postsListCache: Map<string, { posts: Post[]; lastDoc?: any; hasMore: boolean; timestamp: number }> = new Map()
+  private readonly POST_CACHE_TTL = 5 * 60 * 1000 // 5분
+  private readonly LIST_CACHE_TTL = 2 * 60 * 1000 // 2분 (목록은 자주 변경될 수 있음)
+
   constructor(db: FirebaseFirestoreTypes.Module, organizationService?: any) {
     this.db = db
     this.organizationService = organizationService
+  }
+
+  /**
+   * 캐시에서 단일 게시글 조회
+   */
+  private getCachedPost(postId: string): Post | null {
+    const cached = this.postCache.get(postId)
+    if (cached && Date.now() - cached.timestamp < this.POST_CACHE_TTL) {
+      console.log(`💾 [PostService] 캐시에서 게시글 조회: ${postId}`)
+      return cached.data
+    }
+    return null
+  }
+
+  /**
+   * 캐시에 단일 게시글 저장
+   */
+  private setCachedPost(postId: string, data: Post): void {
+    this.postCache.set(postId, {
+      data,
+      timestamp: Date.now()
+    })
+  }
+
+  /**
+   * 캐시에서 게시글 목록 조회
+   */
+  private getCachedPostsList(cacheKey: string): { posts: Post[]; lastDoc?: any; hasMore: boolean } | null {
+    const cached = this.postsListCache.get(cacheKey)
+    if (cached && Date.now() - cached.timestamp < this.LIST_CACHE_TTL) {
+      console.log(`💾 [PostService] 캐시에서 목록 조회: ${cacheKey}`)
+      return { posts: cached.posts, lastDoc: cached.lastDoc, hasMore: cached.hasMore }
+    }
+    return null
+  }
+
+  /**
+   * 캐시에 게시글 목록 저장
+   */
+  private setCachedPostsList(cacheKey: string, posts: Post[], lastDoc?: any, hasMore: boolean = false): void {
+    this.postsListCache.set(cacheKey, {
+      posts,
+      lastDoc,
+      hasMore,
+      timestamp: Date.now()
+    })
+  }
+
+  /**
+   * 캐시 무효화
+   */
+  private invalidatePostCache(postId?: string): void {
+    if (postId) {
+      this.postCache.delete(postId)
+      console.log(`🗑️ [PostService] 게시글 캐시 무효화: ${postId}`)
+    } else {
+      this.postCache.clear()
+      console.log(`🗑️ [PostService] 모든 게시글 캐시 무효화`)
+    }
+  }
+
+  /**
+   * 목록 캐시 무효화
+   */
+  private invalidateListCache(cacheKey?: string): void {
+    if (cacheKey) {
+      this.postsListCache.delete(cacheKey)
+      console.log(`🗑️ [PostService] 목록 캐시 무효화: ${cacheKey}`)
+    } else {
+      this.postsListCache.clear()
+      console.log(`🗑️ [PostService] 모든 목록 캐시 무효화`)
+    }
+  }
+
+  /**
+   * 전체 캐시 무효화 (생성/수정/삭제 시)
+   */
+  private invalidateAllCaches(): void {
+    this.postCache.clear()
+    this.postsListCache.clear()
+    console.log(`🗑️ [PostService] 전체 캐시 무효화`)
   }
 
   /**
@@ -23,7 +110,7 @@ export class PostService {
    */
   private getCurrentUserId(): string {
     const user = auth().currentUser
-    console.log('🔐 [PostService] 현재 사용자 확인:', user ? { uid: user.uid, email: user.email } : 'NULL')
+    console.log('🔐 [PostService] 현재 사용자 확인:', user ? '로그인 상태' : 'NULL')
     if (!user) {
       console.error('❌ [PostService] 사용자가 로그인되어 있지 않음')
       throw new Error(translate("matching:errors.userNotFound"))
@@ -39,13 +126,13 @@ export class PostService {
       const userDocRef = doc(this.db, "users", userId)
       const userDoc = await getDoc(userDocRef)
       if (!userDoc.exists) {
-        console.error(`❌ [PostService] 사용자 문서를 찾을 수 없음: ${userId}`)
+        console.error('❌ [PostService] 사용자 문서를 찾을 수 없음')
         return false
       }
       
       const userData = userDoc.data()
       const isOrganizer = userData?.userType === "organizer"
-      console.log(`🔍 [PostService] 사용자 ${userId} 운영자 여부: ${isOrganizer}`)
+      console.log('🔍 [PostService] 사용자 운영자 여부 확인 완료')
       return isOrganizer
     } catch (error) {
       console.error(`❌ [PostService] 사용자 권한 확인 실패:`, error)
@@ -83,6 +170,76 @@ export class PostService {
    */
   private getServerTimestamp(): FirebaseFirestoreTypes.FieldValue {
     return serverTimestamp()
+  }
+
+  /**
+   * Firebase 에러 처리 및 재시도 로직
+   */
+  private handleFirebaseError(error: any, operation: string, retryCount = 0, maxRetries = 3): boolean {
+    const errorCode = error?.code || 'unknown'
+    const errorMessage = error?.message || 'Unknown error'
+
+    // 인덱스 빌드 중 에러
+    if (errorCode === 'firestore/failed-precondition' && errorMessage.includes('index')) {
+      console.warn(`⏳ [PostService] ${operation} - 인덱스 빌드 중`)
+      return true // 재시도 가능
+    }
+
+    // 네트워크 에러 - 자동 재시도
+    const isNetworkError =
+      errorCode === 'firestore/unavailable' ||
+      errorCode === 'firestore/deadline-exceeded' ||
+      errorCode === 'firestore/cancelled' ||
+      errorMessage.includes('network')
+
+    if (isNetworkError && retryCount < maxRetries) {
+      const delay = Math.min(1000 * Math.pow(2, retryCount), 10000) // 지수 백오프
+      console.warn(`🔄 [PostService] ${operation} - 네트워크 에러, ${delay}ms 후 재시도 (${retryCount + 1}/${maxRetries})`)
+      return true // 재시도 가능
+    }
+
+    // 권한 에러
+    if (errorCode === 'firestore/permission-denied') {
+      console.error(`🚫 [PostService] ${operation} - 권한 없음`)
+      return false
+    }
+
+    // 기타 에러
+    console.error(`❌ [PostService] ${operation} - 에러:`, {
+      code: errorCode,
+      message: errorMessage
+    })
+    return false
+  }
+
+  /**
+   * 재시도 가능한 비동기 작업 실행
+   */
+  private async retryOperation<T>(
+    operation: () => Promise<T>,
+    operationName: string,
+    maxRetries = 3
+  ): Promise<T> {
+    let lastError: any
+
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        return await operation()
+      } catch (error) {
+        lastError = error
+        const shouldRetry = this.handleFirebaseError(error, operationName, attempt, maxRetries)
+
+        if (!shouldRetry || attempt === maxRetries - 1) {
+          throw error
+        }
+
+        // 지수 백오프로 재시도
+        const delay = Math.min(1000 * Math.pow(2, attempt), 10000)
+        await new Promise(resolve => setTimeout(resolve, delay))
+      }
+    }
+
+    throw lastError
   }
 
   /**
@@ -135,7 +292,10 @@ export class PostService {
     })
 
     await setDoc(docRef, post)
-    
+
+    // 캐시 무효화 (새 게시글 생성)
+    this.invalidateAllCaches()
+
     // 단체의 활성 공고 수 업데이트
     if (this.organizationService && post.organizationId) {
       console.log('📊 [PostService] createPost - 단체 활성 공고 수 업데이트 시작:', {
@@ -158,14 +318,20 @@ export class PostService {
         organizationId: post.organizationId
       })
     }
-    
+
     return docRef.id
   }
 
   /**
-   * 게시글 조회 (단일)
+   * 게시글 조회 (단일) - 캐싱 적용
    */
   async getPost(postId: string): Promise<Post | null> {
+    // 캐시 확인
+    const cached = this.getCachedPost(postId)
+    if (cached) {
+      return cached
+    }
+
     const docRef = doc(this.db, "posts", postId)
     const docSnap = await getDoc(docRef)
 
@@ -173,18 +339,32 @@ export class PostService {
       return null
     }
 
-    return {
+    const post = {
       id: docSnap.id,
       ...docSnap.data(),
     } as Post
+
+    // 캐시 저장
+    this.setCachedPost(postId, post)
+
+    return post
   }
 
   /**
-   * 게시글 목록 조회 (활성 게시글만) - 서버 사이드 필터링 + 페이지네이션 최적화
+   * 게시글 목록 조회 (활성 게시글만) - 서버 사이드 필터링 + 페이지네이션 + 캐싱 최적화
    */
   async getPosts(maxLimit = 20, lastDoc?: FirebaseFirestoreTypes.QueryDocumentSnapshot): Promise<{ posts: Post[], lastDoc?: FirebaseFirestoreTypes.QueryDocumentSnapshot, hasMore: boolean }> {
-    console.log('🔥 [PostService] getPosts 서버 사이드 필터링 + 페이지네이션 적용:', { maxLimit, hasLastDoc: !!lastDoc })
-    
+    console.log('🔥 [PostService] getPosts 서버 사이드 필터링 + 페이지네이션 + 캐싱 적용:', { maxLimit, hasLastDoc: !!lastDoc })
+
+    // 캐시 키 생성 (첫 페이지만 캐싱)
+    const cacheKey = `active_posts_${maxLimit}`
+    if (!lastDoc) {
+      const cached = this.getCachedPostsList(cacheKey)
+      if (cached) {
+        return cached
+      }
+    }
+
     // 서버 사이드에서 active 상태만 필터링 + 페이지네이션
     let q = query(
       collection(this.db, "posts"),
@@ -212,12 +392,18 @@ export class PostService {
 
     const newLastDoc = actualDocs.length > 0 ? actualDocs[actualDocs.length - 1] : undefined
 
+    // 첫 페이지만 캐싱 (자주 조회되고 실시간성이 덜 중요)
+    if (!lastDoc) {
+      this.setCachedPostsList(cacheKey, posts, newLastDoc, hasMore)
+    }
+
     console.log('✅ [PostService] 최적화된 getPosts 완료:', {
       requestedLimit: maxLimit,
       actualCount: posts.length,
       hasMore,
       isFirstPage: !lastDoc,
-      optimizationSaving: "서버 사이드 필터링 + 페이지네이션으로 대폭 절약"
+      cached: !lastDoc,
+      optimizationSaving: "서버 사이드 필터링 + 페이지네이션 + 캐싱으로 대폭 절약"
     })
 
     return { posts, lastDoc: newLastDoc, hasMore }
@@ -326,6 +512,10 @@ export class PostService {
       updatedAt: this.getServerTimestamp(),
     })
 
+    // 캐시 무효화 (특정 게시글 + 목록)
+    this.invalidatePostCache(postId)
+    this.invalidateListCache()
+
     // 공고 수정 알림 발송 (지원자들에게)
     try {
       const applicantIds = await this.getPostApplicantIds(postId)
@@ -375,6 +565,10 @@ export class PostService {
     const postRef = doc(this.db, "posts", postId)
     await deleteDoc(postRef)
 
+    // 캐시 무효화 (삭제된 게시글 + 목록)
+    this.invalidatePostCache(postId)
+    this.invalidateListCache()
+
     // 게시글 삭제 후 단체의 활성 공고 수 업데이트
     if (this.organizationService && post.organizationId) {
       console.log('📊 [PostService] 게시글 삭제로 인한 단체 활성 공고 수 업데이트 시작:', post.organizationId)
@@ -410,6 +604,10 @@ export class PostService {
       status,
       updatedAt: this.getServerTimestamp(),
     })
+
+    // 캐시 무효화 (상태 변경은 목록에 영향)
+    this.invalidatePostCache(postId)
+    this.invalidateListCache()
 
     // 공고 상태 변경 알림 발송 (지원자들에게)
     try {
@@ -498,35 +696,11 @@ export class PostService {
           callback(activePosts)
         },
         (error: any) => {
-          if (error.code === 'firestore/failed-precondition' && error.message.includes('index')) {
-            console.warn("⏳ [PostService] 인덱스 빌드 중 - 단순 쿼리로 fallback")
-            
-            // 인덱스 오류 시 단순 쿼리로 fallback
-            const fallbackQuery = query(
-              collection(this.db, "posts"),
-              limit(maxLimit)
-            )
-            
-            return onSnapshot(fallbackQuery, (snapshot) => {
-              const posts = snapshot.docs
-                .map(doc => ({ id: doc.id, ...doc.data() } as Post))
-                .filter(post => post.status === 'active')
-                .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
-                .slice(0, maxLimit)
-              
-              console.log(`🔄 [PostService] Fallback 쿼리로 ${posts.length}개 게시글 로드`)
-              callback(posts)
-            }, (fallbackError) => {
-              console.error("❌ [PostService] Fallback 쿼리도 실패:", fallbackError)
-              callback([])
-            })
+          const shouldRetry = this.handleFirebaseError(error, '게시글 구독')
+          if (shouldRetry) {
+            console.warn("⏳ [PostService] 인덱스 빌드 중 - 빈 결과 반환")
+            callback([])
           } else {
-            console.error("❌ [PostService] 게시글 구독 오류:", error)
-            console.error("❌ [PostService] 에러 상세:", {
-              code: error.code,
-              message: error.message,
-              stack: error.stack
-            })
             callback([])
           }
         },
@@ -566,13 +740,8 @@ export class PostService {
           callback(activePosts)
         },
         (error: any) => {
-          if (error.code === 'firestore/failed-precondition' && error.message.includes('index')) {
-            console.warn("⏳ [PostService] 단체별 인덱스 빌드 중 - 잠시 후 다시 시도됩니다:", error.code)
-            callback([])
-          } else {
-            console.error("❌ [PostService] 단체별 게시글 구독 오류:", error)
-            callback([])
-          }
+          const shouldRetry = this.handleFirebaseError(error, '단체별 게시글 구독')
+          callback([])
         },
       )
   }

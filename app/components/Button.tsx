@@ -1,4 +1,4 @@
-import { ComponentType } from "react"
+import { ComponentType, useMemo } from "react"
 import {
   ActivityIndicator,
   Pressable,
@@ -136,6 +136,17 @@ export function Button(props: ButtonProps) {
   const { themed, theme } = useAppTheme()
 
   const preset: Presets = props.preset ?? "default"
+
+  // Memoize preset styles to prevent unnecessary recalculations
+  const presetStyles = useMemo(() => ({
+    view: themed($viewPresets[preset]),
+    text: themed($textPresets[preset]),
+    pressedView: themed($pressedViewPresets[preset]),
+    pressedText: themed($pressedTextPresets[preset]),
+    disabledView: themed($disabledViewPresets[preset]),
+    disabledText: themed($disabledTextPresets[preset]),
+  }), [preset, themed])
+
   /**
    * @param {PressableStateCallbackType} root0 - The root object containing the pressed state.
    * @param {boolean} root0.pressed - The pressed state.
@@ -143,12 +154,12 @@ export function Button(props: ButtonProps) {
    */
   function $viewStyle({ pressed }: PressableStateCallbackType): StyleProp<ViewStyle> {
     return [
-      themed($viewPresets[preset]),
+      presetStyles.view,
       $viewStyleOverride,
-      !!pressed && themed([$pressedViewPresets[preset], $pressedViewStyleOverride]),
+      !!pressed && [presetStyles.pressedView, $pressedViewStyleOverride],
       !!disabled &&
         !isLoading &&
-        themed([$disabledViewPresets[preset], $disabledViewStyleOverride]),
+        [presetStyles.disabledView, $disabledViewStyleOverride],
     ]
   }
   /**
@@ -158,30 +169,54 @@ export function Button(props: ButtonProps) {
    */
   function $textStyle({ pressed }: PressableStateCallbackType): StyleProp<TextStyle> {
     return [
-      themed($textPresets[preset]),
+      presetStyles.text,
       $textStyleOverride,
-      !!pressed && themed([$pressedTextPresets[preset], $pressedTextStyleOverride]),
+      !!pressed && [presetStyles.pressedText, $pressedTextStyleOverride],
       !!disabled &&
         !isLoading &&
-        themed([$disabledTextPresets[preset], $disabledTextStyleOverride]),
+        [presetStyles.disabledText, $disabledTextStyleOverride],
     ]
   }
 
-  // Get accessibility label from props or fallback to text content
-  const getAccessibilityLabel = () => {
+  // Improved accessibility label generation with better fallback logic
+  const computedAccessibilityLabel = useMemo(() => {
+    // Priority 1: Explicit accessibility label
     if (accessibilityLabel) return accessibilityLabel
+
+    // Priority 2: Text content
     if (text) return text
+
+    // Priority 3: String children
     if (typeof children === 'string') return children
+
+    // Priority 4: Translation key as fallback (extract last segment)
+    if (tx) {
+      const segments = tx.split(':')
+      return segments[segments.length - 1].replace(/([A-Z])/g, ' $1').trim()
+    }
+
+    // Priority 5: Generic button label
     return 'Button'
-  }
+  }, [accessibilityLabel, text, children, tx])
+
+  // Determine loading indicator color based on preset
+  const loadingColor = useMemo(() => {
+    const lightPresets = new Set(['reversed', 'cta', 'accent'])
+    return lightPresets.has(preset)
+      ? theme.colors.palette.neutral100
+      : theme.colors.text
+  }, [preset, theme.colors])
 
   return (
     <Pressable
       style={$viewStyle}
       accessibilityRole="button"
-      accessibilityLabel={getAccessibilityLabel()}
+      accessibilityLabel={isLoading ? `${computedAccessibilityLabel}, Loading` : computedAccessibilityLabel}
       accessibilityHint={accessibilityHint}
-      accessibilityState={{ disabled: !!disabled || !!isLoading }}
+      accessibilityState={{
+        disabled: !!disabled || !!isLoading,
+        busy: !!isLoading
+      }}
       {...rest}
       disabled={disabled || isLoading}
     >
@@ -190,11 +225,8 @@ export function Button(props: ButtonProps) {
           {isLoading ? (
             <ActivityIndicator
               size="small"
-              color={
-                preset === "reversed" || preset === "cta" || preset === "accent"
-                  ? theme.colors.palette.neutral100
-                  : theme.colors.text
-              }
+              color={loadingColor}
+              accessibilityLabel="Loading"
             />
           ) : (
             <>

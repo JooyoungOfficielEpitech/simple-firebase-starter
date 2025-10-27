@@ -61,7 +61,7 @@ class PushNotificationService {
           // 개발 환경에서는 더 자세한 로그 출력
           try {
             this.fcmToken = await messaging().getToken()
-            console.log('FCM 토큰:', this.fcmToken)
+            console.log('FCM 토큰 획득 완료')
           } catch (devError: any) {
             if (devError.code === 'messaging/unknown' && devError.message.includes('APNS token')) {
               console.warn('⚠️ iOS 시뮬레이터에서는 푸시 알림이 지원되지 않습니다. 실제 기기에서 테스트해주세요.')
@@ -71,7 +71,7 @@ class PushNotificationService {
           }
         } else {
           this.fcmToken = await messaging().getToken()
-          console.log('FCM 토큰:', this.fcmToken)
+          console.log('FCM 토큰 획득 완료')
         }
       }
       return this.fcmToken
@@ -87,7 +87,7 @@ class PushNotificationService {
   onTokenRefresh(callback: (token: string) => void): () => void {
     return messaging().onTokenRefresh((token) => {
       this.fcmToken = token
-      console.log('FCM 토큰이 새로고침되었습니다:', token)
+      console.log('FCM 토큰이 새로고침되었습니다')
       callback(token)
     })
   }

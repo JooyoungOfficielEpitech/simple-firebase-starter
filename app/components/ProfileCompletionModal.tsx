@@ -53,10 +53,15 @@ export const ProfileCompletionModal: FC = React.memo(() => {
   }, [shouldShowProfilePrompt, dismissProfilePrompt])
 
   // 프로필 체크가 진행 중이거나 완료되지 않았으면 모달 표시하지 않음
-  const shouldShowModal = shouldShowProfilePrompt && !profileCheckLoading
+  // 또한 로딩 상태나 타임아웃 상황에서도 표시하지 않음
+  const shouldShowModal = shouldShowProfilePrompt && !profileCheckLoading && !timeoutReached
   
   return (
-    <BaseModal visible={shouldShowModal} onClose={handleDismiss}>
+    <BaseModal 
+      visible={shouldShowModal} 
+      onClose={handleDismiss}
+      // 배경 터치 시 모달이 닫히도록 설정
+    >
       <Text preset="heading" style={themed($modalTitle)}>
         🎭 프로필 완성하고 시작하세요!
       </Text>

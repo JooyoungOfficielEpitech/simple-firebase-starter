@@ -1,11 +1,30 @@
 import { MMKV } from "react-native-mmkv"
 
+// Validate encryption key exists and meets minimum security requirements
+const getEncryptionKey = (): string => {
+  const key = __DEV__
+    ? process.env.EXPO_PUBLIC_ENCRYPTION_KEY_DEV
+    : process.env.EXPO_PUBLIC_ENCRYPTION_KEY_PROD
+
+  if (!key) {
+    throw new Error(
+      `Missing encryption key for ${__DEV__ ? 'development' : 'production'} environment. ` +
+      `Please set EXPO_PUBLIC_ENCRYPTION_KEY_${__DEV__ ? 'DEV' : 'PROD'} in your environment variables.`
+    )
+  }
+
+  if (key.length < 16) {
+    throw new Error(
+      'Encryption key must be at least 16 characters long for security reasons.'
+    )
+  }
+
+  return key
+}
+
 export const storage = new MMKV({
   id: "mmecoco-encrypted-storage",
-  encryptionKey: (() =>
-    __DEV__
-      ? process.env.EXPO_PUBLIC_ENCRYPTION_KEY_DEV
-      : process.env.EXPO_PUBLIC_ENCRYPTION_KEY_PROD)(),
+  encryptionKey: getEncryptionKey(),
 })
 
 /**
@@ -16,8 +35,8 @@ export const storage = new MMKV({
 export function loadString(key: string): string | null {
   try {
     return storage.getString(key) ?? null
-  } catch {
-    // not sure why this would fail... even reading the RN docs I'm unclear
+  } catch (error) {
+    console.warn(`Failed to load string from storage for key "${key}":`, error)
     return null
   }
 }
@@ -32,7 +51,8 @@ export function saveString(key: string, value: string): boolean {
   try {
     storage.set(key, value)
     return true
-  } catch {
+  } catch (error) {
+    console.warn(`Failed to save string to storage for key "${key}":`, error)
     return false
   }
 }
@@ -43,12 +63,16 @@ export function saveString(key: string, value: string): boolean {
  * @param key The key to fetch.
  */
 export function load<T>(key: string): T | null {
-  let almostThere: string | null = null
   try {
-    almostThere = loadString(key)
-    return JSON.parse(almostThere ?? "") as T
-  } catch {
-    return (almostThere as T) ?? null
+    const rawData = loadString(key)
+    if (rawData === null) {
+      return null
+    }
+    return JSON.parse(rawData) as T
+  } catch (error) {
+    // Log the parsing error for debugging while returning null for failed parsing
+    console.warn(`Failed to parse stored data for key "${key}":`, error)
+    return null
   }
 }
 
@@ -62,7 +86,8 @@ export function save(key: string, value: unknown): boolean {
   try {
     saveString(key, JSON.stringify(value))
     return true
-  } catch {
+  } catch (error) {
+    console.warn(`Failed to serialize and save data for key "${key}":`, error)
     return false
   }
 }
@@ -75,7 +100,9 @@ export function save(key: string, value: unknown): boolean {
 export function remove(key: string): void {
   try {
     storage.delete(key)
-  } catch {}
+  } catch (error) {
+    console.warn(`Failed to remove data from storage for key "${key}":`, error)
+  }
 }
 
 /**
@@ -84,5 +111,7 @@ export function remove(key: string): void {
 export function clear(): void {
   try {
     storage.clearAll()
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to clear all storage data:', error)
+  }
 }

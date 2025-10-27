@@ -21,7 +21,7 @@ export class TestDataService {
       
       // 현재 인증 상태 확인
       const currentUser = auth().currentUser
-      console.log('🔐 [TestDataService] 현재 인증 상태:', currentUser ? { uid: currentUser.uid, email: currentUser.email } : 'NOT_LOGGED_IN')
+      console.log('🔐 [TestDataService] 현재 인증 상태:', currentUser ? '로그인 상태' : 'NOT_LOGGED_IN')
 
       await this.createTestUser()
       await this.createTestOrganizations()

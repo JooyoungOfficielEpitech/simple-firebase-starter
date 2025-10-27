@@ -11,6 +11,13 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == userId;
     }
     
+    // 사용자가 운영자인지 확인하는 헬퍼 함수
+    function isOrganizer(userId) {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/users/$(userId)) &&
+             get(/databases/$(database)/documents/users/$(userId)).data.userType == 'organizer';
+    }
+    
     // 유효한 게시글 데이터인지 확인하는 헬퍼 함수
     function isValidPost(post) {
       return post.keys().hasAll(['title', 'description', 'production', 'location', 'organizationName', 'authorId', 'status', 'tags', 'createdAt', 'updatedAt']) &&
@@ -33,7 +40,9 @@ service cloud.firestore {
              post.authorId == request.auth.uid &&
              post.status in ['active', 'closed'] &&
              post.tags is list &&
-             post.tags.size() <= 10;
+             post.tags.size() <= 10 &&
+             // 이미지 필드 검증 (선택사항)
+             (!post.keys().hasAny(['images']) || (post.images is list && post.images.size() <= 10));
     }
 
     // Users 컬렉션 - 사용자 프로필 데이터
@@ -99,9 +108,24 @@ service cloud.firestore {
       allow delete: if isAuthenticated() && isOwner(resource.data.applicantId);
     }
 
-    // Messages/Notifications 컬렉션 - 메시지/알림 데이터
+    // Notifications 컬렉션 - 알림 데이터
     match /notifications/{notificationId} {
-      allow read, write: if isAuthenticated() && isOwner(resource.data.userId);
+      // 읽기: 알림 수신자만
+      allow read: if isAuthenticated() && isOwner(resource.data.userId);
+      
+      // 생성: 시스템 또는 게시글 작성자만 (백엔드에서 처리)
+      allow create: if isAuthenticated() &&
+                      resource == null &&
+                      request.resource.data.keys().hasAll(['userId', 'type', 'title', 'message', 'isRead', 'createdAt', 'updatedAt']) &&
+                      request.resource.data.isRead == false;
+      
+      // 수정: 알림 수신자만 (읽음 처리)
+      allow update: if isAuthenticated() && 
+                      isOwner(resource.data.userId) &&
+                      request.resource.data.userId == resource.data.userId;
+      
+      // 삭제: 알림 수신자만
+      allow delete: if isAuthenticated() && isOwner(resource.data.userId);
     }
 
     // 기타 모든 경로는 기본적으로 거부

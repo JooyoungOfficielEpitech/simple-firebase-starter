@@ -1,16 +1,11 @@
-const palette = {
-  // Wicked-inspired neutrals (white to black)
-  neutral100: "#FFFFFF",
-  neutral200: "#F8F8F8",
-  neutral300: "#E5E5E5",
-  neutral400: "#B8B8B8",
-  neutral500: "#8A8A8A",
-  neutral600: "#5C5C5C",
-  neutral700: "#2E2E2E",
-  neutral800: "#1A1A1A",
-  neutral900: "#000000",
+import { createOverlays, createThemeColors } from "./colorsBase"
 
-  // Korean Karaoke Primary - Modern neon-inspired tones  
+/**
+ * Korean Karaoke theme - Modern neon-inspired design
+ * Refactored to use the unified base color system
+ */
+const karaokeSpecific = {
+  // Korean Karaoke Primary - Modern neon-inspired tones
   primary100: "#E8F3FF", // Light blue-tint
   primary200: "#B3D9FF", // Sky blue
   primary300: "#66B8FF", // Bright blue
@@ -20,7 +15,7 @@ const palette = {
 
   // Korean Karaoke Secondary - Warm accent tones
   secondary100: "#FFF9E6", // Light gold
-  secondary200: "#FFE6B3", // Soft gold  
+  secondary200: "#FFE6B3", // Soft gold
   secondary300: "#FFCC66", // Medium gold
   secondary400: "#FFB31A", // Bright gold
   secondary500: "#FF9900", // Korean karaoke gold
@@ -32,14 +27,11 @@ const palette = {
   accent400: "#E17055",
   accent500: "#D63031",
 
-  // Error states
-  angry100: "#FFE5E5",
-  angry500: "#E74C3C",
+  // Blue-tinted overlays for karaoke theme
+  ...createOverlays(0, 102, 204), // Blue overlay
+}
 
-  // Overlays with green tint
-  overlay20: "rgba(34, 139, 34, 0.2)",
-  overlay50: "rgba(34, 139, 34, 0.5)",
-} as const
+const palette = createThemeColors(karaokeSpecific)
 
 export const colors = {
   /**
@@ -99,9 +91,9 @@ export const colors = {
   /**
    * Error messages.
    */
-  error: palette.angry500,
+  error: palette.error500,
   /**
    * Error Background.
    */
-  errorBackground: palette.angry100,
+  errorBackground: palette.error100,
 } as const

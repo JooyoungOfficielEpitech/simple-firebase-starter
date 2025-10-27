@@ -9,9 +9,115 @@ import { Organization, CreateOrganization, UpdateOrganization } from "@/types/or
  */
 export class OrganizationService {
   private db: FirebaseFirestoreTypes.Module
+  private organizationCache: Map<string, { data: Organization; timestamp: number }> = new Map()
+  private organizationListCache: Map<string, { data: Organization[]; timestamp: number }> = new Map()
+  private organizationNameCache: Map<string, { data: Organization | null; timestamp: number }> = new Map()
+  private readonly CACHE_TTL = 5 * 60 * 1000 // 5분
+  private readonly LIST_CACHE_TTL = 3 * 60 * 1000 // 3분 (목록은 조금 더 짧게)
 
   constructor(db: FirebaseFirestoreTypes.Module) {
     this.db = db
+  }
+
+  /**
+   * 캐시에서 단체 조회
+   */
+  private getCachedOrganization(organizationId: string): Organization | null {
+    const cached = this.organizationCache.get(organizationId)
+    if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
+      return cached.data
+    }
+    return null
+  }
+
+  /**
+   * 캐시에 단체 저장
+   */
+  private setCachedOrganization(organizationId: string, data: Organization): void {
+    this.organizationCache.set(organizationId, {
+      data,
+      timestamp: Date.now()
+    })
+  }
+
+  /**
+   * 캐시에서 목록 조회
+   */
+  private getCachedOrganizationList(cacheKey: string): Organization[] | null {
+    const cached = this.organizationListCache.get(cacheKey)
+    if (cached && Date.now() - cached.timestamp < this.LIST_CACHE_TTL) {
+      console.log(`💾 [OrganizationService] 캐시에서 목록 조회: ${cacheKey}`)
+      return cached.data
+    }
+    return null
+  }
+
+  /**
+   * 캐시에 목록 저장
+   */
+  private setCachedOrganizationList(cacheKey: string, data: Organization[]): void {
+    this.organizationListCache.set(cacheKey, {
+      data,
+      timestamp: Date.now()
+    })
+  }
+
+  /**
+   * 이름 캐시에서 조회
+   */
+  private getCachedOrganizationByName(name: string): Organization | null | undefined {
+    const cached = this.organizationNameCache.get(name.toLowerCase())
+    if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
+      console.log(`💾 [OrganizationService] 이름 캐시에서 조회: ${name}`)
+      return cached.data
+    }
+    return undefined
+  }
+
+  /**
+   * 이름 캐시에 저장
+   */
+  private setCachedOrganizationByName(name: string, data: Organization | null): void {
+    this.organizationNameCache.set(name.toLowerCase(), {
+      data,
+      timestamp: Date.now()
+    })
+  }
+
+  /**
+   * 캐시 무효화
+   */
+  private invalidateCache(organizationId?: string): void {
+    if (organizationId) {
+      this.organizationCache.delete(organizationId)
+      console.log(`🗑️ [OrganizationService] 단체 캐시 무효화: ${organizationId}`)
+    } else {
+      this.organizationCache.clear()
+      this.organizationListCache.clear()
+      this.organizationNameCache.clear()
+      console.log(`🗑️ [OrganizationService] 모든 캐시 무효화`)
+    }
+  }
+
+  /**
+   * 목록 캐시 무효화
+   */
+  private invalidateListCache(): void {
+    this.organizationListCache.clear()
+    console.log(`🗑️ [OrganizationService] 목록 캐시 무효화`)
+  }
+
+  /**
+   * 이름 캐시 무효화
+   */
+  private invalidateNameCache(name?: string): void {
+    if (name) {
+      this.organizationNameCache.delete(name.toLowerCase())
+      console.log(`🗑️ [OrganizationService] 이름 캐시 무효화: ${name}`)
+    } else {
+      this.organizationNameCache.clear()
+      console.log(`🗑️ [OrganizationService] 모든 이름 캐시 무효화`)
+    }
   }
 
   /**
@@ -30,6 +136,47 @@ export class OrganizationService {
    */
   private getServerTimestamp(): FirebaseFirestoreTypes.FieldValue {
     return firestore.FieldValue.serverTimestamp()
+  }
+
+  /**
+   * 사용자 친화적 에러 메시지 생성
+   */
+  private getUserFriendlyErrorMessage(error: any, operation: string): string {
+    const errorCode = error?.code || 'unknown'
+
+    const errorMessages: Record<string, string> = {
+      'firestore/permission-denied': '해당 작업을 수행할 권한이 없습니다.',
+      'firestore/not-found': '요청하신 단체를 찾을 수 없습니다.',
+      'firestore/already-exists': '이미 존재하는 단체입니다.',
+      'firestore/unavailable': '서버에 연결할 수 없습니다. 인터넷 연결을 확인해주세요.',
+      'firestore/deadline-exceeded': '요청 시간이 초과되었습니다. 다시 시도해주세요.',
+      'firestore/cancelled': '작업이 취소되었습니다.',
+      'firestore/unauthenticated': '로그인이 필요합니다.',
+      'firestore/resource-exhausted': '일시적으로 서비스 이용이 제한되었습니다. 잠시 후 다시 시도해주세요.',
+      'auth/user-not-found': '사용자 정보를 찾을 수 없습니다.',
+      'auth/invalid-credential': '인증 정보가 올바르지 않습니다.',
+    }
+
+    return errorMessages[errorCode] || `${operation} 중 오류가 발생했습니다. 다시 시도해주세요.`
+  }
+
+  /**
+   * 에러 처리 및 로깅
+   */
+  private handleOrganizationError(error: any, operation: string): void {
+    const errorCode = error?.code || 'unknown'
+    const friendlyMessage = this.getUserFriendlyErrorMessage(error, operation)
+
+    // 특정 에러는 경고로, 나머지는 에러로 처리
+    if (errorCode === 'firestore/not-found') {
+      console.warn(`⚠️ [OrganizationService] ${operation}:`, friendlyMessage)
+    } else {
+      console.error(`❌ [OrganizationService] ${operation}:`, {
+        code: errorCode,
+        message: error?.message || 'Unknown error',
+        friendlyMessage
+      })
+    }
   }
 
   /**
@@ -57,29 +204,43 @@ export class OrganizationService {
   }
 
   /**
-   * 단체명으로 단체 조회
+   * 단체명으로 단체 조회 - 캐싱 적용
    */
   async getOrganizationByName(name: string): Promise<Organization | null> {
     const normalizedName = name.trim().toLowerCase()
-    
+
+    // 캐시 확인
+    const cached = this.getCachedOrganizationByName(normalizedName)
+    if (cached !== undefined) {
+      return cached
+    }
+
     const snapshot = await this.db
       .collection("organizations")
       .where("name", ">=", normalizedName)
       .where("name", "<=", normalizedName + '\uf8ff')
       .get()
 
-    const matchingDoc = snapshot.docs.find(doc => 
+    const matchingDoc = snapshot.docs.find(doc =>
       doc.data().name.toLowerCase() === normalizedName
     )
 
     if (!matchingDoc) {
+      // null도 캐싱 (불필요한 조회 방지)
+      this.setCachedOrganizationByName(normalizedName, null)
       return null
     }
 
-    return {
+    const organization = {
       id: matchingDoc.id,
       ...matchingDoc.data(),
     } as Organization
+
+    // 캐시 저장 (이름 + ID 모두)
+    this.setCachedOrganizationByName(normalizedName, organization)
+    this.setCachedOrganization(organization.id, organization)
+
+    return organization
   }
 
   /**
@@ -167,57 +328,97 @@ export class OrganizationService {
     }
 
     await docRef.set(organization)
+
+    // 캐시 무효화 (새 단체 생성)
+    this.invalidateListCache()
+
     return docRef.id
   }
 
   /**
-   * 단체 조회 (단일)
+   * 단체 조회 (단일) - 캐싱 적용
    */
   async getOrganization(organizationId: string): Promise<Organization | null> {
+    // 캐시 확인
+    const cached = this.getCachedOrganization(organizationId)
+    if (cached) {
+      return cached
+    }
+
     const doc = await this.db.collection("organizations").doc(organizationId).get()
 
     if (!doc.exists) {
       return null
     }
 
-    return {
+    const organization = {
       id: doc.id,
       ...doc.data(),
     } as Organization
+
+    // 캐시 저장
+    this.setCachedOrganization(organizationId, organization)
+
+    return organization
   }
 
   /**
-   * 모든 단체 목록 조회
+   * 모든 단체 목록 조회 - 캐싱 적용
    */
   async getOrganizations(limit = 20): Promise<Organization[]> {
+    const cacheKey = `organizations_list_${limit}`
+
+    // 캐시 확인
+    const cached = this.getCachedOrganizationList(cacheKey)
+    if (cached) {
+      return cached
+    }
+
     const snapshot = await this.db
       .collection("organizations")
       .orderBy("createdAt", "desc")
       .limit(limit)
       .get()
 
-    return snapshot.docs.map(doc => ({
+    const organizations = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
     } as Organization))
+
+    // 캐시 저장
+    this.setCachedOrganizationList(cacheKey, organizations)
+
+    return organizations
   }
 
   /**
-   * 내가 소유한 단체 조회
+   * 내가 소유한 단체 조회 - 캐싱 적용
    */
   async getMyOrganizations(): Promise<Organization[]> {
     const userId = this.getCurrentUserId()
-    
+    const cacheKey = `my_organizations_${userId}`
+
+    // 캐시 확인
+    const cached = this.getCachedOrganizationList(cacheKey)
+    if (cached) {
+      return cached
+    }
+
     const snapshot = await this.db
       .collection("organizations")
       .where("ownerId", "==", userId)
       .orderBy("createdAt", "desc")
       .get()
 
-    return snapshot.docs.map(doc => ({
+    const organizations = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
     } as Organization))
+
+    // 캐시 저장
+    this.setCachedOrganizationList(cacheKey, organizations)
+
+    return organizations
   }
 
   /**
@@ -225,7 +426,7 @@ export class OrganizationService {
    */
   async updateOrganization(organizationId: string, updateData: UpdateOrganization): Promise<void> {
     const userId = this.getCurrentUserId()
-    
+
     // 권한 확인 - 소유자만 수정 가능
     const organization = await this.getOrganization(organizationId)
     if (!organization || organization.ownerId !== userId) {
@@ -236,6 +437,13 @@ export class OrganizationService {
       ...updateData,
       updatedAt: this.getServerTimestamp(),
     })
+
+    // 캐시 무효화 (단일 + 목록 + 이름)
+    this.invalidateCache(organizationId)
+    this.invalidateListCache()
+    if (organization.name) {
+      this.invalidateNameCache(organization.name)
+    }
   }
 
   /**
@@ -243,7 +451,7 @@ export class OrganizationService {
    */
   async deleteOrganization(organizationId: string): Promise<void> {
     const userId = this.getCurrentUserId()
-    
+
     // 권한 확인 - 소유자만 삭제 가능
     const organization = await this.getOrganization(organizationId)
     if (!organization || organization.ownerId !== userId) {
@@ -251,6 +459,13 @@ export class OrganizationService {
     }
 
     await this.db.collection("organizations").doc(organizationId).delete()
+
+    // 캐시 무효화 (단일 + 목록 + 이름)
+    this.invalidateCache(organizationId)
+    this.invalidateListCache()
+    if (organization.name) {
+      this.invalidateNameCache(organization.name)
+    }
   }
 
   /**
@@ -290,29 +505,29 @@ export class OrganizationService {
       
       console.log(`✅ [OrganizationService] 단체 ${organizationId} 활성 공고 수 업데이트 완료`)
     } catch (error) {
-      // 에러 타입별 처리
-      if (error.code === 'firestore/not-found') {
-        console.warn(`⚠️ [OrganizationService] 단체 ${organizationId}를 찾을 수 없음 (not-found). 게시글은 정상 저장됨`)
-      } else {
-        console.error(`❌ [OrganizationService] 단체 ${organizationId} 활성 공고 수 업데이트 실패:`, {
-          code: error.code,
-          message: error.message
-        })
-      }
+      this.handleOrganizationError(error, `단체 ${organizationId} 활성 공고 수 업데이트`)
       // 에러가 발생해도 게시글 저장은 이미 완료되었으므로 throw하지 않음
     }
   }
 
   /**
-   * 모든 단체의 활성 공고 수 업데이트
+   * 모든 단체의 활성 공고 수 업데이트 - 배치 처리
    */
   async updateAllActivePostCounts(): Promise<void> {
     try {
       const organizationsSnapshot = await this.db.collection("organizations").get()
-      
-      for (const orgDoc of organizationsSnapshot.docs) {
-        await this.updateActivePostCount(orgDoc.id)
+
+      // 배치 처리: 5개씩 동시 처리
+      const batchSize = 5
+      const orgDocs = organizationsSnapshot.docs
+
+      for (let i = 0; i < orgDocs.length; i += batchSize) {
+        const batch = orgDocs.slice(i, i + batchSize)
+        await Promise.all(batch.map(orgDoc => this.updateActivePostCount(orgDoc.id)))
       }
+
+      // 캐시 전체 무효화
+      this.invalidateCache()
     } catch (error) {
       console.error('❌ [OrganizationService] 모든 단체 활성 공고 수 업데이트 실패:', error)
     }

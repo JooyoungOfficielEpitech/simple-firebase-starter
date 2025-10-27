@@ -41,6 +41,22 @@ import type {
   WickedCharacterTheme,
 } from "./types"
 
+// Create a stable theme lookup map to avoid if-else chains and enable O(1) lookups
+const THEME_MAP = {
+  light: {
+    elphaba: lightElphabaTheme,
+    glinda: lightGlindaTheme,
+    gwynplaine: lightGwynplaineTheme,
+    johanna: lightJohannaTheme,
+  },
+  dark: {
+    elphaba: darkElphabaTheme,
+    glinda: darkGlindaTheme,
+    gwynplaine: darkGwynplaineTheme,
+    johanna: darkJohannaTheme,
+  },
+} as const
+
 export type ThemeContextType = {
   navigationTheme: NavTheme
   setThemeContextOverride: (newTheme: ThemeContextModeT) => void
@@ -127,28 +143,8 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
   }, [themeContext])
 
   const theme: Theme = useMemo(() => {
-    // Combine dark/light mode with Wicked character theme
-    if (themeContext === "dark") {
-      if (wickedCharacterTheme === "glinda") {
-        return darkGlindaTheme
-      } else if (wickedCharacterTheme === "gwynplaine") {
-        return darkGwynplaineTheme
-      } else if (wickedCharacterTheme === "johanna") {
-        return darkJohannaTheme
-      } else {
-        return darkElphabaTheme
-      }
-    } else {
-      if (wickedCharacterTheme === "glinda") {
-        return lightGlindaTheme
-      } else if (wickedCharacterTheme === "gwynplaine") {
-        return lightGwynplaineTheme
-      } else if (wickedCharacterTheme === "johanna") {
-        return lightJohannaTheme
-      } else {
-        return lightElphabaTheme
-      }
-    }
+    // O(1) theme lookup using the stable theme map
+    return THEME_MAP[themeContext][wickedCharacterTheme]
   }, [themeContext, wickedCharacterTheme])
 
   useEffect(() => {
@@ -171,7 +167,7 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
     [theme],
   )
 
-  const value = {
+  const value = useMemo(() => ({
     navigationTheme,
     theme,
     themeContext,
@@ -179,7 +175,15 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
     setThemeContextOverride,
     setWickedCharacterTheme,
     themed,
-  }
+  }), [
+    navigationTheme,
+    theme,
+    themeContext,
+    wickedCharacterTheme,
+    setThemeContextOverride,
+    setWickedCharacterTheme,
+    themed,
+  ])
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }

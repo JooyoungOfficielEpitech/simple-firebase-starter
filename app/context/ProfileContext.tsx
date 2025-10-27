@@ -113,11 +113,15 @@ export const ProfileProvider: FC<PropsWithChildren<ProfileProviderProps>> = ({
   // 사용자 변경 시 자동 프로필 체크
   useEffect(() => {
     if (user?.uid) {
-      console.log("🚀 [ProfileContext] 사용자 로그인 감지 - 프로필 완성도 체크 즉시 시작")
-      // 즉시 프로필 체크 (지연 제거)
-      checkProfileCompletion(user.uid).catch(error => {
-        console.error('❌ [ProfileContext] 자동 프로필 체크 실패:', error)
-      })
+      console.log("🚀 [ProfileContext] 사용자 로그인 감지 - 프로필 완성도 체크 5초 지연 후 시작")
+      // 5초 지연 후 프로필 체크 (홈 화면 로딩과 사용자 적응 시간 확보)
+      const timeoutId = setTimeout(() => {
+        checkProfileCompletion(user.uid).catch(error => {
+          console.error('❌ [ProfileContext] 자동 프로필 체크 실패:', error)
+        })
+      }, 5000)
+
+      return () => clearTimeout(timeoutId)
     } else {
       // 로그아웃 시 프로필 관련 상태 리셋
       resetProfileState()

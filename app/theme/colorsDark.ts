@@ -1,60 +1,99 @@
-const palette = {
-  // Dark theme neutrals (inverted for dark mode)
-  neutral900: "#FFFFFF",
-  neutral800: "#F8F8F8",
-  neutral700: "#E5E5E5",
-  neutral600: "#B8B8B8",
-  neutral500: "#8A8A8A",
-  neutral400: "#5C5C5C",
-  neutral300: "#2E2E2E",
-  neutral200: "#1A1A1A",
-  neutral100: "#000000",
+import { baseDarkColors, createDarkOverlays, createDarkThemeColors } from "./colorsBaseDark"
 
-  // Wicked Green (adapted for dark theme - maintaining semantic meaning)
-  primary100: "#E8F5E8", // Lightest green
-  primary200: "#C3E6C3",
-  primary300: "#9DD69D",
-  primary400: "#76C676",
-  primary500: "#4FB84F", // Main green
-  primary600: "#228B22", // Darker green
+const darkSpecific = {
+  // Korean Karaoke Primary - Modern neon-inspired tones (dark variants)
+  primary600: "#E8F3FF", // Light blue-tint  
+  primary500: "#B3D9FF", // Sky blue
+  primary400: "#66B8FF", // Bright blue
+  primary300: "#1A90FF", // Karaoke blue
+  primary200: "#0066CC", // Main karaoke blue
+  primary100: "#004499", // Dark karaoke blue
 
-  // Wicked Pink (adapted for dark theme - maintaining semantic meaning)
-  secondary100: "#FFF0F5", // Lightest pink
-  secondary200: "#FFCCE0",
-  secondary300: "#FF99CC",
-  secondary400: "#FF66B8",
-  secondary500: "#FF1493", // Main hot pink
+  // Korean Karaoke Secondary - Warm accent tones (dark variants)
+  secondary500: "#FFF9E6", // Light gold
+  secondary400: "#FFE6B3", // Soft gold
+  secondary300: "#FFCC66", // Medium gold
+  secondary200: "#FFB31A", // Bright gold
+  secondary100: "#FF9900", // Korean karaoke gold
 
-  // Accent colors for dark theme
-  accent100: "#FFFACD",
-  accent200: "#FFEAA7",
+  // Accent - Gold/Yellow highlights (dark variants)
+  accent500: "#FFFACD",
+  accent400: "#FFEAA7",
   accent300: "#FDCB6E",
-  accent400: "#E17055",
-  accent500: "#D63031",
+  accent200: "#E17055",
+  accent100: "#D63031",
 
-  // Error states
-  angry100: "#FFE5E5",
-  angry500: "#E74C3C",
+  // Overlays with blue tint for karaoke theme
+  ...createDarkOverlays(26, 102, 204),
+}
 
-  // Dark overlays with green tint
-  overlay20: "rgba(34, 139, 34, 0.3)",
-  overlay50: "rgba(34, 139, 34, 0.6)",
-} as const
+const palette = createDarkThemeColors(darkSpecific)
 
 export const colors = {
+  /**
+   * The palette is available to use, but prefer using the name.
+   * This is only included for rare, one-off cases. Try to use
+   * semantic names as much as possible.
+   */
   palette,
+  /**
+   * A helper for making something see-thru.
+   */
   transparent: "rgba(0, 0, 0, 0)",
-  text: palette.neutral800,
-  textDim: palette.neutral600,
-  background: palette.neutral200,
-  border: palette.neutral400,
-  tint: palette.primary500,
-  tintInactive: palette.neutral300,
-  primaryAction: palette.primary500,
-  secondaryAction: palette.secondary500,
-  selected: palette.secondary400,
-  iconAccent: palette.secondary500,
-  separator: palette.neutral300,
-  error: palette.angry500,
-  errorBackground: palette.angry100,
+  /**
+   * The default text color in many components.
+   * WCAG AA: White text on dark backgrounds meets 21:1 contrast ratio
+   */
+  text: palette.neutral900, // White text for dark theme
+  /**
+   * Secondary text information.
+   * WCAG AA: Light gray text maintains 7:1 contrast on dark backgrounds
+   */
+  textDim: palette.neutral700, // Light gray for secondary text
+  /**
+   * The default color of the screen background.
+   * Dark background using nearly black
+   */
+  background: palette.neutral100, // Dark background
+  /**
+   * The default border color.
+   * Medium gray for visibility on dark backgrounds
+   */
+  border: palette.neutral500,
+  /**
+   * The main tinting color.
+   */
+  tint: palette.primary300,
+  /**
+   * The inactive tinting color.
+   */
+  tintInactive: palette.neutral400,
+  /**
+   * Primary action color (main CTA buttons, active tabs).
+   */
+  primaryAction: palette.primary300,
+  /**
+   * Secondary action color (secondary buttons, highlights, icons).
+   */
+  secondaryAction: palette.secondary200,
+  /**
+   * Selected/focused item color.
+   */
+  selected: palette.primary400,
+  /**
+   * Icon accent color.
+   */
+  iconAccent: palette.secondary200,
+  /**
+   * A subtle color used for lines.
+   */
+  separator: palette.neutral400,
+  /**
+   * Error messages.
+   */
+  error: palette.error500,
+  /**
+   * Error Background.
+   */
+  errorBackground: palette.error100,
 } as const
