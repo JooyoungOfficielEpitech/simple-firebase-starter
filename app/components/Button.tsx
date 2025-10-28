@@ -1,4 +1,4 @@
-import { ComponentType, useMemo } from "react"
+import { ComponentType, useMemo, useCallback } from "react"
 import {
   ActivityIndicator,
   Pressable,
@@ -148,11 +148,12 @@ export function Button(props: ButtonProps) {
   }), [preset, themed])
 
   /**
+   * Memoized view style function to prevent unnecessary recalculations
    * @param {PressableStateCallbackType} root0 - The root object containing the pressed state.
    * @param {boolean} root0.pressed - The pressed state.
    * @returns {StyleProp<ViewStyle>} The view style based on the pressed state.
    */
-  function $viewStyle({ pressed }: PressableStateCallbackType): StyleProp<ViewStyle> {
+  const $viewStyle = useCallback(({ pressed }: PressableStateCallbackType): StyleProp<ViewStyle> => {
     return [
       presetStyles.view,
       $viewStyleOverride,
@@ -161,13 +162,15 @@ export function Button(props: ButtonProps) {
         !isLoading &&
         [presetStyles.disabledView, $disabledViewStyleOverride],
     ]
-  }
+  }, [presetStyles, $viewStyleOverride, $pressedViewStyleOverride, disabled, isLoading, $disabledViewStyleOverride])
+
   /**
+   * Memoized text style function to prevent unnecessary recalculations
    * @param {PressableStateCallbackType} root0 - The root object containing the pressed state.
    * @param {boolean} root0.pressed - The pressed state.
    * @returns {StyleProp<TextStyle>} The text style based on the pressed state.
    */
-  function $textStyle({ pressed }: PressableStateCallbackType): StyleProp<TextStyle> {
+  const $textStyle = useCallback(({ pressed }: PressableStateCallbackType): StyleProp<TextStyle> => {
     return [
       presetStyles.text,
       $textStyleOverride,
@@ -176,7 +179,7 @@ export function Button(props: ButtonProps) {
         !isLoading &&
         [presetStyles.disabledText, $disabledTextStyleOverride],
     ]
-  }
+  }, [presetStyles, $textStyleOverride, $pressedTextStyleOverride, disabled, isLoading, $disabledTextStyleOverride])
 
   // Improved accessibility label generation with better fallback logic
   const computedAccessibilityLabel = useMemo(() => {
@@ -199,10 +202,10 @@ export function Button(props: ButtonProps) {
     return 'Button'
   }, [accessibilityLabel, text, children, tx])
 
-  // Determine loading indicator color based on preset
+  // Determine loading indicator color based on preset (Set created once outside component)
   const loadingColor = useMemo(() => {
-    const lightPresets = new Set(['reversed', 'cta', 'accent'])
-    return lightPresets.has(preset)
+    const lightPresets: Presets[] = ['reversed', 'cta', 'accent']
+    return lightPresets.includes(preset)
       ? theme.colors.palette.neutral100
       : theme.colors.text
   }, [preset, theme.colors])

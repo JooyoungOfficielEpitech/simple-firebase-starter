@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, Image } from "react-native"
-import { memo, useMemo } from "react"
+import { memo, useMemo, useCallback } from "react"
 import { Text } from "@/components/Text"
 import { StatusBadge } from "@/components/StatusBadge"
 import { useAppTheme } from "@/theme/context"
@@ -18,104 +18,112 @@ export const PostCard = memo<PostCardProps>(({ post, onPress, variant = "compact
     theme: { colors, spacing, typography },
   } = useAppTheme()
 
-  // Memoized style objects
-  const postCardStyle = useMemo(() => themed($postCard), [themed])
-  const postCardHeaderStyle = useMemo(() => themed($postCardHeader), [themed])
-  const postStatusRowStyle = useMemo(() => themed($postStatusRow), [themed])
-  const deadlineTextStyle = useMemo(() => themed($deadlineText), [themed])
-  const postTitleStyle = useMemo(() => themed($postTitle), [themed])
-  const imagePreviewStyle = useMemo(() => themed($imagePreview), [themed])
-  const previewImageStyle = useMemo(() => themed($previewImage), [themed])
-  const imageCountBadgeStyle = useMemo(() => themed($imageCountBadge), [themed])
-  const imageCountTextStyle = useMemo(() => themed($imageCountText), [themed])
-  const productionStyle = useMemo(() => themed($production), [themed])
-  const postMetaStyle = useMemo(() => themed($postMeta), [themed])
-  const organizationRowStyle = useMemo(() => themed($organizationRow), [themed])
-  const organizationStyle = useMemo(() => themed($organization), [themed])
-  const applicantCountStyle = useMemo(() => themed($applicantCount), [themed])
-  const locationStyle = useMemo(() => themed($location), [themed])
-  const scheduleStyle = useMemo(() => themed($schedule), [themed])
-  const rolesPreviewStyle = useMemo(() => themed($rolesPreview), [themed])
-  const rolesPreviewTextStyle = useMemo(() => themed($rolesPreviewText), [themed])
-  const moreRolesStyle = useMemo(() => themed($moreRoles), [themed])
-  const tagsContainerStyle = useMemo(() => themed($tagsContainer), [themed])
-  const tagStyle = useMemo(() => themed($tag), [themed])
-  const tagTextStyle = useMemo(() => themed($tagText), [themed])
+  // Consolidated style objects in single useMemo
+  const styles = useMemo(() => ({
+    postCard: themed($postCard),
+    postCardHeader: themed($postCardHeader),
+    postStatusRow: themed($postStatusRow),
+    deadlineText: themed($deadlineText),
+    postTitle: themed($postTitle),
+    imagePreview: themed($imagePreview),
+    previewImage: themed($previewImage),
+    imageCountBadge: themed($imageCountBadge),
+    imageCountText: themed($imageCountText),
+    production: themed($production),
+    postMeta: themed($postMeta),
+    organizationRow: themed($organizationRow),
+    organization: themed($organization),
+    applicantCount: themed($applicantCount),
+    location: themed($location),
+    schedule: themed($schedule),
+    rolesPreview: themed($rolesPreview),
+    rolesPreviewText: themed($rolesPreviewText),
+    moreRoles: themed($moreRoles),
+    tagsContainer: themed($tagsContainer),
+    tag: themed($tag),
+    tagText: themed($tagText),
+  }), [themed])
+
+  // Memoized onPress handler
+  const handlePress = useCallback(() => {
+    onPress(post.id)
+  }, [onPress, post.id])
 
   return (
     <TouchableOpacity
-      style={postCardStyle}
-      onPress={() => onPress(post.id)}
+      style={styles.postCard}
+      onPress={handlePress}
       accessibilityRole="button"
       accessibilityLabel={`${post.title} - ${post.production} 모집공고`}
       accessibilityHint="터치하여 상세정보 보기"
     >
-      <View style={postCardHeaderStyle}>
-        <View style={postStatusRowStyle}>
+      <View style={styles.postCardHeader}>
+        <View style={styles.postStatusRow}>
           <StatusBadge
             status={post.status === "active" ? "active" : "closed"}
             text={post.status === "active" ? translate("bulletinBoard:status.recruiting") : translate("bulletinBoard:status.closed")}
           />
           {post.deadline ? (
-            <Text text={translate("bulletinBoard:posts.deadline", { date: post.deadline })} style={deadlineTextStyle} />
+            <Text text={translate("bulletinBoard:posts.deadline", { date: post.deadline })} style={styles.deadlineText} />
           ) : null}
         </View>
-        <Text preset="subheading" text={post.title} style={postTitleStyle} />
+        <Text preset="subheading" text={post.title} style={styles.postTitle} />
 
         {/* 이미지 프리뷰 (Images 모드인 경우) */}
         {(post.postType === 'images' || post.images?.length > 0) && post.images?.length > 0 && (
-          <View style={imagePreviewStyle}>
+          <View style={styles.imagePreview}>
             <Image
               source={{ uri: post.images[0] }}
-              style={previewImageStyle}
+              style={styles.previewImage}
               resizeMode="cover"
+              fadeDuration={200}
             />
             {post.images.length > 1 && (
-              <View style={imageCountBadgeStyle}>
-                <Text text={`+${post.images.length - 1}`} style={imageCountTextStyle} />
+              <View style={styles.imageCountBadge}>
+                <Text text={`+${post.images.length - 1}`} style={styles.imageCountText} />
               </View>
             )}
           </View>
         )}
 
-        <Text text={post.production} style={productionStyle} />
+        <Text text={post.production} style={styles.production} />
       </View>
 
-      <View style={postMetaStyle}>
-        <View style={organizationRowStyle}>
-          <Text text={post.organizationName} style={organizationStyle} />
+      <View style={styles.postMeta}>
+        <View style={styles.organizationRow}>
+          <Text text={post.organizationName} style={styles.organization} />
           {post.totalApplicants > 0 ? (
-            <Text text={translate("bulletinBoard:posts.applicants", { count: post.totalApplicants })} style={applicantCountStyle} />
+            <Text text={translate("bulletinBoard:posts.applicants", { count: post.totalApplicants })} style={styles.applicantCount} />
           ) : null}
         </View>
-        <Text text={post.location} style={locationStyle} />
-        <Text text={post.rehearsalSchedule} style={scheduleStyle} />
+        <Text text={post.location} style={styles.location} />
+        <Text text={post.rehearsalSchedule} style={styles.schedule} />
       </View>
 
       {/* Role summary for quick scanning */}
       {post.roles?.length > 0 ? (
-        <View style={rolesPreviewStyle}>
+        <View style={styles.rolesPreview}>
           <Text
             text={post.roles.slice(0, 2).map(role => `${role.name}(${role.count}명)`).join(", ")}
-            style={rolesPreviewTextStyle}
+            style={styles.rolesPreviewText}
             numberOfLines={1}
           />
           {post.roles.length > 2 ? (
-            <Text text={translate("bulletinBoard:posts.moreRoles", { count: post.roles.length - 2 })} style={moreRolesStyle} />
+            <Text text={translate("bulletinBoard:posts.moreRoles", { count: post.roles.length - 2 })} style={styles.moreRoles} />
           ) : null}
         </View>
       ) : null}
 
       {post.tags?.length > 0 ? (
-        <View style={tagsContainerStyle}>
+        <View style={styles.tagsContainer}>
           {post.tags.slice(0, 3).map((tag, tagIndex) => (
-            <View key={tagIndex} style={tagStyle}>
-              <Text text={tag} style={tagTextStyle} />
+            <View key={`tag-${post.id}-${tagIndex}`} style={styles.tag}>
+              <Text text={tag} style={styles.tagText} />
             </View>
           ))}
           {post.tags.length > 3 ? (
-            <View style={tagStyle}>
-              <Text text={`+${post.tags.length - 3}`} style={tagTextStyle} />
+            <View style={styles.tag}>
+              <Text text={`+${post.tags.length - 3}`} style={styles.tagText} />
             </View>
           ) : null}
         </View>
@@ -123,11 +131,24 @@ export const PostCard = memo<PostCardProps>(({ post, onPress, variant = "compact
     </TouchableOpacity>
   )
 }, (prevProps, nextProps) => {
-  // Custom comparison for memo optimization
+  // Enhanced comparison for better memo optimization
+  // Only re-render if critical display fields change
+  const prev = prevProps.post
+  const next = nextProps.post
+
   return (
-    prevProps.post.id === nextProps.post.id &&
-    prevProps.post.status === nextProps.post.status &&
-    prevProps.post.totalApplicants === nextProps.post.totalApplicants &&
+    prev.id === next.id &&
+    prev.status === next.status &&
+    prev.title === next.title &&
+    prev.production === next.production &&
+    prev.organizationName === next.organizationName &&
+    prev.totalApplicants === next.totalApplicants &&
+    prev.deadline === next.deadline &&
+    prev.location === next.location &&
+    prev.rehearsalSchedule === next.rehearsalSchedule &&
+    prev.images?.length === next.images?.length &&
+    prev.roles?.length === next.roles?.length &&
+    prev.tags?.length === next.tags?.length &&
     prevProps.variant === nextProps.variant
   )
 })

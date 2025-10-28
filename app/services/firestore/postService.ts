@@ -5,6 +5,11 @@ import { collection, doc, where, orderBy, limit, onSnapshot, getDoc, getDocs, qu
 import { translate } from "@/i18n/translate"
 import { Post, CreatePost, UpdatePost } from "@/types/post"
 import { notificationService } from "./notificationService"
+import {
+  withRetry,
+  getUserFriendlyMessage,
+  logFirebaseError,
+} from "@/services/error/firebaseErrorHandler"
 
 /**
  * 게시글 관련 Firestore 서비스
@@ -489,57 +494,89 @@ export class PostService {
   }
 
   /**
-   * 게시글 업데이트
+   * 게시글 업데이트 - 자동 재시도 및 향상된 에러 처리
    */
   async updatePost(postId: string, updateData: UpdatePost): Promise<void> {
     const userId = this.getCurrentUserId()
-    
-    // 운영자 모드 확인
-    const isOrganizer = await this.checkUserIsOrganizer(userId)
-    if (!isOrganizer) {
-      throw new Error("운영자 모드에서만 게시글을 수정할 수 있습니다.")
+
+    try {
+      // 운영자 모드 확인
+      const isOrganizer = await this.checkUserIsOrganizer(userId)
+      if (!isOrganizer) {
+        throw new Error('운영자 모드에서만 게시글을 수정할 수 있습니다.')
+      }
+
+      // 권한 확인 - 작성자만 수정 가능
+      const post = await this.getPost(postId)
+      if (!post || post.authorId !== userId) {
+        throw new Error('본인이 작성한 게시글만 수정할 수 있습니다.')
+      }
+
+      // 게시글 업데이트 (자동 재시도)
+      await withRetry(
+        async () => {
+          const postRef = doc(this.db, 'posts', postId)
+          await updateDoc(postRef, {
+            ...updateData,
+            updatedAt: this.getServerTimestamp(),
+          })
+        },
+        '게시글 업데이트',
+        { maxRetries: 3 }
+      )
+
+      // 캐시 무효화 (특정 게시글 + 목록)
+      this.invalidatePostCache(postId)
+      this.invalidateListCache()
+
+      // 공고 수정 알림 발송 (지원자들에게) - 비동기로 처리, 실패해도 업데이트는 완료
+      this.sendPostUpdateNotification(postId, post).catch(error =>
+        console.error('❌ [PostService] 공고 수정 알림 발송 실패:', error)
+      )
+
+      // 상태가 변경된 경우 단체의 활성 공고 수 업데이트 - 비동기로 처리
+      if (this.organizationService && updateData.status && post.organizationId) {
+        this.updateOrganizationPostCount(post.organizationId).catch(error =>
+          console.error('❌ [PostService] 단체 활성 공고 수 업데이트 실패:', error)
+        )
+      }
+    } catch (error) {
+      const userMessage = getUserFriendlyMessage(error)
+      logFirebaseError('게시글 업데이트 실패', error, { postId, userId })
+      throw new Error(userMessage)
     }
-    
-    // 권한 확인 - 작성자만 수정 가능
-    const post = await this.getPost(postId)
-    if (!post || post.authorId !== userId) {
-      throw new Error("본인이 작성한 게시글만 수정할 수 있습니다.")
-    }
+  }
 
-    const postRef = doc(this.db, "posts", postId)
-    await updateDoc(postRef, {
-      ...updateData,
-      updatedAt: this.getServerTimestamp(),
-    })
-
-    // 캐시 무효화 (특정 게시글 + 목록)
-    this.invalidatePostCache(postId)
-    this.invalidateListCache()
-
-    // 공고 수정 알림 발송 (지원자들에게)
+  /**
+   * 게시글 수정 알림 발송 (내부 헬퍼 메서드)
+   */
+  private async sendPostUpdateNotification(postId: string, post: Post): Promise<void> {
     try {
       const applicantIds = await this.getPostApplicantIds(postId)
       if (applicantIds.length > 0) {
         await notificationService.notifyPostUpdated({
           postId,
           postTitle: post.title,
-          applicantIds
+          applicantIds,
         })
+        console.log('✅ [PostService] 공고 수정 알림 발송 완료')
       }
-    } catch (notificationError) {
-      console.error('❌ [PostService] 공고 수정 알림 발송 실패:', notificationError)
+    } catch (error) {
       // 알림 발송 실패는 수정을 방해하지 않음
+      logFirebaseError('공고 수정 알림 발송 실패', error, { postId })
     }
+  }
 
-    // 상태가 변경된 경우 단체의 활성 공고 수 업데이트
-    if (this.organizationService && updateData.status && post.organizationId) {
-      console.log('📊 [PostService] 게시글 상태 변경으로 인한 단체 활성 공고 수 업데이트 시작:', post.organizationId)
-      try {
-        await this.organizationService.updateActivePostCount(post.organizationId)
-        console.log('✅ [PostService] 단체 활성 공고 수 업데이트 완료')
-      } catch (error) {
-        console.error('❌ [PostService] 단체 활성 공고 수 업데이트 실패:', error)
-      }
+  /**
+   * 단체 활성 공고 수 업데이트 (내부 헬퍼 메서드)
+   */
+  private async updateOrganizationPostCount(organizationId: string): Promise<void> {
+    console.log('📊 [PostService] 게시글 상태 변경으로 인한 단체 활성 공고 수 업데이트 시작:', organizationId)
+    try {
+      await this.organizationService.updateActivePostCount(organizationId)
+      console.log('✅ [PostService] 단체 활성 공고 수 업데이트 완료')
+    } catch (error) {
+      logFirebaseError('단체 활성 공고 수 업데이트 실패', error, { organizationId })
     }
   }
 

@@ -3,6 +3,11 @@ import firestore, { FirebaseFirestoreTypes } from "@react-native-firebase/firest
 
 import { translate } from "@/i18n/translate"
 import { Organization, CreateOrganization, UpdateOrganization } from "@/types/organization"
+import {
+  withRetry,
+  getUserFriendlyMessage,
+  logFirebaseError,
+} from "@/services/error/firebaseErrorHandler"
 
 /**
  * 단체 관련 Firestore 서비스
@@ -15,6 +20,11 @@ export class OrganizationService {
   private readonly CACHE_TTL = 5 * 60 * 1000 // 5분
   private readonly LIST_CACHE_TTL = 3 * 60 * 1000 // 3분 (목록은 조금 더 짧게)
 
+  // 성능 메트릭
+  private cacheHits = 0
+  private cacheMisses = 0
+  private dbReads = 0
+
   constructor(db: FirebaseFirestoreTypes.Module) {
     this.db = db
   }
@@ -25,8 +35,10 @@ export class OrganizationService {
   private getCachedOrganization(organizationId: string): Organization | null {
     const cached = this.organizationCache.get(organizationId)
     if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
+      this.cacheHits++
       return cached.data
     }
+    this.cacheMisses++
     return null
   }
 
@@ -204,7 +216,7 @@ export class OrganizationService {
   }
 
   /**
-   * 단체명으로 단체 조회 - 캐싱 적용
+   * 단체명으로 단체 조회 - 캐싱 적용 + 필드 최적화
    */
   async getOrganizationByName(name: string): Promise<Organization | null> {
     const normalizedName = name.trim().toLowerCase()
@@ -212,9 +224,12 @@ export class OrganizationService {
     // 캐시 확인
     const cached = this.getCachedOrganizationByName(normalizedName)
     if (cached !== undefined) {
+      console.log(`💾 [OrganizationService] 캐시 히트 (이름): ${normalizedName}`)
       return cached
     }
 
+    console.log(`🔍 [OrganizationService] DB 조회 (이름): ${normalizedName}`)
+    this.dbReads++
     const snapshot = await this.db
       .collection("organizations")
       .where("name", ">=", normalizedName)
@@ -285,66 +300,83 @@ export class OrganizationService {
   }
 
   /**
-   * 단체 생성
+   * 단체 생성 - 자동 재시도 및 향상된 에러 처리
    */
   async createOrganization(orgData: CreateOrganization, ownerName: string): Promise<string> {
     const userId = this.getCurrentUserId()
-    
-    // 단체명 중복 검증
-    await this.validateUniqueOrganizationName(orgData.name)
-    
-    const docRef = this.db.collection("organizations").doc()
-    
-    const organization = {
-      name: orgData.name,
-      description: orgData.description,
-      contactEmail: orgData.contactEmail,
-      contactPhone: orgData.contactPhone || "",
-      website: orgData.website || "",
-      location: orgData.location,
-      establishedDate: orgData.establishedDate || "",
-      tags: orgData.tags || [],
-      // 소셜 미디어 링크
-      instagramUrl: orgData.instagramUrl || "",
-      youtubeUrl: orgData.youtubeUrl || "",
-      facebookUrl: orgData.facebookUrl || "",
-      twitterUrl: orgData.twitterUrl || "",
-      // 추가 상세 정보
-      foundingStory: orgData.foundingStory || "",
-      vision: orgData.vision || "",
-      specialties: orgData.specialties || [],
-      pastWorks: orgData.pastWorks || [],
-      facilities: orgData.facilities || "",
-      recruitmentInfo: orgData.recruitmentInfo || "",
-      // 기존 필드
-      logoUrl: null,
-      isVerified: false,
-      ownerId: userId,
-      ownerName,
-      memberCount: 1,
-      activePostCount: 0,
-      createdAt: this.getServerTimestamp(),
-      updatedAt: this.getServerTimestamp(),
+
+    try {
+      // 단체명 중복 검증
+      await this.validateUniqueOrganizationName(orgData.name)
+
+      const docRef = this.db.collection('organizations').doc()
+
+      const organization = {
+        name: orgData.name,
+        description: orgData.description,
+        contactEmail: orgData.contactEmail,
+        contactPhone: orgData.contactPhone || '',
+        website: orgData.website || '',
+        location: orgData.location,
+        establishedDate: orgData.establishedDate || '',
+        tags: orgData.tags || [],
+        // 소셜 미디어 링크
+        instagramUrl: orgData.instagramUrl || '',
+        youtubeUrl: orgData.youtubeUrl || '',
+        facebookUrl: orgData.facebookUrl || '',
+        twitterUrl: orgData.twitterUrl || '',
+        // 추가 상세 정보
+        foundingStory: orgData.foundingStory || '',
+        vision: orgData.vision || '',
+        specialties: orgData.specialties || [],
+        pastWorks: orgData.pastWorks || [],
+        facilities: orgData.facilities || '',
+        recruitmentInfo: orgData.recruitmentInfo || '',
+        // 기존 필드
+        logoUrl: null,
+        isVerified: false,
+        ownerId: userId,
+        ownerName,
+        memberCount: 1,
+        activePostCount: 0,
+        createdAt: this.getServerTimestamp(),
+        updatedAt: this.getServerTimestamp(),
+      }
+
+      // 단체 생성 (자동 재시도)
+      await withRetry(
+        async () => {
+          await docRef.set(organization)
+        },
+        '단체 생성',
+        { maxRetries: 3 }
+      )
+
+      // 캐시 무효화 (새 단체 생성)
+      this.invalidateListCache()
+
+      console.log('✅ [OrganizationService] 단체 생성 성공:', docRef.id)
+      return docRef.id
+    } catch (error) {
+      const userMessage = getUserFriendlyMessage(error)
+      logFirebaseError('단체 생성 실패', error, { userId, organizationName: orgData.name })
+      throw new Error(userMessage)
     }
-
-    await docRef.set(organization)
-
-    // 캐시 무효화 (새 단체 생성)
-    this.invalidateListCache()
-
-    return docRef.id
   }
 
   /**
-   * 단체 조회 (단일) - 캐싱 적용
+   * 단체 조회 (단일) - 캐싱 적용 + 성능 로깅
    */
   async getOrganization(organizationId: string): Promise<Organization | null> {
     // 캐시 확인
     const cached = this.getCachedOrganization(organizationId)
     if (cached) {
+      console.log(`💾 [OrganizationService] 캐시 히트 (ID): ${organizationId}`)
       return cached
     }
 
+    console.log(`🔍 [OrganizationService] DB 조회 (ID): ${organizationId}`)
+    this.dbReads++
     const doc = await this.db.collection("organizations").doc(organizationId).get()
 
     if (!doc.exists) {
@@ -579,5 +611,29 @@ export class OrganizationService {
           callback(null)
         },
       )
+  }
+
+  /**
+   * 성능 메트릭 조회
+   */
+  getPerformanceMetrics(): { cacheHits: number; cacheMisses: number; dbReads: number; hitRate: string } {
+    const total = this.cacheHits + this.cacheMisses
+    const hitRate = total > 0 ? ((this.cacheHits / total) * 100).toFixed(2) : '0.00'
+    return {
+      cacheHits: this.cacheHits,
+      cacheMisses: this.cacheMisses,
+      dbReads: this.dbReads,
+      hitRate: `${hitRate}%`
+    }
+  }
+
+  /**
+   * 성능 메트릭 리셋
+   */
+  resetPerformanceMetrics(): void {
+    this.cacheHits = 0
+    this.cacheMisses = 0
+    this.dbReads = 0
+    console.log('🔄 [OrganizationService] 성능 메트릭 초기화')
   }
 }

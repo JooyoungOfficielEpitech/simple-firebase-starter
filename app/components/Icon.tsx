@@ -1,3 +1,4 @@
+import React, { memo, useMemo } from "react"
 import {
   Image,
   ImageStyle,
@@ -8,7 +9,6 @@ import {
   ViewProps,
   ViewStyle,
 } from "react-native"
-import { memo, useMemo } from "react"
 
 import GoogleIcon from "@/components/Icons/GoogleIcon"
 import SettingsIcon from "@/components/Icons/SettingsIcon"
@@ -23,8 +23,16 @@ interface IconRegistry {
   svg: Record<string, SvgIconComponent>
 }
 
-// Icon cache for dynamic loading optimization
-const iconCache = new Map<string, PngIconSource | SvgIconComponent>()
+// Icon type discriminator for type safety
+type IconType = "png" | "svg"
+
+interface IconMetadata {
+  type: IconType
+  source: PngIconSource | SvgIconComponent
+}
+
+// Enhanced icon cache with metadata for better type discrimination
+const iconMetadataCache = new Map<string, IconMetadata>()
 
 export type IconTypes = keyof (typeof pngIconRegistry & typeof svgIconRegistry)
 
@@ -59,32 +67,67 @@ type PressableIconProps = Omit<TouchableOpacityProps, "style"> & BaseIconProps
 type IconProps = Omit<ViewProps, "style"> & BaseIconProps
 
 /**
- * Unified icon renderer with caching and optimization
+ * Get icon metadata with caching for optimal performance
+ * @param icon - Icon name
+ * @returns Icon metadata with type and source
+ */
+const getIconMetadata = (icon: IconTypes): IconMetadata => {
+  // Check cache first
+  if (iconMetadataCache.has(icon)) {
+    return iconMetadataCache.get(icon)!
+  }
+
+  // Determine icon type and source
+  let metadata: IconMetadata
+
+  if (icon in svgIconRegistry) {
+    metadata = {
+      type: "svg",
+      source: svgIconRegistry[icon as keyof typeof svgIconRegistry],
+    }
+  } else {
+    metadata = {
+      type: "png",
+      source: pngIconRegistry[icon as keyof typeof pngIconRegistry],
+    }
+  }
+
+  // Cache for future use
+  iconMetadataCache.set(icon, metadata)
+  return metadata
+}
+
+/**
+ * Unified icon renderer with enhanced caching and type safety
  * @param icon - Icon name to render
  * @param size - Icon size (default: 24)
  * @param color - Icon color
  * @param imageStyle - Style for PNG icons
  * @returns Rendered icon component
  */
-const renderIconContent = (
-  icon: IconTypes,
-  size: number,
-  color: string,
-  imageStyle: StyleProp<ImageStyle>,
-): JSX.Element => {
-  // Check cache first for performance
-  const cacheKey = `${icon}-${size}-${color}`
+const RenderIconContent = memo(function RenderIconContent({
+  icon,
+  size,
+  color,
+  imageStyle,
+}: {
+  icon: IconTypes
+  size: number
+  color: string
+  imageStyle: StyleProp<ImageStyle>
+}) {
+  const metadata = getIconMetadata(icon)
 
-  // SVG icon rendering
-  if (icon in svgIconRegistry) {
-    const SvgIcon = svgIconRegistry[icon as keyof typeof svgIconRegistry]
+  // Unified rendering logic based on icon type
+  if (metadata.type === "svg") {
+    const SvgIcon = metadata.source as SvgIconComponent
     return <SvgIcon width={size} height={size} color={color} />
   }
 
-  // PNG icon rendering with caching
-  const pngSource = pngIconRegistry[icon as keyof typeof pngIconRegistry]
+  // PNG icon rendering
+  const pngSource = metadata.source as PngIconSource
   return <Image style={imageStyle} source={pngSource} />
-}
+})
 
 /**
  * A component to render a registered icon.
@@ -118,14 +161,9 @@ export const PressableIcon = memo(function PressableIcon(props: PressableIconPro
     [iconColor, iconSize, $imageStyleOverride],
   )
 
-  const iconContent = useMemo(
-    () => renderIconContent(icon, iconSize, iconColor, $imageStyle),
-    [icon, iconSize, iconColor, $imageStyle],
-  )
-
   return (
     <TouchableOpacity {...pressableProps} style={$containerStyleOverride}>
-      {iconContent}
+      <RenderIconContent icon={icon} size={iconSize} color={iconColor} imageStyle={$imageStyle} />
     </TouchableOpacity>
   )
 })
@@ -162,14 +200,9 @@ export const Icon = memo(function Icon(props: IconProps) {
     [iconColor, iconSize, $imageStyleOverride],
   )
 
-  const iconContent = useMemo(
-    () => renderIconContent(icon, iconSize, iconColor, $imageStyle),
-    [icon, iconSize, iconColor, $imageStyle],
-  )
-
   return (
     <View {...viewProps} style={$containerStyleOverride}>
-      {iconContent}
+      <RenderIconContent icon={icon} size={iconSize} color={iconColor} imageStyle={$imageStyle} />
     </View>
   )
 })
@@ -212,8 +245,11 @@ export const svgIconRegistry = {
  * @param source - Icon source from require()
  */
 export function registerPngIcon(name: string, source: PngIconSource): void {
-  if (!iconCache.has(name)) {
-    iconCache.set(name, source)
+  if (!iconMetadataCache.has(name)) {
+    iconMetadataCache.set(name, {
+      type: "png",
+      source,
+    })
   }
 }
 
@@ -223,9 +259,30 @@ export function registerPngIcon(name: string, source: PngIconSource): void {
  * @param component - SVG component
  */
 export function registerSvgIcon(name: string, component: SvgIconComponent): void {
-  if (!iconCache.has(name)) {
-    iconCache.set(name, component)
+  if (!iconMetadataCache.has(name)) {
+    iconMetadataCache.set(name, {
+      type: "svg",
+      source: component,
+    })
   }
+}
+
+/**
+ * Clear icon metadata cache (useful for testing or dynamic reloading)
+ */
+export function clearIconCache(): void {
+  iconMetadataCache.clear()
+}
+
+/**
+ * Get icon type for a registered icon
+ * @param name - Icon name
+ * @returns Icon type or undefined if not registered
+ */
+export function getIconType(name: string): IconType | undefined {
+  if (name in svgIconRegistry) return "svg"
+  if (name in pngIconRegistry) return "png"
+  return undefined
 }
 
 /**

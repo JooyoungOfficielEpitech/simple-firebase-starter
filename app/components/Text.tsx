@@ -1,4 +1,4 @@
-import { ReactNode, forwardRef, Ref } from "react"
+import { ReactNode, forwardRef, Ref, useMemo } from "react"
 // eslint-disable-next-line no-restricted-imports
 import { Platform, StyleProp, Text as RNText, TextProps as RNTextProps, TextStyle } from "react-native"
 import { TOptions } from "i18next"
@@ -64,13 +64,15 @@ export const Text = forwardRef<RNText, TextProps>(function Text(props, ref) {
   const content = i18nText || text || children
 
   const preset: Presets = props.preset ?? "default"
-  const $styles: StyleProp<TextStyle> = [
+
+  // Memoize styles to prevent unnecessary recalculations
+  const $styles: StyleProp<TextStyle> = useMemo(() => [
     $rtlStyle,
     themed($presets[preset]),
     weight && $fontWeightStyles[weight],
     size && $sizeStyles[size],
     $styleOverride,
-  ]
+  ], [themed, preset, weight, size, $styleOverride])
 
   return (
     <RNText {...rest} style={$styles} ref={ref}>
@@ -78,6 +80,9 @@ export const Text = forwardRef<RNText, TextProps>(function Text(props, ref) {
     </RNText>
   )
 })
+
+// Set displayName for better debugging
+Text.displayName = 'Text'
 
 // 한국어 폰트 최적화: 한글 자모의 높이를 고려한 lineHeight 조정
 // 한글은 자음+모음 결합 구조로 인해 영문보다 약간 더 높은 line height가 필요

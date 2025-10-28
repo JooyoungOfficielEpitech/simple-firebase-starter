@@ -14,6 +14,12 @@ export class NotificationService {
   private readonly UNREAD_COUNT_CACHE_TTL = 1 * 60 * 1000 // 1분 (실시간성 중요)
   private readonly LIST_CACHE_TTL = 2 * 60 * 1000 // 2분
 
+  // 성능 메트릭
+  private cacheHits = 0
+  private cacheMisses = 0
+  private dbReads = 0
+  private batchWrites = 0
+
   constructor(firestoreInstance = firestore()) {
     this.db = firestoreInstance
   }
@@ -24,9 +30,11 @@ export class NotificationService {
   private getCachedUnreadCount(userId: string): number | null {
     const cached = this.unreadCountCache.get(userId)
     if (cached && Date.now() - cached.timestamp < this.UNREAD_COUNT_CACHE_TTL) {
+      this.cacheHits++
       console.log(`💾 [NotificationService] 읽지 않은 알림 수 캐시 조회: ${userId}`)
       return cached.count
     }
+    this.cacheMisses++
     return null
   }
 
@@ -46,9 +54,11 @@ export class NotificationService {
   private getCachedNotificationList(cacheKey: string): Notification[] | null {
     const cached = this.notificationListCache.get(cacheKey)
     if (cached && Date.now() - cached.timestamp < this.LIST_CACHE_TTL) {
+      this.cacheHits++
       console.log(`💾 [NotificationService] 알림 목록 캐시 조회: ${cacheKey}`)
       return cached.notifications
     }
+    this.cacheMisses++
     return null
   }
 
@@ -195,14 +205,15 @@ export class NotificationService {
         })
       })
 
+      this.batchWrites++
       await batch.commit()
 
       // 캐시 무효화
       if (userId) {
-        this.invalidateCache(userId)
+        this.invalidateAllCaches(userId)
       }
 
-      console.log(`✅ [NotificationService] ${notificationIds.length}개 알림 일괄 읽음 처리 완료`)
+      console.log(`✅ [NotificationService] ${notificationIds.length}개 알림 일괄 읽음 처리 완료 (배치: ${this.batchWrites})`)
     } catch (error) {
       console.error('❌ [NotificationService] 일괄 읽음 처리 실패:', error)
       throw error
@@ -221,6 +232,7 @@ export class NotificationService {
       }
 
       console.log('🔥 [NotificationService] 서버 사이드 읽지 않은 알림 수 조회')
+      this.dbReads++
 
       const snapshot = await this.db
         .collection('notifications')
@@ -566,15 +578,17 @@ export class NotificationService {
       })
     })
 
+    this.batchWrites++
     await batch.commit()
 
     // 캐시 무효화
-    params.applicantIds.forEach(id => this.invalidateCache(id))
+    params.applicantIds.forEach(id => this.invalidateAllCaches(id))
 
     console.log('🔔 [NotificationService] 공고 상태 변경 알림 발송:', {
       post: params.postTitle,
       status: params.newStatus,
-      recipients: params.applicantIds.length
+      recipients: params.applicantIds.length,
+      batchCount: this.batchWrites
     })
   }
 
@@ -610,15 +624,49 @@ export class NotificationService {
       })
     })
 
+    this.batchWrites++
     await batch.commit()
 
     // 캐시 무효화
-    params.applicantIds.forEach(id => this.invalidateCache(id))
+    params.applicantIds.forEach(id => this.invalidateAllCaches(id))
 
     console.log('🔔 [NotificationService] 공고 수정 알림 발송:', {
       post: params.postTitle,
-      recipients: params.applicantIds.length
+      recipients: params.applicantIds.length,
+      batchCount: this.batchWrites
     })
+  }
+
+  /**
+   * 성능 메트릭 조회
+   */
+  getPerformanceMetrics(): {
+    cacheHits: number
+    cacheMisses: number
+    dbReads: number
+    batchWrites: number
+    hitRate: string
+  } {
+    const total = this.cacheHits + this.cacheMisses
+    const hitRate = total > 0 ? ((this.cacheHits / total) * 100).toFixed(2) : '0.00'
+    return {
+      cacheHits: this.cacheHits,
+      cacheMisses: this.cacheMisses,
+      dbReads: this.dbReads,
+      batchWrites: this.batchWrites,
+      hitRate: `${hitRate}%`
+    }
+  }
+
+  /**
+   * 성능 메트릭 리셋
+   */
+  resetPerformanceMetrics(): void {
+    this.cacheHits = 0
+    this.cacheMisses = 0
+    this.dbReads = 0
+    this.batchWrites = 0
+    console.log('🔄 [NotificationService] 성능 메트릭 초기화')
   }
 }
 
