@@ -136,24 +136,32 @@ export function AudioPlayer({
   useEffect(() => {
     const initializeTrackPlayer = async () => {
       try {
+        console.log('🎵 AudioPlayer TrackPlayer 초기화 시작...');
+
         // 이미 초기화되었는지 확인 (중복 방지)
-        if (typeof global.state.isPlayerInitialized === 'function' && global.state.isPlayerInitialized()) {
+        if (typeof global.isPlayerInitialized === 'function' && global.isPlayerInitialized()) {
+          console.log('✅ AudioPlayer TrackPlayer 이미 초기화됨 - 건너뛰기');
           actions.setPlayerInitialized(true);
           return;
         }
 
         // TrackPlayer 초기화
+        console.log('⚙️ AudioPlayer TrackPlayer.setupPlayer() 호출...');
         await TrackPlayer.setupPlayer({
           waitForBuffer: true,
         });
+        console.log('✅ AudioPlayer TrackPlayer.setupPlayer() 완료');
 
         // 초기화 상태 업데이트
         if (typeof global.setPlayerInitialized === 'function') {
           global.setPlayerInitialized(true);
         }
-        
+
         actions.setPlayerInitialized(true);
+        console.log('✅ AudioPlayer 초기화 완료');
       } catch (error) {
+        console.error('❌ AudioPlayer TrackPlayer 초기화 실패:', error);
+        console.error('❌ 에러 스택:', error.stack);
         actions.setError('TrackPlayer 초기화에 실패했습니다.');
         actions.setPlayerInitialized(false);
       }

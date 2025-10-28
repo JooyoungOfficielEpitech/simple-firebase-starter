@@ -159,3 +159,125 @@ export const cleanupExpiredQueueEntries = onDocumentCreated(
     }
   },
 )
+
+/**
+ * Send push notification when a new notification document is created
+ * Triggers on notifications/{notificationId} document creation
+ */
+export const sendPushNotification = onDocumentCreated(
+  "notifications/{notificationId}",
+  async (event) => {
+    const snapshot = event.data
+    if (!snapshot) {
+      logger.error("No notification data associated with the event")
+      return
+    }
+
+    const notificationData = snapshot.data()
+    const notificationId = snapshot.id
+
+    // 필수 필드 검증
+    const { userId, title, message } = notificationData
+    if (!userId || !title || !message) {
+      logger.error("Missing required notification fields", { notificationId })
+      return
+    }
+
+    logger.info("Processing push notification", { notificationId, userId })
+
+    try {
+      // 사용자의 활성 FCM 토큰들 조회
+      const tokensSnapshot = await db
+        .collection("userFCMTokens")
+        .where("userId", "==", userId)
+        .where("isActive", "==", true)
+        .get()
+
+      if (tokensSnapshot.empty) {
+        logger.warn(`No active FCM tokens found for user ${userId}`)
+        return
+      }
+
+      const fcmTokens = tokensSnapshot.docs.map((doc) => doc.data().fcmToken)
+      logger.info(`Found ${fcmTokens.length} active FCM tokens for user ${userId}`)
+
+      // FCM 메시지 구성
+      const messages = fcmTokens.map((token) => ({
+        token,
+        notification: {
+          title,
+          body: message,
+        },
+        data: {
+          notificationId,
+          type: notificationData.type || "general",
+          postId: notificationData.postId || "",
+          ...(notificationData.applicantId && { applicantId: notificationData.applicantId }),
+          ...(notificationData.organizerId && { organizerId: notificationData.organizerId }),
+        },
+        apns: {
+          payload: {
+            aps: {
+              sound: "default",
+              badge: 1,
+            },
+          },
+        },
+        android: {
+          priority: "high" as const,
+          notification: {
+            sound: "default",
+            priority: "high" as const,
+          },
+        },
+      }))
+
+      // FCM으로 푸시 전송
+      const response = await admin.messaging().sendEach(messages)
+
+      // 결과 처리
+      const successCount = response.responses.filter((r) => r.success).length
+      const failureCount = response.failureCount
+
+      logger.info(
+        `Push notification sent: ${successCount} success, ${failureCount} failed`,
+        { notificationId, userId },
+      )
+
+      // 실패한 토큰들 처리 (무효한 토큰 비활성화)
+      if (failureCount > 0) {
+        const batch = db.batch()
+        response.responses.forEach((res, index) => {
+          if (!res.success && res.error) {
+            const errorCode = res.error.code
+            // 토큰이 무효하거나 등록되지 않은 경우
+            if (
+              errorCode === "messaging/invalid-registration-token" ||
+              errorCode === "messaging/registration-token-not-registered"
+            ) {
+              const invalidToken = fcmTokens[index]
+              logger.warn(`Deactivating invalid FCM token: ${invalidToken.substring(0, 20)}...`)
+
+              // 무효한 토큰 비활성화
+              const tokenDoc = tokensSnapshot.docs.find(
+                (doc) => doc.data().fcmToken === invalidToken,
+              )
+              if (tokenDoc) {
+                batch.update(tokenDoc.ref, {
+                  isActive: false,
+                  lastUsed: admin.firestore.FieldValue.serverTimestamp(),
+                })
+              }
+            }
+          }
+        })
+
+        await batch.commit()
+        logger.info(`Cleaned up ${failureCount} invalid FCM tokens`)
+      }
+    } catch (error) {
+      logger.error(`Error sending push notification for ${userId}:`, error)
+      throw error
+    }
+  },
+)
