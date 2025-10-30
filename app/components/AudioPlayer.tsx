@@ -369,6 +369,40 @@ export function AudioPlayer({
     }
   }, [audioFile, audioUrl, state.isPlayerInitialized])
 
+  // 🎵 오디오 로드 시 A-B 초기값 설정
+  useEffect(() => {
+    const duration = progress.duration || 0
+
+    // duration이 있고, A나 B가 아직 설정 안 되어 있으면 자동 설정
+    if (duration > 0 && (state.loopState.pointA === null || state.loopState.pointB === null)) {
+      if (__DEV__) console.log(`🎵 오디오 로드 완료 - A-B 초기값 설정 (duration: ${duration}s)`)
+      actions.setLoopState({
+        pointA: 0,
+        pointB: duration,
+        isLooping: true
+      })
+    }
+  }, [progress.duration, state.loopState.pointA, state.loopState.pointB, actions])
+
+  // 🔁 A-B 반복 재생 로직
+  useEffect(() => {
+    const { pointA, pointB, isLooping } = state.loopState
+
+    // A-B가 모두 설정되어 있고, 반복이 활성화되어 있을 때만
+    if (pointA === null || pointB === null || !isLooping) {
+      return
+    }
+
+    // 현재 재생 위치 확인
+    const currentPos = progress.position || 0
+
+    // B점을 넘어갔으면 A점으로 돌아가기
+    if (currentPos >= pointB && !state.isJumping) {
+      if (__DEV__) console.log(`🔁 B점 도달 (${currentPos.toFixed(2)}s) → A점으로 이동 (${pointA.toFixed(2)}s)`)
+      safeSeekTo(pointA, 'A-B 반복')
+    }
+  }, [progress.position, state.loopState, state.isJumping, safeSeekTo])
+
   // 🔑 useProgress가 localPosition을 따라잡으면 자동으로 해제
   useEffect(() => {
     if (localPosition !== null) {
@@ -592,8 +626,14 @@ export function AudioPlayer({
     return Math.max(0, Math.min(1, progressValue))
   }, [currentPosition, progress.duration])
 
-  // 진행바 터치 핸들러 - 간단해진 버전 (localPosition이 모든 것을 처리)
+  // 진행바 터치 핸들러 - 마커 드래그 처리 추가
   const handleProgressPressIn = (event: any) => {
+    // 마커 드래그 중이면 마커 드래그 처리
+    if (state.isDragging) {
+      handleMarkerDrag(event)
+      return
+    }
+
     const { locationX } = event.nativeEvent
     if (state.progressBarWidth > 0) {
       const ratio = Math.max(0, Math.min(1, locationX / state.progressBarWidth))
@@ -603,6 +643,12 @@ export function AudioPlayer({
   }
 
   const handleProgressTouch = (event: any) => {
+    // 마커 드래그 중이면 마커 드래그 처리
+    if (state.isDragging) {
+      handleMarkerDrag(event)
+      return
+    }
+
     const { locationX } = event.nativeEvent
     if (state.progressBarWidth > 0) {
       const ratio = Math.max(0, Math.min(1, locationX / state.progressBarWidth))
@@ -620,11 +666,92 @@ export function AudioPlayer({
   }
 
   const handleProgressPressOut = () => {
+    // 마커 드래그 종료 처리
+    if (state.isDragging) {
+      handleMarkerDragEnd()
+      return
+    }
+
     // 터치 종료 처리
     if (__DEV__) console.log('✋ 진행바 터치 종료')
   }
 
 
+
+  // A, B 점 설정 및 리셋 함수 제거 - 드래그로만 조작
+
+  // 마커 드래그 핸들러
+  const handleMarkerDragStart = useCallback((marker: 'A' | 'B', event: any) => {
+    event.stopPropagation()
+    actions.setDragging(marker)
+    const { pageX } = event.nativeEvent
+    if (__DEV__) console.log(`🖐️ ${marker} 마커 드래그 시작:`, pageX)
+  }, [actions])
+
+  const handleMarkerDrag = useCallback((event: any) => {
+    if (!state.isDragging) return
+
+    const { pageX } = event.nativeEvent
+    const duration = progress.duration || 0
+    if (duration === 0 || state.progressBarWidth === 0) return
+
+    // 진행바의 절대 위치를 측정하여 상대 위치 계산
+    if (progressBarRef.current) {
+      progressBarRef.current.measure((x, y, width, height, pageXPos, pageYPos) => {
+        const relativeX = pageX - pageXPos
+        const ratio = Math.max(0, Math.min(1, relativeX / width))
+        const newPosition = ratio * duration
+
+        if (__DEV__) console.log(`👆 ${state.isDragging} 마커 드래그:`, {
+          pageX,
+          pageXPos,
+          relativeX,
+          ratio: ratio.toFixed(3),
+          newPosition: newPosition.toFixed(2)
+        })
+
+        // A 또는 B 위치 업데이트
+        if (state.isDragging === 'A') {
+          // B가 있으면 A는 B보다 앞에만 가능
+          if (state.loopState.pointB !== null && newPosition >= state.loopState.pointB) {
+            return
+          }
+          actions.setLoopState({ pointA: newPosition })
+        } else if (state.isDragging === 'B') {
+          // A가 있으면 B는 A보다 뒤에만 가능
+          if (state.loopState.pointA !== null && newPosition <= state.loopState.pointA) {
+            return
+          }
+          actions.setLoopState({ pointB: newPosition })
+        }
+      })
+    }
+  }, [state.isDragging, state.loopState, state.progressBarWidth, progress.duration, actions])
+
+  const handleMarkerDragEnd = useCallback(() => {
+    if (state.isDragging) {
+      if (__DEV__) console.log(`✋ ${state.isDragging} 마커 드래그 종료`)
+
+      // A 마커 드래그 종료 시, 플레이어가 A-B 구간 밖에 있으면 A로 이동
+      if (state.isDragging === 'A' && state.loopState.pointA !== null && state.loopState.pointB !== null) {
+        const currentPos = currentPosition
+        const pointA = state.loopState.pointA
+        const pointB = state.loopState.pointB
+
+        // 플레이어가 A-B 구간 밖에 있는지 체크
+        const isOutsideAB = currentPos < pointA || currentPos > pointB
+
+        if (isOutsideAB) {
+          if (__DEV__) console.log(`🎯 플레이어(${currentPos.toFixed(2)}s)가 A-B 구간[${pointA.toFixed(2)}s, ${pointB.toFixed(2)}s] 밖 → A로 이동`)
+          safeSeekTo(pointA, 'A 마커 드래그로 구간 밖으로 벗어남')
+        } else {
+          if (__DEV__) console.log(`✅ 플레이어(${currentPos.toFixed(2)}s)가 A-B 구간[${pointA.toFixed(2)}s, ${pointB.toFixed(2)}s] 안 → 유지`)
+        }
+      }
+
+      actions.setDragging(null)
+    }
+  }, [state.isDragging, state.loopState.pointA, state.loopState.pointB, actions, currentPosition, safeSeekTo])
 
   // 구간 저장 - 사용자 입력 이름 사용
   const saveSection = (name: string) => {
@@ -643,10 +770,10 @@ export function AudioPlayer({
 
     const updatedSections = [...savedSections, newSection]
     onSavedSectionsChange?.(updatedSections)
-    
+
     // 로컬 스토리지에 자동 저장
     saveSectionsToStorage(updatedSections)
-    
+
     alert("저장 완료!", `"${newSection.name}" 구간이 저장되었습니다.`)
   }
 
@@ -689,8 +816,58 @@ export function AudioPlayer({
         />
       </View>
 
-      {/* 진행바 - A/B 마커 제거됨 */}
+      {/* 진행바 + A-B Pin 마커 */}
       <View style={themed($progressContainer)}>
+        {/* A, B Pin 마커 - 진행바 위에 위치 */}
+        <View style={themed($pinsContainer)}>
+          {/* A Pin 마커 */}
+          {state.loopState.pointA !== null && (
+            <View
+              style={[
+                themed($pinMarker),
+                themed($pinMarkerA),
+                state.isDragging === 'A' && themed($pinMarkerDragging),
+                { left: `${(state.loopState.pointA / (progress.duration || 1)) * 100}%` }
+              ]}
+              onStartShouldSetResponder={() => true}
+              onMoveShouldSetResponder={() => state.isDragging === 'A'}
+              onResponderGrant={(event) => handleMarkerDragStart('A', event)}
+              onResponderMove={(event) => handleMarkerDrag(event)}
+              onResponderRelease={handleMarkerDragEnd}
+              onResponderTerminationRequest={() => false}
+            >
+              <View style={[themed($pinHead), { backgroundColor: "#4CAF50" }]}>
+                <Text style={themed($pinText)}>A</Text>
+              </View>
+              <View style={themed($pinNeedle)} />
+            </View>
+          )}
+
+          {/* B Pin 마커 */}
+          {state.loopState.pointB !== null && (
+            <View
+              style={[
+                themed($pinMarker),
+                themed($pinMarkerB),
+                state.isDragging === 'B' && themed($pinMarkerDragging),
+                { left: `${(state.loopState.pointB / (progress.duration || 1)) * 100}%` }
+              ]}
+              onStartShouldSetResponder={() => true}
+              onMoveShouldSetResponder={() => state.isDragging === 'B'}
+              onResponderGrant={(event) => handleMarkerDragStart('B', event)}
+              onResponderMove={(event) => handleMarkerDrag(event)}
+              onResponderRelease={handleMarkerDragEnd}
+              onResponderTerminationRequest={() => false}
+            >
+              <View style={[themed($pinHead), { backgroundColor: "#F44336" }]}>
+                <Text style={themed($pinText)}>B</Text>
+              </View>
+              <View style={themed($pinNeedle)} />
+            </View>
+          )}
+        </View>
+
+        {/* 진행바 */}
         <View
           ref={progressBarRef}
           style={themed($progressTrack)}
@@ -700,6 +877,19 @@ export function AudioPlayer({
           onResponderRelease={() => handleProgressPressOut()}
           onLayout={handleProgressBarLayout}
         >
+          {/* A-B 구간 하이라이트 */}
+          {state.loopState.pointA !== null && state.loopState.pointB !== null && (
+            <View
+              style={[
+                themed($loopHighlight),
+                {
+                  left: `${(state.loopState.pointA / (progress.duration || 1)) * 100}%`,
+                  width: `${((state.loopState.pointB - state.loopState.pointA) / (progress.duration || 1)) * 100}%`
+                }
+              ]}
+            />
+          )}
+
           {/* 기본 진행바 */}
           <View
             style={[
@@ -710,7 +900,7 @@ export function AudioPlayer({
         </View>
       </View>
 
-      {/* A/B 위치 설정 버튼 제거됨 - 구간 저장 기능만 유지 */}
+      {/* A-B 제어 버튼 제거 - 드래그로만 조작 */}
 
       {/* 간단한 저장 모달 */}
       <Modal
@@ -927,9 +1117,11 @@ const $playButton: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
 
 
 const $progressContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  position: "relative",
   paddingVertical: spacing.md,
   paddingHorizontal: spacing.sm,
   width: "100%",
+  paddingTop: 50, // Pin 마커 공간 확보
 })
 
 const $timeContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
@@ -981,7 +1173,78 @@ const $errorText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   textAlign: "center",
 })
 
-// A/B 관련 스타일 제거됨
+// A/B 관련 스타일
+const $loopHighlight: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  position: "absolute",
+  height: "100%",
+  backgroundColor: colors.tint,
+  opacity: 0.2,
+  borderRadius: 4,
+})
+
+// Pin 마커 컨테이너 (진행바 위)
+const $pinsContainer: ThemedStyle<ViewStyle> = () => ({
+  position: "absolute",
+  top: -40, // 진행바 위 40px
+  left: 0,
+  right: 0,
+  height: 40,
+  zIndex: 20,
+})
+
+// Pin 마커 (A, B)
+const $pinMarker: ThemedStyle<ViewStyle> = () => ({
+  position: "absolute",
+  alignItems: "center",
+  width: 40,
+  marginLeft: -20, // 중앙 정렬
+  zIndex: 20,
+})
+
+// Pin 머리 (원형)
+const $pinHead: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  width: 28,
+  height: 28,
+  borderRadius: 14,
+  justifyContent: "center",
+  alignItems: "center",
+  shadowColor: colors.palette.neutral900,
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.3,
+  shadowRadius: 3,
+  elevation: 4,
+})
+
+// Pin 바늘 (세로선)
+const $pinNeedle: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  width: 2,
+  height: 20,
+  backgroundColor: colors.palette.neutral800,
+})
+
+// A Pin 색상
+const $pinMarkerA: ThemedStyle<ViewStyle> = () => ({
+  zIndex: 21,
+})
+
+// B Pin 색상
+const $pinMarkerB: ThemedStyle<ViewStyle> = () => ({
+  zIndex: 22,
+})
+
+// Pin 텍스트
+const $pinText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
+  fontSize: 12,
+  fontFamily: typography.primary.bold,
+  color: colors.background,
+})
+
+// Pin 드래그 상태
+const $pinMarkerDragging: ThemedStyle<ViewStyle> = () => ({
+  transform: [{ scale: 1.3 }],
+})
+
+// A-B 버튼 스타일 제거됨 - 드래그로만 조작
 
 const $saveButtonsContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   flexDirection: "row",
