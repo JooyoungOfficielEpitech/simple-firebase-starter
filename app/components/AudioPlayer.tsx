@@ -118,6 +118,7 @@ export function AudioPlayer({
   const seekTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const lastSeekTimeRef = useRef<number>(0) // 마지막 seek 시간 추적
   const isLoadingDurationRef = useRef<boolean>(false) // duration 로드 중 플래그
+  const lastABLoopTimeRef = useRef<number>(0) // 마지막 A-B 반복 점프 시간 추적
 
   // 로컬 position 추적 (useProgress보다 빠른 업데이트)
   const [localPosition, setLocalPosition] = useState<number | null>(null)
@@ -398,7 +399,17 @@ export function AudioPlayer({
 
     // B점을 넘어갔으면 A점으로 돌아가기
     if (currentPos >= pointB && !state.isJumping) {
+      // 마지막 A-B 점프로부터 최소 500ms 경과했는지 확인 (버벅임 방지)
+      const now = Date.now()
+      const timeSinceLastLoop = now - lastABLoopTimeRef.current
+
+      if (timeSinceLastLoop < 500) {
+        if (__DEV__) console.log(`⏳ A-B 반복 쿨다운 중... (${timeSinceLastLoop}ms < 500ms)`)
+        return
+      }
+
       if (__DEV__) console.log(`🔁 B점 도달 (${currentPos.toFixed(2)}s) → A점으로 이동 (${pointA.toFixed(2)}s)`)
+      lastABLoopTimeRef.current = now
       safeSeekTo(pointA, 'A-B 반복')
     }
   }, [progress.position, state.loopState, state.isJumping, safeSeekTo])
@@ -634,11 +645,30 @@ export function AudioPlayer({
       return
     }
 
-    const { locationX } = event.nativeEvent
-    if (state.progressBarWidth > 0) {
-      const ratio = Math.max(0, Math.min(1, locationX / state.progressBarWidth))
-      if (__DEV__) console.log('👆 진행바 터치:', { locationX, progressBarWidth: state.progressBarWidth, ratio })
-      seekToPosition(ratio)
+    // pageX와 measure()를 사용하여 정확한 위치 계산
+    const { pageX } = event.nativeEvent
+    if (progressBarRef.current) {
+      progressBarRef.current.measure((_x, _y, width, _height, pageXPos, _pageYPos) => {
+        const relativeX = pageX - pageXPos
+        const ratio = Math.max(0, Math.min(1, relativeX / width))
+
+        // A-B 구간이 설정되어 있으면 구간 내로 제한
+        const duration = progress.duration || 0
+        if (duration > 0 && state.loopState.pointA !== null && state.loopState.pointB !== null) {
+          const targetPosition = ratio * duration
+          const pointA = state.loopState.pointA
+          const pointB = state.loopState.pointB
+
+          // A-B 구간 밖이면 차단
+          if (targetPosition < pointA || targetPosition > pointB) {
+            if (__DEV__) console.log(`🚫 진행바 터치 차단: ${targetPosition.toFixed(2)}s는 A-B 구간[${pointA.toFixed(2)}s, ${pointB.toFixed(2)}s] 밖`)
+            return
+          }
+        }
+
+        if (__DEV__) console.log('👆 진행바 터치:', { pageX, pageXPos, relativeX, width, ratio: ratio.toFixed(3) })
+        seekToPosition(ratio)
+      })
     }
   }
 
@@ -649,19 +679,37 @@ export function AudioPlayer({
       return
     }
 
-    const { locationX } = event.nativeEvent
-    if (state.progressBarWidth > 0) {
-      const ratio = Math.max(0, Math.min(1, locationX / state.progressBarWidth))
+    // 드래그 중에는 50ms throttle 적용 (부드러운 드래그를 위해)
+    const now = Date.now()
+    if (now - lastSeekTimeRef.current < 50) {
+      return
+    }
+    lastSeekTimeRef.current = now
 
-      // 드래그 중에는 50ms throttle 적용 (부드러운 드래그를 위해)
-      const now = Date.now()
-      if (now - lastSeekTimeRef.current < 50) {
-        return
-      }
-      lastSeekTimeRef.current = now
+    // pageX와 measure()를 사용하여 정확한 위치 계산
+    const { pageX } = event.nativeEvent
+    if (progressBarRef.current) {
+      progressBarRef.current.measure((_x, _y, width, _height, pageXPos, _pageYPos) => {
+        const relativeX = pageX - pageXPos
+        const ratio = Math.max(0, Math.min(1, relativeX / width))
 
-      if (__DEV__) console.log('👉 진행바 드래그:', { locationX, progressBarWidth: state.progressBarWidth, ratio })
-      seekToPosition(ratio)
+        // A-B 구간이 설정되어 있으면 구간 내로 제한
+        const duration = progress.duration || 0
+        if (duration > 0 && state.loopState.pointA !== null && state.loopState.pointB !== null) {
+          const targetPosition = ratio * duration
+          const pointA = state.loopState.pointA
+          const pointB = state.loopState.pointB
+
+          // A-B 구간 밖이면 차단
+          if (targetPosition < pointA || targetPosition > pointB) {
+            if (__DEV__) console.log(`🚫 진행바 드래그 차단: ${targetPosition.toFixed(2)}s는 A-B 구간[${pointA.toFixed(2)}s, ${pointB.toFixed(2)}s] 밖`)
+            return
+          }
+        }
+
+        if (__DEV__) console.log('👉 진행바 드래그:', { pageX, pageXPos, relativeX, width, ratio: ratio.toFixed(3) })
+        seekToPosition(ratio)
+      })
     }
   }
 
