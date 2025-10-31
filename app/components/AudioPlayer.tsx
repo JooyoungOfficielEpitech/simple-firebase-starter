@@ -123,6 +123,7 @@ export function AudioPlayer({
   // 로컬 position 추적 (useProgress보다 빠른 업데이트)
   const [localPosition, setLocalPosition] = useState<number | null>(null)
   const localPositionTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const isABLoopJumpRef = useRef<boolean>(false) // A-B 반복 점프 중인지 플래그
 
   // 🔧 통합 seekTo 함수 - 모든 재생 위치 변경을 여기서 관리
   const safeSeekTo = useCallback(async (positionSeconds: number, reason: string = '') => {
@@ -130,6 +131,24 @@ export function AudioPlayer({
 
     // 🔑 로컬 position 즉시 업데이트 (useProgress보다 빠름)
     setLocalPosition(positionSeconds)
+
+    // A-B 반복일 경우 localPosition 타임아웃을 더 길게 설정
+    if (reason === 'A-B 반복') {
+      // 기존 타이머 취소
+      if (localPositionTimeoutRef.current) {
+        clearTimeout(localPositionTimeoutRef.current)
+      }
+
+      // A-B 반복 플래그 설정 (useEffect 자동 타이머 방지)
+      isABLoopJumpRef.current = true
+
+      // A-B 반복은 긴 거리 점프이므로 1.5초 후 해제
+      localPositionTimeoutRef.current = setTimeout(() => {
+        setLocalPosition(null)
+        isABLoopJumpRef.current = false
+        if (__DEV__) console.log('⚠️ localPosition 타임아웃 해제 (A-B 반복, 1.5초 경과)')
+      }, 1500)
+    }
 
     // isJumping 플래그 설정
     actions.setIsJumping(true)
@@ -429,8 +448,15 @@ export function AudioPlayer({
 
         // 즉시 해제
         setLocalPosition(null)
+        isABLoopJumpRef.current = false
         if (__DEV__) console.log(`✅ localPosition 자동 해제 - useProgress 따라잡음 (diff: ${diff.toFixed(3)}s)`)
       } else {
+        // A-B 반복 점프 중이면 타이머 설정 건너뛰기 (safeSeekTo에서 이미 설정함)
+        if (isABLoopJumpRef.current) {
+          if (__DEV__) console.log('⏭️ A-B 반복 중 - useEffect 타이머 건너뛰기')
+          return
+        }
+
         // 아직 멀면 안전장치로 1초 후 강제 해제
         if (localPositionTimeoutRef.current) {
           clearTimeout(localPositionTimeoutRef.current)
