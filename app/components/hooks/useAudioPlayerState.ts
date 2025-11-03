@@ -55,6 +55,8 @@ export type AudioPlayerAction =
   | { type: 'SET_DRAG_START'; payload: { x: number; time: number } }
   | { type: 'RESET_LOOP_STATE' }
   | { type: 'RESET_FOR_NEW_AUDIO' }
+  | { type: 'LOAD_SECTION'; payload: SavedSection }
+  | { type: 'AUTO_SET_B_TO_DURATION'; payload: number }
 
 // Initial state
 const initialState: AudioPlayerState = {
@@ -161,7 +163,25 @@ function audioPlayerReducer(state: AudioPlayerState, action: AudioPlayerAction):
         sectionName: '',
         isDragging: null,
       }
-    
+
+    case 'LOAD_SECTION':
+      return {
+        ...state,
+        loopState: {
+          pointA: action.payload.pointA,
+          pointB: action.payload.pointB,
+          isLooping: true,
+          currentSection: action.payload,
+        },
+      }
+
+    case 'AUTO_SET_B_TO_DURATION':
+      return {
+        ...state,
+        loopState: { ...state.loopState, pointB: action.payload },
+        hasAutoSetB: true,
+      }
+
     default:
       return state
   }
@@ -231,6 +251,14 @@ export function useAudioPlayerState() {
 
     resetForNewAudio: useCallback(() => {
       dispatch({ type: 'RESET_FOR_NEW_AUDIO' })
+    }, []),
+
+    loadSection: useCallback((section: SavedSection) => {
+      dispatch({ type: 'LOAD_SECTION', payload: section })
+    }, []),
+
+    autoSetBToDuration: useCallback((duration: number) => {
+      dispatch({ type: 'AUTO_SET_B_TO_DURATION', payload: duration })
     }, []),
   }
 

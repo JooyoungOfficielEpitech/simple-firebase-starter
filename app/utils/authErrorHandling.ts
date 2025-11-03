@@ -42,8 +42,8 @@ export function showAuthError(error: unknown, config: AuthErrorConfig): void {
 function createAuthErrorHandler(titleKey: string, defaultMessageKey: string) {
   return (error: unknown, showAlert?: (title: string, message: string, buttons?: AlertButton[]) => void): void => {
     showAuthError(error, {
-      title: translate(titleKey),
-      defaultMessage: translate(defaultMessageKey),
+      title: translate(titleKey as any),
+      defaultMessage: translate(defaultMessageKey as any),
       showAlert,
     })
   }

@@ -12,7 +12,7 @@ import { Screen } from "@/components/Screen"
 import { ScreenHeader } from "@/components/ScreenHeader"
 import { Text } from "@/components/Text"
 import { AlertModal } from "@/components/AlertModal"
-import { Dropdown, type DropdownOption } from "@/components/Dropdown"
+import { Dropdown } from "@/components/Dropdown"
 import { postService, userService, organizationService } from "@/services/firestore"
 import { getStorage } from "@react-native-firebase/storage"
 import firestore from "@react-native-firebase/firestore"
@@ -20,7 +20,7 @@ import { useAppTheme } from "@/theme/context"
 import { useAlert } from "@/hooks/useAlert"
 import { CreatePost, UpdatePost, PostType } from "@/types/post"
 import { UserProfile } from "@/types/user"
-import { BulletinBoardStackParamList } from "@/navigators/BulletinBoardStackNavigator"
+import { BulletinBoardStackParamList } from "@/navigators/types"
 import { POST_TEMPLATES, PostTemplate } from "@/utils/postTemplates"
 
 type NavigationProp = NativeStackNavigationProp<BulletinBoardStackParamList>
@@ -34,7 +34,7 @@ export const CreatePostScreen = () => {
   
   const {
     themed,
-    theme: { colors, spacing, typography },
+    theme: { colors },
   } = useAppTheme()
 
   const { alertState, alert, hideAlert } = useAlert()
@@ -46,7 +46,6 @@ export const CreatePostScreen = () => {
   const [showDeadlinePicker, setShowDeadlinePicker] = useState(false)
   const [showAuditionDatePicker, setShowAuditionDatePicker] = useState(false)
   const [showAuditionResultPicker, setShowAuditionResultPicker] = useState(false)
-  const [showPerformanceDatePicker, setShowPerformanceDatePicker] = useState(false)
   
   // 모드 관련 상태
   const [postMode, setPostMode] = useState<PostType>('text')
@@ -469,7 +468,7 @@ export const CreatePostScreen = () => {
 
       // 이미지 선택
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsMultipleSelection: true,
         selectionLimit: 5,
         quality: 0.8,
@@ -659,7 +658,7 @@ export const CreatePostScreen = () => {
   }
 
   // 날짜 변경 핸들러들
-  const handleDeadlineChange = (event: any, selectedDate?: Date) => {
+  const handleDeadlineChange = (_event: any, selectedDate?: Date) => {
     if (Platform.OS === 'android') {
       setShowDeadlinePicker(false)
     }
@@ -671,7 +670,7 @@ export const CreatePostScreen = () => {
     }
   }
 
-  const handleAuditionDateChange = (event: any, selectedDate?: Date) => {
+  const handleAuditionDateChange = (_event: any, selectedDate?: Date) => {
     if (Platform.OS === 'android') {
       setShowAuditionDatePicker(false)
     }
@@ -683,7 +682,7 @@ export const CreatePostScreen = () => {
     }
   }
 
-  const handleAuditionResultChange = (event: any, selectedDate?: Date) => {
+  const handleAuditionResultChange = (_event: any, selectedDate?: Date) => {
     if (Platform.OS === 'android') {
       setShowAuditionResultPicker(false)
     }

@@ -16,10 +16,10 @@ import { useAppTheme } from "@/theme/context"
 import { useAlert } from "@/hooks/useAlert"
 import { CreateOrganization } from "@/types/organization"
 import { UserProfile } from "@/types/user"
-import { BulletinBoardStackParamList } from "@/navigators/BulletinBoardStackNavigator"
+import { AppStackParamList } from "@/navigators/types"
 
-type NavigationProp = NativeStackNavigationProp<BulletinBoardStackParamList, "CreateOrganization">
-type RouteProp = import("@react-navigation/native").RouteProp<BulletinBoardStackParamList, "CreateOrganization">
+type NavigationProp = NativeStackNavigationProp<AppStackParamList, "CreateOrganization">
+type RouteProp = import("@react-navigation/native").RouteProp<AppStackParamList, "CreateOrganization">
 
 export const CreateOrganizationScreen = () => {
   const { top } = useSafeAreaInsets()

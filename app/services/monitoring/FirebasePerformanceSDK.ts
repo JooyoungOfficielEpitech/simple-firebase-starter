@@ -37,7 +37,7 @@ export class FirebasePerformanceSDK {
   private traceMetrics: Map<string, { startTime: number; endTime?: number; duration?: number }> = new Map()
 
   private constructor() {
-    logger.info('[FirebasePerformance] SDK initialized')
+    logger.info('FirebasePerformance', 'SDK initialized')
   }
 
   static getInstance(): FirebasePerformanceSDK {
@@ -71,9 +71,9 @@ export class FirebasePerformanceSDK {
       this.activeTraces.set(traceName, trace)
       this.traceMetrics.set(traceName, { startTime: Date.now() })
 
-      logger.info(`[FirebasePerformance] Trace started: ${traceName}`, options)
+      logger.info('FirebasePerformance', `Trace started: ${traceName}`, options)
     } catch (error) {
-      logger.error(`[FirebasePerformance] Failed to start trace: ${traceName}`, error)
+      logger.error('FirebasePerformance', `Failed to start trace: ${traceName}`, { error })
     }
   }
 
@@ -84,7 +84,7 @@ export class FirebasePerformanceSDK {
     try {
       const trace = this.activeTraces.get(traceName)
       if (!trace) {
-        logger.warn(`[FirebasePerformance] No active trace found: ${traceName}`)
+        logger.warn('FirebasePerformance', `No active trace found: ${traceName}`)
         return
       }
 
@@ -106,12 +106,12 @@ export class FirebasePerformanceSDK {
 
       this.activeTraces.delete(traceName)
 
-      logger.info(`[FirebasePerformance] Trace stopped: ${traceName}`, {
+      logger.info('FirebasePerformance', `Trace stopped: ${traceName}`, {
         duration: metric?.duration,
         additionalMetrics
       })
     } catch (error) {
-      logger.error(`[FirebasePerformance] Failed to stop trace: ${traceName}`, error)
+      logger.error('FirebasePerformance', `Failed to stop trace: ${traceName}`, { error })
     }
   }
 
@@ -142,14 +142,14 @@ export class FirebasePerformanceSDK {
     try {
       const trace = this.activeTraces.get(traceName)
       if (!trace) {
-        logger.warn(`[FirebasePerformance] No active trace found: ${traceName}`)
+        logger.warn('FirebasePerformance', `No active trace found: ${traceName}`)
         return
       }
 
       await trace.putAttribute(key, value)
-      logger.info(`[FirebasePerformance] Attribute added to ${traceName}: ${key}=${value}`)
+      logger.info('FirebasePerformance', `Attribute added to ${traceName}: ${key}=${value}`)
     } catch (error) {
-      logger.error(`[FirebasePerformance] Failed to add attribute to trace: ${traceName}`, error)
+      logger.error('FirebasePerformance', `Failed to add attribute to trace: ${traceName}`, { error })
     }
   }
 
@@ -160,14 +160,14 @@ export class FirebasePerformanceSDK {
     try {
       const trace = this.activeTraces.get(traceName)
       if (!trace) {
-        logger.warn(`[FirebasePerformance] No active trace found: ${traceName}`)
+        logger.warn('FirebasePerformance', `No active trace found: ${traceName}`)
         return
       }
 
       await trace.incrementMetric(metricName, value)
-      logger.info(`[FirebasePerformance] Metric incremented in ${traceName}: ${metricName} +${value}`)
+      logger.info('FirebasePerformance', `Metric incremented in ${traceName}: ${metricName} +${value}`)
     } catch (error) {
-      logger.error(`[FirebasePerformance] Failed to increment metric: ${traceName}`, error)
+      logger.error('FirebasePerformance', `Failed to increment metric: ${traceName}`, { error })
     }
   }
 
@@ -215,7 +215,7 @@ export class FirebasePerformanceSDK {
     }
 
     this.traceMetrics.clear()
-    logger.info('[FirebasePerformance] All traces cleared')
+    logger.info('FirebasePerformance', 'All traces cleared')
   }
 
   /**
@@ -224,9 +224,9 @@ export class FirebasePerformanceSDK {
   async setPerformanceCollectionEnabled(enabled: boolean): Promise<void> {
     try {
       await perf().setPerformanceCollectionEnabled(enabled)
-      logger.info(`[FirebasePerformance] Collection ${enabled ? 'enabled' : 'disabled'}`)
+      logger.info('FirebasePerformance', `Collection ${enabled ? 'enabled' : 'disabled'}`)
     } catch (error) {
-      logger.error('[FirebasePerformance] Failed to set collection enabled', error)
+      logger.error('FirebasePerformance', 'Failed to set collection enabled', { error })
     }
   }
 
@@ -235,9 +235,11 @@ export class FirebasePerformanceSDK {
    */
   async isPerformanceCollectionEnabled(): Promise<boolean> {
     try {
-      return await perf().isPerformanceCollectionEnabled()
+      const perfModule = perf()
+      // Type assertion needed due to @react-native-firebase/perf type definitions
+      return await (perfModule.isPerformanceCollectionEnabled as unknown as () => Promise<boolean>)()
     } catch (error) {
-      logger.error('[FirebasePerformance] Failed to check collection enabled', error)
+      logger.error('FirebasePerformance', 'Failed to check collection enabled', { error })
       return false
     }
   }

@@ -153,10 +153,11 @@ export class NotificationService {
           callback(notifications)
         },
         (error) => {
-          if (error.code === 'firestore/failed-precondition' && error.message.includes('index')) {
+          const firestoreError = error as { code?: string; message: string }
+          if (firestoreError.code === 'firestore/failed-precondition' && error.message.includes('index')) {
             console.warn("⏳ [NotificationService] 인덱스 생성 중 - 잠시 후 다시 시도하세요")
           } else {
-            console.error('❌ [NotificationService] 알림 구독 오류:', error.code || error.message)
+            console.error('❌ [NotificationService] 알림 구독 오류:', firestoreError.code || error.message)
           }
           callback([])
         }
@@ -273,10 +274,11 @@ export class NotificationService {
           callback(snapshot.size)
         },
         (error) => {
-          if (error.code === 'firestore/failed-precondition' && error.message.includes('index')) {
+          const firestoreError = error as { code?: string; message: string }
+          if (firestoreError.code === 'firestore/failed-precondition' && error.message.includes('index')) {
             console.warn("⏳ [NotificationService] 인덱스 생성 중 - 0 반환")
           } else {
-            console.error('❌ [NotificationService] 읽지 않은 알림 수 구독 오류:', error.code || error.message)
+            console.error('❌ [NotificationService] 읽지 않은 알림 수 구독 오류:', firestoreError.code || error.message)
           }
           callback(0)
         }

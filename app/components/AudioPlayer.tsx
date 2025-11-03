@@ -82,6 +82,10 @@ export interface AudioPlayerProps {
    */
   onLoadSection?: (section: SavedSection) => void
   /**
+   * 구간 삭제 콜백
+   */
+  onDeleteSection?: (sectionId: string) => void
+  /**
    * 외부에서 로드할 구간 (이 값이 변경되면 자동으로 로드됨)
    */
   loadSection?: SavedSection | null
@@ -98,6 +102,7 @@ export function AudioPlayer({
   savedSections = [],
   onSavedSectionsChange,
   onLoadSection,
+  onDeleteSection,
   loadSection,
 }: AudioPlayerProps) {
   // Validate props to prevent text rendering errors
@@ -119,6 +124,7 @@ export function AudioPlayer({
   const lastSeekTimeRef = useRef<number>(0) // 마지막 seek 시간 추적
   const isLoadingDurationRef = useRef<boolean>(false) // duration 로드 중 플래그
   const lastABLoopTimeRef = useRef<number>(0) // 마지막 A-B 반복 점프 시간 추적
+  const lastLoadedSectionIdRef = useRef<string | null>(null) // 마지막으로 로드한 구간 ID 추적
 
   // 로컬 position 추적 (useProgress보다 빠른 업데이트)
   const [localPosition, setLocalPosition] = useState<number | null>(null)
@@ -265,6 +271,31 @@ export function AudioPlayer({
       onSavedSectionsChange?.(loadedSections)
     }
   }, [])
+
+  // 외부에서 loadSection prop으로 구간이 전달되면 자동 로드
+  useEffect(() => {
+    // 같은 구간을 중복 로드하지 않도록 체크
+    if (loadSection && state.isPlayerInitialized && loadSection.id !== lastLoadedSectionIdRef.current) {
+      if (__DEV__) console.log(`📥 구간 로드: "${loadSection.name}" [${loadSection.pointA.toFixed(2)}s ~ ${loadSection.pointB.toFixed(2)}s]`)
+
+      // 마지막 로드 ID 저장
+      lastLoadedSectionIdRef.current = loadSection.id
+
+      // 1. A/B 마커 설정
+      actions.loadSection(loadSection)
+
+      // 2. A점으로 재생 위치 이동
+      safeSeekTo(loadSection.pointA, '구간 로드')
+
+      // 3. 부모 컴포넌트에 로드 완료 알림
+      if (onLoadSection) {
+        onLoadSection(loadSection)
+      }
+
+      if (__DEV__) console.log('✅ 구간 로드 완료')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadSection?.id, state.isPlayerInitialized])
 
   // TrackPlayer용 오디오 소스 결정
   const getAudioSource = useCallback(() => {
@@ -849,6 +880,22 @@ export function AudioPlayer({
     saveSectionsToStorage(updatedSections)
 
     alert("저장 완료!", `"${newSection.name}" 구간이 저장되었습니다.`)
+  }
+
+  // 구간 삭제
+  const handleDeleteSection = (sectionId: string) => {
+    if (__DEV__) console.log(`🗑️ 구간 삭제: ${sectionId}`)
+
+    const updatedSections = savedSections.filter(section => section.id !== sectionId)
+    onSavedSectionsChange?.(updatedSections)
+
+    // 로컬 스토리지에서도 삭제
+    saveSectionsToStorage(updatedSections)
+
+    // 부모 컴포넌트에 알림
+    onDeleteSection?.(sectionId)
+
+    if (__DEV__) console.log('✅ 구간 삭제 완료')
   }
 
 

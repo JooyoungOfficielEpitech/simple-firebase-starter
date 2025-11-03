@@ -4,6 +4,7 @@
 
 export { useAuthStore } from "./authStore"
 export { useThemeStore } from "./themeStore"
+export { useNotificationStore } from "./notificationStore"
 
 // 기존 Context API 호환 레이어 (점진적 마이그레이션)
 // TODO: Create compatibility layer for gradual migration

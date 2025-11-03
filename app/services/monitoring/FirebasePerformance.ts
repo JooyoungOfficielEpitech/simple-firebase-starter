@@ -16,9 +16,9 @@ export class FirebasePerformance {
     try {
       const trace = await perf().startTrace(traceName)
       this.traces.set(traceName, trace)
-      logger.debug(`🔥 Started trace: ${traceName}`)
+      logger.debug('FirebasePerformance', `🔥 Started trace: ${traceName}`)
     } catch (error) {
-      logger.error(`Failed to start trace ${traceName}:`, error)
+      logger.error('FirebasePerformance', `Failed to start trace ${traceName}`, { error })
     }
   }
 
@@ -31,10 +31,10 @@ export class FirebasePerformance {
       if (trace) {
         await trace.stop()
         this.traces.delete(traceName)
-        logger.debug(`🔥 Stopped trace: ${traceName}`)
+        logger.debug('FirebasePerformance', `🔥 Stopped trace: ${traceName}`)
       }
     } catch (error) {
-      logger.error(`Failed to stop trace ${traceName}:`, error)
+      logger.error('FirebasePerformance', `Failed to stop trace ${traceName}`, { error })
     }
   }
 

@@ -1,5 +1,5 @@
 import React, { memo, useState, useRef, useCallback } from "react"
-import { View, ViewStyle, TouchableOpacity } from "react-native"
+import { View, ViewStyle, TextStyle, TouchableOpacity } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 
 import { Text } from "@/components/Text"
@@ -46,7 +46,7 @@ export const ProgressBar = memo<ProgressBarProps>(({
     return Math.max(0, Math.min(1, progressValue))
   }, [progress, duration])
 
-  const getPercentage = useCallback((value: number | null, total: number | null): string => {
+  const getPercentage = useCallback((value: number | null, total: number | null): `${number}%` => {
     if (value === null || total === null || total <= 0 || isNaN(value) || isNaN(total)) {
       return "0%"
     }
@@ -54,7 +54,7 @@ export const ProgressBar = memo<ProgressBarProps>(({
     if (isNaN(percentage) || !isFinite(percentage)) {
       return "0%"
     }
-    return `${Math.max(0, Math.min(100, percentage))}%`
+    return `${Math.max(0, Math.min(100, percentage))}%` as `${number}%`
   }, [])
 
   const getTimeFromPosition = useCallback((x: number): number => {
@@ -295,7 +295,7 @@ const $markerB: ThemedStyle<ViewStyle> = ({ colors }) => ({
   backgroundColor: "#007AFF",
 })
 
-const $markerText: ThemedStyle<ViewStyle> = ({ colors, typography }) => ({
+const $markerText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   fontSize: 10,
   fontWeight: "bold",
   color: colors.background,
@@ -352,7 +352,7 @@ const $usageGuideContainer: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
   marginTop: spacing.md,
 })
 
-const $usageGuideText: ThemedStyle<ViewStyle> = ({ colors, typography }) => ({
+const $usageGuideText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   fontSize: 12,
   fontFamily: typography.primary.normal,
   color: colors.textDim,

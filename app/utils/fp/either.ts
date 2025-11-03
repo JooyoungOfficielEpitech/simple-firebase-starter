@@ -6,7 +6,8 @@
  * By convention: Left = Error, Right = Success
  */
 
-import type { Either, Left, Right, Mapper } from './types'
+import type { Either as EitherType, Left, Right, Mapper } from './types'
+type Either<L, R> = EitherType<L, R>
 
 /**
  * Create a Left value (error)
@@ -192,11 +193,11 @@ class EitherBuilder<L, R> {
   constructor(private readonly either: Either<L, R>) {}
 
   static right<R, L = never>(value: R): EitherBuilder<L, R> {
-    return new EitherBuilder(right(value))
+    return new EitherBuilder(right(value)) as any
   }
 
   static left<L, R = never>(value: L): EitherBuilder<L, R> {
-    return new EitherBuilder(left(value))
+    return new EitherBuilder(left(value)) as any
   }
 
   static tryCatch<R, L = Error>(
@@ -215,11 +216,11 @@ class EitherBuilder<L, R> {
   }
 
   map<R2>(fn: Mapper<R, R2>): EitherBuilder<L, R2> {
-    return new EitherBuilder(map(fn)(this.either))
+    return new EitherBuilder(map(fn)(this.either)) as any
   }
 
   mapLeft<L2>(fn: Mapper<L, L2>): EitherBuilder<L2, R> {
-    return new EitherBuilder(mapLeft(fn)(this.either))
+    return new EitherBuilder(mapLeft(fn)(this.either)) as any
   }
 
   flatMap<R2>(fn: (value: R) => Either<L, R2>): EitherBuilder<L, R2> {
@@ -227,11 +228,11 @@ class EitherBuilder<L, R> {
   }
 
   tap(fn: (value: R) => void): EitherBuilder<L, R> {
-    return new EitherBuilder(tap(fn)(this.either))
+    return new EitherBuilder(tap(fn)(this.either)) as any
   }
 
   tapLeft(fn: (value: L) => void): EitherBuilder<L, R> {
-    return new EitherBuilder(tapLeft(fn)(this.either))
+    return new EitherBuilder(tapLeft(fn)(this.either)) as any
   }
 
   getOrElse(defaultValue: R): R {
@@ -268,12 +269,12 @@ class EitherBuilder<L, R> {
  *
  * @example
  * // Basic error handling
- * Either.tryCatch(() => JSON.parse(data))
+ * EitherOps.tryCatch(() => JSON.parse(data))
  *   .map(processData)
  *   .fold(handleError, handleSuccess)
  *
  * // Async error handling
- * const result = await Either.tryCatchAsync(async () => {
+ * const result = await EitherOps.tryCatchAsync(async () => {
  *   const response = await fetch(url)
  *   return response.json()
  * })
@@ -283,12 +284,12 @@ class EitherBuilder<L, R> {
  * )
  *
  * // With custom error mapping
- * Either.tryCatch(
+ * EitherOps.tryCatch(
  *   () => riskyOperation(),
  *   (error) => `Failed: ${error}`
  * ).getOrElse(defaultValue)
  */
-export const Either = {
+export const EitherOps = {
   right: EitherBuilder.right,
   left: EitherBuilder.left,
   tryCatch: EitherBuilder.tryCatch,
@@ -310,5 +311,8 @@ export const Either = {
   all,
 }
 
+// Export for backwards compatibility
+export { EitherOps as Either }
+
 // Export types
-export type { Either, Left, Right }
+export type { EitherType, Left, Right }

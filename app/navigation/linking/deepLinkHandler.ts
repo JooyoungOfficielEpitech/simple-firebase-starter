@@ -3,7 +3,7 @@
  * URL 파싱 및 내비게이션 처리
  */
 import { NavigationContainerRef } from "@react-navigation/native"
-import type { AppStackParamList } from "../types"
+import type { AppStackParamList } from "@/navigators/types"
 import { useAuthStore } from "@/stores"
 
 /**
@@ -134,8 +134,8 @@ export const handleDeepLink = async (
 
   // 인증 필요 여부 확인
   if (parsedLink.requiresAuth) {
-    const { isAuthenticated } = useAuthStore.getState()
-    if (!isAuthenticated) {
+    const { user } = useAuthStore.getState()
+    if (!user) {
       console.warn("🔍 [DeepLink] 인증이 필요한 링크:", parsedLink.type)
       // 로그인 페이지로 리다이렉트 (로그인 후 원래 URL로 복귀)
       navigation.navigate("SignIn")

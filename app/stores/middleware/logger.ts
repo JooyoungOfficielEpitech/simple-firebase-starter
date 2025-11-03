@@ -71,12 +71,12 @@ export const logger: Logger =
     }
 
     return config(
-      (args, ...rest) => {
+      ((args: any, ...rest: any[]) => {
         const prevState = get()
         const timestamp = new Date().toLocaleTimeString()
 
         // 상태 업데이트 실행
-        set(args as any, ...rest)
+        set(args, ...rest)
 
         const nextState = get()
 
@@ -102,7 +102,7 @@ export const logger: Logger =
         }
 
         console.groupEnd()
-      },
+      }) as any,
       get,
       api,
     )

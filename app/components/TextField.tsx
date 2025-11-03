@@ -249,10 +249,10 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
           placeholderTextColor={colors.textDim}
           accessibilityLabel={getAccessibilityLabel()}
           accessibilityHint={getAccessibilityDescription()}
-          accessibilityState={{ 
-            disabled: disabled,
-            invalid: status === "error"
+          accessibilityState={{
+            disabled: disabled
           }}
+          aria-invalid={status === "error"}
           accessibilityRole="text"
           {...TextInputProps}
           editable={!disabled}

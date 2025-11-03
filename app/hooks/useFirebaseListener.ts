@@ -133,7 +133,7 @@ export function useFirebaseListenerWithTimeout(timeoutMs: number = 30000) {
 
     // 기존 타임아웃 정리
     if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
+      globalThis.clearTimeout(timeoutRef.current)
     }
 
     // 새 타임아웃 설정
@@ -144,18 +144,18 @@ export function useFirebaseListenerWithTimeout(timeoutMs: number = 30000) {
     }, timeoutMs)
   }, [addListener, removeListener, timeoutMs])
 
-  const clearTimeout = useCallback(() => {
+  const clearListenerTimeout = useCallback(() => {
     if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
+      globalThis.clearTimeout(timeoutRef.current)
       timeoutRef.current = null
     }
   }, [])
 
   useEffect(() => {
     return () => {
-      clearTimeout()
+      clearListenerTimeout()
     }
-  }, [clearTimeout])
+  }, [clearListenerTimeout])
 
   return {
     addListener: addListenerWithTimeout,

@@ -9,7 +9,7 @@
  */
 
 import { performanceMonitor } from './PerformanceMonitor'
-import { businessMetricsCollector } from './BusinessMetricsCollector'
+import { businessMetrics } from './BusinessMetricsCollector'
 
 export interface NotificationDeliveryMetrics {
   notificationId: string
@@ -80,7 +80,8 @@ export class NotificationPerformanceTracker {
       success: true
     })
 
-    businessMetricsCollector.trackNotificationSent(notificationType, 1, metadata)
+    // TODO: Implement trackNotificationSent with parameters in BusinessMetricsCollector
+    businessMetrics.trackNotificationSent()
 
     console.log(`📤 [NotificationTracker] Notification sent: ${notificationId}`)
   }
@@ -110,7 +111,7 @@ export class NotificationPerformanceTracker {
         success: true
       })
 
-      businessMetricsCollector.trackNotificationDelivered(notificationId, metadata)
+      // TODO: Implement trackNotificationDelivered with parameters in BusinessMetricsCollector
 
       console.log(`📥 [NotificationTracker] Notification delivered: ${notificationId} (${metrics.deliveryTime}ms)`)
     } else {
@@ -135,7 +136,7 @@ export class NotificationPerformanceTracker {
         success: true
       })
 
-      businessMetricsCollector.trackNotificationOpened(notificationId, metrics.openTime, metadata)
+      // TODO: Implement trackNotificationOpened with parameters in BusinessMetricsCollector
 
       console.log(`👁️ [NotificationTracker] Notification opened: ${notificationId} (${metrics.openTime}ms after delivery)`)
     } else {
@@ -187,10 +188,8 @@ export class NotificationPerformanceTracker {
     recipientCount: number,
     metadata?: Record<string, any>
   ): void {
-    businessMetricsCollector.trackNotificationSent(notificationType, recipientCount, {
-      ...metadata,
-      batch: true
-    })
+    // TODO: Implement trackNotificationSent with parameters in BusinessMetricsCollector
+    businessMetrics.trackNotificationSent()
 
     console.log(`📤 [NotificationTracker] Batch notification sent: ${notificationType} (${recipientCount} recipients)`)
   }

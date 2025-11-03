@@ -21,6 +21,7 @@ export const customFontsToLoad = {
 const fonts = {
   spaceGrotesk: {
     // Cross-platform Google font.
+    thin: "spaceGroteskLight", // Using light as thin
     light: "spaceGroteskLight",
     normal: "spaceGroteskRegular",
     medium: "spaceGroteskMedium",

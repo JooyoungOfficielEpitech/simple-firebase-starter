@@ -1,5 +1,5 @@
 import React, { FC, ReactNode } from "react"
-import { View, Modal, ViewStyle, ModalProps, TouchableOpacity } from "react-native"
+import { View, Modal, ViewStyle, ModalProps, TouchableOpacity, NativeSyntheticEvent } from "react-native"
 import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
 
@@ -41,9 +41,9 @@ export const BaseModal: FC<BaseModalProps> = React.memo(({
 }) => {
   const { themed } = useAppTheme()
 
-  const handleRequestClose = () => {
+  const handleRequestClose = (event: NativeSyntheticEvent<any>) => {
     onClose()
-    onRequestClose?.()
+    onRequestClose?.(event)
   }
 
   return (

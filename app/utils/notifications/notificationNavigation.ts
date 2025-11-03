@@ -6,7 +6,8 @@ import { NavigationContainerRef } from "@react-navigation/native"
 import type { AppStackParamList } from "@/navigators/types"
 import type { NotificationItem } from "@/stores/types"
 import { handleDeepLink } from "@/navigation/linking/deepLinkHandler"
-import { trackEvent } from "@/utils/analytics/analyticsService"
+// TODO: Implement analytics service
+// import { trackEvent } from "@/utils/analytics/analyticsService"
 
 /**
  * 알림 타입 정의
@@ -80,10 +81,10 @@ const extractDeepLink = (notification: NotificationItem): string | null => {
 /**
  * 알림 타입별 내비게이션 처리
  */
-export const handleNotificationNavigation = (
+export const handleNotificationNavigation = async (
   notification: NotificationItem,
   navigation: NavigationContainerRef<AppStackParamList>,
-): boolean => {
+): Promise<boolean> => {
   console.log("🔔 [NotificationNav] 알림 내비게이션 처리:", {
     type: notification.type,
     title: notification.title,
@@ -94,27 +95,27 @@ export const handleNotificationNavigation = (
   if (deepLink) {
     console.log("🔔 [NotificationNav] 딥링크로 이동:", deepLink)
 
-    // 분석 추적
-    trackEvent("notification_opened", {
-      notification_type: notification.type,
-      notification_id: notification.id,
-      has_deep_link: true,
-      deep_link: deepLink,
-    })
+    // TODO: Implement analytics tracking
+    // trackEvent("notification_opened", {
+    //   notification_type: notification.type,
+    //   notification_id: notification.id,
+    //   has_deep_link: true,
+    //   deep_link: deepLink,
+    // })
 
     // 딥링크 핸들러로 위임
-    return handleDeepLink(deepLink, navigation)
+    return await handleDeepLink(deepLink, navigation)
   }
 
   // 딥링크가 없는 경우 알림 센터로 이동
   console.log("🔔 [NotificationNav] 딥링크 없음 - 알림 센터로 이동")
 
-  // 분석 추적
-  trackEvent("notification_opened", {
-    notification_type: notification.type,
-    notification_id: notification.id,
-    has_deep_link: false,
-  })
+  // TODO: Implement analytics tracking
+  // trackEvent("notification_opened", {
+  //   notification_type: notification.type,
+  //   notification_id: notification.id,
+  //   has_deep_link: false,
+  // })
 
   try {
     navigation.navigate("NotificationCenter")

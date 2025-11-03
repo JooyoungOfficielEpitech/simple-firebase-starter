@@ -70,7 +70,7 @@ export class ThemeBuilder {
     this.config.colors = {
       ...this.config.colors,
       ...colors,
-    }
+    } as Partial<Colors>
     return this
   }
 
@@ -80,10 +80,10 @@ export class ThemeBuilder {
    * @param value Color value (hex or rgba)
    */
   addColor(key: keyof Colors, value: string): this {
-    if (!this.config.colors) {
-      this.config.colors = {}
-    }
-    this.config.colors[key] = value as any
+    this.config.colors = {
+      ...this.config.colors,
+      [key]: value
+    } as Partial<Colors>
     return this
   }
 
@@ -99,14 +99,16 @@ export class ThemeBuilder {
     500?: string
     600?: string
   }): this {
-    if (!this.config.colors) {
-      this.config.colors = {}
-    }
-
+    const primaryColors: Record<string, string> = {}
     Object.entries(shades).forEach(([shade, color]) => {
-      const key = `primary${shade}` as keyof Colors
-      this.config.colors![key] = color as any
+      const key = `primary${shade}`
+      primaryColors[key] = color
     })
+
+    this.config.colors = {
+      ...this.config.colors,
+      ...primaryColors
+    } as Partial<Colors>
 
     return this
   }
@@ -122,14 +124,16 @@ export class ThemeBuilder {
     400?: string
     500?: string
   }): this {
-    if (!this.config.colors) {
-      this.config.colors = {}
-    }
-
+    const secondaryColors: Record<string, string> = {}
     Object.entries(shades).forEach(([shade, color]) => {
-      const key = `secondary${shade}` as keyof Colors
-      this.config.colors![key] = color as any
+      const key = `secondary${shade}`
+      secondaryColors[key] = color
     })
+
+    this.config.colors = {
+      ...this.config.colors,
+      ...secondaryColors
+    } as Partial<Colors>
 
     return this
   }
@@ -145,14 +149,16 @@ export class ThemeBuilder {
     400?: string
     500?: string
   }): this {
-    if (!this.config.colors) {
-      this.config.colors = {}
-    }
-
+    const accentColors: Record<string, string> = {}
     Object.entries(shades).forEach(([shade, color]) => {
-      const key = `accent${shade}` as keyof Colors
-      this.config.colors![key] = color as any
+      const key = `accent${shade}`
+      accentColors[key] = color
     })
+
+    this.config.colors = {
+      ...this.config.colors,
+      ...accentColors
+    } as Partial<Colors>
 
     return this
   }

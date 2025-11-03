@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useCallback, useMemo } from "react"
-import { View, ViewStyle } from "react-native"
+import { View, ViewStyle, TextStyle } from "react-native"
 import TrackPlayer, { usePlaybackState, useProgress } from 'react-native-track-player'
 import { MMKV } from "react-native-mmkv"
 
@@ -498,14 +498,14 @@ const $container: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   alignItems: "center",
 })
 
-const $statusText: ThemedStyle<ViewStyle> = ({ colors, typography }) => ({
+const $statusText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   fontSize: 12,
   color: colors.textDim,
   fontFamily: typography.primary.normal,
   textAlign: "center",
 })
 
-const $errorText: ThemedStyle<ViewStyle> = ({ colors, typography }) => ({
+const $errorText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   fontSize: 14,
   color: colors.error,
   fontFamily: typography.primary.normal,

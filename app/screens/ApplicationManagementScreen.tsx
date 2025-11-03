@@ -14,10 +14,10 @@ import { applicationService } from "@/services/firestore"
 import { Application, ApplicationStatus } from "@/services/firestore/applicationService"
 import { useAppTheme } from "@/theme/context"
 import { useAlert } from "@/hooks/useAlert"
-import { BulletinBoardStackParamList } from "@/navigators/BulletinBoardStackNavigator"
+import { AppStackParamList } from "@/navigators/types"
 
-type NavigationProp = NativeStackNavigationProp<BulletinBoardStackParamList>
-type RoutePropType = RouteProp<BulletinBoardStackParamList, "ApplicationManagement">
+type NavigationProp = NativeStackNavigationProp<AppStackParamList>
+type RoutePropType = RouteProp<AppStackParamList, "ApplicationManagement">
 
 // Helper function to safely format Firestore Timestamp
 const formatApplicationDate = (timestamp: FirebaseFirestoreTypes.Timestamp | undefined): string => {
@@ -210,7 +210,7 @@ export const ApplicationManagementScreen = () => {
     const statusColors: Record<ApplicationStatus, string> = {
       pending: colors.palette.secondary500 || colors.tint,
       accepted: colors.palette.primary500 || colors.tint,
-      rejected: colors.palette.angry500 || colors.error,
+      rejected: colors.error,
       withdrawn: colors.palette.neutral400 || colors.textDim,
     }
 

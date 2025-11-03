@@ -68,10 +68,11 @@ export const DevSettingsScreen: FC<DevSettingsScreenProps> = ({ navigation }) =>
       try {
         // React Native에서 메모리 사용량 추정
         const now = performance.now()
+        const performanceMemory = (global.performance as any)?.memory
         setPerformanceStats(prev => ({
           ...prev,
           memoryUsage: Math.round(now / 1000), // 간접적인 메모리 추정
-          jsHeapSize: global.performance?.memory?.usedJSHeapSize || 0
+          jsHeapSize: performanceMemory?.usedJSHeapSize || 0
         }))
       } catch (error) {
         addLog(`❌ 메모리 모니터링 오류: ${error.message}`)
@@ -96,8 +97,9 @@ export const DevSettingsScreen: FC<DevSettingsScreenProps> = ({ navigation }) =>
     }, 30000)
 
     // Global error handler
-    const originalErrorHandler = global.ErrorUtils?.getGlobalHandler?.()
-    global.ErrorUtils?.setGlobalHandler?.((error, isFatal) => {
+    const errorUtils = (global as any).ErrorUtils
+    const originalErrorHandler = errorUtils?.getGlobalHandler?.()
+    errorUtils?.setGlobalHandler?.((error: Error, isFatal: boolean) => {
       addLog(`💥 Global Error: ${error.message} (Fatal: ${isFatal})`)
       setPerformanceStats(prev => ({
         ...prev,
@@ -114,7 +116,8 @@ export const DevSettingsScreen: FC<DevSettingsScreenProps> = ({ navigation }) =>
       clearInterval(memoryInterval)
       clearInterval(freezeInterval)
       if (originalErrorHandler) {
-        global.ErrorUtils?.setGlobalHandler?.(originalErrorHandler)
+        const errorUtils = (global as any).ErrorUtils
+        errorUtils?.setGlobalHandler?.(originalErrorHandler)
       }
     }
   }
@@ -316,6 +319,50 @@ FCM 토큰이 클립보드에 복사되었습니다.
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const cleanupDuplicateTokens = async () => {
+    if (!user) {
+      Alert.alert('오류', '로그인이 필요합니다.')
+      return
+    }
+
+    Alert.alert(
+      '중복 토큰 정리',
+      '같은 FCM 토큰을 가진 여러 문서 중 하나만 남기고 비활성화합니다. 계속하시겠습니까?',
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '정리',
+          style: 'destructive',
+          onPress: async () => {
+            setIsLoading(true)
+            try {
+              addLog('🧹 중복 토큰 정리 시작...')
+              const cleanedCount = await fcmTokenService.cleanupUserDuplicateTokens(user.uid)
+              addLog(`✅ ${cleanedCount}개 중복 토큰 정리 완료`)
+
+              if (cleanedCount > 0) {
+                Alert.alert(
+                  '정리 완료!',
+                  `${cleanedCount}개의 중복 토큰을 비활성화했습니다.\n\n이제 푸시 알림이 한 번만 발송됩니다.`,
+                )
+              } else {
+                Alert.alert('완료', '중복 토큰이 없습니다. 이미 정리되어 있습니다.')
+              }
+
+              // 토큰 목록 새로고침
+              loadAllUserTokens()
+            } catch (error) {
+              addLog(`❌ 중복 토큰 정리 실패: ${error.message}`)
+              Alert.alert('오류', '중복 토큰 정리에 실패했습니다.')
+            } finally {
+              setIsLoading(false)
+            }
+          },
+        },
+      ]
+    )
   }
 
   const deactivateAllTokens = async () => {
@@ -761,6 +808,22 @@ FCM 토큰이 클립보드에 복사되었습니다.
           >
             <Text style={{ color: '#FFFFFF', fontWeight: '600' }}>
               🧹 오래된 토큰 정리
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={cleanupDuplicateTokens}
+            disabled={isLoading}
+            style={{
+              backgroundColor: '#FF9800',
+              padding: spacing.md,
+              borderRadius: 8,
+              alignItems: 'center',
+              marginBottom: spacing.sm
+            }}
+          >
+            <Text style={{ color: '#FFFFFF', fontWeight: '600' }}>
+              🔄 중복 토큰 정리 (추천)
             </Text>
           </TouchableOpacity>
 

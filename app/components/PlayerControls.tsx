@@ -1,5 +1,5 @@
 import React, { memo } from "react"
-import { View, ViewStyle, TouchableOpacity } from "react-native"
+import { View, ViewStyle, TextStyle, TouchableOpacity } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { State } from 'react-native-track-player'
 
@@ -171,7 +171,7 @@ const $saveButtonAligned: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   elevation: 3,
 })
 
-const $saveButtonTextOnly: ThemedStyle<ViewStyle> = ({ colors, typography }) => ({
+const $saveButtonTextOnly: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   fontSize: 14,
   fontFamily: typography.primary.medium,
   color: colors.background,

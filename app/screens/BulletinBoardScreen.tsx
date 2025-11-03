@@ -18,11 +18,15 @@ import { useAlert } from "@/hooks/useAlert"
 import { Post } from "@/types/post"
 import { UserProfile } from "@/types/user"
 import { Organization } from "@/types/organization"
-import { BulletinBoardStackParamList } from "@/navigators/BulletinBoardStackNavigator"
+import { BulletinBoardStackParamList, AppStackParamList } from "@/navigators/types"
 import { createComponentLogger } from "@/utils/logger"
 import { translate } from "@/i18n"
+import type { CompositeNavigationProp } from "@react-navigation/native"
 
-type NavigationProp = NativeStackNavigationProp<BulletinBoardStackParamList>
+type NavigationProp = CompositeNavigationProp<
+  NativeStackNavigationProp<BulletinBoardStackParamList>,
+  NativeStackNavigationProp<AppStackParamList>
+>
 
 export const BulletinBoardScreen = () => {
   // All hooks must be called at the top level, unconditionally
@@ -30,7 +34,7 @@ export const BulletinBoardScreen = () => {
   const navigation = useNavigation<NavigationProp>()
   const {
     themed,
-    theme: { colors, spacing },
+    theme: { spacing },
   } = useAppTheme()
   const { alertState, alert, hideAlert } = useAlert()
   
@@ -153,13 +157,8 @@ export const BulletinBoardScreen = () => {
   }, [userProfile?.uid])
 
   const getFilteredPosts = useMemo(() => {
-    let result;
-    if (selectedOrganizationId) {
-      result = filteredPosts
-    } else {
-      result = posts
-    }
-    
+    const result: Post[] = selectedOrganizationId ? filteredPosts : posts
+
     console.log('📄 [getFilteredPosts] result length:', result.length);
     return result;
   }, [selectedOrganizationId, filteredPosts, posts])

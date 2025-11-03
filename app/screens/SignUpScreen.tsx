@@ -75,7 +75,7 @@ export const SignUpScreen: FC<SignUpScreenProps> = function SignUpScreen({ navig
         // 폼이 유효하지 않은 경우 사용자에게 알림
         alert(
           translate("signUpScreen:errorTitle"),
-          translate("auth:validation.fillAllFields"),
+          "모든 필드를 입력해주세요", // TODO: Add proper translation key
         )
         return
       }

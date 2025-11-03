@@ -79,7 +79,7 @@ export const setupNotificationOpenedHandler = (
 
     // 알림 타입별 내비게이션 처리
     if (navigation) {
-      handleNotificationNavigation(notification, navigation)
+      void handleNotificationNavigation(notification, navigation)
     }
   })
 }
@@ -105,7 +105,7 @@ export const checkInitialNotification = async (
       if (navigation) {
         // 약간의 지연 후 내비게이션 (앱 초기화 대기)
         setTimeout(() => {
-          handleNotificationNavigation(notification, navigation)
+          void handleNotificationNavigation(notification, navigation)
         }, 1000)
       }
 

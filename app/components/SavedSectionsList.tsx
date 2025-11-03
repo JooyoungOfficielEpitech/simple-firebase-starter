@@ -52,6 +52,7 @@ export function SavedSectionsList({
     confirmDestructive(
       "삭제 확인",
       `"${sectionName}" 구간을 삭제하시겠습니까?`,
+      "삭제",
       () => onDeleteSection(sectionId)
     )
   }

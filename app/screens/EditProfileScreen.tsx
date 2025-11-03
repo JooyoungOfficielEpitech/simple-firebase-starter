@@ -105,10 +105,10 @@ export const EditProfileScreen: FC<EditProfileScreenProps> = ({ navigation }) =>
   if (isLoading) {
     return (
       <Screen style={themed($root)} preset="fixed" safeAreaEdges={[]}>
-        <ScreenHeader 
-          title="프로필 편집" 
+        <ScreenHeader
+          title="프로필 편집"
           showBackButton={true}
-          onBackPress={() => navigation.goBack()}
+          backButtonProps={{ onPress: () => navigation.goBack() }}
         />
         <View style={themed($loadingContainer)}>
           <Text>프로필 로딩 중...</Text>
@@ -124,10 +124,10 @@ export const EditProfileScreen: FC<EditProfileScreenProps> = ({ navigation }) =>
       safeAreaEdges={[]}
       contentContainerStyle={themed($contentContainer)}
     >
-      <ScreenHeader 
-        title="프로필 편집" 
+      <ScreenHeader
+        title="프로필 편집"
         showBackButton={true}
-        onBackPress={() => navigation.goBack()}
+        backButtonProps={{ onPress: () => navigation.goBack() }}
       />
 
       <View style={themed($formContainer)}>

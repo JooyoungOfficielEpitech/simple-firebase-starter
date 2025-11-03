@@ -215,7 +215,7 @@ export async function withRetry<T>(
 
       // 재시도 가능 여부 확인
       if (!shouldRetry(error) || attempt === maxRetries - 1) {
-        logger.error(`❌ [Firebase] ${operationName} 실패:`, error)
+        logger.error('Firebase', `❌ ${operationName} 실패`, { error })
         throw error
       }
 
@@ -223,7 +223,8 @@ export async function withRetry<T>(
       const delay = Math.min(initialDelay * Math.pow(2, attempt), maxDelay)
 
       logger.warn(
-        `🔄 [Firebase] ${operationName} - 네트워크 에러, ${delay}ms 후 재시도 (${attempt + 1}/${maxRetries})`
+        'Firebase',
+        `🔄 ${operationName} - 네트워크 에러, ${delay}ms 후 재시도 (${attempt + 1}/${maxRetries})`
       )
 
       // 대기
@@ -271,7 +272,7 @@ export function logFirebaseError(
   const shouldRetry = shouldRetryError(error)
   const isNetwork = isNetworkError(error)
 
-  logger.error(`❌ [Firebase] ${context}`, {
+  logger.error('Firebase', `❌ ${context}`, {
     error,
     userMessage,
     shouldRetry,

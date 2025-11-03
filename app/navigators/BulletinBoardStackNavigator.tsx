@@ -9,6 +9,9 @@ import { useAppTheme } from "@/theme/context"
 import type { MainTabParamList, BulletinBoardStackParamList } from "./types"
 import type { MainTabScreenProps } from "./MainNavigator"
 
+// Re-export BulletinBoardStackParamList from types for use in screens
+export type { BulletinBoardStackParamList } from "./types"
+
 
 /**
  * Helper for automatically generating navigation prop types for each route.

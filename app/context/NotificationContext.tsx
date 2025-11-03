@@ -216,13 +216,22 @@ export const NotificationProvider: FC<PropsWithChildren<NotificationProviderProp
     if (user) {
       console.log("🚀 [NotificationContext] 사용자 로그인 감지 - 알림 정리 시작")
       cleanupUserNotifications(user.uid)
-      
-      // FCM 토큰이 있으면 서버에 등록
+
+      // FCM 토큰이 있으면 서버에 등록 및 중복 토큰 정리
       if (fcmToken) {
         console.log('🔄 [NotificationContext] 로그인 후 FCM 토큰 서버 등록 중...')
-        fcmTokenService.registerToken(user.uid, fcmToken).then(success => {
+        fcmTokenService.registerToken(user.uid, fcmToken).then(async (success) => {
           if (success) {
             console.log('✅ [NotificationContext] 로그인 후 FCM 토큰 서버 등록 성공')
+
+            // 중복 토큰 정리
+            console.log('🧹 [NotificationContext] 중복 FCM 토큰 정리 시작...')
+            const cleanedCount = await fcmTokenService.cleanupUserDuplicateTokens(user.uid)
+            if (cleanedCount > 0) {
+              console.log(`✅ [NotificationContext] 중복 FCM 토큰 ${cleanedCount}개 정리 완료`)
+            } else {
+              console.log('✅ [NotificationContext] 중복 FCM 토큰 없음')
+            }
           } else {
             console.log('❌ [NotificationContext] 로그인 후 FCM 토큰 서버 등록 실패')
           }

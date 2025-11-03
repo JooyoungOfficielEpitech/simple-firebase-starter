@@ -16,10 +16,14 @@ import { useAlert } from "@/hooks/useAlert"
 import { Post } from "@/types/post"
 import { UserProfile } from "@/types/user"
 import { Application } from "@/services/firestore/applicationService"
-import { BulletinBoardStackParamList } from "@/navigators/BulletinBoardStackNavigator"
+import { AppStackParamList, BulletinBoardStackParamList } from "@/navigators/types"
+import type { CompositeNavigationProp } from "@react-navigation/native"
 
-type NavigationProp = NativeStackNavigationProp<BulletinBoardStackParamList>
-type RoutePropType = RouteProp<BulletinBoardStackParamList, "PostDetail">
+type NavigationProp = CompositeNavigationProp<
+  NativeStackNavigationProp<AppStackParamList>,
+  NativeStackNavigationProp<BulletinBoardStackParamList>
+>
+type RoutePropType = RouteProp<AppStackParamList, "PostDetail">
 
 // 화면 크기 가져오기
 const { width: screenWidth } = Dimensions.get('window')
@@ -166,12 +170,12 @@ export const PostDetailScreen = () => {
     return unsubscribe
   }, [postId])
 
-  // 지원자 데이터 로드 (운영자인 경우)
+  // 지원자 데이터 로드 (운영자인 경우) 및 본인 지원서 실시간 구독
   useEffect(() => {
     if (!post || !userProfile) return
 
     const isMyPost = post.authorId === userProfile.uid && userProfile.userType === "organizer"
-    
+
     if (isMyPost) {
       // 운영자인 경우 지원자 목록 구독
       const unsubscribeApplications = applicationService.subscribeToApplicationsByPost(
@@ -180,31 +184,37 @@ export const PostDetailScreen = () => {
       )
       return unsubscribeApplications
     } else {
-      // 일반 유저인 경우 본인의 지원 여부 및 지원서 정보 확인
-      const checkApplication = async () => {
-        try {
-          const applied = await applicationService.hasAppliedToPost(postId, userProfile.uid)
-          setHasApplied(applied)
-          
-          if (applied) {
-            // 지원한 경우 해당 게시글의 지원서 정보 가져오기
-            const myApps = await applicationService.getApplicationsByApplicant(userProfile.uid, { 
-              limit: 10 
-            })
-            // 클라이언트에서 해당 게시글 지원서 찾기
-            const myPostApplication = myApps.data.find(app => app.postId === postId)
-            if (myPostApplication) {
-              setMyApplication(myPostApplication)
+      // 일반 유저인 경우 해당 게시글의 본인 지원서를 실시간으로 구독
+      const unsubscribe = applicationService.db
+        .collection("applications")
+        .where("postId", "==", postId)
+        .where("applicantId", "==", userProfile.uid)
+        .limit(1)
+        .onSnapshot(
+          (snapshot) => {
+            if (!snapshot.empty) {
+              const doc = snapshot.docs[0]
+              const application = {
+                id: doc.id,
+                ...doc.data(),
+              } as Application
+
+              setHasApplied(true)
+              setMyApplication(application)
+              console.log("✅ [PostDetailScreen] 지원서 상태:", application.status)
+            } else {
+              setHasApplied(false)
+              setMyApplication(null)
             }
+          },
+          (error) => {
+            console.error("❌ [PostDetailScreen] 지원서 구독 오류:", error)
+            setHasApplied(false)
+            setMyApplication(null)
           }
-        } catch (error) {
-          console.error("❌ [PostDetailScreen] 지원 여부 확인 오류:", error)
-          // 오류 발생시 지원하기 버튼은 활성화
-          setHasApplied(false)
-          setMyApplication(null)
-        }
-      }
-      checkApplication()
+        )
+
+      return unsubscribe
     }
   }, [post, userProfile, postId])
 
@@ -441,41 +451,52 @@ export const PostDetailScreen = () => {
           <View style={themed($actionButtonsRow)}>
             {!isMyPost && userProfile?.userType !== "organizer" && (
               <View style={themed($applicationButtonContainer)}>
-                {!hasApplied || !myApplication ? (
-                  <TouchableOpacity 
-                    style={themed($applyButton)}
-                    onPress={handleApplyButtonClick}
-                    disabled={post.status !== "active"}
-                  >
-                    <Text 
-                      text="지원하기" 
-                      style={themed($applyButtonText)} 
-                    />
-                  </TouchableOpacity>
-                ) : myApplication.status === 'pending' ? (
-                  <TouchableOpacity 
-                    style={themed($withdrawButton)}
-                    onPress={handleWithdrawApplication}
-                    disabled={submittingApplication}
-                  >
-                    <Text 
-                      text={submittingApplication ? "철회 중..." : "❌ 취소"} 
-                      style={themed($withdrawButtonText)} 
-                    />
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity 
-                    style={themed($statusButton(myApplication.status))}
-                    disabled={true}
-                  >
-                    <Text 
-                      text={myApplication.status === 'accepted' ? '승인됨' : 
-                            myApplication.status === 'rejected' ? '거절됨' : 
-                            myApplication.status === 'withdrawn' ? '철회됨' : '상태 확인 중'}
-                      style={themed($statusButtonText)} 
-                    />
-                  </TouchableOpacity>
-                )}
+                {(() => {
+
+                  if (!hasApplied || !myApplication) {
+                    return (
+                      <TouchableOpacity
+                        style={themed($applyButton)}
+                        onPress={handleApplyButtonClick}
+                        disabled={post.status !== "active"}
+                      >
+                        <Text
+                          text="지원하기"
+                          style={themed($applyButtonText)}
+                        />
+                      </TouchableOpacity>
+                    )
+                  }
+
+                  if (myApplication.status === 'pending') {
+                    return (
+                      <TouchableOpacity
+                        style={themed($withdrawButton)}
+                        onPress={handleWithdrawApplication}
+                        disabled={submittingApplication}
+                      >
+                        <Text
+                          text={submittingApplication ? "철회 중..." : "지원 취소"}
+                          style={themed($withdrawButtonText)}
+                        />
+                      </TouchableOpacity>
+                    )
+                  }
+
+                  return (
+                    <TouchableOpacity
+                      style={themed($statusButton(myApplication.status))}
+                      disabled={true}
+                    >
+                      <Text
+                        text={myApplication.status === 'accepted' ? '승인됨' :
+                              myApplication.status === 'rejected' ? '거절됨' :
+                              myApplication.status === 'withdrawn' ? '철회됨' : '상태 확인 중'}
+                        style={themed($statusButtonText)}
+                      />
+                    </TouchableOpacity>
+                  )
+                })()}
               </View>
             )}
             
@@ -1309,8 +1330,10 @@ const $applyButton = ({ colors, spacing }) => ({
   paddingHorizontal: spacing?.md || 12,
   borderRadius: 8,
   alignItems: "center" as const,
+  justifyContent: "center" as const,
   flex: 1,
   minWidth: 100,
+  minHeight: 44,
 })
 
 const $applyButtonText = ({ colors, typography }) => ({
@@ -1519,31 +1542,27 @@ const $formInput = ({ spacing }) => ({
 })
 
 // 기존 지원하기 버튼과 동일한 스타일 유지
-const $applicationButtonContainer = ({ spacing }) => ({
+const $applicationButtonContainer = () => ({
   flex: 1,
+  minHeight: 44,
+  alignSelf: "stretch" as const,
 })
 
-const $appliedButtonsRow = ({ spacing }) => ({
-  flexDirection: "row" as const,
-  gap: spacing?.sm || 8,
-  width: "100%",
-  alignItems: "stretch" as const,
-})
-
-// 기존 $applyButton 스타일을 기반으로 상태별 색상만 변경
 // 지원하기 버튼과 정확히 동일한 스타일, 상태별 색상만 변경
 const $statusButton = (status: string) => ({ colors, spacing }) => ({
-  backgroundColor: 
-    status === 'pending' ? colors.palette.warning500 :
-    status === 'accepted' ? '#22c55e' : // 초록색
-    status === 'rejected' ? colors.palette.angry500 :
+  backgroundColor:
+    status === 'pending' ? colors.palette.goldAccent400 :  // 주황색 (대기중)
+    status === 'accepted' ? colors.palette.primary500 :  // 지원하기와 동일한 파란색
+    status === 'rejected' ? colors.palette.error500 :  // 빨간색 (거절됨)
     colors.palette.neutral500,
   paddingVertical: spacing?.sm || 8,
   paddingHorizontal: spacing?.md || 12,
   borderRadius: 8,
   alignItems: "center" as const,
+  justifyContent: "center" as const,
   flex: 1,
   minWidth: 100,
+  minHeight: 44,
 })
 
 // 지원하기 버튼과 동일한 텍스트 스타일
@@ -1556,13 +1575,15 @@ const $statusButtonText = ({ colors, typography }) => ({
 
 // 지원하기 버튼과 정확히 동일한 스타일, 색상만 빨간색
 const $withdrawButton = ({ colors, spacing }) => ({
-  backgroundColor: colors.palette.angry500,
+  backgroundColor: colors.palette.error500,  // 빨간색 (angry500이 없어서 error500 사용)
   paddingVertical: spacing?.sm || 8,
   paddingHorizontal: spacing?.md || 12,
   borderRadius: 8,
   alignItems: "center" as const,
+  justifyContent: "center" as const,
   flex: 1,
   minWidth: 100,
+  minHeight: 44,
 })
 
 const $withdrawButtonText = ({ colors, typography }) => ({
@@ -1855,7 +1876,7 @@ const $galleryImage = {
   resizeMode: "cover" as const,
 }
 
-const $indicatorContainer = ({ spacing }) => ({
+const $indicatorContainer = () => ({
   flexDirection: "row" as const,
   justifyContent: "center" as const,
   alignItems: "center" as const,
@@ -1866,7 +1887,7 @@ const $indicatorContainer = ({ spacing }) => ({
   zIndex: 10,
 })
 
-const $activeIndicator = ({ colors }) => ({
+const $activeIndicator = () => ({
   width: 8,
   height: 8,
   borderRadius: 4,
@@ -1878,7 +1899,7 @@ const $activeIndicator = ({ colors }) => ({
   shadowRadius: 2,
 })
 
-const $inactiveIndicator = ({ colors }) => ({
+const $inactiveIndicator = () => ({
   width: 8,
   height: 8,
   borderRadius: 4,
@@ -1886,7 +1907,7 @@ const $inactiveIndicator = ({ colors }) => ({
   marginHorizontal: 3,
 })
 
-const $counterContainer = ({ colors, spacing }) => ({
+const $counterContainer = () => ({
   position: "absolute" as const,
   top: 16,
   right: 16,

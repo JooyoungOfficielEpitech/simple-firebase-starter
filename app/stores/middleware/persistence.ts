@@ -28,7 +28,7 @@ export interface PersistOptions<S, PersistedState = S> {
 type Persist = <
   S,
   Ps extends Partial<S> = Partial<S>,
-  Mps extends StoreMutatorIdentifier = never,
+  Mps extends [StoreMutatorIdentifier, unknown][] = [],
 >(
   config: StateCreator<S, [["zustand/persist", Ps]], Mps>,
   options: PersistOptions<S, Ps>,
@@ -88,7 +88,7 @@ export const persist: Persist = (config, options) => (set, get, api) => {
   }
 
   // 스토리지에 상태 저장
-  const persist = async (state: S) => {
+  const persistState = async (state: any) => {
     try {
       const partialState = partialize(state)
       const data = JSON.stringify({
@@ -106,13 +106,13 @@ export const persist: Persist = (config, options) => (set, get, api) => {
 
   // 상태 변경 시 자동 저장
   return config(
-    (args, ...rest) => {
-      set(args as any, ...rest)
+    ((args: any, ...rest: any[]) => {
+      set(args, ...rest)
       // 하이드레이션 완료 후에만 저장
       if (hasHydrated) {
-        persist(get())
+        persistState(get())
       }
-    },
+    }) as any,
     get,
     api,
   )

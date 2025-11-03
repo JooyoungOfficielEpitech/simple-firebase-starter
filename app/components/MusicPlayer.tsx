@@ -152,7 +152,7 @@ const MusicPlayer = () => {
     }
     
     try {
-      if (playbackState === State.Playing) {
+      if (playbackState?.state === State.Playing) {
         await TrackPlayer.pause();
         console.log('⏸️ TrackPlayer 일시정지');
       } else {
@@ -263,7 +263,7 @@ const MusicPlayer = () => {
           onPress={togglePlayback}
         >
           <Text style={styles.buttonText}>
-            {playbackState === State.Playing ? '⏸️' : '▶️'}
+            {playbackState?.state === State.Playing ? '⏸️' : '▶️'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -307,7 +307,7 @@ const MusicPlayer = () => {
       {/* 상태 정보 */}
       <View style={styles.status}>
         <Text style={styles.initStatus}>초기화: {initStatus}</Text>
-        <Text>재생 상태: {playbackState}</Text>
+        <Text>재생 상태: {playbackState?.state ?? 'Unknown'}</Text>
         {abLoop.enabled && (
           <Text style={styles.loopStatus}>
             🔄 백그라운드 A-B 루프 활성 ({formatTime(abLoop.a)} - {formatTime(abLoop.b)})

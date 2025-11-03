@@ -13,7 +13,7 @@ import type { ThemedStyle } from '@/theme/types'
 import { Text } from './Text'
 import { Button } from './Button'
 import { PermissionType, PermissionContext } from '@/hooks/usePermissions'
-import { useRouter } from 'expo-router'
+// import { useRouter } from 'expo-router' // TODO: Replace with React Navigation when needed
 
 export type PermissionMessageType = 'info' | 'warning' | 'error' | 'guide' | 'action'
 
@@ -57,21 +57,25 @@ export function PermissionMessage({
   hidden = false
 }: PermissionMessageProps) {
   const { themed } = useAppTheme()
-  const router = useRouter()
-  
+  // const router = useRouter() // TODO: Implement with React Navigation when needed
+
   if (hidden || !message) {
     return null
   }
-  
+
   // 권한별 기본 액션 정의
+  // TODO: Replace expo-router navigation with React Navigation
   const getDefaultAction = () => {
+    // Temporarily disabled until React Navigation is implemented
+    return null
+    /*
     switch (permission) {
       case 'isAuthenticated':
         return {
           text: '로그인',
           onPress: () => router.push('/auth/signin')
         }
-        
+
       case 'canApplyToPost':
         if (message.includes('프로필')) {
           return {
@@ -86,24 +90,25 @@ export function PermissionMessage({
           }
         }
         break
-        
+
       case 'canCreatePost':
         return {
           text: '운영자 정보 확인',
           onPress: () => router.push('/help/organizer-guide')
         }
-        
+
       case 'canCreateOrganization':
         return {
           text: '계정 타입 확인',
           onPress: () => router.push('/profile/account-type')
         }
-        
+
       default:
         return null
     }
+    */
   }
-  
+
   const defaultAction = getDefaultAction()
   const finalAction = action || defaultAction
   

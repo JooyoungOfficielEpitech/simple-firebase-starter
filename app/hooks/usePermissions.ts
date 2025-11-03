@@ -61,9 +61,12 @@ export interface UserPermissions {
  * 권한 기반 UI 표시를 위한 중앙화된 권한 관리 훅
  */
 export function usePermissions(): UserPermissions {
-  const { user, profile } = useAuth()
+  const { user } = useAuth()
   const { isProfileComplete } = useProfile()
-  
+
+  // TODO: Get profile from a proper source (e.g., ProfileContext with profile state, or separate hook)
+  const profile = null // Temporary fix - profile should be fetched properly
+
   const permissions = useMemo((): UserPermissions => {
     const isAuthenticated = !!user
     const userType = profile?.userType

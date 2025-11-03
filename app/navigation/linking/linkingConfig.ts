@@ -4,7 +4,7 @@
  */
 import { LinkingOptions } from "@react-navigation/native"
 import * as Linking from "expo-linking"
-import type { AppStackParamList } from "../types"
+import type { AppStackParamList } from "@/navigators/types"
 
 /**
  * 앱 URL 스키마 및 프리픽스 설정

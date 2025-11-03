@@ -6,7 +6,7 @@
  */
 
 import { spacing } from "../spacing"
-import { spacingDark } from "../spacingDark"
+import { spacing as spacingDark } from "../spacingDark"
 import { timing } from "../timing"
 import { typography } from "../typography"
 import { baseColors, createSemanticColors } from "../colorsBase"
@@ -44,14 +44,14 @@ export class ThemeFactory {
     const fullColors = this.mergeWithBaseColors(config.colors)
 
     // Create semantic colors
-    const colors = createSemanticColors(fullColors) as Colors
+    const colors = createSemanticColors(fullColors as any) as Colors
 
     // Build complete theme
     const theme: Theme = {
       colors,
-      spacing: config.spacing || (config.isDark ? spacingDark : spacing),
-      typography: config.typography || typography,
-      timing: config.timing || timing,
+      spacing: (config.spacing || (config.isDark ? spacingDark : spacing)) as any,
+      typography: { ...typography, ...config.typography } as any,
+      timing: { ...timing, ...config.timing } as any,
       isDark: config.isDark,
       wickedCharacter: config.wickedCharacter || "elphaba",
     }
@@ -163,20 +163,20 @@ export class ThemeFactory {
     // Critical contrast pairs to check
     const criticalPairs = [
       {
-        fg: colors.neutral800 || baseColors.neutral800,
-        bg: colors.primary100 || colors.neutral100 || baseColors.neutral100,
+        fg: (colors as any).neutral800 || baseColors.neutral800,
+        bg: (colors as any).primary100 || (colors as any).neutral100 || baseColors.neutral100,
         fgName: "text",
         bgName: "background",
       },
       {
-        fg: colors.neutral600 || baseColors.neutral600,
-        bg: colors.primary100 || colors.neutral100 || baseColors.neutral100,
+        fg: (colors as any).neutral600 || baseColors.neutral600,
+        bg: (colors as any).primary100 || (colors as any).neutral100 || baseColors.neutral100,
         fgName: "textDim",
         bgName: "background",
       },
       {
-        fg: colors.neutral100 || baseColors.neutral100,
-        bg: colors.primary500 || baseColors.neutral800,
+        fg: (colors as any).neutral100 || baseColors.neutral100,
+        bg: (colors as any).primary500 || baseColors.neutral800,
         fgName: "textLight",
         bgName: "primary",
       },
