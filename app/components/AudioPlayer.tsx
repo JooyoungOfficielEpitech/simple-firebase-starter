@@ -957,10 +957,10 @@ export function AudioPlayer({
               onResponderRelease={handleMarkerDragEnd}
               onResponderTerminationRequest={() => false}
             >
-              <View style={[themed($pinHead), { backgroundColor: "#4CAF50" }]}>
+              <View style={themed($pinLabel)}>
                 <Text style={themed($pinText)}>A</Text>
               </View>
-              <View style={themed($pinNeedle)} />
+              <View style={[themed($pinTriangle), { borderTopColor: "#4CAF50" }]} />
             </View>
           )}
 
@@ -980,10 +980,10 @@ export function AudioPlayer({
               onResponderRelease={handleMarkerDragEnd}
               onResponderTerminationRequest={() => false}
             >
-              <View style={[themed($pinHead), { backgroundColor: "#F44336" }]}>
+              <View style={themed($pinLabel)}>
                 <Text style={themed($pinText)}>B</Text>
               </View>
-              <View style={themed($pinNeedle)} />
+              <View style={[themed($pinTriangle), { borderTopColor: "#F44336" }]} />
             </View>
           )}
         </View>
@@ -1242,7 +1242,7 @@ const $progressContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   paddingVertical: spacing.md,
   paddingHorizontal: spacing.sm,
   width: "100%",
-  paddingTop: 50, // Pin 마커 공간 확보
+  paddingTop: 22, // Pin 마커 공간 확보 (최소화)
 })
 
 const $timeContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
@@ -1304,12 +1304,13 @@ const $loopHighlight: ThemedStyle<ViewStyle> = ({ colors }) => ({
 })
 
 // Pin 마커 컨테이너 (진행바 위)
-const $pinsContainer: ThemedStyle<ViewStyle> = () => ({
+const $pinsContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   position: "absolute",
-  top: -40, // 진행바 위 40px
+  top: -18, // 진행바 위 18px (매우 가까이)
   left: 0,
   right: 0,
-  height: 40,
+  paddingHorizontal: spacing.sm, // 진행바와 동일한 padding
+  height: 18,
   zIndex: 20,
 })
 
@@ -1317,30 +1318,38 @@ const $pinsContainer: ThemedStyle<ViewStyle> = () => ({
 const $pinMarker: ThemedStyle<ViewStyle> = () => ({
   position: "absolute",
   alignItems: "center",
-  width: 40,
-  marginLeft: -20, // 중앙 정렬
+  marginLeft: 0, // 중앙 정렬 (확 좁힘)
   zIndex: 20,
 })
 
-// Pin 머리 (원형)
-const $pinHead: ThemedStyle<ViewStyle> = ({ colors }) => ({
-  width: 28,
-  height: 28,
-  borderRadius: 14,
+// Pin 라벨 (둥근 직사각형)
+const $pinLabel: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  paddingHorizontal: 6,
+  paddingVertical: 1,
+  borderRadius: 6,
+  backgroundColor: colors.palette.neutral100,
   justifyContent: "center",
   alignItems: "center",
   shadowColor: colors.palette.neutral900,
   shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.3,
+  shadowOpacity: 0.25,
   shadowRadius: 3,
-  elevation: 4,
+  elevation: 3,
+  borderWidth: 2,
+  borderColor: colors.palette.neutral400,
 })
 
-// Pin 바늘 (세로선)
-const $pinNeedle: ThemedStyle<ViewStyle> = ({ colors }) => ({
-  width: 2,
-  height: 20,
-  backgroundColor: colors.palette.neutral800,
+// Pin 역삼각형 포인터 (▼)
+const $pinTriangle: ThemedStyle<ViewStyle> = () => ({
+  width: 0,
+  height: 0,
+  borderLeftWidth: 5,
+  borderRightWidth: 5,
+  borderTopWidth: 6,
+  borderLeftColor: "transparent",
+  borderRightColor: "transparent",
+  // borderTopColor는 동적으로 설정 (A: 녹색, B: 빨강)
+  marginTop: 1, // 라벨과 살짝 붙여서 자연스럽게
 })
 
 // A Pin 색상
@@ -1357,7 +1366,7 @@ const $pinMarkerB: ThemedStyle<ViewStyle> = () => ({
 const $pinText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   fontSize: 12,
   fontFamily: typography.primary.bold,
-  color: colors.background,
+  color: colors.palette.neutral900,
 })
 
 // Pin 드래그 상태
