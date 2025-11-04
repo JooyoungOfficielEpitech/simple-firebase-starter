@@ -40,9 +40,9 @@ export interface NotificationProviderProps {
   user: FirebaseAuthTypes.User | null
 }
 
-export const NotificationProvider: FC<PropsWithChildren<NotificationProviderProps>> = ({ 
-  children, 
-  user 
+export const NotificationProvider: FC<PropsWithChildren<NotificationProviderProps>> = ({
+  children,
+  user
 }) => {
   const [isCleanupLoading, setIsCleanupLoading] = useState(false)
   const [lastCleanupTime, setLastCleanupTime] = useState<Date | null>(null)
@@ -52,9 +52,16 @@ export const NotificationProvider: FC<PropsWithChildren<NotificationProviderProp
   const [isPushNotificationEnabled, setIsPushNotificationEnabled] = useState(false)
   const [fcmToken, setFcmToken] = useState<string | null>(null)
   const [latestNotification, setLatestNotification] = useState<PushNotificationProps | null>(null)
-  
+
   // 푸시 알림 서비스 인스턴스
   const pushService = useRef(PushNotificationService.getInstance())
+
+  // 리스너 cleanup 함수들을 저장하는 ref
+  const unsubscribeRefs = useRef<{
+    foreground?: () => void
+    opened?: () => void
+    tokenRefresh?: () => void
+  }>({})
 
   // 사용자 알림 정리 함수
   const cleanupUserNotifications = useCallback(async (userId: string) => {
@@ -93,6 +100,21 @@ export const NotificationProvider: FC<PropsWithChildren<NotificationProviderProp
       }
     }
 
+    // 모든 리스너 제거
+    console.log('🧹 [NotificationContext] 로그아웃 - 모든 리스너 제거')
+    if (unsubscribeRefs.current.foreground) {
+      unsubscribeRefs.current.foreground()
+      unsubscribeRefs.current.foreground = undefined
+    }
+    if (unsubscribeRefs.current.opened) {
+      unsubscribeRefs.current.opened()
+      unsubscribeRefs.current.opened = undefined
+    }
+    if (unsubscribeRefs.current.tokenRefresh) {
+      unsubscribeRefs.current.tokenRefresh()
+      unsubscribeRefs.current.tokenRefresh = undefined
+    }
+
     // 상태 초기화
     isCleaningRef.current = false
     setIsCleanupLoading(false)
@@ -120,7 +142,21 @@ export const NotificationProvider: FC<PropsWithChildren<NotificationProviderProp
   const initializePushNotifications = useCallback(async (): Promise<boolean> => {
     try {
       console.log("🚀 [NotificationContext] 푸시 알림 초기화 시작")
-      
+
+      // 기존 리스너가 있다면 먼저 제거 (중복 방지)
+      if (unsubscribeRefs.current.foreground) {
+        console.log("🧹 [NotificationContext] 기존 포그라운드 리스너 제거")
+        unsubscribeRefs.current.foreground()
+      }
+      if (unsubscribeRefs.current.opened) {
+        console.log("🧹 [NotificationContext] 기존 백그라운드 리스너 제거")
+        unsubscribeRefs.current.opened()
+      }
+      if (unsubscribeRefs.current.tokenRefresh) {
+        console.log("🧹 [NotificationContext] 기존 토큰 새로고침 리스너 제거")
+        unsubscribeRefs.current.tokenRefresh()
+      }
+
       // 서비스 초기화
       const isInitialized = await pushService.current.initialize()
       if (!isInitialized) {
@@ -156,14 +192,16 @@ export const NotificationProvider: FC<PropsWithChildren<NotificationProviderProp
         },
       })
 
-      // 포그라운드 메시지 리스너 등록
-      const unsubscribeForeground = pushService.current.onForegroundMessage()
+      // 포그라운드 메시지 리스너 등록 및 ref에 저장
+      unsubscribeRefs.current.foreground = pushService.current.onForegroundMessage()
+      console.log("✅ [NotificationContext] 포그라운드 리스너 등록 완료")
 
-      // 백그라운드/종료 상태에서 알림으로 앱이 열린 경우 리스너 등록  
-      const unsubscribeOpened = pushService.current.onNotificationOpenedApp()
+      // 백그라운드/종료 상태에서 알림으로 앱이 열린 경우 리스너 등록
+      unsubscribeRefs.current.opened = pushService.current.onNotificationOpenedApp()
+      console.log("✅ [NotificationContext] 백그라운드 리스너 등록 완료")
 
       // 토큰 새로고침 리스너 등록
-      const unsubscribeTokenRefresh = pushService.current.onTokenRefresh(async (newToken) => {
+      unsubscribeRefs.current.tokenRefresh = pushService.current.onTokenRefresh(async (newToken) => {
         console.log("🔄 [NotificationContext] FCM 토큰 새로고침:", newToken)
         const oldToken = fcmToken
         setFcmToken(newToken)
@@ -185,6 +223,7 @@ export const NotificationProvider: FC<PropsWithChildren<NotificationProviderProp
           }
         }
       })
+      console.log("✅ [NotificationContext] 토큰 새로고침 리스너 등록 완료")
 
       // 앱이 종료된 상태에서 알림으로 열렸는지 확인
       const initialNotification = await pushService.current.checkInitialNotification()
@@ -198,7 +237,7 @@ export const NotificationProvider: FC<PropsWithChildren<NotificationProviderProp
       console.error("❌ [NotificationContext] 푸시 알림 초기화 실패:", error)
       return false
     }
-  }, [])
+  }, [user, fcmToken])
 
   // 최신 알림 클리어
   const clearLatestNotification = useCallback(() => {
@@ -209,6 +248,20 @@ export const NotificationProvider: FC<PropsWithChildren<NotificationProviderProp
   useEffect(() => {
     console.log("🚀 [NotificationContext] 앱 시작 - 푸시 알림 무조건 초기화 시작")
     initializePushNotifications()
+
+    // Cleanup: 컴포넌트 언마운트 시 모든 리스너 제거
+    return () => {
+      console.log("🧹 [NotificationContext] 컴포넌트 언마운트 - 리스너 정리")
+      if (unsubscribeRefs.current.foreground) {
+        unsubscribeRefs.current.foreground()
+      }
+      if (unsubscribeRefs.current.opened) {
+        unsubscribeRefs.current.opened()
+      }
+      if (unsubscribeRefs.current.tokenRefresh) {
+        unsubscribeRefs.current.tokenRefresh()
+      }
+    }
   }, [initializePushNotifications])
 
   // 사용자 로그인 시 알림 정리 및 토큰 등록
@@ -217,25 +270,38 @@ export const NotificationProvider: FC<PropsWithChildren<NotificationProviderProp
       console.log("🚀 [NotificationContext] 사용자 로그인 감지 - 알림 정리 시작")
       cleanupUserNotifications(user.uid)
 
-      // FCM 토큰이 있으면 서버에 등록 및 중복 토큰 정리
+      // FCM 토큰이 있으면 서버에 등록 및 중복 토큰 강제 정리
       if (fcmToken) {
-        console.log('🔄 [NotificationContext] 로그인 후 FCM 토큰 서버 등록 중...')
-        fcmTokenService.registerToken(user.uid, fcmToken).then(async (success) => {
-          if (success) {
-            console.log('✅ [NotificationContext] 로그인 후 FCM 토큰 서버 등록 성공')
-
-            // 중복 토큰 정리
-            console.log('🧹 [NotificationContext] 중복 FCM 토큰 정리 시작...')
+        ;(async () => {
+          try {
+            // 1단계: 먼저 기존 중복 토큰을 모두 정리
+            console.log('🧹 [NotificationContext] 기존 중복 FCM 토큰 강제 정리 중...')
             const cleanedCount = await fcmTokenService.cleanupUserDuplicateTokens(user.uid)
             if (cleanedCount > 0) {
-              console.log(`✅ [NotificationContext] 중복 FCM 토큰 ${cleanedCount}개 정리 완료`)
-            } else {
-              console.log('✅ [NotificationContext] 중복 FCM 토큰 없음')
+              console.log(`✅ [NotificationContext] 기존 중복 FCM 토큰 ${cleanedCount}개 정리 완료`)
             }
-          } else {
-            console.log('❌ [NotificationContext] 로그인 후 FCM 토큰 서버 등록 실패')
+
+            // 2단계: 현재 토큰 등록 (이미 강화된 중복 방지 로직 포함)
+            console.log('🔄 [NotificationContext] 로그인 후 FCM 토큰 서버 등록 중...')
+            const success = await fcmTokenService.registerToken(user.uid, fcmToken)
+            if (success) {
+              console.log('✅ [NotificationContext] 로그인 후 FCM 토큰 서버 등록 성공')
+            } else {
+              console.log('❌ [NotificationContext] 로그인 후 FCM 토큰 서버 등록 실패')
+            }
+
+            // 3단계: 등록 후 다시 한번 중복 체크 (안전장치)
+            console.log('🔍 [NotificationContext] 최종 중복 토큰 검증 중...')
+            const finalCheck = await fcmTokenService.cleanupUserDuplicateTokens(user.uid)
+            if (finalCheck > 0) {
+              console.log(`⚠️ [NotificationContext] 추가 중복 ${finalCheck}개 발견 및 정리`)
+            } else {
+              console.log('✅ [NotificationContext] 중복 없음 - 완료')
+            }
+          } catch (error) {
+            console.error('❌ [NotificationContext] 토큰 등록/정리 실패:', error)
           }
-        })
+        })()
       }
     } else {
       // 로그아웃 시 알림 관련 상태 리셋

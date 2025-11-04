@@ -89,13 +89,13 @@ class FCMTokenService {
   }
 
   /**
-   * FCM 토큰을 Firestore에 등록/업데이트 - 자동 재시도 기능 포함 + 중복 방지
+   * FCM 토큰을 Firestore에 등록/업데이트 - 강력한 중복 방지
    */
   async registerToken(userId: string, fcmToken: string): Promise<boolean> {
     try {
       return await withRetry(
         async () => {
-          logger.info('FCMTokenService', '🔄 FCM 토큰 등록 시작', {
+          logger.info('FCMTokenService', '🔄 FCM 토큰 등록 시작 (중복 완전 차단)', {
             userId,
             tokenPrefix: fcmToken.substring(0, 10),
           })
@@ -106,33 +106,32 @@ class FCMTokenService {
           // 문서 ID를 userId_deviceId 형태로 생성하여 기기별 고유 문서 생성
           const docId = `${userId}_${deviceInfo.deviceId}`
 
-          // 1. 같은 userId에서 같은 fcmToken을 가진 다른 문서들 비활성화 (중복 제거)
-          const duplicateTokensQuery = await firestore()
+          // 1단계: 같은 userId의 모든 활성 토큰 조회 (현재 기기 포함)
+          const allActiveTokensQuery = await firestore()
             .collection(this.COLLECTION)
             .where('userId', '==', userId)
-            .where('fcmToken', '==', fcmToken)
+            .where('isActive', '==', true)
             .get()
 
           const batch = firestore().batch()
           let deactivatedCount = 0
 
-          duplicateTokensQuery.docs.forEach((doc) => {
-            // 현재 등록하려는 문서가 아닌 경우만 비활성화
-            if (doc.id !== docId) {
+          // 2단계: 현재 등록하려는 토큰과 다른 모든 활성 토큰 비활성화
+          allActiveTokensQuery.docs.forEach((doc) => {
+            const data = doc.data() as FCMTokenData
+
+            // 현재 토큰이 아니거나, 같은 토큰이지만 다른 문서 ID인 경우 비활성화
+            if (doc.id !== docId || data.fcmToken !== fcmToken) {
               batch.update(doc.ref, {
                 isActive: false,
                 lastUsed: now,
               })
               deactivatedCount++
+              logger.info('FCMTokenService', `🧹 비활성화 대상: ${doc.id} (토큰: ${data.fcmToken.substring(0, 10)}...)`)
             }
           })
 
-          if (deactivatedCount > 0) {
-            await batch.commit()
-            logger.info('FCMTokenService', `🧹 중복 토큰 ${deactivatedCount}개 비활성화`)
-          }
-
-          // 2. 현재 기기의 토큰 등록/업데이트
+          // 3단계: 현재 기기의 토큰을 유일한 활성 토큰으로 등록
           const tokenData: FCMTokenData = {
             userId,
             fcmToken,
@@ -142,9 +141,18 @@ class FCMTokenService {
             isActive: true,
           }
 
-          await firestore().collection(this.COLLECTION).doc(docId).set(tokenData, { merge: true })
+          const docRef = firestore().collection(this.COLLECTION).doc(docId)
+          batch.set(docRef, tokenData, { merge: true })
 
-          logger.info('FCMTokenService', '✅ FCM 토큰 등록 성공', { docId })
+          // 4단계: 모든 변경사항을 한 번에 적용 (원자성 보장)
+          await batch.commit()
+
+          if (deactivatedCount > 0) {
+            logger.info('FCMTokenService', `✅ ${deactivatedCount}개 토큰 비활성화 + 1개 활성화 완료`)
+          } else {
+            logger.info('FCMTokenService', '✅ FCM 토큰 등록 성공 (신규 또는 갱신)', { docId })
+          }
+
           return true
         },
         'FCM 토큰 등록'

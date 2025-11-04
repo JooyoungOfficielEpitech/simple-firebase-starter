@@ -1,11 +1,18 @@
 import { useState } from 'react'
 import { Alert, Share } from 'react-native'
 import { fcmTokenService } from '@/services/fcmTokenService'
+import firestore from '@react-native-firebase/firestore'
 
 export const useDevSettings = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [allUserTokens, setAllUserTokens] = useState<string[]>([])
   const [debugLogs, setDebugLogs] = useState<string[]>([])
+  const [tokenStats, setTokenStats] = useState<{
+    total: number
+    active: number
+    inactive: number
+    duplicates: number
+  }>({ total: 0, active: 0, inactive: 0, duplicates: 0 })
 
   const addLog = (message: string) => {
     const timestamp = new Date().toLocaleTimeString()
@@ -102,16 +109,107 @@ export const useDevSettings = () => {
 
   const clearLogs = () => setDebugLogs([])
 
+  // DB 상태 확인 (모든 토큰 조회 및 중복 체크)
+  const checkDatabaseStatus = async (userId: string) => {
+    setIsLoading(true)
+    try {
+      addLog('🔍 DB 상태 확인 시작...')
+
+      // 사용자의 모든 토큰 문서 조회 (활성/비활성 모두)
+      const snapshot = await firestore()
+        .collection('userFCMTokens')
+        .where('userId', '==', userId)
+        .get()
+
+      const total = snapshot.docs.length
+      let active = 0
+      let inactive = 0
+      const tokenMap = new Map<string, number>()
+
+      snapshot.docs.forEach(doc => {
+        const data = doc.data()
+        if (data.isActive) {
+          active++
+        } else {
+          inactive++
+        }
+
+        // 중복 체크
+        const token = data.fcmToken
+        tokenMap.set(token, (tokenMap.get(token) || 0) + 1)
+      })
+
+      // 중복 개수 계산 (2개 이상인 토큰)
+      let duplicates = 0
+      tokenMap.forEach((count) => {
+        if (count > 1) {
+          duplicates += count - 1  // 중복 개수만 세기
+        }
+      })
+
+      const stats = { total, active, inactive, duplicates }
+      setTokenStats(stats)
+
+      addLog(`✅ 총 ${total}개 (활성: ${active}, 비활성: ${inactive}, 중복: ${duplicates})`)
+
+      // 중복 토큰 상세 정보
+      const duplicateTokens: string[] = []
+      tokenMap.forEach((count, token) => {
+        if (count > 1) {
+          duplicateTokens.push(`${token.substring(0, 15)}... (${count}개)`)
+        }
+      })
+
+      if (duplicateTokens.length > 0) {
+        addLog(`⚠️ 중복 토큰: ${duplicateTokens.join(', ')}`)
+
+        Alert.alert(
+          'DB 상태 확인',
+          `총 ${total}개 토큰\n` +
+          `활성: ${active}개\n` +
+          `비활성: ${inactive}개\n` +
+          `중복: ${duplicates}개\n\n` +
+          `중복 토큰:\n${duplicateTokens.join('\n')}`,
+          [
+            { text: '확인' },
+            {
+              text: '지금 정리',
+              onPress: () => cleanupDuplicateTokens(userId)
+            }
+          ]
+        )
+      } else {
+        Alert.alert(
+          'DB 상태 확인',
+          `총 ${total}개 토큰\n` +
+          `활성: ${active}개\n` +
+          `비활성: ${inactive}개\n` +
+          `중복: 없음 ✅`
+        )
+      }
+
+      return stats
+    } catch (error: any) {
+      addLog(`❌ DB 확인 실패: ${error.message}`)
+      Alert.alert('오류', 'DB 상태 확인에 실패했습니다.')
+      return null
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return {
     isLoading,
     allUserTokens,
     debugLogs,
+    tokenStats,
     addLog,
     copyToClipboard,
     loadAllUserTokens,
     cleanupOldTokens,
     cleanupDuplicateTokens,
     deactivateAllTokens,
-    clearLogs
+    clearLogs,
+    checkDatabaseStatus,
   }
 }

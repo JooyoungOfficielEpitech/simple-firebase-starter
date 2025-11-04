@@ -36,13 +36,15 @@ export const DevSettingsScreen: FC<DevSettingsScreenProps> = ({ navigation }) =>
     isLoading,
     allUserTokens,
     debugLogs,
+    tokenStats,
     addLog,
     copyToClipboard,
     loadAllUserTokens,
     cleanupOldTokens,
     cleanupDuplicateTokens,
     deactivateAllTokens,
-    clearLogs
+    clearLogs,
+    checkDatabaseStatus,
   } = useDevSettings()
 
   const {
@@ -166,6 +168,8 @@ FCM 토큰이 클립보드에 복사되었습니다.`
         <TokenManagementSection
           isLoading={isLoading}
           tokenCount={allUserTokens.length}
+          tokenStats={tokenStats}
+          onCheckDatabase={() => checkDatabaseStatus(user.uid)}
           onLoadTokens={() => loadAllUserTokens(user.uid)}
           onCleanupOld={cleanupOldTokens}
           onCleanupDuplicate={() => cleanupDuplicateTokens(user.uid)}
