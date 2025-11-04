@@ -24,6 +24,7 @@ export type AppStackParamList = {
   
   // 게시판 관련 화면
   PostDetail: { postId: string }
+  CreatePost: { postId?: string; isEdit?: boolean }
   ApplicationManagement: { postId: string; postTitle: string }
   CreateOrganization: { organizationId?: string; isEdit?: boolean; isOrganizerConversion?: boolean }
   
