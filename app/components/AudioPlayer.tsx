@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useCallback, useMemo, useState } from "react"
-import { View, ViewStyle, TouchableOpacity } from "react-native"
-import TrackPlayer, { usePlaybackState, useProgress } from 'react-native-track-player'
+import { View, ViewStyle, TouchableOpacity, ActivityIndicator } from "react-native"
+import TrackPlayer, { usePlaybackState, useProgress, State } from 'react-native-track-player'
 
 import { AlertModal } from "@/components/AlertModal"
 import { Text } from "@/components/Text"
@@ -10,6 +10,10 @@ import { useAudioPlayerState } from "@/components/hooks/useAudioPlayerState"
 import { AudioButton } from "./AudioPlayer/AudioButton"
 import { AudioPlayerProgressBar } from "./AudioPlayer/AudioPlayerProgressBar"
 import { SaveSectionModal } from "./AudioPlayer/SaveSectionModal"
+import { MetronomeControl } from "./MusicPlayer/MetronomeControl"
+import { PitchControl } from "./MusicPlayer/PitchControl"
+import { useMetronome } from "@/hooks/useMetronome"
+import { usePitchShift } from "@/hooks/usePitchShift"
 import { formatTime, loadSavedSections, saveSectionsToStorage, SavedSection } from "@/utils/audioHelpers"
 import * as styles from "./AudioPlayer/AudioPlayer.styles"
 
@@ -42,12 +46,12 @@ export function AudioPlayer({
   if (typeof audioFile !== 'string' && audioFile !== undefined) return null
   if (typeof audioUrl !== 'string' && audioUrl !== undefined) return null
 
-  const { themed } = useAppTheme()
+  const { themed, theme } = useAppTheme()
   const { alertState, alert, hideAlert } = useAlert()
   const playbackState = usePlaybackState()
   const progress = useProgress()
   const { state, actions } = useAudioPlayerState()
-  
+
   const progressBarRef = useRef<View>(null)
   const seekTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const lastSeekTimeRef = useRef<number>(0)
@@ -57,6 +61,70 @@ export function AudioPlayer({
   const [localPosition, setLocalPosition] = useState<number | null>(null)
   const localPositionTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const isABLoopJumpRef = useRef<boolean>(false)
+
+  // 메트로놈 상태
+  const [metronomeEnabled, setMetronomeEnabled] = useState(false)
+  const [metronomeBpm, setMetronomeBpm] = useState(120)
+  const [metronomeVolume, setMetronomeVolume] = useState(0.7)
+  const prevPositionRef = useRef(0)
+
+  // 피치 조절 상태
+  const [pitchEnabled, setPitchEnabled] = useState(false)
+  const [pitchSemitones, setPitchSemitones] = useState(0)
+
+  // 메트로놈 Hook 사용
+  const { currentBeat, totalBeats, isReady: metronomeReady, error: metronomeError, resetBeat } = useMetronome({
+    bpm: metronomeBpm,
+    enabled: metronomeEnabled,
+    volume: metronomeVolume,
+  })
+
+  // 피치 조절 Hook 사용 (네이티브 모듈)
+  usePitchShift({
+    semitones: pitchSemitones,
+    enabled: pitchEnabled,
+  })
+
+  // 메트로놈 BPM 변경 시 플레이어 속도도 함께 조절
+  useEffect(() => {
+    // 플레이어가 초기화되지 않았으면 속도 조절 안 함
+    if (!state.isPlayerInitialized) return
+
+    const applyPlaybackRate = async () => {
+      try {
+        // 큐에 트랙이 있는지 확인
+        const queue = await TrackPlayer.getQueue()
+        if (queue.length === 0) return
+
+        // 원본 BPM을 120으로 가정하고 비율 계산
+        const rate = metronomeBpm / 120
+        await TrackPlayer.setRate(rate)
+        if (__DEV__) {
+          console.log(`🎵 플레이어 속도 조절: BPM ${metronomeBpm} → Rate ${rate.toFixed(2)}x`)
+        }
+      } catch (error) {
+        if (__DEV__) {
+          console.error('❌ 플레이어 속도 조절 오류:', error)
+        }
+      }
+    }
+
+    applyPlaybackRate()
+  }, [metronomeBpm, state.isPlayerInitialized])
+
+  // 음악 재생 상태에 따라 메트로놈 자동 제어 (동기화)
+  useEffect(() => {
+    const isPlaying = playbackState?.state !== undefined &&
+                      String(playbackState.state) === "playing"
+
+    if (isPlaying && !metronomeEnabled) {
+      // 음악이 재생 중인데 메트로놈이 꺼져있으면 켜기
+      setMetronomeEnabled(true)
+      if (__DEV__) {
+        console.log('🎵 음악 재생 시작 → 메트로놈 자동 켜기')
+      }
+    }
+  }, [playbackState, metronomeEnabled])
 
   // Unified seekTo function
   const safeSeekTo = useCallback(async (positionSeconds: number, reason: string = '') => {
@@ -260,6 +328,29 @@ export function AudioPlayer({
     }
   }, [progress.position, state.loopState, state.isJumping, safeSeekTo])
 
+  // A-B 루프 재시작 감지 → 메트로놈 박자 리셋
+  useEffect(() => {
+    const { pointA, pointB, isLooping } = state.loopState
+    if (!isLooping || !metronomeEnabled || pointA === null || pointB === null) {
+      prevPositionRef.current = 0
+      return
+    }
+
+    const currentPosition = progress.position || 0
+
+    // 위치가 뒤로 점프했고 (B → A), A 포인트 근처라면 루프 재시작으로 판단
+    if (currentPosition < prevPositionRef.current - 1 && // 1초 이상 뒤로 점프
+        Math.abs(currentPosition - pointA) < 2) { // A 포인트 근처 (±2초)
+      if (__DEV__) console.log(`🔄 A-B 루프 재시작 감지: ${prevPositionRef.current.toFixed(1)}s → ${currentPosition.toFixed(1)}s`)
+      resetBeat()
+    }
+
+    prevPositionRef.current = currentPosition
+  }, [progress.position, state.loopState, metronomeEnabled, resetBeat])
+
+  // 네이티브 pitch shifting은 usePitchShift hook에서 처리됩니다
+  // TrackPlayer와 자동으로 통합되므로 별도의 동기화 로직이 필요 없습니다
+
   // Local position auto-release
   useEffect(() => {
     if (localPosition !== null) {
@@ -301,13 +392,14 @@ export function AudioPlayer({
     if (!state.isPlayerInitialized) return
 
     try {
+      // TrackPlayer 제어 (pitch shift는 네이티브 모듈이 자동 처리)
       const queue = await TrackPlayer.getQueue()
       if (queue.length === 0) {
         await loadAudio()
         return
       }
 
-      const isCurrentlyPlaying = playbackState?.state !== undefined && 
+      const isCurrentlyPlaying = playbackState?.state !== undefined &&
                                 String(playbackState.state) === "playing"
       const currentTime = progress.position || 0
       const duration = progress.duration || 0
@@ -315,13 +407,17 @@ export function AudioPlayer({
       if (currentTime >= duration && duration > 0) {
         await safeSeekTo(0, '곡 끝')
         await TrackPlayer.play()
+        // 메트로놈은 playback state 변경 시 자동으로 켜짐
         return
       }
 
       if (isCurrentlyPlaying) {
         await TrackPlayer.pause()
+        // 일시정지 시 메트로놈도 끄기
+        setMetronomeEnabled(false)
       } else {
         await TrackPlayer.play()
+        // 메트로놈은 playback state 변경 시 자동으로 켜짐
       }
     } catch (err) {
       actions.setError("재생 오류")
@@ -547,6 +643,22 @@ export function AudioPlayer({
     )
   }
 
+  // 로딩 상태 체크: 플레이어 초기화 중이거나 메트로놈이 준비되지 않았거나 MP3가 로딩 중일 때
+  const isLoading = state.isLoading || !metronomeReady || !progress.duration || progress.duration === 0
+
+  // 로딩 중이면 스피너 표시
+  if (isLoading) {
+    return (
+      <View style={themed([styles.$container, style, { justifyContent: 'center', alignItems: 'center' }])}>
+        <ActivityIndicator size="large" color={theme.colors.palette.primary500} />
+        <Text
+          text="음악과 메트로놈을 준비하는 중..."
+          style={themed([styles.$timeText, { marginTop: 16 }])}
+        />
+      </View>
+    )
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <View style={themed([styles.$container, style])}>
@@ -608,7 +720,7 @@ export function AudioPlayer({
             size={32}
             style={themed(styles.$playButton)}
           />
-          
+
           <TouchableOpacity
             style={themed(styles.$saveButtonAligned)}
             onPress={() => actions.setShowSaveModal(true)}
@@ -617,8 +729,47 @@ export function AudioPlayer({
           </TouchableOpacity>
         </View>
 
+        {/* 메트로놈 컨트롤 */}
+        <View style={{ marginTop: 20 }}>
+          <MetronomeControl
+            enabled={metronomeEnabled}
+            bpm={metronomeBpm}
+            volume={metronomeVolume}
+            currentBeat={currentBeat}
+            totalBeats={totalBeats}
+            isReady={metronomeReady}
+            error={metronomeError}
+            onToggle={() => setMetronomeEnabled(!metronomeEnabled)}
+            onBpmChange={setMetronomeBpm}
+            onVolumeChange={setMetronomeVolume}
+          />
+        </View>
+
+        {/* 피치 컨트롤 */}
+        <View style={{ marginTop: 15 }}>
+          <PitchControl
+            enabled={pitchEnabled}
+            semitones={pitchSemitones}
+            onPitchChange={setPitchSemitones}
+            onReset={() => setPitchSemitones(0)}
+            onToggle={() => setPitchEnabled(!pitchEnabled)}
+          />
+        </View>
+
         {state.isLoading && (
           <Text text="로딩 중..." style={themed(styles.$statusText)} />
+        )}
+
+        {/* 상태 정보 */}
+        {(metronomeEnabled || pitchEnabled) && (
+          <View style={{ marginTop: 15, padding: 10, backgroundColor: themed(styles.$container).backgroundColor, borderRadius: 8 }}>
+            {metronomeEnabled && (
+              <Text text={`🎵 메트로놈 활성 (${metronomeBpm} BPM)`} style={{ fontSize: 14, color: '#007AFF', fontWeight: 'bold' }} />
+            )}
+            {pitchEnabled && (
+              <Text text={`🎹 피치 조절 활성 (${pitchSemitones > 0 ? '+' : ''}${pitchSemitones} 반음)`} style={{ fontSize: 14, color: '#FF9500', fontWeight: 'bold', marginTop: metronomeEnabled ? 5 : 0 }} />
+            )}
+          </View>
         )}
 
         <AlertModal

@@ -341,4 +341,4 @@
 
 
   push notification
-  background mode
+  background mode붙 

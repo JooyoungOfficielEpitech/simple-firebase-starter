@@ -13,6 +13,9 @@
     "**/__tests__/**/*",
     "**/*.test.ts",
     "**/*.test.tsx",
-    "test/**/*"
+    "test/**/*",
+    "metro.config.js",
+    "babel.config.js",
+    "app.config.js"
   ]
 }

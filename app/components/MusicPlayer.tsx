@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import TrackPlayer, {
   Capability,
   State,
@@ -7,6 +7,13 @@ import TrackPlayer, {
   useProgress,
   RepeatMode,
 } from 'react-native-track-player';
+import { Audio } from 'expo-av';
+import { UrgentDebug } from './URGENT_DEBUG';
+import { MetronomeControl } from './MusicPlayer/MetronomeControl';
+import { PitchControl } from './MusicPlayer/PitchControl';
+import { SimpleTest } from './MusicPlayer/SimpleTest';
+import { useMetronome } from '../hooks/useMetronome';
+import { usePitchShift } from '../hooks/usePitchShift';
 
 const MusicPlayer = () => {
   const playbackState = usePlaybackState();
@@ -14,6 +21,33 @@ const MusicPlayer = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [abLoop, setAbLoop] = useState({ a: null, b: null, enabled: false });
   const [initStatus, setInitStatus] = useState('대기 중...');
+
+  // A-B 루프 재시작 감지를 위한 이전 위치 추적
+  const prevPositionRef = useRef(0);
+
+  // 메트로놈 상태
+  const [metronomeEnabled, setMetronomeEnabled] = useState(false);
+  const [metronomeBpm, setMetronomeBpm] = useState(120);
+  const [metronomeVolume, setMetronomeVolume] = useState(0.7);
+
+  // 피치 조절 상태
+  const [pitchEnabled, setPitchEnabled] = useState(false);
+  const [pitchSemitones, setPitchSemitones] = useState(0);
+  const [expoSound, setExpoSound] = useState<Audio.Sound | null>(null);
+  const [isPitchReady, setIsPitchReady] = useState(false);
+
+  // 메트로놈 Hook 사용
+  const { currentBeat, totalBeats, isReady, error, resetBeat } = useMetronome({
+    bpm: metronomeBpm,
+    enabled: metronomeEnabled,
+    volume: metronomeVolume,
+  });
+
+  // 피치 조절 Hook 사용 (네이티브 모듈)
+  usePitchShift({
+    semitones: pitchSemitones,
+    enabled: pitchEnabled,
+  });
 
   // TrackPlayer 초기화 (DevSettings 방식과 동일하게)
   useEffect(() => {
@@ -137,6 +171,86 @@ const MusicPlayer = () => {
     };
   }, []);
 
+  // expo-av Sound 초기화 (피치 조절용)
+  useEffect(() => {
+    const loadExpoSound = async () => {
+      try {
+        console.log('🎵 expo-av Sound 로드 시작...');
+
+        // 오디오 모드 설정
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: false,
+          playsInSilentModeIOS: true,
+          staysActiveInBackground: true,
+          shouldDuckAndroid: true,
+        });
+
+        // Sound 인스턴스 생성 및 로드
+        const sound = new Audio.Sound();
+        await sound.loadAsync({
+          uri: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+        });
+
+        setExpoSound(sound);
+        setIsPitchReady(true);
+        console.log('✅ expo-av Sound 로드 완료');
+      } catch (error) {
+        console.error('❌ expo-av Sound 로드 실패:', error);
+        setIsPitchReady(false);
+      }
+    };
+
+    loadExpoSound();
+
+    // cleanup
+    return () => {
+      if (expoSound) {
+        console.log('🧹 expo-av Sound 정리...');
+        expoSound.unloadAsync().catch(err => console.error('Sound unload 오류:', err));
+      }
+    };
+  }, []);
+
+  // Pitch 활성화 시 TrackPlayer와 expo-av 동기화
+  useEffect(() => {
+    const syncPlayback = async () => {
+      if (!expoSound || !isInitialized) return;
+
+      try {
+        if (pitchEnabled) {
+          // Pitch 활성화: TrackPlayer 일시정지 → expo-av 재생
+          const currentPosition = progress.position;
+          await TrackPlayer.pause();
+
+          // expo-av를 현재 위치로 이동
+          await expoSound.setPositionAsync(currentPosition * 1000); // ms 단위
+          await expoSound.playAsync();
+
+          console.log('🎹 Pitch 모드 활성화: expo-av 재생 시작');
+        } else {
+          // Pitch 비활성화: expo-av 일시정지 → TrackPlayer 재생
+          const status = await expoSound.getStatusAsync();
+          if (status.isLoaded) {
+            const expoPosition = status.positionMillis / 1000; // 초 단위
+            await expoSound.pauseAsync();
+
+            // TrackPlayer를 expo-av 위치로 이동
+            await TrackPlayer.seekTo(expoPosition);
+            if (playbackState?.state === State.Playing) {
+              await TrackPlayer.play();
+            }
+          }
+
+          console.log('🎵 TrackPlayer 모드로 전환');
+        }
+      } catch (error) {
+        console.error('❌ Playback 동기화 오류:', error);
+      }
+    };
+
+    syncPlayback();
+  }, [pitchEnabled]);
+
   // A-B 루프는 이제 service.js에서 처리됩니다
   // 포그라운드에서는 상태만 서비스에 전달
   useEffect(() => {
@@ -145,43 +259,87 @@ const MusicPlayer = () => {
     }
   }, [abLoop]);
 
+  // A-B 루프 재시작 감지 → 메트로놈 박자 리셋
+  useEffect(() => {
+    if (!abLoop.enabled || !metronomeEnabled || abLoop.a === null || abLoop.b === null) {
+      // 비활성화 시 이전 위치 초기화
+      prevPositionRef.current = 0;
+      return;
+    }
+
+    const currentPosition = progress.position;
+
+    // 위치가 뒤로 점프했고 (B → A), A 포인트 근처라면 루프 재시작으로 판단
+    if (currentPosition < prevPositionRef.current - 1 && // 1초 이상 뒤로 점프
+        Math.abs(currentPosition - abLoop.a) < 2) { // A 포인트 근처 (±2초)
+      console.log(`🔄 A-B 루프 재시작 감지: ${prevPositionRef.current.toFixed(1)}s → ${currentPosition.toFixed(1)}s`);
+      resetBeat();
+    }
+
+    prevPositionRef.current = currentPosition;
+  }, [progress.position, abLoop, metronomeEnabled, resetBeat]);
+
   const togglePlayback = async () => {
     if (!isInitialized) {
       Alert.alert('알림', 'TrackPlayer가 아직 초기화되지 않았습니다.');
       return;
     }
-    
+
     try {
-      if (playbackState?.state === State.Playing) {
-        await TrackPlayer.pause();
-        console.log('⏸️ TrackPlayer 일시정지');
+      if (pitchEnabled && expoSound) {
+        // Pitch 모드: expo-av 제어
+        const status = await expoSound.getStatusAsync();
+        if (status.isLoaded) {
+          if (status.isPlaying) {
+            await expoSound.pauseAsync();
+            console.log('⏸️ expo-av 일시정지');
+          } else {
+            await expoSound.playAsync();
+            console.log('▶️ expo-av 재생');
+          }
+        }
       } else {
-        await TrackPlayer.play();
-        console.log('▶️ TrackPlayer 재생');
+        // 일반 모드: TrackPlayer 제어
+        if (playbackState?.state === State.Playing) {
+          await TrackPlayer.pause();
+          console.log('⏸️ TrackPlayer 일시정지');
+        } else {
+          await TrackPlayer.play();
+          console.log('▶️ TrackPlayer 재생');
+        }
       }
     } catch (error) {
-      console.error('❌ TrackPlayer 재생/일시정지 오류:', error);
+      console.error('❌ 재생/일시정지 오류:', error);
       Alert.alert('재생 오류', error.message);
     }
   };
 
-  const setLoopPoint = (point: 'a' | 'b') => {
+  const setLoopPoint = async (point: 'a' | 'b') => {
     if (!isInitialized) {
       Alert.alert('알림', 'TrackPlayer가 아직 초기화되지 않았습니다.');
       return;
     }
-    
-    const currentPosition = progress.position;
-    if (!currentPosition || currentPosition === 0) {
-      Alert.alert('알림', '재생 중일 때 루프 포인트를 설정할 수 있습니다.');
-      return;
+
+    try {
+      // 실시간 위치를 직접 가져오기 (progress.position은 지연될 수 있음)
+      const currentPosition = await TrackPlayer.getPosition();
+
+      if (!currentPosition || currentPosition === 0) {
+        Alert.alert('알림', '재생 중일 때 루프 포인트를 설정할 수 있습니다.');
+        return;
+      }
+
+      setAbLoop(prev => ({
+        ...prev,
+        [point]: currentPosition,
+      }));
+
+      console.log(`📍 ${point.toUpperCase()} 포인트 설정: ${currentPosition.toFixed(2)}초`);
+      Alert.alert('루프 포인트 설정', `${point.toUpperCase()} 포인트: ${currentPosition.toFixed(1)}초`);
+    } catch (error) {
+      console.error('❌ 루프 포인트 설정 오류:', error);
+      Alert.alert('오류', '루프 포인트 설정에 실패했습니다.');
     }
-    
-    setAbLoop(prev => ({
-      ...prev,
-      [point]: currentPosition,
-    }));
-    Alert.alert('루프 포인트 설정', `${point.toUpperCase()} 포인트: ${Math.floor(currentPosition)}초`);
   };
 
   const toggleLoop = () => {
@@ -213,15 +371,88 @@ const MusicPlayer = () => {
   if (!isInitialized) {
     return (
       <View style={styles.container}>
-        <Text>플레이어 초기화 중...</Text>
+        <UrgentDebug />
+        <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#ff0000', textAlign: 'center', marginTop: 20 }}>
+          플레이어 초기화 중...
+        </Text>
       </View>
     );
   }
 
+  // 로딩 상태 체크: 플레이어 초기화 중이거나 메트로놈이 준비되지 않았을 때
+  const isLoading = !isInitialized || !isReady
+
+  // 로딩 중이면 스피너 표시
+  if (isLoading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#007AFF" />
+        <Text style={{ marginTop: 16, fontSize: 16, color: '#666' }}>
+          음악과 메트로놈을 준비하는 중...
+        </Text>
+        <Text style={{ marginTop: 8, fontSize: 14, color: '#999' }}>
+          {initStatus}
+        </Text>
+      </View>
+    )
+  }
+
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      <UrgentDebug />
       <Text style={styles.title}>뮤직 플레이어</Text>
-      
+
+      {/* 테스트 컴포넌트 - 이게 보이면 렌더링 성공 */}
+      <SimpleTest />
+
+      {/* 디버그: 컴포넌트 렌더링 확인 */}
+      <View style={{ backgroundColor: '#ffcccc', padding: 10, marginVertical: 10 }}>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#ff0000' }}>🔍 디버그 정보</Text>
+        <Text>메트로놈 활성: {metronomeEnabled ? 'ON' : 'OFF'}</Text>
+        <Text>BPM: {metronomeBpm}</Text>
+        <Text>현재 박자: {currentBeat}/{totalBeats}</Text>
+        <Text>메트로놈 준비: {isReady ? 'YES' : 'NO'}</Text>
+        <Text>메트로놈 에러: {error || '없음'}</Text>
+        <Text>---</Text>
+        <Text>Pitch 활성: {pitchEnabled ? 'ON' : 'OFF'}</Text>
+        <Text>반음: {pitchSemitones}</Text>
+        <Text>expo-av Sound: {expoSound ? 'loaded' : 'null'}</Text>
+        <Text>Pitch 준비: {isPitchReady ? 'YES' : 'NO'}</Text>
+      </View>
+
+      {/* 메트로놈 컨트롤 */}
+      <View style={{ backgroundColor: '#ccffcc', padding: 10, marginVertical: 5 }}>
+        <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#008800' }}>
+          ⬇️ MetronomeControl 컴포넌트 (아래에 렌더링되어야 함)
+        </Text>
+      </View>
+      <MetronomeControl
+        enabled={metronomeEnabled}
+        bpm={metronomeBpm}
+        volume={metronomeVolume}
+        currentBeat={currentBeat}
+        totalBeats={totalBeats}
+        isReady={isReady}
+        error={error}
+        onToggle={() => setMetronomeEnabled(!metronomeEnabled)}
+        onBpmChange={setMetronomeBpm}
+        onVolumeChange={setMetronomeVolume}
+      />
+
+      {/* 피치 컨트롤 */}
+      <View style={{ backgroundColor: '#ccccff', padding: 10, marginVertical: 5 }}>
+        <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#000088' }}>
+          ⬇️ PitchControl 컴포넌트 (아래에 렌더링되어야 함)
+        </Text>
+      </View>
+      <PitchControl
+        enabled={pitchEnabled}
+        semitones={pitchSemitones}
+        onPitchChange={setPitchSemitones}
+        onReset={() => setPitchSemitones(0)}
+        onToggle={() => setPitchEnabled(!pitchEnabled)}
+      />
+
       {/* 진행률 표시 */}
       <View style={styles.progressContainer}>
         <Text>{formatTime(progress.position)}</Text>
@@ -313,17 +544,29 @@ const MusicPlayer = () => {
             🔄 백그라운드 A-B 루프 활성 ({formatTime(abLoop.a)} - {formatTime(abLoop.b)})
           </Text>
         )}
+        {metronomeEnabled && (
+          <Text style={styles.metronomeStatus}>
+            🎵 메트로놈 활성 ({metronomeBpm} BPM)
+          </Text>
+        )}
+        {pitchEnabled && (
+          <Text style={styles.pitchStatus}>
+            🎹 피치 조절 활성 ({pitchSemitones > 0 ? '+' : ''}{pitchSemitones} 반음)
+          </Text>
+        )}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    justifyContent: 'center',
     backgroundColor: '#f5f5f5',
+  },
+  contentContainer: {
+    padding: 20,
+    paddingBottom: 40,
   },
   title: {
     fontSize: 24,
@@ -410,6 +653,16 @@ const styles = StyleSheet.create({
   },
   loopStatus: {
     color: '#ff6600',
+    fontWeight: 'bold',
+    marginTop: 5,
+  },
+  metronomeStatus: {
+    color: '#007AFF',
+    fontWeight: 'bold',
+    marginTop: 5,
+  },
+  pitchStatus: {
+    color: '#FF9500',
     fontWeight: 'bold',
     marginTop: 5,
   },
