@@ -29,6 +29,7 @@ export const EditProfileScreen: FC<EditProfileScreenProps> = ({ navigation }) =>
 
   // Form fields
   const [name, setName] = useState("")
+  const [phoneNumber, setPhoneNumber] = useState("")
   const [gender, setGender] = useState<UserGender | "">("")
   const [birthday, setBirthday] = useState("")
   const [heightCm, setHeightCm] = useState("")
@@ -47,6 +48,7 @@ export const EditProfileScreen: FC<EditProfileScreenProps> = ({ navigation }) =>
       
       if (profile) {
         setName(profile.name || "")
+        setPhoneNumber(profile.phoneNumber || "")
         setGender(profile.gender || "")
         setBirthday(profile.birthday || "")
         setHeightCm(profile.heightCm?.toString() || "")
@@ -70,6 +72,10 @@ export const EditProfileScreen: FC<EditProfileScreenProps> = ({ navigation }) =>
       
       const updateData: any = {
         name: name.trim()
+      }
+
+      if (phoneNumber.trim()) {
+        updateData.phoneNumber = phoneNumber.trim()
       }
 
       if (gender) {
@@ -138,6 +144,15 @@ export const EditProfileScreen: FC<EditProfileScreenProps> = ({ navigation }) =>
           value={name}
           onChangeText={setName}
           placeholder="이름을 입력하세요"
+          style={themed($textField)}
+        />
+
+        <TextField
+          label="전화번호"
+          value={phoneNumber}
+          onChangeText={setPhoneNumber}
+          placeholder="전화번호를 입력하세요"
+          keyboardType="phone-pad"
           style={themed($textField)}
         />
 

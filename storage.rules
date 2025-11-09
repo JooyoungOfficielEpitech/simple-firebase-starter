@@ -101,22 +101,76 @@ service firebase.storage {
     // === 임시 파일 업로드 규칙 ===
     // 경로: temp/{userId}/{filename}
     match /temp/{userId}/{fileName} {
-      allow read, write, delete: if 
+      allow read, write, delete: if
         // 1. 본인의 임시 폴더에만 접근 가능
         request.auth.uid == userId
-        
+
         // 2. 파일 타입 제한 (더 넓은 범위 허용)
         && (
           request.resource.contentType.matches('image/.*') ||
           request.resource.contentType.matches('application/pdf') ||
           request.resource.contentType.matches('text/.*')
         )
-        
+
         // 3. 파일 크기 제한 (10MB 이하)
         && request.resource.size < 10 * 1024 * 1024
-        
+
         // 4. 파일명 안전성 검증
         && fileName.matches('^[a-zA-Z0-9._-]+\\.[a-zA-Z0-9]+$');
+    }
+
+    // === 뮤지컬 노래방 음악 파일 규칙 ===
+    // 경로: karaoke/songs/{filename}
+    match /karaoke/songs/{fileName} {
+      allow read: if true;  // 모든 사용자가 음악 파일 읽기 가능
+
+      allow write: if
+        // 1. 사용자가 인증되어 있어야 함 (관리자만 업로드)
+        request.auth != null
+
+        // 2. 파일 타입 제한 (오디오 파일만 허용)
+        && (
+          request.resource.contentType.matches('audio/mpeg') ||
+          request.resource.contentType.matches('audio/mp3') ||
+          request.resource.contentType.matches('audio/wav') ||
+          request.resource.contentType.matches('audio/ogg')
+        )
+
+        // 3. 파일 크기 제한 (20MB 이하)
+        && request.resource.size < 20 * 1024 * 1024
+
+        // 4. 파일명 안전성 검증 (.mp3, .wav, .ogg만 허용)
+        && fileName.matches('^[a-zA-Z0-9._-]+\\.(mp3|wav|ogg)$');
+
+      allow delete: if
+        // 관리자만 삭제 가능
+        request.auth != null;
+    }
+
+    // === MusicXML 파일 규칙 ===
+    // 경로: karaoke/musicxml/{filename}
+    match /karaoke/musicxml/{fileName} {
+      allow read: if true;  // 모든 사용자가 MusicXML 파일 읽기 가능
+
+      allow write: if
+        // 1. 사용자가 인증되어 있어야 함
+        request.auth != null
+
+        // 2. 파일 타입 제한 (XML 파일만 허용)
+        && (
+          request.resource.contentType.matches('application/xml') ||
+          request.resource.contentType.matches('text/xml') ||
+          request.resource.contentType.matches('application/vnd.recordare.musicxml')
+        )
+
+        // 3. 파일 크기 제한 (5MB 이하)
+        && request.resource.size < 5 * 1024 * 1024
+
+        // 4. 파일명 안전성 검증 (.musicxml, .xml만 허용)
+        && fileName.matches('^[a-zA-Z0-9._-]+\\.(musicxml|xml)$');
+
+      allow delete: if
+        request.auth != null;
     }
     
     // === 기본 거부 규칙 ===

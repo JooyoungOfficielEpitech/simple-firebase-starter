@@ -11,6 +11,7 @@ export interface UserProfile {
   uid: string
   email: string
   name: string
+  phoneNumber?: string        // 전화번호
   gender?: UserGender
   /** YYYY-MM-DD */
   birthday?: string
@@ -28,6 +29,7 @@ export interface UserProfile {
 // Payload for creating the initial user document
 export type CreateUserProfile = {
   name: string
+  phoneNumber?: string
   gender?: UserGender
   birthday?: string
   heightCm?: number
@@ -41,6 +43,6 @@ export type CreateUserProfile = {
 export type UpdateUserProfile = Partial<
   Pick<
     UserProfile,
-    "name" | "gender" | "birthday" | "heightCm" | "requiredProfileComplete" | "userType" | "organizationId" | "organizationName" | "previousOrganizationName" | "hasBeenOrganizer"
+    "name" | "phoneNumber" | "gender" | "birthday" | "heightCm" | "requiredProfileComplete" | "userType" | "organizationId" | "organizationName" | "previousOrganizationName" | "hasBeenOrganizer"
   >
 >

@@ -95,6 +95,60 @@ export class SongService {
   }
 
   /**
+   * Update song with audio file URL (Admin only)
+   */
+  static async updateSongAudioUrl(songTitle: string, mrUrl: string): Promise<void> {
+    try {
+      const snapshot = await this.collection
+        .where("title", "==", songTitle)
+        .limit(1)
+        .get()
+
+      if (snapshot.empty) {
+        throw new Error(`Song not found: ${songTitle}`)
+      }
+
+      const docId = snapshot.docs[0].id
+      await this.updateSong(docId, { mrUrl })
+
+      console.log(`✅ Updated ${songTitle} with audio URL`)
+    } catch (error) {
+      console.error("Failed to update song audio URL:", error)
+      throw error
+    }
+  }
+
+  /**
+   * Batch update songs with audio URLs (Admin only)
+   */
+  static async batchUpdateAudioUrls(updates: Array<{ title: string; mrUrl: string }>): Promise<void> {
+    try {
+      const batch = firestore().batch()
+
+      for (const update of updates) {
+        const snapshot = await this.collection
+          .where("title", "==", update.title)
+          .limit(1)
+          .get()
+
+        if (!snapshot.empty) {
+          const docRef = this.collection.doc(snapshot.docs[0].id)
+          batch.update(docRef, {
+            mrUrl: update.mrUrl,
+            updatedAt: firestore.FieldValue.serverTimestamp(),
+          })
+        }
+      }
+
+      await batch.commit()
+      console.log(`✅ Batch updated ${updates.length} songs`)
+    } catch (error) {
+      console.error("Failed to batch update audio URLs:", error)
+      throw error
+    }
+  }
+
+  /**
    * Delete a song (Admin only)
    */
   static async deleteSong(id: string): Promise<void> {
@@ -140,6 +194,9 @@ export class SongService {
         {
           title: "This is the Moment",
           musical: "지킬 앤 하이드",
+          // 테스트용 공개 오디오 URL (나중에 Firebase Storage URL로 교체)
+          mrUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+          localMrFile: "sample.mp3", // 로컬 폴백
         },
         {
           title: "Defying Gravity",

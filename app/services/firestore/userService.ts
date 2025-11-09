@@ -60,6 +60,9 @@ export class UserService {
     }
 
     // 선택적 필드들은 undefined가 아닐 때만 포함
+    if (profileData.phoneNumber) {
+      profile.phoneNumber = profileData.phoneNumber
+    }
     if (profileData.gender) {
       profile.gender = profileData.gender
     }
@@ -99,6 +102,7 @@ export class UserService {
     console.log("🔍 [UserService] 프로필 조회 결과:", {
       uid: profile.uid,
       name: profile.name,
+      phoneNumber: profile.phoneNumber,
       gender: profile.gender,
       birthday: profile.birthday,
       heightCm: profile.heightCm,
@@ -107,6 +111,7 @@ export class UserService {
 
     // requiredProfileComplete가 undefined이거나 잘못된 경우 재계산
     const calculatedComplete = Boolean(
+      profile.phoneNumber &&
       profile.gender &&
       profile.birthday &&
       typeof profile.heightCm === "number"
@@ -159,12 +164,14 @@ export class UserService {
     const updatedProfile = { ...baseProfile, ...updateData }
 
     const requiredProfileComplete = Boolean(
+      updatedProfile.phoneNumber &&
       updatedProfile.gender &&
         updatedProfile.birthday &&
         typeof updatedProfile.heightCm === "number"
     )
 
     console.log("🧮 [UserService] 업데이트 시 requiredProfileComplete 계산:", {
+      phoneNumber: updatedProfile.phoneNumber,
       gender: updatedProfile.gender,
       birthday: updatedProfile.birthday,
       heightCm: updatedProfile.heightCm,
@@ -202,6 +209,9 @@ export class UserService {
       }
 
       // Only add fields that are not undefined
+      if (updatedProfile.phoneNumber !== undefined) {
+        newDoc.phoneNumber = updatedProfile.phoneNumber
+      }
       if (updatedProfile.gender !== undefined) {
         newDoc.gender = updatedProfile.gender
       }

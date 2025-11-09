@@ -6,6 +6,7 @@ export interface SavedSection {
   pointA: number
   pointB: number
   createdAt: Date
+  songId: string  // 곡 ID (곡별 구간 구분용)
 }
 
 const storage = new MMKV()

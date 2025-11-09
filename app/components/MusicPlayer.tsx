@@ -10,10 +10,8 @@ import TrackPlayer, {
 import { Audio } from 'expo-av';
 import { UrgentDebug } from './URGENT_DEBUG';
 import { MetronomeControl } from './MusicPlayer/MetronomeControl';
-import { PitchControl } from './MusicPlayer/PitchControl';
 import { SimpleTest } from './MusicPlayer/SimpleTest';
 import { useMetronome } from '../hooks/useMetronome';
-import { usePitchShift } from '../hooks/usePitchShift';
 
 const MusicPlayer = () => {
   const playbackState = usePlaybackState();
@@ -30,23 +28,11 @@ const MusicPlayer = () => {
   const [metronomeBpm, setMetronomeBpm] = useState(120);
   const [metronomeVolume, setMetronomeVolume] = useState(0.7);
 
-  // 피치 조절 상태
-  const [pitchEnabled, setPitchEnabled] = useState(false);
-  const [pitchSemitones, setPitchSemitones] = useState(0);
-  const [expoSound, setExpoSound] = useState<Audio.Sound | null>(null);
-  const [isPitchReady, setIsPitchReady] = useState(false);
-
   // 메트로놈 Hook 사용
   const { currentBeat, totalBeats, isReady, error, resetBeat } = useMetronome({
     bpm: metronomeBpm,
     enabled: metronomeEnabled,
     volume: metronomeVolume,
-  });
-
-  // 피치 조절 Hook 사용 (네이티브 모듈)
-  usePitchShift({
-    semitones: pitchSemitones,
-    enabled: pitchEnabled,
   });
 
   // TrackPlayer 초기화 (DevSettings 방식과 동일하게)
@@ -117,6 +103,10 @@ const MusicPlayer = () => {
         });
         console.log('⚙️ TrackPlayer 옵션 설정 완료');
 
+        // 음량을 최대치로 설정
+        await TrackPlayer.setVolume(1.0);
+        console.log('🔊 TrackPlayer 음량 최대치로 설정 (1.0)');
+
         // 샘플 트랙 추가
         await TrackPlayer.add({
           id: 'music-player-track',
@@ -171,86 +161,6 @@ const MusicPlayer = () => {
     };
   }, []);
 
-  // expo-av Sound 초기화 (피치 조절용)
-  useEffect(() => {
-    const loadExpoSound = async () => {
-      try {
-        console.log('🎵 expo-av Sound 로드 시작...');
-
-        // 오디오 모드 설정
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: false,
-          playsInSilentModeIOS: true,
-          staysActiveInBackground: true,
-          shouldDuckAndroid: true,
-        });
-
-        // Sound 인스턴스 생성 및 로드
-        const sound = new Audio.Sound();
-        await sound.loadAsync({
-          uri: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-        });
-
-        setExpoSound(sound);
-        setIsPitchReady(true);
-        console.log('✅ expo-av Sound 로드 완료');
-      } catch (error) {
-        console.error('❌ expo-av Sound 로드 실패:', error);
-        setIsPitchReady(false);
-      }
-    };
-
-    loadExpoSound();
-
-    // cleanup
-    return () => {
-      if (expoSound) {
-        console.log('🧹 expo-av Sound 정리...');
-        expoSound.unloadAsync().catch(err => console.error('Sound unload 오류:', err));
-      }
-    };
-  }, []);
-
-  // Pitch 활성화 시 TrackPlayer와 expo-av 동기화
-  useEffect(() => {
-    const syncPlayback = async () => {
-      if (!expoSound || !isInitialized) return;
-
-      try {
-        if (pitchEnabled) {
-          // Pitch 활성화: TrackPlayer 일시정지 → expo-av 재생
-          const currentPosition = progress.position;
-          await TrackPlayer.pause();
-
-          // expo-av를 현재 위치로 이동
-          await expoSound.setPositionAsync(currentPosition * 1000); // ms 단위
-          await expoSound.playAsync();
-
-          console.log('🎹 Pitch 모드 활성화: expo-av 재생 시작');
-        } else {
-          // Pitch 비활성화: expo-av 일시정지 → TrackPlayer 재생
-          const status = await expoSound.getStatusAsync();
-          if (status.isLoaded) {
-            const expoPosition = status.positionMillis / 1000; // 초 단위
-            await expoSound.pauseAsync();
-
-            // TrackPlayer를 expo-av 위치로 이동
-            await TrackPlayer.seekTo(expoPosition);
-            if (playbackState?.state === State.Playing) {
-              await TrackPlayer.play();
-            }
-          }
-
-          console.log('🎵 TrackPlayer 모드로 전환');
-        }
-      } catch (error) {
-        console.error('❌ Playback 동기화 오류:', error);
-      }
-    };
-
-    syncPlayback();
-  }, [pitchEnabled]);
-
   // A-B 루프는 이제 service.js에서 처리됩니다
   // 포그라운드에서는 상태만 서비스에 전달
   useEffect(() => {
@@ -286,27 +196,12 @@ const MusicPlayer = () => {
     }
 
     try {
-      if (pitchEnabled && expoSound) {
-        // Pitch 모드: expo-av 제어
-        const status = await expoSound.getStatusAsync();
-        if (status.isLoaded) {
-          if (status.isPlaying) {
-            await expoSound.pauseAsync();
-            console.log('⏸️ expo-av 일시정지');
-          } else {
-            await expoSound.playAsync();
-            console.log('▶️ expo-av 재생');
-          }
-        }
+      if (playbackState?.state === State.Playing) {
+        await TrackPlayer.pause();
+        console.log('⏸️ TrackPlayer 일시정지');
       } else {
-        // 일반 모드: TrackPlayer 제어
-        if (playbackState?.state === State.Playing) {
-          await TrackPlayer.pause();
-          console.log('⏸️ TrackPlayer 일시정지');
-        } else {
-          await TrackPlayer.play();
-          console.log('▶️ TrackPlayer 재생');
-        }
+        await TrackPlayer.play();
+        console.log('▶️ TrackPlayer 재생');
       }
     } catch (error) {
       console.error('❌ 재생/일시정지 오류:', error);
@@ -413,11 +308,6 @@ const MusicPlayer = () => {
         <Text>현재 박자: {currentBeat}/{totalBeats}</Text>
         <Text>메트로놈 준비: {isReady ? 'YES' : 'NO'}</Text>
         <Text>메트로놈 에러: {error || '없음'}</Text>
-        <Text>---</Text>
-        <Text>Pitch 활성: {pitchEnabled ? 'ON' : 'OFF'}</Text>
-        <Text>반음: {pitchSemitones}</Text>
-        <Text>expo-av Sound: {expoSound ? 'loaded' : 'null'}</Text>
-        <Text>Pitch 준비: {isPitchReady ? 'YES' : 'NO'}</Text>
       </View>
 
       {/* 메트로놈 컨트롤 */}
@@ -437,20 +327,6 @@ const MusicPlayer = () => {
         onToggle={() => setMetronomeEnabled(!metronomeEnabled)}
         onBpmChange={setMetronomeBpm}
         onVolumeChange={setMetronomeVolume}
-      />
-
-      {/* 피치 컨트롤 */}
-      <View style={{ backgroundColor: '#ccccff', padding: 10, marginVertical: 5 }}>
-        <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#000088' }}>
-          ⬇️ PitchControl 컴포넌트 (아래에 렌더링되어야 함)
-        </Text>
-      </View>
-      <PitchControl
-        enabled={pitchEnabled}
-        semitones={pitchSemitones}
-        onPitchChange={setPitchSemitones}
-        onReset={() => setPitchSemitones(0)}
-        onToggle={() => setPitchEnabled(!pitchEnabled)}
       />
 
       {/* 진행률 표시 */}
@@ -547,11 +423,6 @@ const MusicPlayer = () => {
         {metronomeEnabled && (
           <Text style={styles.metronomeStatus}>
             🎵 메트로놈 활성 ({metronomeBpm} BPM)
-          </Text>
-        )}
-        {pitchEnabled && (
-          <Text style={styles.pitchStatus}>
-            🎹 피치 조절 활성 ({pitchSemitones > 0 ? '+' : ''}{pitchSemitones} 반음)
           </Text>
         )}
       </View>

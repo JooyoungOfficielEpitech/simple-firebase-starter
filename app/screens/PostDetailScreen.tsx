@@ -75,7 +75,6 @@ export const PostDetailScreen = () => {
     applicationPhoneNumber,
     applicationExperience,
     applicationRolePreference,
-    applicationPortfolio,
     submittingApplication,
     isMyPost,
     alertState,
@@ -84,7 +83,6 @@ export const PostDetailScreen = () => {
     setApplicationPhoneNumber,
     setApplicationExperience,
     setApplicationRolePreference,
-    setApplicationPortfolio,
     handleDelete,
     handleApplyButtonClick,
     handleApply,
@@ -266,15 +264,6 @@ export const PostDetailScreen = () => {
                   multiline
                   numberOfLines={3}
                   style={themed($formInput)}
-                />
-
-                <TextField
-                  label="포트폴리오 URL"
-                  placeholder="YouTube, Instagram 등 포트폴리오 링크 (선택사항)"
-                  value={applicationPortfolio}
-                  onChangeText={setApplicationPortfolio}
-                  style={themed($formInput)}
-                  keyboardType="url"
                 />
 
                 <TextField

@@ -2,15 +2,18 @@ import { useEffect, useState, useCallback, useMemo } from "react"
 import { Linking } from "react-native"
 import { applicationService } from "@/services/firestore"
 import { Application, ApplicationStatus } from "@/services/firestore/applicationService"
-import { useAlert } from "@/hooks/useAlert"
 import { FilterTab } from "@/components/ApplicationManagement/StatusFilterBar"
 
 interface UseApplicationManagementProps {
   postId: string
+  alert: (title: string, message?: string, buttons?: Array<{
+    text: string
+    onPress?: () => void
+    style?: "default" | "cancel" | "destructive"
+  }>) => void
 }
 
-export const useApplicationManagement = ({ postId }: UseApplicationManagementProps) => {
-  const { alert } = useAlert()
+export const useApplicationManagement = ({ postId, alert }: UseApplicationManagementProps) => {
 
   const [applications, setApplications] = useState<Application[]>([])
   const [loading, setLoading] = useState(true)

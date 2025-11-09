@@ -24,7 +24,7 @@ export const ApplicationManagementScreen = () => {
   const { postId, postTitle } = route.params
   
   const { themed } = useAppTheme()
-  const { alertState, hideAlert } = useAlert()
+  const { alertState, hideAlert, alert } = useAlert()
   const styles = applicationManagementStyles()
 
   const {
@@ -37,7 +37,7 @@ export const ApplicationManagementScreen = () => {
     handleCall,
     handleOpenPortfolio,
     showApplicationOptions,
-  } = useApplicationManagement({ postId })
+  } = useApplicationManagement({ postId, alert })
 
   // Loading state
   if (loading && applications.length === 0) {

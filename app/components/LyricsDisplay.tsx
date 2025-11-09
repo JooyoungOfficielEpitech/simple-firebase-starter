@@ -464,6 +464,7 @@ export function LyricsDisplay({
           <AudioPlayer
             audioFile={audioFile}
             audioUrl={audioUrl}
+            songId="lyrics-display"
             onPlaybackStatusUpdate={onPlaybackStatusUpdate}
             style={themed($audioPlayer)}
           />

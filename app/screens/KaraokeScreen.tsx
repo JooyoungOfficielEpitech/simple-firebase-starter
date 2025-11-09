@@ -1,7 +1,6 @@
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useState, useEffect, useMemo } from "react"
 import { View, ViewStyle, TextStyle } from "react-native"
 import { AVPlaybackStatus } from "expo-av"
-import { MMKV } from "react-native-mmkv"
 
 import { AudioPlayer, SavedSection } from "@/components/AudioPlayer"
 import { SavedSectionsList } from "@/components/SavedSectionsList"
@@ -11,29 +10,31 @@ import { Text } from "@/components/Text"
 import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
 import type { HomeStackScreenProps } from "@/navigators/HomeStackNavigator"
-
-// MMKV 스토리지 인스턴스
-const storage = new MMKV()
-const SAVED_SECTIONS_KEY = "audio_player_saved_sections"
-
-// 로컬 스토리지 유틸리티 함수
-const saveSectionsToStorage = (sections: SavedSection[]) => {
-  try {
-    storage.set(SAVED_SECTIONS_KEY, JSON.stringify(sections))
-    console.log("✅ 구간을 로컬 스토리지에 저장 완료:", sections.length, "개")
-  } catch (error) {
-    console.error("❌ 구간 저장 실패:", error)
-  }
-}
+import { loadSavedSections, saveSectionsToStorage } from "@/utils/audioHelpers"
 
 export function KaraokeScreen({ route, navigation }: HomeStackScreenProps<"KaraokeScreen">) {
   const { themed } = useAppTheme()
   const { song } = route.params
 
-  // 저장된 구간들 상태 관리
-  const [savedSections, setSavedSections] = useState<SavedSection[]>([])
+  // 곡 ID 생성 (song.id가 있으면 사용, 없으면 title 사용)
+  const songId = song.id || song.title
+
+  // 전체 저장된 구간들 상태 관리 (모든 곡의 구간)
+  const [allSavedSections, setAllSavedSections] = useState<SavedSection[]>([])
   // 로드할 구간 상태
   const [sectionToLoad, setSectionToLoad] = useState<SavedSection | null>(null)
+
+  // 현재 곡의 구간만 필터링
+  const currentSongSections = useMemo(() => {
+    return allSavedSections.filter(section => section.songId === songId)
+  }, [allSavedSections, songId])
+
+  // 초기 로드: 저장된 모든 구간 불러오기
+  useEffect(() => {
+    const loadedSections = loadSavedSections()
+    setAllSavedSections(loadedSections)
+    console.log(`📚 전체 구간 로드: ${loadedSections.length}개, 현재 곡 구간: ${loadedSections.filter(s => s.songId === songId).length}개`)
+  }, [])
 
   // 🧪 임시 테스트: 여러 곡에 오디오 파일 설정
   const testSong = {
@@ -69,8 +70,14 @@ export function KaraokeScreen({ route, navigation }: HomeStackScreenProps<"Karao
 
   // 저장된 구간 업데이트 처리
   const handleSavedSectionsChange = useCallback((newSections: SavedSection[]) => {
-    setSavedSections(newSections)
-  }, [])
+    // newSections는 현재 곡의 구간만 포함
+    // 전체 구간 배열을 업데이트: 다른 곡 구간 유지 + 현재 곡 구간 교체
+    setAllSavedSections(prev => {
+      const otherSongSections = prev.filter(s => s.songId !== songId)
+      return [...otherSongSections, ...newSections]
+    })
+    saveSectionsToStorage([...allSavedSections.filter(s => s.songId !== songId), ...newSections])
+  }, [songId, allSavedSections])
 
   // 구간 로드 처리
   const handleLoadSection = useCallback((section: SavedSection) => {
@@ -82,7 +89,7 @@ export function KaraokeScreen({ route, navigation }: HomeStackScreenProps<"Karao
 
   // 구간 삭제 처리
   const handleDeleteSection = useCallback((sectionId: string) => {
-    setSavedSections(prev => {
+    setAllSavedSections(prev => {
       const updatedSections = prev.filter(s => s.id !== sectionId)
       // 로컬 스토리지에 업데이트된 구간들 저장
       saveSectionsToStorage(updatedSections)
@@ -106,8 +113,9 @@ export function KaraokeScreen({ route, navigation }: HomeStackScreenProps<"Karao
             <AudioPlayer
               audioFile={typeof testSong.localMrFile === 'string' ? testSong.localMrFile : undefined}
               audioUrl={typeof testSong.mrUrl === 'string' ? testSong.mrUrl : undefined}
+              songId={songId}
               onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
-              savedSections={savedSections}
+              savedSections={currentSongSections}
               onSavedSectionsChange={handleSavedSectionsChange}
               onLoadSection={handleLoadSection}
               loadSection={sectionToLoad}
@@ -127,10 +135,10 @@ export function KaraokeScreen({ route, navigation }: HomeStackScreenProps<"Karao
           )}
         </View>
 
-        {/* 저장된 구간 목록 */}
+        {/* 저장된 구간 목록 (현재 곡만) */}
         {hasAudio && (
           <SavedSectionsList
-            sections={savedSections}
+            sections={currentSongSections}
             onLoadSection={handleLoadSection}
             onDeleteSection={handleDeleteSection}
             style={themed($savedSectionsContainer)}

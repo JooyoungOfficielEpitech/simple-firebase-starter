@@ -29,18 +29,23 @@ export const usePostDetail = (postId: string) => {
   const [applicationPhoneNumber, setApplicationPhoneNumber] = useState("")
   const [applicationExperience, setApplicationExperience] = useState("")
   const [applicationRolePreference, setApplicationRolePreference] = useState("")
-  const [applicationPortfolio, setApplicationPortfolio] = useState("")
   const [submittingApplication, setSubmittingApplication] = useState(false)
 
   // Load user profile and subscribe to post
   useEffect(() => {
     let hasIncrementedView = false
-    
+
     const loadUserProfile = async () => {
       try {
         const profile = await userService.getUserProfile()
         console.log("🔍 [usePostDetail] 프로필 데이터:", JSON.stringify(profile, null, 2))
         setUserProfile(profile)
+
+        // 프로필에 전화번호가 있으면 자동으로 채우기
+        if (profile?.phoneNumber) {
+          setApplicationPhoneNumber(profile.phoneNumber)
+        }
+
         if (!profile) {
           console.warn("⚠️ [usePostDetail] 사용자 프로필이 존재하지 않습니다")
         } else {
@@ -49,13 +54,14 @@ export const usePostDetail = (postId: string) => {
             name: !!profile.name,
             gender: !!profile.gender,
             birthday: !!profile.birthday,
-            heightCm: typeof profile.heightCm === "number"
+            heightCm: typeof profile.heightCm === "number",
+            phoneNumber: !!profile.phoneNumber
           })
         }
       } catch (error) {
         console.error("❌ [usePostDetail] 사용자 프로필 로드 오류:", error)
         alert(
-          "프로필 오류", 
+          "프로필 오류",
           "사용자 프로필을 불러오는데 실패했습니다. 프로필을 먼저 설정해주세요.",
           [
             { text: "확인", onPress: () => navigation.goBack() }
@@ -92,6 +98,8 @@ export const usePostDetail = (postId: string) => {
       )
       return unsubscribeApplications
     } else {
+      console.log("🔔 [usePostDetail] 내 지원서 실시간 구독 시작:", { postId, applicantId: userProfile.uid })
+
       const unsubscribe = applicationService.db
         .collection("applications")
         .where("postId", "==", postId)
@@ -99,6 +107,12 @@ export const usePostDetail = (postId: string) => {
         .limit(1)
         .onSnapshot(
           (snapshot) => {
+            console.log("📡 [usePostDetail] onSnapshot 트리거됨:", {
+              isEmpty: snapshot.empty,
+              size: snapshot.size,
+              timestamp: new Date().toISOString()
+            })
+
             if (!snapshot.empty) {
               const doc = snapshot.docs[0]
               const application = {
@@ -106,10 +120,17 @@ export const usePostDetail = (postId: string) => {
                 ...doc.data(),
               } as Application
 
+              console.log("✅ [usePostDetail] 지원서 상태 업데이트:", {
+                id: application.id,
+                status: application.status,
+                hasApplied: true,
+                timestamp: new Date().toISOString()
+              })
+
               setHasApplied(true)
               setMyApplication(application)
-              console.log("✅ [usePostDetail] 지원서 상태:", application.status)
             } else {
+              console.log("📭 [usePostDetail] 지원서 없음 - 상태 초기화")
               setHasApplied(false)
               setMyApplication(null)
             }
@@ -159,7 +180,7 @@ export const usePostDetail = (postId: string) => {
     if (!userProfile.requiredProfileComplete) {
       alert(
         "프로필 완성 필요",
-        "지원하려면 프로필 정보를 완성해주세요.\n(성별, 생년월일, 키 정보가 필요합니다)"
+        "지원하려면 프로필 정보를 완성해주세요.\n(전화번호, 성별, 생년월일, 키 정보가 필요합니다)"
       )
       return
     }
@@ -192,7 +213,6 @@ export const usePostDetail = (postId: string) => {
         phoneNumber: applicationPhoneNumber.trim() || undefined,
         experience: applicationExperience.trim() || undefined,
         rolePreference: applicationRolePreference.trim() || undefined,
-        portfolio: applicationPortfolio.trim() || undefined,
       })
       
       setHasApplied(true)
@@ -265,7 +285,6 @@ export const usePostDetail = (postId: string) => {
     setApplicationPhoneNumber("")
     setApplicationExperience("")
     setApplicationRolePreference("")
-    setApplicationPortfolio("")
   }
 
   const isMyPost = post && userProfile && post.authorId === userProfile.uid && userProfile.userType === "organizer"
@@ -283,19 +302,17 @@ export const usePostDetail = (postId: string) => {
     applicationPhoneNumber,
     applicationExperience,
     applicationRolePreference,
-    applicationPortfolio,
     submittingApplication,
     isMyPost,
     alertState,
-    
+
     // Setters
     setShowApplicationModal,
     setApplicationMessage,
     setApplicationPhoneNumber,
     setApplicationExperience,
     setApplicationRolePreference,
-    setApplicationPortfolio,
-    
+
     // Handlers
     handleDelete,
     handleApplyButtonClick,

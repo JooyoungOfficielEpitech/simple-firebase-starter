@@ -61,6 +61,14 @@ export const HeroCard = ({
 }: HeroCardProps) => {
   const { themed } = useAppTheme()
 
+  // 디버깅: 렌더링 시 상태 로그
+  console.log("🎨 [HeroCard] 렌더링:", {
+    hasApplied,
+    applicationStatus: myApplication?.status,
+    applicationId: myApplication?.id,
+    timestamp: new Date().toISOString()
+  })
+
   return (
     <View style={themed($heroCard)}>
       <View style={themed($statusHeader)}>

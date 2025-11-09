@@ -167,21 +167,28 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
       notEmpty: userProfile.name && userProfile.name.trim() !== "",
       final: !!userProfile.name && userProfile.name.trim() !== ""
     }
-    
+
+    const phoneCheck = {
+      value: userProfile.phoneNumber,
+      exists: !!userProfile.phoneNumber,
+      notEmpty: userProfile.phoneNumber && userProfile.phoneNumber.trim() !== "",
+      final: !!userProfile.phoneNumber && userProfile.phoneNumber.trim() !== ""
+    }
+
     const genderCheck = {
       value: userProfile.gender,
       exists: !!userProfile.gender,
       isValidGender: userProfile.gender === 'male' || userProfile.gender === 'female',
       final: !!userProfile.gender && (userProfile.gender === 'male' || userProfile.gender === 'female')
     }
-    
+
     const birthdayCheck = {
       value: userProfile.birthday,
       exists: !!userProfile.birthday,
       notEmpty: userProfile.birthday && userProfile.birthday.trim() !== "",
       final: !!userProfile.birthday && userProfile.birthday.trim() !== ""
     }
-    
+
     const heightCheck = {
       value: userProfile.heightCm,
       type: typeof userProfile.heightCm,
@@ -189,36 +196,43 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
       isPositive: typeof userProfile.heightCm === 'number' && userProfile.heightCm > 0,
       final: typeof userProfile.heightCm === 'number' && userProfile.heightCm > 0
     }
-    
+
     console.log("🔍 [ProfileScreen] 각 필드 상세 체크:", {
       name: nameCheck,
+      phone: phoneCheck,
       gender: genderCheck,
       birthday: birthdayCheck,
       height: heightCheck
     })
     
     const items = [
-      { 
-        key: 'name', 
-        label: '이름', 
+      {
+        key: 'name',
+        label: '이름',
         completed: nameCheck.final,
         value: userProfile.name
       },
-      { 
-        key: 'gender', 
-        label: '성별', 
+      {
+        key: 'phone',
+        label: '전화번호',
+        completed: phoneCheck.final,
+        value: userProfile.phoneNumber
+      },
+      {
+        key: 'gender',
+        label: '성별',
         completed: genderCheck.final,
         value: userProfile.gender
       },
-      { 
-        key: 'birthday', 
-        label: '생년월일', 
+      {
+        key: 'birthday',
+        label: '생년월일',
         completed: birthdayCheck.final,
         value: userProfile.birthday
       },
-      { 
-        key: 'height', 
-        label: '키', 
+      {
+        key: 'height',
+        label: '키',
         completed: heightCheck.final,
         value: userProfile.heightCm
       }
@@ -255,7 +269,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
     
     confirm(
       "프로필 완성도",
-      `완성된 항목 (${completed.length}/4):\n${completedList || '없음'}\n\n아직 필요한 항목 (${missing.length}/4):\n${missingList}`,
+      `완성된 항목 (${completed.length}/5):\n${completedList || '없음'}\n\n아직 필요한 항목 (${missing.length}/5):\n${missingList}`,
       () => navigation?.navigate("EditProfile")
     )
   }
@@ -302,7 +316,12 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({ navigation }) => {
             <Text style={themed($label)}>이메일:</Text>
             <Text style={themed($value)}>{user?.email}</Text>
           </View>
-          
+
+          <View style={themed($infoRow)}>
+            <Text style={themed($label)}>전화번호:</Text>
+            <Text style={themed($value)}>{userProfile?.phoneNumber || "미설정"}</Text>
+          </View>
+
           <View style={themed($infoRow)}>
             <Text style={themed($label)}>성별:</Text>
             <Text style={themed($value)}>{formatGender(userProfile?.gender)}</Text>

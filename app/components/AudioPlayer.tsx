@@ -11,9 +11,7 @@ import { AudioButton } from "./AudioPlayer/AudioButton"
 import { AudioPlayerProgressBar } from "./AudioPlayer/AudioPlayerProgressBar"
 import { SaveSectionModal } from "./AudioPlayer/SaveSectionModal"
 import { MetronomeControl } from "./MusicPlayer/MetronomeControl"
-import { PitchControl } from "./MusicPlayer/PitchControl"
 import { useMetronome } from "@/hooks/useMetronome"
-import { usePitchShift } from "@/hooks/usePitchShift"
 import { formatTime, loadSavedSections, saveSectionsToStorage, SavedSection } from "@/utils/audioHelpers"
 import * as styles from "./AudioPlayer/AudioPlayer.styles"
 
@@ -22,6 +20,7 @@ export type { SavedSection } from "@/utils/audioHelpers"
 export interface AudioPlayerProps {
   audioFile?: string
   audioUrl?: string
+  songId: string  // 곡 ID (필수)
   style?: ViewStyle
   onPlaybackStatusUpdate?: (status: any) => void
   savedSections?: SavedSection[]
@@ -34,6 +33,7 @@ export interface AudioPlayerProps {
 export function AudioPlayer({
   audioFile,
   audioUrl,
+  songId,
   style,
   onPlaybackStatusUpdate,
   savedSections = [],
@@ -68,21 +68,11 @@ export function AudioPlayer({
   const [metronomeVolume, setMetronomeVolume] = useState(0.7)
   const prevPositionRef = useRef(0)
 
-  // 피치 조절 상태
-  const [pitchEnabled, setPitchEnabled] = useState(false)
-  const [pitchSemitones, setPitchSemitones] = useState(0)
-
   // 메트로놈 Hook 사용
   const { currentBeat, totalBeats, isReady: metronomeReady, error: metronomeError, resetBeat } = useMetronome({
     bpm: metronomeBpm,
     enabled: metronomeEnabled,
     volume: metronomeVolume,
-  })
-
-  // 피치 조절 Hook 사용 (네이티브 모듈)
-  usePitchShift({
-    semitones: pitchSemitones,
-    enabled: pitchEnabled,
   })
 
   // 메트로놈 BPM 변경 시 플레이어 속도도 함께 조절
@@ -111,20 +101,6 @@ export function AudioPlayer({
 
     applyPlaybackRate()
   }, [metronomeBpm, state.isPlayerInitialized])
-
-  // 음악 재생 상태에 따라 메트로놈 자동 제어 (동기화)
-  useEffect(() => {
-    const isPlaying = playbackState?.state !== undefined &&
-                      String(playbackState.state) === "playing"
-
-    if (isPlaying && !metronomeEnabled) {
-      // 음악이 재생 중인데 메트로놈이 꺼져있으면 켜기
-      setMetronomeEnabled(true)
-      if (__DEV__) {
-        console.log('🎵 음악 재생 시작 → 메트로놈 자동 켜기')
-      }
-    }
-  }, [playbackState, metronomeEnabled])
 
   // Unified seekTo function
   const safeSeekTo = useCallback(async (positionSeconds: number, reason: string = '') => {
@@ -272,6 +248,10 @@ export function AudioPlayer({
         artist: 'AudioPlayer',
       })
 
+      // 음량을 최대치로 설정
+      await TrackPlayer.setVolume(1.0)
+      if (__DEV__) console.log('🔊 TrackPlayer 음량 최대치로 설정 (1.0)')
+
       actions.setLoading(false)
     } catch (err) {
       actions.setError("오디오 로드 실패")
@@ -348,9 +328,6 @@ export function AudioPlayer({
     prevPositionRef.current = currentPosition
   }, [progress.position, state.loopState, metronomeEnabled, resetBeat])
 
-  // 네이티브 pitch shifting은 usePitchShift hook에서 처리됩니다
-  // TrackPlayer와 자동으로 통합되므로 별도의 동기화 로직이 필요 없습니다
-
   // Local position auto-release
   useEffect(() => {
     if (localPosition !== null) {
@@ -392,7 +369,6 @@ export function AudioPlayer({
     if (!state.isPlayerInitialized) return
 
     try {
-      // TrackPlayer 제어 (pitch shift는 네이티브 모듈이 자동 처리)
       const queue = await TrackPlayer.getQueue()
       if (queue.length === 0) {
         await loadAudio()
@@ -407,17 +383,13 @@ export function AudioPlayer({
       if (currentTime >= duration && duration > 0) {
         await safeSeekTo(0, '곡 끝')
         await TrackPlayer.play()
-        // 메트로놈은 playback state 변경 시 자동으로 켜짐
         return
       }
 
       if (isCurrentlyPlaying) {
         await TrackPlayer.pause()
-        // 일시정지 시 메트로놈도 끄기
-        setMetronomeEnabled(false)
       } else {
         await TrackPlayer.play()
-        // 메트로놈은 playback state 변경 시 자동으로 켜짐
       }
     } catch (err) {
       actions.setError("재생 오류")
@@ -598,6 +570,7 @@ export function AudioPlayer({
       pointA: state.loopState.pointA,
       pointB: state.loopState.pointB,
       createdAt: new Date(),
+      songId: songId,  // 곡 ID 포함
     }
 
     const updatedSections = [...savedSections, newSection]
@@ -745,30 +718,14 @@ export function AudioPlayer({
           />
         </View>
 
-        {/* 피치 컨트롤 */}
-        <View style={{ marginTop: 15 }}>
-          <PitchControl
-            enabled={pitchEnabled}
-            semitones={pitchSemitones}
-            onPitchChange={setPitchSemitones}
-            onReset={() => setPitchSemitones(0)}
-            onToggle={() => setPitchEnabled(!pitchEnabled)}
-          />
-        </View>
-
         {state.isLoading && (
           <Text text="로딩 중..." style={themed(styles.$statusText)} />
         )}
 
         {/* 상태 정보 */}
-        {(metronomeEnabled || pitchEnabled) && (
+        {metronomeEnabled && (
           <View style={{ marginTop: 15, padding: 10, backgroundColor: themed(styles.$container).backgroundColor, borderRadius: 8 }}>
-            {metronomeEnabled && (
-              <Text text={`🎵 메트로놈 활성 (${metronomeBpm} BPM)`} style={{ fontSize: 14, color: '#007AFF', fontWeight: 'bold' }} />
-            )}
-            {pitchEnabled && (
-              <Text text={`🎹 피치 조절 활성 (${pitchSemitones > 0 ? '+' : ''}${pitchSemitones} 반음)`} style={{ fontSize: 14, color: '#FF9500', fontWeight: 'bold', marginTop: metronomeEnabled ? 5 : 0 }} />
-            )}
+            <Text text={`🎵 메트로놈 활성 (${metronomeBpm} BPM)`} style={{ fontSize: 14, color: '#007AFF', fontWeight: 'bold' }} />
           </View>
         )}
 
