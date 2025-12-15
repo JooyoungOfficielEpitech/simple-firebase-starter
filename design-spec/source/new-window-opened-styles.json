@@ -1,0 +1,906 @@
+[
+  {
+    "tag": "html",
+    "id": "",
+    "class": "__className_6bee3b light",
+    "text": "Vite + React + TS에 로그인\nGoogle로 계속하기\nOR\n이메일\n비밀번호\n비밀번호를 잊으셨나요?\n로그인\n계정이 없으신가요?계정 만들기",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "w": 800,
+      "h": 600
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "body",
+    "id": "",
+    "class": "",
+    "text": "Vite + React + TS에 로그인\nGoogle로 계속하기\nOR\n이메일\n비밀번호\n비밀번호를 잊으셨나요?\n로그인\n계정이 없으신가요?계정 만들기",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "w": 800,
+      "h": 600
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgb(28, 26, 45)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgb(28, 26, 45) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex h-[100dvh] w-full px-5 items-center justify-center bg-[#121121]",
+    "text": "Vite + React + TS에 로그인\nGoogle로 계속하기\nOR\n이메일\n비밀번호\n비밀번호를 잊으셨나요?\n로그인\n계정이 없으신가요?계정 만들기",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "w": 800,
+      "h": 600
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgb(18, 17, 33)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px 20px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgb(18, 17, 33) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex flex-col items-stretch w-[343px]",
+    "text": "Vite + React + TS에 로그인\nGoogle로 계속하기\nOR\n이메일\n비밀번호\n비밀번호를 잊으셨나요?\n로그인\n계정이 없으신가요?계정 만들기",
+    "rect": {
+      "x": 228.5,
+      "y": 42,
+      "w": 343,
+      "h": 516
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex flex-col items-center gap-3",
+    "text": "Vite + React + TS에 로그인",
+    "rect": {
+      "x": 228.5,
+      "y": 42,
+      "w": 343,
+      "h": 124
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "img",
+    "id": "",
+    "class": "size-20",
+    "text": "",
+    "rect": {
+      "x": 360,
+      "y": 42,
+      "w": 80,
+      "h": 80
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "h1",
+    "id": "",
+    "class": "text-2xl font-bold text-center",
+    "text": "Vite + React + TS에 로그인",
+    "rect": {
+      "x": 256.1484375,
+      "y": 134,
+      "w": 287.6953125,
+      "h": 32
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "24px",
+      "fontWeight": "700",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "button",
+    "id": "",
+    "class": "relative inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive text-primary-foreground shadow-xs px-4 py-2 has-[>svg:not(.button-loading)]:px-3 group w-full h-10 text-[16px] bg-primary hover:bg-primary-active disabled:bg-primary-active opacity-100! mt-4.5",
+    "text": "Google로 계속하기",
+    "rect": {
+      "x": 228.5,
+      "y": 184,
+      "w": 343,
+      "h": 40
+    },
+    "styles": {
+      "display": "flex",
+      "position": "relative",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgb(46, 95, 255)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "padding": "8px 16px",
+      "margin": "18px 0px 0px",
+      "borderRadius": "7.6px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "background": "rgb(46, 95, 255) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex items-center justify-center gap-2 group-disabled:opacity-50",
+    "text": "Google로 계속하기",
+    "rect": {
+      "x": 318.453125,
+      "y": 192,
+      "w": 163.09375,
+      "h": 24
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 318.453125,
+      "y": 192,
+      "w": 24,
+      "h": 24
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "g",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 320.9375,
+      "y": 194.61279296875,
+      "w": 19.075592041015625,
+      "h": 19.086807250976562
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 320.9375,
+      "y": 199.927978515625,
+      "w": 4.284881591796875,
+      "h": 8.452621459960938
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 321.9386291503906,
+      "y": 194.61279296875,
+      "w": 15.19232177734375,
+      "h": 7.7718353271484375
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 321.9386291503906,
+      "y": 205.92771911621094,
+      "w": 15.119110107421875,
+      "h": 7.771881103515625
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 330.69586181640625,
+      "y": 202.421142578125,
+      "w": 9.317230224609375,
+      "h": 8.89996337890625
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex items-center justify-center gap-2.5 my-7",
+    "text": "OR",
+    "rect": {
+      "x": 228.5,
+      "y": 252,
+      "w": 343,
+      "h": 20
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "28px 0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px flex-1 bg-bg-tertiary",
+    "text": "",
+    "rect": {
+      "x": 228.5,
+      "y": 261.5,
+      "w": 151.7421875,
+      "h": 1
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgb(58, 56, 78)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgb(58, 56, 78) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-sm text-text-tertiary",
+    "text": "OR",
+    "rect": {
+      "x": 390.2421875,
+      "y": 252,
+      "w": 19.5234375,
+      "h": 20
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(139, 136, 160)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px flex-1 bg-bg-tertiary",
+    "text": "",
+    "rect": {
+      "x": 419.765625,
+      "y": 261.5,
+      "w": 151.7421875,
+      "h": 1
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgb(58, 56, 78)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgb(58, 56, 78) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "form",
+    "id": "",
+    "class": "flex flex-col items-stretch gap-6",
+    "text": "이메일\n비밀번호\n비밀번호를 잊으셨나요?\n로그인",
+    "rect": {
+      "x": 228.5,
+      "y": 300,
+      "w": 343,
+      "h": 214
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "grid gap-2",
+    "text": "이메일",
+    "rect": {
+      "x": 228.5,
+      "y": 300,
+      "w": 343,
+      "h": 62
+    },
+    "styles": {
+      "display": "grid",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "label",
+    "id": "",
+    "class": "flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 data-[error=true]:text-destructive",
+    "text": "이메일",
+    "rect": {
+      "x": 228.5,
+      "y": 300,
+      "w": 343,
+      "h": 14
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "_r_0_-form-item",
+    "class": "relative group",
+    "text": "",
+    "rect": {
+      "x": 228.5,
+      "y": 322,
+      "w": 343,
+      "h": 40
+    },
+    "styles": {
+      "display": "block",
+      "position": "relative",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "input",
+    "id": "",
+    "class": "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive h-10",
+    "text": "",
+    "rect": {
+      "x": 228.5,
+      "y": 322,
+      "w": 343,
+      "h": 40
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "4px 12px",
+      "margin": "0px",
+      "borderRadius": "7.6px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "grid gap-2",
+    "text": "비밀번호\n비밀번호를 잊으셨나요?",
+    "rect": {
+      "x": 228.5,
+      "y": 386,
+      "w": 343,
+      "h": 64
+    },
+    "styles": {
+      "display": "grid",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "label",
+    "id": "",
+    "class": "flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 data-[error=true]:text-destructive",
+    "text": "비밀번호\n비밀번호를 잊으셨나요?",
+    "rect": {
+      "x": 228.5,
+      "y": 386,
+      "w": 343,
+      "h": 16
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "w-full flex items-center justify-between",
+    "text": "비밀번호\n비밀번호를 잊으셨나요?",
+    "rect": {
+      "x": 228.5,
+      "y": 386,
+      "w": 343,
+      "h": 16
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "",
+    "text": "비밀번호",
+    "rect": {
+      "x": 228.5,
+      "y": 387,
+      "w": 48.4453125,
+      "h": 14
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "button",
+    "id": "",
+    "class": "text-xs text-text-tertiary underline hover:text-text-base",
+    "text": "비밀번호를 잊으셨나요?",
+    "rect": {
+      "x": 458.1171875,
+      "y": 386,
+      "w": 113.3828125,
+      "h": 16
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(139, 136, 160)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "input",
+    "id": "_r_1_-form-item",
+    "class": "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive h-10",
+    "text": "",
+    "rect": {
+      "x": 228.5,
+      "y": 410,
+      "w": 343,
+      "h": 40
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "4px 12px",
+      "margin": "0px",
+      "borderRadius": "7.6px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "button",
+    "id": "",
+    "class": "relative inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-all disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive shadow-xs px-4 py-2 has-[>svg:not(.button-loading)]:px-3 group w-full h-10 text-[16px] text-[#070412] bg-white hover:bg-[#DEE6FF] disabled:bg-[#DEE6FF] disabled:opacity-100",
+    "text": "로그인",
+    "rect": {
+      "x": 228.5,
+      "y": 474,
+      "w": 343,
+      "h": 40
+    },
+    "styles": {
+      "display": "flex",
+      "position": "relative",
+      "color": "rgb(7, 4, 18)",
+      "bgColor": "rgb(255, 255, 255)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "padding": "8px 16px",
+      "margin": "0px",
+      "borderRadius": "7.6px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "background": "rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex items-center justify-center gap-3 group-disabled:opacity-50 text-4",
+    "text": "로그인",
+    "rect": {
+      "x": 379.234375,
+      "y": 482,
+      "w": 41.5234375,
+      "h": 24
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(7, 4, 18)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "text-sm text-center mt-6",
+    "text": "계정이 없으신가요?계정 만들기",
+    "rect": {
+      "x": 228.5,
+      "y": 538,
+      "w": 343,
+      "h": 20
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "24px 0px 0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-text-tertiary",
+    "text": "계정이 없으신가요?",
+    "rect": {
+      "x": 311.875,
+      "y": 538,
+      "w": 107.9609375,
+      "h": 19.5
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(139, 136, 160)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "button",
+    "id": "",
+    "class": "ml-1 text-text-base underline",
+    "text": "계정 만들기",
+    "rect": {
+      "x": 423.8359375,
+      "y": 538,
+      "w": 64.2890625,
+      "h": 20
+    },
+    "styles": {
+      "display": "inline-block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px 0px 0px 4px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  }
+]

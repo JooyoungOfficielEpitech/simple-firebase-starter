@@ -1,0 +1,418 @@
+[
+  {
+    "tag": "html",
+    "id": "",
+    "class": "",
+    "text": "🎭\nOrphi\n\n뮤지컬 배우를 위한 플랫폼\n\n로그인\nLumi로 시작하기\n\n계정이 없으신가요? 로그인하면 자동으로 생성됩니다.\n\n\"누구나 세상을 날아오를 수 있어\"\n\n- 엘파바",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "w": 375,
+      "h": 812
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "body",
+    "id": "",
+    "class": "",
+    "text": "🎭\nOrphi\n\n뮤지컬 배우를 위한 플랫폼\n\n로그인\nLumi로 시작하기\n\n계정이 없으신가요? 로그인하면 자동으로 생성됩니다.\n\n\"누구나 세상을 날아오를 수 있어\"\n\n- 엘파바",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "w": 375,
+      "h": 812
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "root",
+    "class": "",
+    "text": "🎭\nOrphi\n\n뮤지컬 배우를 위한 플랫폼\n\n로그인\nLumi로 시작하기\n\n계정이 없으신가요? 로그인하면 자동으로 생성됩니다.\n\n\"누구나 세상을 날아오를 수 있어\"\n\n- 엘파바",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "w": 375,
+      "h": 812
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "min-h-screen flex flex-col items-center justify-center px-6 bg-gradient-to-br from-purple-900 via-purple-700 to-pink-600",
+    "text": "🎭\nOrphi\n\n뮤지컬 배우를 위한 플랫폼\n\n로그인\nLumi로 시작하기\n\n계정이 없으신가요? 로그인하면 자동으로 생성됩니다.\n\n\"누구나 세상을 날아오를 수 있어\"\n\n- 엘파바",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "w": 375,
+      "h": 812
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px 24px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) linear-gradient(to right bottom, rgb(88, 28, 135), rgb(126, 34, 206), rgb(219, 39, 119)) repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "linear-gradient(to right bottom, rgb(88, 28, 135), rgb(126, 34, 206), rgb(219, 39, 119))"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "text-center mb-12",
+    "text": "🎭\nOrphi\n\n뮤지컬 배우를 위한 플랫폼",
+    "rect": {
+      "x": 115.2109375,
+      "y": 142,
+      "w": 144.578125,
+      "h": 144
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px 0px 48px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "text-6xl mb-4",
+    "text": "🎭",
+    "rect": {
+      "x": 115.2109375,
+      "y": 142,
+      "w": 144.578125,
+      "h": 60
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "60px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px 0px 16px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "h1",
+    "id": "",
+    "class": "text-4xl font-bold text-white mb-2",
+    "text": "Orphi",
+    "rect": {
+      "x": 115.2109375,
+      "y": 218,
+      "w": 144.578125,
+      "h": 40
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "36px",
+      "fontWeight": "700",
+      "padding": "0px",
+      "margin": "0px 0px 8px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "p",
+    "id": "",
+    "class": "text-purple-200 text-sm",
+    "text": "뮤지컬 배우를 위한 플랫폼",
+    "rect": {
+      "x": 115.2109375,
+      "y": 266,
+      "w": 144.578125,
+      "h": 20
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(233, 213, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "w-full max-w-sm bg-white rounded-2xl shadow-2xl p-8",
+    "text": "로그인\nLumi로 시작하기\n\n계정이 없으신가요? 로그인하면 자동으로 생성됩니다.",
+    "rect": {
+      "x": 24,
+      "y": 334,
+      "w": 327,
+      "h": 232
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(255, 255, 255)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "32px",
+      "margin": "0px",
+      "borderRadius": "16px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.25) 0px 25px 50px -12px",
+      "background": "rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "h2",
+    "id": "",
+    "class": "text-2xl font-bold text-gray-800 mb-6 text-center",
+    "text": "로그인",
+    "rect": {
+      "x": 56,
+      "y": 366,
+      "w": 263,
+      "h": 32
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(31, 41, 55)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "24px",
+      "fontWeight": "700",
+      "padding": "0px",
+      "margin": "0px 0px 24px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "button",
+    "id": "",
+    "class": "w-full py-3 rounded-lg font-medium text-white shadow-lg transition-all hover:shadow-xl active:scale-95",
+    "text": "Lumi로 시작하기",
+    "rect": {
+      "x": 56,
+      "y": 422,
+      "w": 263,
+      "h": 48
+    },
+    "styles": {
+      "display": "inline-block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgb(46, 125, 50)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "padding": "12px 0px",
+      "margin": "0px",
+      "borderRadius": "8px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.1) 0px 8px 10px -6px",
+      "background": "rgb(46, 125, 50) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "p",
+    "id": "",
+    "class": "text-center text-gray-500 text-sm mt-6",
+    "text": "계정이 없으신가요? 로그인하면 자동으로 생성됩니다.",
+    "rect": {
+      "x": 56,
+      "y": 494,
+      "w": 263,
+      "h": 40
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "24px 0px 0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "mt-12 text-center",
+    "text": "\"누구나 세상을 날아오를 수 있어\"\n\n- 엘파바",
+    "rect": {
+      "x": 70.6875,
+      "y": 614,
+      "w": 233.6171875,
+      "h": 56
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "48px 0px 0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "p",
+    "id": "",
+    "class": "text-white text-lg font-light italic",
+    "text": "\"누구나 세상을 날아오를 수 있어\"",
+    "rect": {
+      "x": 70.6875,
+      "y": 614,
+      "w": 233.6171875,
+      "h": 28
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "18px",
+      "fontWeight": "300",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "p",
+    "id": "",
+    "class": "text-purple-200 text-sm mt-2",
+    "text": "- 엘파바",
+    "rect": {
+      "x": 70.6875,
+      "y": 650,
+      "w": 233.6171875,
+      "h": 20
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(233, 213, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "8px 0px 0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "",
+    "text": "",
+    "rect": {
+      "x": 195,
+      "y": 776,
+      "w": 172,
+      "h": 28
+    },
+    "styles": {
+      "display": "block",
+      "position": "fixed",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  }
+]

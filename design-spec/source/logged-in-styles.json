@@ -1,0 +1,2893 @@
+[
+  {
+    "tag": "html",
+    "id": "",
+    "class": "",
+    "text": "공고 게시판\n\n✨ 새로운 기회를 찾아보세요\n\n공고\n단체\n모집중\nD--330\n뮤지컬 <위키드> 배우 모집\n브로드웨이 뮤지컬단\n엘파바\n글린다\n#주연\n#여성\n서울 강남구\n12명\n모집중\n",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "w": 375,
+      "h": 812
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "body",
+    "id": "",
+    "class": "",
+    "text": "공고 게시판\n\n✨ 새로운 기회를 찾아보세요\n\n공고\n단체\n모집중\nD--330\n뮤지컬 <위키드> 배우 모집\n브로드웨이 뮤지컬단\n엘파바\n글린다\n#주연\n#여성\n서울 강남구\n12명\n모집중\n",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "w": 375,
+      "h": 812
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "root",
+    "class": "",
+    "text": "공고 게시판\n\n✨ 새로운 기회를 찾아보세요\n\n공고\n단체\n모집중\nD--330\n뮤지컬 <위키드> 배우 모집\n브로드웨이 뮤지컬단\n엘파바\n글린다\n#주연\n#여성\n서울 강남구\n12명\n모집중\n",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "w": 375,
+      "h": 812
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col max-w-md mx-auto shadow-2xl",
+    "text": "공고 게시판\n\n✨ 새로운 기회를 찾아보세요\n\n공고\n단체\n모집중\nD--330\n뮤지컬 <위키드> 배우 모집\n브로드웨이 뮤지컬단\n엘파바\n글린다\n#주연\n#여성\n서울 강남구\n12명\n모집중\n",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "w": 375,
+      "h": 812
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.25) 0px 25px 50px -12px",
+      "background": "rgba(0, 0, 0, 0) linear-gradient(to right bottom, rgb(249, 250, 251), rgb(243, 244, 246)) repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "linear-gradient(to right bottom, rgb(249, 250, 251), rgb(243, 244, 246))"
+    }
+  },
+  {
+    "tag": "header",
+    "id": "",
+    "class": "sticky top-0 z-50 px-6 py-4 text-white shadow-lg backdrop-blur-sm bg-opacity-95 flex items-center justify-between rounded-b-3xl animate-slide-down",
+    "text": "공고 게시판\n\n✨ 새로운 기회를 찾아보세요",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "w": 375,
+      "h": 88
+    },
+    "styles": {
+      "display": "flex",
+      "position": "sticky",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "16px 24px",
+      "margin": "0px",
+      "borderRadius": "0px 0px 24px 24px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px",
+      "background": "rgba(0, 0, 0, 0) linear-gradient(135deg, rgb(46, 125, 50) 0%, rgb(102, 187, 106) 100%) repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "linear-gradient(135deg, rgb(46, 125, 50) 0%, rgb(102, 187, 106) 100%)"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex-1",
+    "text": "공고 게시판\n\n✨ 새로운 기회를 찾아보세요",
+    "rect": {
+      "x": 24,
+      "y": 16,
+      "w": 273,
+      "h": 56
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "",
+    "text": "공고 게시판\n\n✨ 새로운 기회를 찾아보세요",
+    "rect": {
+      "x": 24,
+      "y": 16,
+      "w": 273,
+      "h": 56
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "h1",
+    "id": "",
+    "class": "text-2xl font-bold",
+    "text": "공고 게시판",
+    "rect": {
+      "x": 24,
+      "y": 16,
+      "w": 273,
+      "h": 32
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "24px",
+      "fontWeight": "700",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "p",
+    "id": "",
+    "class": "text-sm opacity-90 mt-1",
+    "text": "✨ 새로운 기회를 찾아보세요",
+    "rect": {
+      "x": 24,
+      "y": 52,
+      "w": 273,
+      "h": 20
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "4px 0px 0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "button",
+    "id": "",
+    "class": "ml-4 relative active:scale-95 transition-transform p-2 hover:bg-white/20 rounded-full",
+    "text": "",
+    "rect": {
+      "x": 313,
+      "y": 25,
+      "w": 38,
+      "h": 38
+    },
+    "styles": {
+      "display": "block",
+      "position": "relative",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "8px",
+      "margin": "0px 0px 0px 16px",
+      "borderRadius": "9999px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 321,
+      "y": 33,
+      "w": 22,
+      "h": 22
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 330.4123229980469,
+      "y": 52.25,
+      "w": 3.17535400390625,
+      "h": 0.9165840148925781
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 323.75067138671875,
+      "y": 34.83333206176758,
+      "w": 16.499664306640625,
+      "h": 13.75
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse",
+    "text": "",
+    "rect": {
+      "x": 337,
+      "y": 29,
+      "w": 10,
+      "h": 10
+    },
+    "styles": {
+      "display": "block",
+      "position": "absolute",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgb(239, 68, 68)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "9999px",
+      "boxShadow": "none",
+      "background": "rgb(239, 68, 68) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "main",
+    "id": "",
+    "class": "flex-1 overflow-y-auto pb-20",
+    "text": "공고\n단체\n모집중\nD--330\n뮤지컬 <위키드> 배우 모집\n브로드웨이 뮤지컬단\n엘파바\n글린다\n#주연\n#여성\n서울 강남구\n12명\n모집중\nD--325\n뮤지컬 <웃는 남자> 오디션 공고",
+    "rect": {
+      "x": 0,
+      "y": 88,
+      "w": 375,
+      "h": 724
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px 0px 80px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10 shadow-sm",
+    "text": "공고\n단체",
+    "rect": {
+      "x": 0,
+      "y": 88,
+      "w": 375,
+      "h": 53
+    },
+    "styles": {
+      "display": "flex",
+      "position": "sticky",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(255, 255, 255, 0.8)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "background": "rgba(255, 255, 255, 0.8) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "button",
+    "id": "",
+    "class": "flex-1 py-4 text-sm font-semibold transition-all duration-200 relative",
+    "text": "공고",
+    "rect": {
+      "x": 0,
+      "y": 88,
+      "w": 187.5,
+      "h": 52
+    },
+    "styles": {
+      "display": "block",
+      "position": "relative",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "padding": "16px 0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "absolute bottom-0 left-0 right-0 h-1 rounded-t-full transition-all",
+    "text": "",
+    "rect": {
+      "x": 0,
+      "y": 136,
+      "w": 187.5,
+      "h": 4
+    },
+    "styles": {
+      "display": "block",
+      "position": "absolute",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgb(46, 125, 50)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "9999px 9999px 0px 0px",
+      "boxShadow": "none",
+      "background": "rgb(46, 125, 50) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "button",
+    "id": "",
+    "class": "flex-1 py-4 text-sm font-semibold transition-all duration-200 relative",
+    "text": "단체",
+    "rect": {
+      "x": 187.5,
+      "y": 88,
+      "w": 187.5,
+      "h": 52
+    },
+    "styles": {
+      "display": "block",
+      "position": "relative",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "padding": "16px 0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "p-4 space-y-4",
+    "text": "모집중\nD--330\n뮤지컬 <위키드> 배우 모집\n브로드웨이 뮤지컬단\n엘파바\n글린다\n#주연\n#여성\n서울 강남구\n12명\n모집중\nD--325\n뮤지컬 <웃는 남자> 오디션 공고\n서울예술극",
+    "rect": {
+      "x": 0,
+      "y": 141,
+      "w": 375,
+      "h": 546
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "16px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl border border-gray-100 active:scale-98 transition-all duration-200 cursor-pointer overflow-hidden",
+    "text": "모집중\nD--330\n뮤지컬 <위키드> 배우 모집\n브로드웨이 뮤지컬단\n엘파바\n글린다\n#주연\n#여성\n서울 강남구\n12명",
+    "rect": {
+      "x": 16,
+      "y": 157,
+      "w": 343,
+      "h": 231
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(255, 255, 255)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "20px",
+      "margin": "0px",
+      "borderRadius": "16px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px",
+      "background": "rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex items-center justify-between mb-3",
+    "text": "모집중\nD--330",
+    "rect": {
+      "x": 37,
+      "y": 178,
+      "w": 301,
+      "h": 28
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px 0px 12px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm",
+    "text": "모집중",
+    "rect": {
+      "x": 37,
+      "y": 178,
+      "w": 73.140625,
+      "h": 28
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgb(46, 125, 50)",
+      "fontSize": "12px",
+      "fontWeight": "700",
+      "padding": "6px 12px",
+      "margin": "0px",
+      "borderRadius": "9999px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "background": "rgb(46, 125, 50) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 49,
+      "y": 186,
+      "w": 12,
+      "h": 12
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "700",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 55,
+      "y": 189,
+      "w": 2,
+      "h": 4
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "700",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "circle",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 50,
+      "y": 187,
+      "w": 10,
+      "h": 10
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "700",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-xs font-bold px-3 py-1.5 rounded-full",
+    "text": "D--330",
+    "rect": {
+      "x": 269.1875,
+      "y": 178,
+      "w": 68.8125,
+      "h": 28
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(102, 187, 106, 0.125)",
+      "fontSize": "12px",
+      "fontWeight": "700",
+      "padding": "6px 12px",
+      "margin": "0px",
+      "borderRadius": "9999px",
+      "boxShadow": "none",
+      "background": "rgba(102, 187, 106, 0.125) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "mb-4",
+    "text": "뮤지컬 <위키드> 배우 모집\n브로드웨이 뮤지컬단",
+    "rect": {
+      "x": 37,
+      "y": 218,
+      "w": 301,
+      "h": 52
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px 0px 16px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "h3",
+    "id": "",
+    "class": "font-bold text-lg text-gray-900 mb-1 line-clamp-2",
+    "text": "뮤지컬 <위키드> 배우 모집",
+    "rect": {
+      "x": 37,
+      "y": 218,
+      "w": 301,
+      "h": 28
+    },
+    "styles": {
+      "display": "flow-root",
+      "position": "static",
+      "color": "rgb(17, 24, 39)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "18px",
+      "fontWeight": "700",
+      "padding": "0px",
+      "margin": "0px 0px 4px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex items-center gap-2 text-sm text-gray-600",
+    "text": "브로드웨이 뮤지컬단",
+    "rect": {
+      "x": 37,
+      "y": 250,
+      "w": 301,
+      "h": 20
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 37,
+      "y": 253,
+      "w": 14,
+      "h": 14
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 40.5,
+      "y": 254.1666717529297,
+      "w": 7,
+      "h": 11.666671752929688
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 38.16666793823242,
+      "y": 260,
+      "w": 2.333332061767578,
+      "h": 5.833343505859375
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 47.5,
+      "y": 258.25,
+      "w": 2.333332061767578,
+      "h": 7.583343505859375
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "",
+    "text": "브로드웨이 뮤지컬단",
+    "rect": {
+      "x": 59,
+      "y": 250,
+      "w": 112.78125,
+      "h": 20
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex flex-wrap gap-2 mb-4",
+    "text": "엘파바\n글린다\n#주연\n#여성",
+    "rect": {
+      "x": 37,
+      "y": 286,
+      "w": 301,
+      "h": 32
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px 0px 16px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-xs font-medium px-3 py-1.5 rounded-lg border-2",
+    "text": "엘파바",
+    "rect": {
+      "x": 37,
+      "y": 286,
+      "w": 59.140625,
+      "h": 32
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "6px 12px",
+      "margin": "0px",
+      "borderRadius": "8px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-xs font-medium px-3 py-1.5 rounded-lg border-2",
+    "text": "글린다",
+    "rect": {
+      "x": 104.140625,
+      "y": 286,
+      "w": 59.140625,
+      "h": 32
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "6px 12px",
+      "margin": "0px",
+      "borderRadius": "8px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-xs font-medium bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg",
+    "text": "#주연",
+    "rect": {
+      "x": 171.28125,
+      "y": 286,
+      "w": 52.4921875,
+      "h": 32
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(55, 65, 81)",
+      "bgColor": "rgb(243, 244, 246)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "6px 12px",
+      "margin": "0px",
+      "borderRadius": "8px",
+      "boxShadow": "none",
+      "background": "rgb(243, 244, 246) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-xs font-medium bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg",
+    "text": "#여성",
+    "rect": {
+      "x": 231.7734375,
+      "y": 286,
+      "w": 52.4921875,
+      "h": 32
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(55, 65, 81)",
+      "bgColor": "rgb(243, 244, 246)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "6px 12px",
+      "margin": "0px",
+      "borderRadius": "8px",
+      "boxShadow": "none",
+      "background": "rgb(243, 244, 246) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex items-center justify-between pt-3 border-t border-gray-100",
+    "text": "서울 강남구\n12명",
+    "rect": {
+      "x": 37,
+      "y": 334,
+      "w": 301,
+      "h": 33
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "12px 0px 0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex items-center gap-1.5 text-sm text-gray-600",
+    "text": "서울 강남구",
+    "rect": {
+      "x": 37,
+      "y": 347,
+      "w": 86.34375,
+      "h": 20
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 37,
+      "y": 349,
+      "w": 16,
+      "h": 16
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 39.66666793823242,
+      "y": 350.3333435058594,
+      "w": 10.666664123535156,
+      "h": 13.333160400390625
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "circle",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 43,
+      "y": 353.6666564941406,
+      "w": 4,
+      "h": 4
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "",
+    "text": "서울 강남구",
+    "rect": {
+      "x": 59,
+      "y": 347,
+      "w": 64.34375,
+      "h": 20
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex items-center gap-1.5 text-sm font-semibold",
+    "text": "12명",
+    "rect": {
+      "x": 288.421875,
+      "y": 347,
+      "w": 49.578125,
+      "h": 20
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 288.421875,
+      "y": 349,
+      "w": 16,
+      "h": 16
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 289.7552185058594,
+      "y": 359,
+      "w": 9.33331298828125,
+      "h": 4
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 299.0885314941406,
+      "y": 351.0853271484375,
+      "w": 1.997467041015625,
+      "h": 5.16265869140625
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 301.0885314941406,
+      "y": 359.086669921875,
+      "w": 2,
+      "h": 3.913330078125
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "circle",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 291.7552185058594,
+      "y": 351,
+      "w": 5.33331298828125,
+      "h": 5.333343505859375
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "",
+    "text": "12명",
+    "rect": {
+      "x": 310.421875,
+      "y": 347,
+      "w": 27.578125,
+      "h": 20
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl border border-gray-100 active:scale-98 transition-all duration-200 cursor-pointer overflow-hidden",
+    "text": "모집중\nD--325\n뮤지컬 <웃는 남자> 오디션 공고\n서울예술극장\n그윈플렌\n데아\n#주연\n#남성\n#여성\n서울 종로구\n8명",
+    "rect": {
+      "x": 16,
+      "y": 404,
+      "w": 343,
+      "h": 267
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(255, 255, 255)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "20px",
+      "margin": "16px 0px 0px",
+      "borderRadius": "16px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.1) 0px 8px 10px -6px",
+      "background": "rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex items-center justify-between mb-3",
+    "text": "모집중\nD--325",
+    "rect": {
+      "x": 37,
+      "y": 425,
+      "w": 301,
+      "h": 28
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px 0px 12px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm",
+    "text": "모집중",
+    "rect": {
+      "x": 37,
+      "y": 425,
+      "w": 73.140625,
+      "h": 28
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgb(46, 125, 50)",
+      "fontSize": "12px",
+      "fontWeight": "700",
+      "padding": "6px 12px",
+      "margin": "0px",
+      "borderRadius": "9999px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "background": "rgb(46, 125, 50) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 49,
+      "y": 433,
+      "w": 12,
+      "h": 12
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "700",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 55,
+      "y": 436,
+      "w": 2,
+      "h": 4
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "700",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "circle",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 50,
+      "y": 434,
+      "w": 10,
+      "h": 10
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "700",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-xs font-bold px-3 py-1.5 rounded-full",
+    "text": "D--325",
+    "rect": {
+      "x": 269.6875,
+      "y": 425,
+      "w": 68.3125,
+      "h": 28
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(102, 187, 106, 0.125)",
+      "fontSize": "12px",
+      "fontWeight": "700",
+      "padding": "6px 12px",
+      "margin": "0px",
+      "borderRadius": "9999px",
+      "boxShadow": "none",
+      "background": "rgba(102, 187, 106, 0.125) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "mb-4",
+    "text": "뮤지컬 <웃는 남자> 오디션 공고\n서울예술극장",
+    "rect": {
+      "x": 37,
+      "y": 465,
+      "w": 301,
+      "h": 52
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px 0px 16px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "h3",
+    "id": "",
+    "class": "font-bold text-lg text-gray-900 mb-1 line-clamp-2",
+    "text": "뮤지컬 <웃는 남자> 오디션 공고",
+    "rect": {
+      "x": 37,
+      "y": 465,
+      "w": 301,
+      "h": 28
+    },
+    "styles": {
+      "display": "flow-root",
+      "position": "static",
+      "color": "rgb(17, 24, 39)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "18px",
+      "fontWeight": "700",
+      "padding": "0px",
+      "margin": "0px 0px 4px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex items-center gap-2 text-sm text-gray-600",
+    "text": "서울예술극장",
+    "rect": {
+      "x": 37,
+      "y": 497,
+      "w": 301,
+      "h": 20
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 37,
+      "y": 500,
+      "w": 14,
+      "h": 14
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 40.5,
+      "y": 501.1666564941406,
+      "w": 7,
+      "h": 11.666656494140625
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 38.16666793823242,
+      "y": 507,
+      "w": 2.333332061767578,
+      "h": 5.83331298828125
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 47.5,
+      "y": 505.25,
+      "w": 2.333332061767578,
+      "h": 7.58331298828125
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "",
+    "text": "서울예술극장",
+    "rect": {
+      "x": 59,
+      "y": 497,
+      "w": 72.6640625,
+      "h": 20
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex flex-wrap gap-2 mb-4",
+    "text": "그윈플렌\n데아\n#주연\n#남성\n#여성",
+    "rect": {
+      "x": 37,
+      "y": 533,
+      "w": 301,
+      "h": 68
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px 0px 16px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-xs font-medium px-3 py-1.5 rounded-lg border-2",
+    "text": "그윈플렌",
+    "rect": {
+      "x": 37,
+      "y": 533,
+      "w": 69.5234375,
+      "h": 32
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "6px 12px",
+      "margin": "0px",
+      "borderRadius": "8px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-xs font-medium px-3 py-1.5 rounded-lg border-2",
+    "text": "데아",
+    "rect": {
+      "x": 114.5234375,
+      "y": 533,
+      "w": 48.765625,
+      "h": 32
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "6px 12px",
+      "margin": "0px",
+      "borderRadius": "8px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-xs font-medium bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg",
+    "text": "#주연",
+    "rect": {
+      "x": 171.2890625,
+      "y": 533,
+      "w": 52.4921875,
+      "h": 32
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(55, 65, 81)",
+      "bgColor": "rgb(243, 244, 246)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "6px 12px",
+      "margin": "0px",
+      "borderRadius": "8px",
+      "boxShadow": "none",
+      "background": "rgb(243, 244, 246) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-xs font-medium bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg",
+    "text": "#남성",
+    "rect": {
+      "x": 231.78125,
+      "y": 533,
+      "w": 52.4921875,
+      "h": 32
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(55, 65, 81)",
+      "bgColor": "rgb(243, 244, 246)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "6px 12px",
+      "margin": "0px",
+      "borderRadius": "8px",
+      "boxShadow": "none",
+      "background": "rgb(243, 244, 246) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-xs font-medium bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg",
+    "text": "#여성",
+    "rect": {
+      "x": 37,
+      "y": 573,
+      "w": 52.4921875,
+      "h": 28
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(55, 65, 81)",
+      "bgColor": "rgb(243, 244, 246)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "6px 12px",
+      "margin": "0px",
+      "borderRadius": "8px",
+      "boxShadow": "none",
+      "background": "rgb(243, 244, 246) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex items-center justify-between pt-3 border-t border-gray-100",
+    "text": "서울 종로구\n8명",
+    "rect": {
+      "x": 37,
+      "y": 617,
+      "w": 301,
+      "h": 33
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "12px 0px 0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex items-center gap-1.5 text-sm text-gray-600",
+    "text": "서울 종로구",
+    "rect": {
+      "x": 37,
+      "y": 630,
+      "w": 86.34375,
+      "h": 20
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 37,
+      "y": 632,
+      "w": 16,
+      "h": 16
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 39.66666793823242,
+      "y": 633.3333129882812,
+      "w": 10.666664123535156,
+      "h": 13.33319091796875
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "circle",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 43,
+      "y": 636.6666870117188,
+      "w": 4,
+      "h": 4
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "",
+    "text": "서울 종로구",
+    "rect": {
+      "x": 59,
+      "y": 630,
+      "w": 64.34375,
+      "h": 20
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex items-center gap-1.5 text-sm font-semibold",
+    "text": "8명",
+    "rect": {
+      "x": 294.578125,
+      "y": 630,
+      "w": 43.421875,
+      "h": 20
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 294.578125,
+      "y": 632,
+      "w": 16,
+      "h": 16
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 295.9114685058594,
+      "y": 642,
+      "w": 9.33331298828125,
+      "h": 4
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 305.2447814941406,
+      "y": 634.0853271484375,
+      "w": 1.997467041015625,
+      "h": 5.16265869140625
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 307.2447814941406,
+      "y": 642.086669921875,
+      "w": 2,
+      "h": 3.913330078125
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "circle",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 297.9114685058594,
+      "y": 634,
+      "w": 5.33331298828125,
+      "h": 5.33331298828125
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "",
+    "text": "8명",
+    "rect": {
+      "x": 316.578125,
+      "y": 630,
+      "w": 21.421875,
+      "h": 20
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "button",
+    "id": "",
+    "class": "fixed bottom-24 right-6 w-16 h-16 rounded-2xl shadow-2xl flex items-center justify-center text-white active:scale-95 transition-all duration-200 hover:shadow-3xl",
+    "text": "",
+    "rect": {
+      "x": 287,
+      "y": 652,
+      "w": 64,
+      "h": 64
+    },
+    "styles": {
+      "display": "flex",
+      "position": "fixed",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "16px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.25) 0px 25px 50px -12px",
+      "background": "rgba(0, 0, 0, 0) linear-gradient(135deg, rgb(46, 125, 50) 0%, rgb(102, 187, 106) 100%) repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "linear-gradient(135deg, rgb(46, 125, 50) 0%, rgb(102, 187, 106) 100%)"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 305,
+      "y": 670,
+      "w": 28,
+      "h": 28
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "nav",
+    "id": "",
+    "class": "fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-md border-t border-gray-200 px-8 py-4 shadow-2xl rounded-t-3xl animate-slide-up",
+    "text": "홈\n연습실\n프로필\n설정",
+    "rect": {
+      "x": 0,
+      "y": 735,
+      "w": 375,
+      "h": 77
+    },
+    "styles": {
+      "display": "block",
+      "position": "fixed",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(255, 255, 255, 0.95)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "16px 32px",
+      "margin": "0px",
+      "borderRadius": "24px 24px 0px 0px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.25) 0px 25px 50px -12px",
+      "background": "rgba(255, 255, 255, 0.95) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex justify-around items-center",
+    "text": "홈\n연습실\n프로필\n설정",
+    "rect": {
+      "x": 32,
+      "y": 752,
+      "w": 311,
+      "h": 44
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "a",
+    "id": "",
+    "class": "flex flex-col items-center gap-1 transition-all duration-200 opacity-60 hover:opacity-80",
+    "text": "홈",
+    "rect": {
+      "x": 57.0859375,
+      "y": 752,
+      "w": 24,
+      "h": 44
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 57.0859375,
+      "y": 752,
+      "w": 24,
+      "h": 24
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 66.0859375,
+      "y": 764,
+      "w": 6,
+      "h": 9
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 60.0859375,
+      "y": 754.0005493164062,
+      "w": 18,
+      "h": 18.99945068359375
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-xs font-medium",
+    "text": "홈",
+    "rect": {
+      "x": 63.890625,
+      "y": 780,
+      "w": 10.3828125,
+      "h": 16
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "a",
+    "id": "",
+    "class": "flex flex-col items-center gap-1 transition-all duration-200 opacity-60 hover:opacity-80",
+    "text": "연습실",
+    "rect": {
+      "x": 131.265625,
+      "y": 752,
+      "w": 31.140625,
+      "h": 44
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 134.8359375,
+      "y": 752,
+      "w": 24,
+      "h": 24
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 143.8359375,
+      "y": 755,
+      "w": 12,
+      "h": 15
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "circle",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 137.8359375,
+      "y": 767,
+      "w": 6,
+      "h": 6
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "circle",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 149.8359375,
+      "y": 765,
+      "w": 6,
+      "h": 6
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-xs font-medium",
+    "text": "연습실",
+    "rect": {
+      "x": 131.265625,
+      "y": 780,
+      "w": 31.140625,
+      "h": 16
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "a",
+    "id": "",
+    "class": "flex flex-col items-center gap-1 transition-all duration-200 opacity-60 hover:opacity-80",
+    "text": "프로필",
+    "rect": {
+      "x": 212.5859375,
+      "y": 752,
+      "w": 31.140625,
+      "h": 44
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 216.15625,
+      "y": 752,
+      "w": 24,
+      "h": 24
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 221.15625,
+      "y": 767,
+      "w": 14,
+      "h": 6
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "circle",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 224.15625,
+      "y": 755,
+      "w": 8,
+      "h": 8
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-xs font-medium",
+    "text": "프로필",
+    "rect": {
+      "x": 212.5859375,
+      "y": 780,
+      "w": 31.140625,
+      "h": 16
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "a",
+    "id": "",
+    "class": "flex flex-col items-center gap-1 transition-all duration-200 opacity-60 hover:opacity-80",
+    "text": "설정",
+    "rect": {
+      "x": 293.90625,
+      "y": 752,
+      "w": 24,
+      "h": 44
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 293.90625,
+      "y": 752,
+      "w": 24,
+      "h": 24
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 296.94989013671875,
+      "y": 754.0173950195312,
+      "w": 17.9127197265625,
+      "h": 19.96417236328125
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "circle",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 302.90625,
+      "y": 761,
+      "w": 6,
+      "h": 6
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-xs font-medium",
+    "text": "설정",
+    "rect": {
+      "x": 295.5234375,
+      "y": 780,
+      "w": 20.765625,
+      "h": 16
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "",
+    "text": "",
+    "rect": {
+      "x": 195,
+      "y": 776,
+      "w": 172,
+      "h": 28
+    },
+    "styles": {
+      "display": "block",
+      "position": "fixed",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  }
+]

@@ -1,0 +1,1450 @@
+[
+  {
+    "tag": "html",
+    "class": "",
+    "text": "설정\n사용자 유형\n현재 유형\n배우\n운영자 계정으로 전환하기\n테마 선택\n\n좋아하는 뮤지컬 캐",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "body",
+    "class": "",
+    "text": "설정\n사용자 유형\n현재 유형\n배우\n운영자 계정으로 전환하기\n테마 선택\n\n좋아하는 뮤지컬 캐",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "",
+    "text": "설정\n사용자 유형\n현재 유형\n배우\n운영자 계정으로 전환하기\n테마 선택\n\n좋아하는 뮤지컬 캐",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col max-w-md mx-auto shadow-2xl",
+    "text": "설정\n사용자 유형\n현재 유형\n배우\n운영자 계정으로 전환하기\n테마 선택\n\n좋아하는 뮤지컬 캐",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "header",
+    "class": "sticky top-0 z-50 px-6 py-4 text-white shadow-lg backdrop-blur-sm bg-opacity-95 flex items-center justify-between rounded-b-3xl animate-slide-down",
+    "text": "설정",
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px 0px 24px 24px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex-1",
+    "text": "설정",
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex justify-between items-center",
+    "text": "설정",
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "h1",
+    "class": "text-xl font-bold",
+    "text": "설정",
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "20px",
+      "fontWeight": "700",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "button",
+    "class": "ml-4 relative active:scale-95 transition-transform p-2 hover:bg-white/20 rounded-full",
+    "text": "",
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "9999px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse",
+    "text": "",
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgb(239, 68, 68)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "9999px"
+    }
+  },
+  {
+    "tag": "main",
+    "class": "flex-1 overflow-y-auto pb-20",
+    "text": "사용자 유형\n현재 유형\n배우\n운영자 계정으로 전환하기\n테마 선택\n\n좋아하는 뮤지컬 캐릭터의",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "p-6 space-y-6",
+    "text": "사용자 유형\n현재 유형\n배우\n운영자 계정으로 전환하기\n테마 선택\n\n좋아하는 뮤지컬 캐릭터의",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "bg-white rounded-3xl p-6 shadow-lg border border-gray-100",
+    "text": "사용자 유형\n현재 유형\n배우\n운영자 계정으로 전환하기",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(255, 255, 255)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "24px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-3 mb-5",
+    "text": "사용자 유형",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "w-10 h-10 rounded-xl flex items-center justify-center",
+    "text": "",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(46, 125, 50, 0.082)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "12px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "circle",
+    "class": {},
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "h3",
+    "class": "font-bold text-gray-900 text-lg",
+    "text": "사용자 유형",
+    "styles": {
+      "color": "rgb(17, 24, 39)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "18px",
+      "fontWeight": "700",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center justify-between py-4 px-3 rounded-xl bg-gray-50",
+    "text": "현재 유형\n배우",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(249, 250, 251)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "12px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-gray-700 font-medium",
+    "text": "현재 유형",
+    "styles": {
+      "color": "rgb(55, 65, 81)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-2",
+    "text": "배우",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-gray-900 font-bold",
+    "text": "배우",
+    "styles": {
+      "color": "rgb(17, 24, 39)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "700",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "w-2 h-2 rounded-full bg-green-500",
+    "text": "",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(34, 197, 94)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "9999px"
+    }
+  },
+  {
+    "tag": "button",
+    "class": "w-full mt-4 py-4 rounded-2xl font-semibold text-white shadow-lg transition-all active:scale-98 flex items-center justify-center gap-2",
+    "text": "운영자 계정으로 전환하기",
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "16px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "circle",
+    "class": {},
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "bg-white rounded-3xl p-6 shadow-lg border border-gray-100",
+    "text": "테마 선택\n\n좋아하는 뮤지컬 캐릭터의 테마를 선택하세요\n\n🟢\n엘파바\n선택됨\n\n\"누구나 세",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(255, 255, 255)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "24px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-3 mb-3",
+    "text": "테마 선택",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "w-10 h-10 rounded-xl flex items-center justify-center",
+    "text": "",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(102, 187, 106, 0.082)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "12px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(102, 187, 106)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(102, 187, 106)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "circle",
+    "class": {},
+    "styles": {
+      "color": "rgb(102, 187, 106)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "circle",
+    "class": {},
+    "styles": {
+      "color": "rgb(102, 187, 106)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "circle",
+    "class": {},
+    "styles": {
+      "color": "rgb(102, 187, 106)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "circle",
+    "class": {},
+    "styles": {
+      "color": "rgb(102, 187, 106)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "h3",
+    "class": "font-bold text-gray-900 text-lg",
+    "text": "테마 선택",
+    "styles": {
+      "color": "rgb(17, 24, 39)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "18px",
+      "fontWeight": "700",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "p",
+    "class": "text-gray-500 text-sm mb-6 px-1",
+    "text": "좋아하는 뮤지컬 캐릭터의 테마를 선택하세요",
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "space-y-3",
+    "text": "🟢\n엘파바\n선택됨\n\n\"누구나 세상을 날아오를 수 있어\"\n\n🌸\n글린다\n\n\"인기가 많아질거",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "button",
+    "class": "w-full p-5 rounded-2xl border-2 transition-all text-left relative overflow-hidden group shadow-xl scale-[1.02]",
+    "text": "🟢\n엘파바\n선택됨\n\n\"누구나 세상을 날아오를 수 있어\"",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "16px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "absolute top-0 right-0 w-24 h-24 rounded-full blur-2xl opacity-10 group-hover:opacity-20 transition-opacity",
+    "text": "",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(46, 125, 50)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "9999px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-4 relative",
+    "text": "🟢\n엘파바\n선택됨\n\n\"누구나 세상을 날아오를 수 있어\"",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg",
+    "text": "🟢",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "30px",
+      "fontWeight": "400",
+      "borderRadius": "16px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex-1",
+    "text": "엘파바\n선택됨\n\n\"누구나 세상을 날아오를 수 있어\"",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-2 mb-1",
+    "text": "엘파바\n선택됨",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "font-bold text-gray-900 text-lg",
+    "text": "엘파바",
+    "styles": {
+      "color": "rgb(17, 24, 39)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "18px",
+      "fontWeight": "700",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold",
+    "text": "선택됨",
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(46, 125, 50, 0.125)",
+      "fontSize": "12px",
+      "fontWeight": "600",
+      "borderRadius": "9999px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "p",
+    "class": "text-sm text-gray-600 italic leading-relaxed",
+    "text": "\"누구나 세상을 날아오를 수 있어\"",
+    "styles": {
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "w-6 h-6 rounded-full flex items-center justify-center",
+    "text": "",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(46, 125, 50)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "9999px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "button",
+    "class": "w-full p-5 rounded-2xl border-2 transition-all text-left relative overflow-hidden group shadow-md hover:shadow-lg hover:scale-[1.01] border-gray-200",
+    "text": "🌸\n글린다\n\n\"인기가 많아질거야!\"",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(255, 255, 255)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "16px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "absolute top-0 right-0 w-24 h-24 rounded-full blur-2xl opacity-10 group-hover:opacity-20 transition-opacity",
+    "text": "",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(194, 24, 91)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "9999px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-4 relative",
+    "text": "🌸\n글린다\n\n\"인기가 많아질거야!\"",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg",
+    "text": "🌸",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "30px",
+      "fontWeight": "400",
+      "borderRadius": "16px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex-1",
+    "text": "글린다\n\n\"인기가 많아질거야!\"",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-2 mb-1",
+    "text": "글린다",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "font-bold text-gray-900 text-lg",
+    "text": "글린다",
+    "styles": {
+      "color": "rgb(17, 24, 39)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "18px",
+      "fontWeight": "700",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "p",
+    "class": "text-sm text-gray-600 italic leading-relaxed",
+    "text": "\"인기가 많아질거야!\"",
+    "styles": {
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "button",
+    "class": "w-full p-5 rounded-2xl border-2 transition-all text-left relative overflow-hidden group shadow-md hover:shadow-lg hover:scale-[1.01] border-gray-200",
+    "text": "🍷\n그윈플렌\n\n\"부자들의 낙원은...\"",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(255, 255, 255)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "16px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "absolute top-0 right-0 w-24 h-24 rounded-full blur-2xl opacity-10 group-hover:opacity-20 transition-opacity",
+    "text": "",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(141, 110, 99)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "9999px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-4 relative",
+    "text": "🍷\n그윈플렌\n\n\"부자들의 낙원은...\"",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg",
+    "text": "🍷",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "30px",
+      "fontWeight": "400",
+      "borderRadius": "16px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex-1",
+    "text": "그윈플렌\n\n\"부자들의 낙원은...\"",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-2 mb-1",
+    "text": "그윈플렌",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "font-bold text-gray-900 text-lg",
+    "text": "그윈플렌",
+    "styles": {
+      "color": "rgb(17, 24, 39)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "18px",
+      "fontWeight": "700",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "p",
+    "class": "text-sm text-gray-600 italic leading-relaxed",
+    "text": "\"부자들의 낙원은...\"",
+    "styles": {
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "button",
+    "class": "w-full p-5 rounded-2xl border-2 transition-all text-left relative overflow-hidden group shadow-md hover:shadow-lg hover:scale-[1.01] border-gray-200",
+    "text": "🕊️\n조안나\n\n\"날 수 없는 난 노래해\"",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(255, 255, 255)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "16px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "absolute top-0 right-0 w-24 h-24 rounded-full blur-2xl opacity-10 group-hover:opacity-20 transition-opacity",
+    "text": "",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(63, 124, 172)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "9999px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-4 relative",
+    "text": "🕊️\n조안나\n\n\"날 수 없는 난 노래해\"",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg",
+    "text": "🕊️",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "30px",
+      "fontWeight": "400",
+      "borderRadius": "16px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex-1",
+    "text": "조안나\n\n\"날 수 없는 난 노래해\"",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-2 mb-1",
+    "text": "조안나",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "font-bold text-gray-900 text-lg",
+    "text": "조안나",
+    "styles": {
+      "color": "rgb(17, 24, 39)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "18px",
+      "fontWeight": "700",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "p",
+    "class": "text-sm text-gray-600 italic leading-relaxed",
+    "text": "\"날 수 없는 난 노래해\"",
+    "styles": {
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "bg-white rounded-3xl p-6 shadow-lg border border-gray-100",
+    "text": "앱 정보\n버전\n1.0.0\n개발자\nOrphi Team",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(255, 255, 255)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "24px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-3 mb-5",
+    "text": "앱 정보",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "w-10 h-10 rounded-xl flex items-center justify-center bg-gray-100",
+    "text": "",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(243, 244, 246)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "12px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(55, 65, 81)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "circle",
+    "class": {},
+    "styles": {
+      "color": "rgb(55, 65, 81)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "h3",
+    "class": "font-bold text-gray-900 text-lg",
+    "text": "앱 정보",
+    "styles": {
+      "color": "rgb(17, 24, 39)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "18px",
+      "fontWeight": "700",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "space-y-3",
+    "text": "버전\n1.0.0\n개발자\nOrphi Team",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex justify-between items-center py-3 px-3 rounded-xl hover:bg-gray-50 transition-colors",
+    "text": "버전\n1.0.0",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "12px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-gray-600 font-medium",
+    "text": "버전",
+    "styles": {
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-gray-900 font-bold",
+    "text": "1.0.0",
+    "styles": {
+      "color": "rgb(17, 24, 39)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "700",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex justify-between items-center py-3 px-3 rounded-xl hover:bg-gray-50 transition-colors",
+    "text": "개발자\nOrphi Team",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "12px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-gray-600 font-medium",
+    "text": "개발자",
+    "styles": {
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-gray-900 font-bold",
+    "text": "Orphi Team",
+    "styles": {
+      "color": "rgb(17, 24, 39)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "700",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "nav",
+    "class": "fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-md border-t border-gray-200 px-8 py-4 shadow-2xl rounded-t-3xl animate-slide-up",
+    "text": "홈\n연습실\n프로필\n설정",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(255, 255, 255, 0.95)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "24px 24px 0px 0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex justify-around items-center",
+    "text": "홈\n연습실\n프로필\n설정",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "a",
+    "class": "flex flex-col items-center gap-1 transition-all duration-200 opacity-60 hover:opacity-80",
+    "text": "홈",
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-xs font-medium",
+    "text": "홈",
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "a",
+    "class": "flex flex-col items-center gap-1 transition-all duration-200 opacity-60 hover:opacity-80",
+    "text": "연습실",
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "circle",
+    "class": {},
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "circle",
+    "class": {},
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-xs font-medium",
+    "text": "연습실",
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "a",
+    "class": "flex flex-col items-center gap-1 transition-all duration-200 opacity-60 hover:opacity-80",
+    "text": "프로필",
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "circle",
+    "class": {},
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-xs font-medium",
+    "text": "프로필",
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "a",
+    "class": "flex flex-col items-center gap-1 transition-all duration-200 scale-110",
+    "text": "설정",
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "circle",
+    "class": {},
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-xs font-medium",
+    "text": "설정",
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "",
+    "text": "",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  }
+]

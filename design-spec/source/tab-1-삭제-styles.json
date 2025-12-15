@@ -1,0 +1,1775 @@
+[
+  {
+    "tag": "html",
+    "id": "",
+    "class": "",
+    "text": "알림\n\n읽지 않은 알림 1개\n\n지원이 승인되었습니다\n1시간 전\n\n'뮤지컬 <웃는 남자> 오디션' 지원이 승인되었습니다. 오디션 일정을 확인하세요.\n\n읽음 표시\n삭제\n공고가 수정되었",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "w": 375,
+      "h": 812
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "body",
+    "id": "",
+    "class": "",
+    "text": "알림\n\n읽지 않은 알림 1개\n\n지원이 승인되었습니다\n1시간 전\n\n'뮤지컬 <웃는 남자> 오디션' 지원이 승인되었습니다. 오디션 일정을 확인하세요.\n\n읽음 표시\n삭제\n공고가 수정되었",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "w": 375,
+      "h": 812
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "root",
+    "class": "",
+    "text": "알림\n\n읽지 않은 알림 1개\n\n지원이 승인되었습니다\n1시간 전\n\n'뮤지컬 <웃는 남자> 오디션' 지원이 승인되었습니다. 오디션 일정을 확인하세요.\n\n읽음 표시\n삭제\n공고가 수정되었",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "w": 375,
+      "h": 812
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col max-w-md mx-auto shadow-2xl",
+    "text": "알림\n\n읽지 않은 알림 1개\n\n지원이 승인되었습니다\n1시간 전\n\n'뮤지컬 <웃는 남자> 오디션' 지원이 승인되었습니다. 오디션 일정을 확인하세요.\n\n읽음 표시\n삭제\n공고가 수정되었",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "w": 375,
+      "h": 812
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.25) 0px 25px 50px -12px",
+      "background": "rgba(0, 0, 0, 0) linear-gradient(to right bottom, rgb(249, 250, 251), rgb(243, 244, 246)) repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "linear-gradient(to right bottom, rgb(249, 250, 251), rgb(243, 244, 246))"
+    }
+  },
+  {
+    "tag": "header",
+    "id": "",
+    "class": "sticky top-0 z-50 px-6 py-4 text-white shadow-lg backdrop-blur-sm bg-opacity-95 flex items-center justify-between rounded-b-3xl animate-slide-down",
+    "text": "알림\n\n읽지 않은 알림 1개",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "w": 375,
+      "h": 88
+    },
+    "styles": {
+      "display": "flex",
+      "position": "sticky",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "16px 24px",
+      "margin": "0px",
+      "borderRadius": "0px 0px 24px 24px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px",
+      "background": "rgba(0, 0, 0, 0) linear-gradient(135deg, rgb(46, 125, 50) 0%, rgb(102, 187, 106) 100%) repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "linear-gradient(135deg, rgb(46, 125, 50) 0%, rgb(102, 187, 106) 100%)"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex-1",
+    "text": "알림\n\n읽지 않은 알림 1개",
+    "rect": {
+      "x": 24,
+      "y": 16,
+      "w": 273,
+      "h": 56
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex items-center justify-between",
+    "text": "알림\n\n읽지 않은 알림 1개",
+    "rect": {
+      "x": 24,
+      "y": 16,
+      "w": 273,
+      "h": 56
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "",
+    "text": "알림\n\n읽지 않은 알림 1개",
+    "rect": {
+      "x": 24,
+      "y": 16,
+      "w": 102.484375,
+      "h": 56
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "h1",
+    "id": "",
+    "class": "text-2xl font-bold",
+    "text": "알림",
+    "rect": {
+      "x": 24,
+      "y": 16,
+      "w": 102.484375,
+      "h": 32
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "24px",
+      "fontWeight": "700",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "p",
+    "id": "",
+    "class": "text-sm opacity-90 mt-1",
+    "text": "읽지 않은 알림 1개",
+    "rect": {
+      "x": 24,
+      "y": 52,
+      "w": 102.484375,
+      "h": 20
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "4px 0px 0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "button",
+    "id": "",
+    "class": "ml-4 relative active:scale-95 transition-transform p-2 hover:bg-white/20 rounded-full",
+    "text": "",
+    "rect": {
+      "x": 313,
+      "y": 25,
+      "w": 38,
+      "h": 38
+    },
+    "styles": {
+      "display": "block",
+      "position": "relative",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "8px",
+      "margin": "0px 0px 0px 16px",
+      "borderRadius": "9999px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 321,
+      "y": 33,
+      "w": 22,
+      "h": 22
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 330.4123229980469,
+      "y": 52.25,
+      "w": 3.17535400390625,
+      "h": 0.9165840148925781
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 323.75067138671875,
+      "y": 34.83333206176758,
+      "w": 16.499664306640625,
+      "h": 13.75
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse",
+    "text": "",
+    "rect": {
+      "x": 337,
+      "y": 29,
+      "w": 10,
+      "h": 10
+    },
+    "styles": {
+      "display": "block",
+      "position": "absolute",
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgb(239, 68, 68)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "9999px",
+      "boxShadow": "none",
+      "background": "rgb(239, 68, 68) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "main",
+    "id": "",
+    "class": "flex-1 overflow-y-auto ",
+    "text": "지원이 승인되었습니다\n1시간 전\n\n'뮤지컬 <웃는 남자> 오디션' 지원이 승인되었습니다. 오디션 일정을 확인하세요.\n\n읽음 표시\n삭제\n공고가 수정되었습니다\n2시간 전\n\n지원한 '뮤",
+    "rect": {
+      "x": 0,
+      "y": 88,
+      "w": 375,
+      "h": 724
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "p-4",
+    "text": "지원이 승인되었습니다\n1시간 전\n\n'뮤지컬 <웃는 남자> 오디션' 지원이 승인되었습니다. 오디션 일정을 확인하세요.\n\n읽음 표시\n삭제\n공고가 수정되었습니다\n2시간 전\n\n지원한 '뮤",
+    "rect": {
+      "x": 0,
+      "y": 88,
+      "w": 375,
+      "h": 492.5
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "16px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "space-y-3",
+    "text": "지원이 승인되었습니다\n1시간 전\n\n'뮤지컬 <웃는 남자> 오디션' 지원이 승인되었습니다. 오디션 일정을 확인하세요.\n\n읽음 표시\n삭제\n공고가 수정되었습니다\n2시간 전\n\n지원한 '뮤",
+    "rect": {
+      "x": 16,
+      "y": 104,
+      "w": 343,
+      "h": 460.5
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "rounded-2xl p-4 transition-all duration-200 cursor-pointer border-2 bg-gradient-to-br from-white to-gray-50 shadow-lg border-transparent",
+    "text": "지원이 승인되었습니다\n1시간 전\n\n'뮤지컬 <웃는 남자> 오디션' 지원이 승인되었습니다. 오디션 일정을 확인하세요.\n\n읽음 표시\n삭제",
+    "rect": {
+      "x": 16,
+      "y": 104,
+      "w": 343,
+      "h": 145.5
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "16px",
+      "margin": "0px",
+      "borderRadius": "16px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px",
+      "background": "rgba(0, 0, 0, 0) linear-gradient(to right bottom, rgb(255, 255, 255), rgb(249, 250, 251)) repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "linear-gradient(to right bottom, rgb(255, 255, 255), rgb(249, 250, 251))"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex gap-3",
+    "text": "지원이 승인되었습니다\n1시간 전\n\n'뮤지컬 <웃는 남자> 오디션' 지원이 승인되었습니다. 오디션 일정을 확인하세요.\n\n읽음 표시\n삭제",
+    "rect": {
+      "x": 34,
+      "y": 122,
+      "w": 307,
+      "h": 109.5
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm",
+    "text": "",
+    "rect": {
+      "x": 34,
+      "y": 122,
+      "w": 40,
+      "h": 40
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(16, 185, 129)",
+      "bgColor": "rgba(16, 185, 129, 0.082)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "12px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "background": "rgba(16, 185, 129, 0.082) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 44,
+      "y": 132,
+      "w": 20,
+      "h": 20
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(16, 185, 129)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "circle",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 45.66666793823242,
+      "y": 133.6666717529297,
+      "w": 16.666667938232422,
+      "h": 16.666656494140625
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(16, 185, 129)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 51.5,
+      "y": 140.3333282470703,
+      "w": 5,
+      "h": 3.333343505859375
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(16, 185, 129)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex-1 min-w-0",
+    "text": "지원이 승인되었습니다\n1시간 전\n\n'뮤지컬 <웃는 남자> 오디션' 지원이 승인되었습니다. 오디션 일정을 확인하세요.\n\n읽음 표시\n삭제",
+    "rect": {
+      "x": 86,
+      "y": 122,
+      "w": 233,
+      "h": 109.5
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex items-start justify-between gap-2 mb-1",
+    "text": "지원이 승인되었습니다\n1시간 전",
+    "rect": {
+      "x": 86,
+      "y": 122,
+      "w": 233,
+      "h": 20
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px 0px 4px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "h3",
+    "id": "",
+    "class": "font-bold text-sm text-gray-900 flex-1",
+    "text": "지원이 승인되었습니다",
+    "rect": {
+      "x": 86,
+      "y": 122,
+      "w": 184.9140625,
+      "h": 20
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(17, 24, 39)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "700",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-xs text-gray-500 flex-shrink-0",
+    "text": "1시간 전",
+    "rect": {
+      "x": 278.9140625,
+      "y": 122,
+      "w": 40.0859375,
+      "h": 16
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "p",
+    "id": "",
+    "class": "text-sm text-gray-600 leading-relaxed mb-3",
+    "text": "'뮤지컬 <웃는 남자> 오디션' 지원이 승인되었습니다. 오디션 일정을 확인하세요.",
+    "rect": {
+      "x": 86,
+      "y": 146,
+      "w": 233,
+      "h": 45.5
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px 0px 12px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex items-center gap-2",
+    "text": "읽음 표시\n삭제",
+    "rect": {
+      "x": 86,
+      "y": 203.5,
+      "w": 233,
+      "h": 28
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "button",
+    "id": "",
+    "class": "text-xs font-medium px-3 py-1.5 rounded-lg transition-colors",
+    "text": "읽음 표시",
+    "rect": {
+      "x": 86,
+      "y": 203.5,
+      "w": 68.8046875,
+      "h": 28
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(46, 125, 50, 0.082)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "6px 12px",
+      "margin": "0px",
+      "borderRadius": "8px",
+      "boxShadow": "none",
+      "background": "rgba(46, 125, 50, 0.082) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "button",
+    "id": "",
+    "class": "text-xs font-medium px-3 py-1.5 rounded-lg transition-colors bg-red-50 text-red-600 hover:bg-red-100 flex items-center gap-1",
+    "text": "삭제",
+    "rect": {
+      "x": 162.8046875,
+      "y": 203.5,
+      "w": 60.765625,
+      "h": 28
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(220, 38, 38)",
+      "bgColor": "rgb(254, 226, 226)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "6px 12px",
+      "margin": "0px",
+      "borderRadius": "8px",
+      "boxShadow": "none",
+      "background": "rgb(254, 226, 226) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 174.8046875,
+      "y": 211.5,
+      "w": 12,
+      "h": 12
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(220, 38, 38)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 177.3046875,
+      "y": 214.5,
+      "w": 7,
+      "h": 8
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(220, 38, 38)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 178.8046875,
+      "y": 212.5,
+      "w": 4,
+      "h": 2
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(220, 38, 38)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1 animate-pulse",
+    "text": "",
+    "rect": {
+      "x": 331,
+      "y": 126,
+      "w": 10,
+      "h": 10
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(46, 125, 50)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "4px 0px 0px",
+      "borderRadius": "9999px",
+      "boxShadow": "none",
+      "background": "rgb(46, 125, 50) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "rounded-2xl p-4 transition-all duration-200 cursor-pointer border-2 bg-white border-gray-100 shadow-sm",
+    "text": "공고가 수정되었습니다\n2시간 전\n\n지원한 '뮤지컬 <레미제라블> 배우 모집' 공고의 오디션 일정이 변경되었습니다.\n\n삭제",
+    "rect": {
+      "x": 16,
+      "y": 261.5,
+      "w": 343,
+      "h": 145.5
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(255, 255, 255)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "16px",
+      "margin": "12px 0px 0px",
+      "borderRadius": "16px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "background": "rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex gap-3",
+    "text": "공고가 수정되었습니다\n2시간 전\n\n지원한 '뮤지컬 <레미제라블> 배우 모집' 공고의 오디션 일정이 변경되었습니다.\n\n삭제",
+    "rect": {
+      "x": 34,
+      "y": 279.5,
+      "w": 307,
+      "h": 109.5
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm",
+    "text": "",
+    "rect": {
+      "x": 34,
+      "y": 279.5,
+      "w": 40,
+      "h": 40
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(245, 158, 11)",
+      "bgColor": "rgba(245, 158, 11, 0.082)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "12px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "background": "rgba(245, 158, 11, 0.082) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 44,
+      "y": 289.5,
+      "w": 20,
+      "h": 20
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(245, 158, 11)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 45.66672134399414,
+      "y": 291.1663513183594,
+      "w": 16.66651153564453,
+      "h": 16.666290283203125
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(245, 158, 11)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex-1 min-w-0",
+    "text": "공고가 수정되었습니다\n2시간 전\n\n지원한 '뮤지컬 <레미제라블> 배우 모집' 공고의 오디션 일정이 변경되었습니다.\n\n삭제",
+    "rect": {
+      "x": 86,
+      "y": 279.5,
+      "w": 255,
+      "h": 109.5
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex items-start justify-between gap-2 mb-1",
+    "text": "공고가 수정되었습니다\n2시간 전",
+    "rect": {
+      "x": 86,
+      "y": 279.5,
+      "w": 255,
+      "h": 20
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px 0px 4px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "h3",
+    "id": "",
+    "class": "font-bold text-sm text-gray-900 flex-1",
+    "text": "공고가 수정되었습니다",
+    "rect": {
+      "x": 86,
+      "y": 279.5,
+      "w": 205.2421875,
+      "h": 20
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(17, 24, 39)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "700",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-xs text-gray-500 flex-shrink-0",
+    "text": "2시간 전",
+    "rect": {
+      "x": 299.2421875,
+      "y": 279.5,
+      "w": 41.7578125,
+      "h": 16
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "p",
+    "id": "",
+    "class": "text-sm text-gray-600 leading-relaxed mb-3",
+    "text": "지원한 '뮤지컬 <레미제라블> 배우 모집' 공고의 오디션 일정이 변경되었습니다.",
+    "rect": {
+      "x": 86,
+      "y": 303.5,
+      "w": 255,
+      "h": 45.5
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px 0px 12px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex items-center gap-2",
+    "text": "삭제",
+    "rect": {
+      "x": 86,
+      "y": 361,
+      "w": 255,
+      "h": 28
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "button",
+    "id": "",
+    "class": "text-xs font-medium px-3 py-1.5 rounded-lg transition-colors bg-red-50 text-red-600 hover:bg-red-100 flex items-center gap-1",
+    "text": "삭제",
+    "rect": {
+      "x": 86,
+      "y": 361,
+      "w": 60.765625,
+      "h": 28
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(220, 38, 38)",
+      "bgColor": "rgb(254, 242, 242)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "6px 12px",
+      "margin": "0px",
+      "borderRadius": "8px",
+      "boxShadow": "none",
+      "background": "rgb(254, 242, 242) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 98,
+      "y": 369,
+      "w": 12,
+      "h": 12
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(220, 38, 38)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 100.5,
+      "y": 372,
+      "w": 7,
+      "h": 8
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(220, 38, 38)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 102,
+      "y": 370,
+      "w": 4,
+      "h": 2
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(220, 38, 38)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "rounded-2xl p-4 transition-all duration-200 cursor-pointer border-2 bg-white border-gray-100 shadow-sm",
+    "text": "지원이 거절되었습니다\n어제\n\n'뮤지컬 <캣츠> 앙상블 모집' 지원이 거절되었습니다.\n\n삭제",
+    "rect": {
+      "x": 16,
+      "y": 419,
+      "w": 343,
+      "h": 145.5
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(255, 255, 255)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "16px",
+      "margin": "12px 0px 0px",
+      "borderRadius": "16px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "background": "rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex gap-3",
+    "text": "지원이 거절되었습니다\n어제\n\n'뮤지컬 <캣츠> 앙상블 모집' 지원이 거절되었습니다.\n\n삭제",
+    "rect": {
+      "x": 34,
+      "y": 437,
+      "w": 307,
+      "h": 109.5
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm",
+    "text": "",
+    "rect": {
+      "x": 34,
+      "y": 437,
+      "w": 40,
+      "h": 40
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(239, 68, 68)",
+      "bgColor": "rgba(239, 68, 68, 0.082)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "12px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "background": "rgba(239, 68, 68, 0.082) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 44,
+      "y": 447,
+      "w": 20,
+      "h": 20
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(239, 68, 68)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "circle",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 45.66666793823242,
+      "y": 448.6666564941406,
+      "w": 16.666667938232422,
+      "h": 16.66668701171875
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(239, 68, 68)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 51.5,
+      "y": 454.5,
+      "w": 5,
+      "h": 5
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(239, 68, 68)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 51.5,
+      "y": 454.5,
+      "w": 5,
+      "h": 5
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(239, 68, 68)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex-1 min-w-0",
+    "text": "지원이 거절되었습니다\n어제\n\n'뮤지컬 <캣츠> 앙상블 모집' 지원이 거절되었습니다.\n\n삭제",
+    "rect": {
+      "x": 86,
+      "y": 437,
+      "w": 255,
+      "h": 109.5
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex items-start justify-between gap-2 mb-1",
+    "text": "지원이 거절되었습니다\n어제",
+    "rect": {
+      "x": 86,
+      "y": 437,
+      "w": 255,
+      "h": 20
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px 0px 4px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "h3",
+    "id": "",
+    "class": "font-bold text-sm text-gray-900 flex-1",
+    "text": "지원이 거절되었습니다",
+    "rect": {
+      "x": 86,
+      "y": 437,
+      "w": 226.234375,
+      "h": 20
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(17, 24, 39)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "700",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "span",
+    "id": "",
+    "class": "text-xs text-gray-500 flex-shrink-0",
+    "text": "어제",
+    "rect": {
+      "x": 320.234375,
+      "y": 437,
+      "w": 20.765625,
+      "h": 16
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "p",
+    "id": "",
+    "class": "text-sm text-gray-600 leading-relaxed mb-3",
+    "text": "'뮤지컬 <캣츠> 앙상블 모집' 지원이 거절되었습니다.",
+    "rect": {
+      "x": 86,
+      "y": 461,
+      "w": 255,
+      "h": 45.5
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px 0px 12px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "flex items-center gap-2",
+    "text": "삭제",
+    "rect": {
+      "x": 86,
+      "y": 518.5,
+      "w": 255,
+      "h": 28
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "button",
+    "id": "",
+    "class": "text-xs font-medium px-3 py-1.5 rounded-lg transition-colors bg-red-50 text-red-600 hover:bg-red-100 flex items-center gap-1",
+    "text": "삭제",
+    "rect": {
+      "x": 86,
+      "y": 518.5,
+      "w": 60.765625,
+      "h": 28
+    },
+    "styles": {
+      "display": "flex",
+      "position": "static",
+      "color": "rgb(220, 38, 38)",
+      "bgColor": "rgb(254, 242, 242)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "6px 12px",
+      "margin": "0px",
+      "borderRadius": "8px",
+      "boxShadow": "none",
+      "background": "rgb(254, 242, 242) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "svg",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 98,
+      "y": 526.5,
+      "w": 12,
+      "h": 12
+    },
+    "styles": {
+      "display": "block",
+      "position": "static",
+      "color": "rgb(220, 38, 38)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 100.5,
+      "y": 529.5,
+      "w": 7,
+      "h": 8
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(220, 38, 38)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "path",
+    "id": "",
+    "class": {},
+    "rect": {
+      "x": 102,
+      "y": 527.5,
+      "w": 4,
+      "h": 2
+    },
+    "styles": {
+      "display": "inline",
+      "position": "static",
+      "color": "rgb(220, 38, 38)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  },
+  {
+    "tag": "div",
+    "id": "",
+    "class": "",
+    "text": "",
+    "rect": {
+      "x": 195,
+      "y": 776,
+      "w": 172,
+      "h": 28
+    },
+    "styles": {
+      "display": "block",
+      "position": "fixed",
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "padding": "0px",
+      "margin": "0px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "backgroundImage": "none"
+    }
+  }
+]

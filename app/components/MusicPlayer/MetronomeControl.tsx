@@ -1,245 +1,227 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import Slider from '@react-native-community/slider';
+import React from 'react'
+import { View, StyleSheet, TouchableOpacity } from 'react-native'
+import Slider from '@react-native-community/slider'
+import { OrphiButton, OrphiText, OrphiBadge, orphiTokens } from '@/design-system'
+import { BPM_RANGE } from '@/core/types/audio.types'
+import { useTheme } from '@/core/context/ThemeContext'
 
 interface MetronomeControlProps {
-  enabled: boolean;
-  bpm: number;
-  volume: number;
-  currentBeat: number;
-  totalBeats: number;
-  isReady: boolean;
-  error: string | null;
-  onToggle: () => void;
-  onBpmChange: (bpm: number) => void;
-  onVolumeChange: (volume: number) => void;
+  enabled: boolean
+  bpm: number
+  volume: number
+  currentBeat: number
+  totalBeats: number
+  onToggle: () => void
+  onBpmChange: (bpm: number) => void
+  onVolumeChange: (volume: number) => void
+  isReady?: boolean
 }
 
-/**
- * 메트로놈 컨트롤 UI 컴포넌트
- *
- * 메트로놈 ON/OFF, BPM, 볼륨 조절 및 현재 박자 시각화를 제공합니다.
- *
- * @param enabled - 메트로놈 활성화 여부
- * @param bpm - 현재 BPM 값
- * @param volume - 현재 볼륨 값 (0.0-1.0)
- * @param currentBeat - 현재 박자 (0부터 시작)
- * @param totalBeats - 전체 박자 수
- * @param isReady - 메트로놈 준비 상태
- * @param error - 에러 메시지
- * @param onToggle - ON/OFF 토글 핸들러
- * @param onBpmChange - BPM 변경 핸들러
- * @param onVolumeChange - 볼륨 변경 핸들러
- */
 export const MetronomeControl: React.FC<MetronomeControlProps> = ({
   enabled,
   bpm,
   volume,
   currentBeat,
   totalBeats,
-  isReady,
-  error,
   onToggle,
   onBpmChange,
   onVolumeChange,
+  isReady = true,
 }) => {
+  const { currentTheme } = useTheme()
+
+  const handleBpmIncrement = () => {
+    if (bpm < BPM_RANGE.MAX) {
+      onBpmChange(Math.min(bpm + 5, BPM_RANGE.MAX))
+    }
+  }
+
+  const handleBpmDecrement = () => {
+    if (bpm > BPM_RANGE.MIN) {
+      onBpmChange(Math.max(bpm - 5, BPM_RANGE.MIN))
+    }
+  }
+
+  // 박자 표시 (1-based)
+  const beats = Array.from({ length: totalBeats }, (_, i) => i)
+
   return (
     <View style={styles.container}>
-      {/* 헤더 */}
       <View style={styles.header}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>메트로놈</Text>
-          {!isReady && <Text style={styles.loadingText}>로딩 중...</Text>}
-          {error && <Text style={styles.errorText}>⚠️ 무음 모드</Text>}
+        <OrphiText variant="h4">메트로놈</OrphiText>
+        {enabled && isReady && (
+          <OrphiBadge variant="success">활성화</OrphiBadge>
+        )}
+        {!isReady && (
+          <OrphiBadge variant="warning">준비 중...</OrphiBadge>
+        )}
+      </View>
+
+      {/* 박자 시각화 */}
+      {enabled && (
+        <View style={styles.beatIndicator}>
+          {beats.map((beat) => (
+            <View
+              key={beat}
+              style={[
+                styles.beatDot,
+                beat === currentBeat && [
+                  styles.beatDotActive,
+                  { backgroundColor: currentTheme.colors.primary600 },
+                ],
+              ]}
+            />
+          ))}
         </View>
-        <TouchableOpacity
-          style={[styles.toggleButton, enabled && styles.toggleButtonActive]}
-          onPress={onToggle}
-          disabled={!isReady}
-        >
-          <Text style={styles.toggleText}>{enabled ? 'ON' : 'OFF'}</Text>
-        </TouchableOpacity>
+      )}
+
+      {/* BPM 조절 */}
+      <View style={styles.bpmContainer}>
+        <OrphiText variant="body" color="gray600">
+          BPM
+        </OrphiText>
+        <View style={styles.bpmControls}>
+          <TouchableOpacity
+            onPress={handleBpmDecrement}
+            disabled={!enabled || bpm <= BPM_RANGE.MIN}
+            style={[
+              styles.bpmButton,
+              { backgroundColor: currentTheme.colors.primary600 },
+              (!enabled || bpm <= BPM_RANGE.MIN) && styles.bpmButtonDisabled,
+            ]}
+          >
+            <OrphiText variant="body">-</OrphiText>
+          </TouchableOpacity>
+
+          <OrphiText variant="h3" style={styles.bpmValue}>
+            {bpm}
+          </OrphiText>
+
+          <TouchableOpacity
+            onPress={handleBpmIncrement}
+            disabled={!enabled || bpm >= BPM_RANGE.MAX}
+            style={[
+              styles.bpmButton,
+              { backgroundColor: currentTheme.colors.primary600 },
+              (!enabled || bpm >= BPM_RANGE.MAX) && styles.bpmButtonDisabled,
+            ]}
+          >
+            <OrphiText variant="body">+</OrphiText>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* BPM 슬라이더 */}
-      <View style={styles.control}>
-        <Text style={styles.label}>템포</Text>
+      <View style={styles.sliderContainer}>
         <Slider
           style={styles.slider}
-          minimumValue={40}
-          maximumValue={240}
-          step={1}
+          minimumValue={BPM_RANGE.MIN}
+          maximumValue={BPM_RANGE.MAX}
           value={bpm}
-          onValueChange={onBpmChange}
-          minimumTrackTintColor="#007AFF"
-          maximumTrackTintColor="#ddd"
-          disabled={!enabled || !isReady}
-          thumbTintColor={enabled && isReady ? '#007AFF' : '#ccc'}
+          onSlidingComplete={onBpmChange}
+          step={1}
+          minimumTrackTintColor={currentTheme.colors.primary600}
+          maximumTrackTintColor={orphiTokens.colors.gray400}
+          thumbTintColor={currentTheme.colors.primary600}
+          disabled={!enabled}
         />
-        <Text style={styles.value}>{bpm} BPM</Text>
       </View>
 
-      {/* 볼륨 슬라이더 */}
-      <View style={styles.control}>
-        <Text style={styles.label}>볼륨</Text>
-        <Slider
-          style={styles.slider}
-          minimumValue={0}
-          maximumValue={1}
-          step={0.01}
-          value={volume}
-          onValueChange={onVolumeChange}
-          minimumTrackTintColor="#007AFF"
-          maximumTrackTintColor="#ddd"
-          disabled={!enabled || !isReady}
-          thumbTintColor={enabled && isReady ? '#007AFF' : '#ccc'}
-        />
-        <Text style={styles.value}>{Math.round(volume * 100)}%</Text>
-      </View>
-
-      {/* 박자 표시기 */}
-      {enabled && isReady && (
-        <View style={styles.beatIndicatorContainer}>
-          <Text style={styles.beatLabel}>박자</Text>
-          <View style={styles.beatIndicator}>
-            {Array.from({ length: totalBeats }, (_, i) => (
-              <View
-                key={i}
-                style={[
-                  styles.beat,
-                  i === currentBeat && styles.beatActive,
-                  i === 0 && styles.beatFirst,
-                  i > 0 && { marginLeft: 8 },
-                ]}
-              />
-            ))}
-          </View>
+      {/* 볼륨 조절 */}
+      {enabled && (
+        <View style={styles.volumeContainer}>
+          <OrphiText variant="caption" color="gray600">
+            볼륨: {Math.round(volume * 100)}%
+          </OrphiText>
+          <Slider
+            style={styles.slider}
+            minimumValue={0}
+            maximumValue={1}
+            value={volume}
+            onSlidingComplete={onVolumeChange}
+            step={0.1}
+            minimumTrackTintColor={currentTheme.colors.primary600}
+            maximumTrackTintColor={orphiTokens.colors.gray400}
+            thumbTintColor={currentTheme.colors.primary600}
+          />
         </View>
       )}
 
-      {/* 도움말 */}
-      {!error && (
-        <Text style={styles.hint}>
-          💡 BPM 40-240 범위로 조절 가능합니다.
-        </Text>
-      )}
-      {error && (
-        <Text style={styles.hint}>
-          ℹ️ 사운드 파일이 없어도 박자는 시각적으로 표시됩니다.
-          {'\n'}app/assets/sounds/README.md를 참고하세요.
-        </Text>
-      )}
+      {/* 토글 버튼 */}
+      <OrphiButton
+        variant={enabled ? 'secondary' : 'primary'}
+        onPress={onToggle}
+        disabled={!isReady}
+      >
+        {enabled ? '메트로놈 끄기' : '메트로놈 켜기'}
+      </OrphiButton>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#f9f9f9',
-    padding: 15,
-    borderRadius: 10,
-    marginVertical: 10,
+    paddingVertical: orphiTokens.spacing.md,
+    paddingHorizontal: orphiTokens.spacing.base,
+    backgroundColor: orphiTokens.colors.gray50,
+    borderRadius: orphiTokens.borderRadius.md,
+    marginHorizontal: orphiTokens.spacing.base,
+    marginVertical: orphiTokens.spacing.sm,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: orphiTokens.spacing.md,
   },
-  titleContainer: {
+  beatIndicator: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: orphiTokens.spacing.sm,
+    marginBottom: orphiTokens.spacing.md,
+  },
+  beatDot: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: orphiTokens.colors.gray400,
+  },
+  beatDotActive: {
+    transform: [{ scale: 1.3 }],
+  },
+  bpmContainer: {
+    marginBottom: orphiTokens.spacing.sm,
+  },
+  bpmControls: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: orphiTokens.spacing.md,
+    marginTop: orphiTokens.spacing.sm,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  loadingText: {
-    fontSize: 12,
-    color: '#999',
-    fontStyle: 'italic',
-  },
-  errorText: {
-    fontSize: 12,
-    color: '#FF9500',
-    fontWeight: 'bold',
-  },
-  toggleButton: {
-    backgroundColor: '#ccc',
-    paddingHorizontal: 20,
-    paddingVertical: 8,
+  bpmButton: {
+    width: 40,
+    height: 40,
     borderRadius: 20,
-    minWidth: 60,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  toggleButtonActive: {
-    backgroundColor: '#34C759',
+  bpmButtonDisabled: {
+    backgroundColor: orphiTokens.colors.gray400,
+    opacity: 0.5,
   },
-  toggleText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 14,
+  bpmValue: {
+    minWidth: 60,
+    textAlign: 'center',
   },
-  control: {
-    marginBottom: 15,
-  },
-  label: {
-    fontSize: 14,
-    marginBottom: 5,
-    color: '#666',
-    fontWeight: '600',
+  sliderContainer: {
+    marginBottom: orphiTokens.spacing.sm,
   },
   slider: {
     width: '100%',
     height: 40,
   },
-  value: {
-    textAlign: 'center',
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#007AFF',
+  volumeContainer: {
+    marginBottom: orphiTokens.spacing.md,
   },
-  beatIndicatorContainer: {
-    marginTop: 10,
-    marginBottom: 15,
-  },
-  beatLabel: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '600',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  beatIndicator: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  beat: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#ddd',
-  },
-  beatActive: {
-    backgroundColor: '#007AFF',
-    transform: [{ scale: 1.3 }],
-    shadowColor: '#007AFF',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  beatFirst: {
-    borderWidth: 2,
-    borderColor: '#FF3B30',
-  },
-  hint: {
-    fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
-    marginTop: 5,
-    lineHeight: 18,
-  },
-});
+})

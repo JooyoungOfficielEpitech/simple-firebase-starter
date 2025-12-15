@@ -1,289 +1,516 @@
-import React from "react"
-import { View, Modal, ScrollView, TouchableOpacity, Switch } from "react-native"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { useNavigation, useRoute } from "@react-navigation/native"
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import type { RouteProp } from "@react-navigation/native"
+import React, { useState } from 'react'
+import { View, StyleSheet, ScrollView, TextInput, Alert } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import { OrphiHeader, OrphiText, OrphiCard, OrphiButton, orphiTokens } from '@/design-system'
+import { postService } from '@/core/services/firestore'
+import auth from '@react-native-firebase/auth'
+import firestore from '@react-native-firebase/firestore'
 
-import { Button } from "@/components/Button"
-import { Screen } from "@/components/Screen"
-import { ScreenHeader } from "@/components/ScreenHeader"
-import { Text } from "@/components/Text"
-import { AlertModal } from "@/components/AlertModal"
-import { useAppTheme } from "@/theme/context"
-import { useAlert } from "@/hooks/useAlert"
-import { useCreatePostForm } from "@/hooks/useCreatePostForm"
-import { BulletinBoardStackParamList } from "@/navigators/types"
-import { POST_TEMPLATES } from "@/utils/postTemplates"
+export const CreatePostScreen: React.FC = () => {
+  const navigation = useNavigation()
 
-// Sub-components
-import { ModeSelector } from "@/components/CreatePost/ModeSelector"
-import { BasicInfoSection } from "@/components/CreatePost/BasicInfoSection"
-import { RoleSection } from "@/components/CreatePost/RoleSection"
-import { AuditionSection } from "@/components/CreatePost/AuditionSection"
-import { BenefitsSection } from "@/components/CreatePost/BenefitsSection"
-import { ContactSection } from "@/components/CreatePost/ContactSection"
-import { ImageUpload } from "@/components/CreatePost/ImageUpload"
+  // 기본 정보
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [production, setProduction] = useState('')
+  const [organizationName, setOrganizationName] = useState('')
+  const [location, setLocation] = useState('')
+  const [rehearsalSchedule, setRehearsalSchedule] = useState('')
+  const [deadline, setDeadline] = useState('')
+  const [tags, setTags] = useState('')
 
-// Styles
-import * as styles from "./CreatePostScreen.styles"
+  // 역할 정보 (간단한 버전)
+  const [roleName, setRoleName] = useState('')
+  const [roleGender, setRoleGender] = useState<'male' | 'female' | 'any'>('any')
+  const [roleAgeRange, setRoleAgeRange] = useState('')
+  const [roleRequirements, setRoleRequirements] = useState('')
+  const [roleCount, setRoleCount] = useState('1')
 
-type NavigationProp = NativeStackNavigationProp<BulletinBoardStackParamList>
-type RoutePropType = RouteProp<BulletinBoardStackParamList, "CreatePost">
+  // 오디션 정보
+  const [auditionDate, setAuditionDate] = useState('')
+  const [auditionLocation, setAuditionLocation] = useState('')
+  const [auditionMethod, setAuditionMethod] = useState('대면')
 
-export const CreatePostScreen = () => {
-  useSafeAreaInsets()
-  const navigation = useNavigation<NavigationProp>()
-  const route = useRoute<RoutePropType>()
-  const params = route.params || {}
-  const postId = params.postId
-  const isEdit = params.isEdit
-  
-  const appTheme = useAppTheme()
-  const themed = appTheme.themed
-  const colors = appTheme.theme.colors
+  // 연락처
+  const [contactEmail, setContactEmail] = useState('')
+  const [contactPhone, setContactPhone] = useState('')
+  const [applicationMethod, setApplicationMethod] = useState('')
 
-  const alertHook = useAlert()
+  const [loading, setLoading] = useState(false)
 
-  const formHook = useCreatePostForm({
-    postId,
-    isEdit,
-    onSuccess: (message) => alertHook.alert("성공", message),
-    onError: (title, message) => alertHook.alert(title, message),
-    onNavigateBack: () => navigation.goBack(),
-  })
-
-  // Loading state
-  if (!formHook.userProfile) {
-    return (
-      <Screen preset="fixed" safeAreaEdges={[]}>
-        <ScreenHeader title="게시글 작성" />
-        <View style={themed(styles.$container)}>
-          <View style={themed(styles.$centerContainer) as any}>
-            <Text text="사용자 정보를 불러오는 중..." style={themed(styles.$messageText) as any} />
-          </View>
-        </View>
-      </Screen>
-    )
+  const validateForm = (): boolean => {
+    if (!title.trim()) {
+      Alert.alert('오류', '제목을 입력해주세요')
+      return false
+    }
+    if (!description.trim()) {
+      Alert.alert('오류', '상세 설명을 입력해주세요')
+      return false
+    }
+    if (!production.trim()) {
+      Alert.alert('오류', '작품명을 입력해주세요')
+      return false
+    }
+    if (!organizationName.trim()) {
+      Alert.alert('오류', '단체명을 입력해주세요')
+      return false
+    }
+    if (!location.trim()) {
+      Alert.alert('오류', '장소를 입력해주세요')
+      return false
+    }
+    if (!rehearsalSchedule.trim()) {
+      Alert.alert('오류', '연습 일정을 입력해주세요')
+      return false
+    }
+    if (!contactEmail.trim()) {
+      Alert.alert('오류', '연락처 이메일을 입력해주세요')
+      return false
+    }
+    return true
   }
 
-  // Non-organizer state
-  if (formHook.userProfile.userType !== "organizer") {
-    return (
-      <Screen preset="fixed" safeAreaEdges={[]}>
-        <ScreenHeader title="게시글 작성" />
-        <View style={themed(styles.$container)}>
-          <View style={themed(styles.$centerContainer) as any}>
-            <Text text="단체 운영자만 게시글을 작성할 수 있습니다." style={themed(styles.$messageText) as any} />
-            <Text text={"현재 사용자 타입: " + formHook.userProfile.userType} style={themed(styles.$debugInfoText) as any} />
-            <Button
-              text="설정에서 운영자로 전환"
-              onPress={() => navigation.navigate("Settings" as any)}
-              style={themed(styles.$convertButton)}
-            />
-          </View>
-        </View>
-      </Screen>
-    )
-  }
+  const handleSubmit = async () => {
+    if (!validateForm()) return
 
-  const completeness = formHook.calculateCompleteness()
+    const user = auth().currentUser
+    if (!user) {
+      Alert.alert('오류', '로그인이 필요합니다')
+      return
+    }
+
+    try {
+      setLoading(true)
+      console.log('📝 공고 작성 시작...')
+
+      // 역할 정보 구성
+      const roles = roleName.trim()
+        ? [
+            {
+              name: roleName,
+              gender: roleGender,
+              ageRange: roleAgeRange || '무관',
+              requirements: roleRequirements || '없음',
+              count: parseInt(roleCount) || 1,
+            },
+          ]
+        : undefined
+
+      // 오디션 정보 구성
+      const audition =
+        auditionDate && auditionLocation
+          ? {
+              date: auditionDate,
+              location: auditionLocation,
+              method: auditionMethod,
+              requirements: [],
+              resultDate: '',
+            }
+          : undefined
+
+      // 연락처 정보 구성
+      const contact = {
+        email: contactEmail,
+        phone: contactPhone || undefined,
+        applicationMethod: applicationMethod || '이메일',
+        requiredDocuments: [],
+      }
+
+      // 태그 배열 생성
+      const tagArray = tags
+        .split(',')
+        .map((tag) => tag.trim())
+        .filter((tag) => tag.length > 0)
+
+      const postData = {
+        title: title.trim(),
+        description: description.trim(),
+        production: production.trim(),
+        organizationName: organizationName.trim(),
+        location: location.trim(),
+        rehearsalSchedule: rehearsalSchedule.trim(),
+        status: 'active' as const,
+        tags: tagArray.length > 0 ? tagArray : ['뮤지컬'],
+        deadline: deadline || undefined,
+        roles,
+        audition,
+        contact,
+        createdAt: firestore.FieldValue.serverTimestamp(),
+        updatedAt: firestore.FieldValue.serverTimestamp(),
+      }
+
+      const postId = await postService.createPost(postData, user.displayName || '익명', user.uid)
+
+      console.log('✅ 공고 작성 완료:', postId)
+
+      Alert.alert('성공', '공고가 등록되었습니다', [
+        {
+          text: '확인',
+          onPress: () => {
+            navigation.goBack()
+          },
+        },
+      ])
+    } catch (error) {
+      console.error('❌ 공고 작성 실패:', error)
+      Alert.alert('오류', '공고 작성에 실패했습니다')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
-    <Screen preset="scroll" safeAreaEdges={[]}>
-      <ScreenHeader title={isEdit ? "게시글 수정" : "게시글 작성"} />
-      <View style={themed(styles.$container)}>
-        <ModeSelector 
-          postMode={formHook.postMode} 
-          onModeChange={formHook.setPostMode} 
-          isEdit={isEdit} 
-        />
+    <View style={styles.container}>
+      <OrphiHeader title="공고 작성" showBack onBackPress={() => navigation.goBack()} />
 
-        {formHook.postMode === 'text' && (
-          <View style={themed(styles.$templateSection)}>
-            <Text text="⚡ 빠른 작성" style={themed(styles.$sectionHeader)} />
-            <TouchableOpacity 
-              style={themed(styles.$templateButton)}
-              onPress={() => formHook.setShowTemplateModal(true)}
-              activeOpacity={0.7}
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+        {/* 기본 정보 */}
+        <OrphiCard style={styles.section}>
+          <OrphiText variant="h4" style={styles.sectionTitle}>
+            기본 정보
+          </OrphiText>
+
+          <OrphiText variant="body" style={styles.label}>
+            제목 *
+          </OrphiText>
+          <TextInput
+            style={styles.input}
+            value={title}
+            onChangeText={setTitle}
+            placeholder="예: 뮤지컬 '햄릿' 주연 배우 모집"
+            placeholderTextColor={orphiTokens.colors.gray500}
+          />
+
+          <OrphiText variant="body" style={styles.label}>
+            작품명 *
+          </OrphiText>
+          <TextInput
+            style={styles.input}
+            value={production}
+            onChangeText={setProduction}
+            placeholder="예: 햄릿"
+            placeholderTextColor={orphiTokens.colors.gray500}
+          />
+
+          <OrphiText variant="body" style={styles.label}>
+            단체명 *
+          </OrphiText>
+          <TextInput
+            style={styles.input}
+            value={organizationName}
+            onChangeText={setOrganizationName}
+            placeholder="예: 서울뮤지컬단"
+            placeholderTextColor={orphiTokens.colors.gray500}
+          />
+
+          <OrphiText variant="body" style={styles.label}>
+            장소 *
+          </OrphiText>
+          <TextInput
+            style={styles.input}
+            value={location}
+            onChangeText={setLocation}
+            placeholder="예: 건대입구역 앞 연습실"
+            placeholderTextColor={orphiTokens.colors.gray500}
+          />
+
+          <OrphiText variant="body" style={styles.label}>
+            연습 일정 *
+          </OrphiText>
+          <TextInput
+            style={styles.input}
+            value={rehearsalSchedule}
+            onChangeText={setRehearsalSchedule}
+            placeholder="예: 매주 일요일 오후 2시"
+            placeholderTextColor={orphiTokens.colors.gray500}
+          />
+
+          <OrphiText variant="body" style={styles.label}>
+            마감일
+          </OrphiText>
+          <TextInput
+            style={styles.input}
+            value={deadline}
+            onChangeText={setDeadline}
+            placeholder="예: 2025-01-31"
+            placeholderTextColor={orphiTokens.colors.gray500}
+          />
+
+          <OrphiText variant="body" style={styles.label}>
+            태그 (쉼표로 구분)
+          </OrphiText>
+          <TextInput
+            style={styles.input}
+            value={tags}
+            onChangeText={setTags}
+            placeholder="예: 뮤지컬, 남성역할, 주연"
+            placeholderTextColor={orphiTokens.colors.gray500}
+          />
+        </OrphiCard>
+
+        {/* 상세 설명 */}
+        <OrphiCard style={styles.section}>
+          <OrphiText variant="h4" style={styles.sectionTitle}>
+            상세 설명 *
+          </OrphiText>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            value={description}
+            onChangeText={setDescription}
+            placeholder="공고에 대한 상세한 설명을 입력해주세요"
+            placeholderTextColor={orphiTokens.colors.gray500}
+            multiline
+            numberOfLines={6}
+            textAlignVertical="top"
+          />
+        </OrphiCard>
+
+        {/* 모집 역할 */}
+        <OrphiCard style={styles.section}>
+          <OrphiText variant="h4" style={styles.sectionTitle}>
+            모집 역할 (선택)
+          </OrphiText>
+
+          <OrphiText variant="body" style={styles.label}>
+            역할명
+          </OrphiText>
+          <TextInput
+            style={styles.input}
+            value={roleName}
+            onChangeText={setRoleName}
+            placeholder="예: 햄릿"
+            placeholderTextColor={orphiTokens.colors.gray500}
+          />
+
+          <OrphiText variant="body" style={styles.label}>
+            성별
+          </OrphiText>
+          <View style={styles.genderButtons}>
+            <OrphiButton
+              variant={roleGender === 'male' ? 'primary' : 'text'}
+              size="sm"
+              onPress={() => setRoleGender('male')}
+              style={styles.genderButton}
             >
-              <View style={themed(styles.$templateButtonContent)}>
-                <Text text="📝 템플릿 선택하기" style={themed(styles.$templateButtonText)} />
-                <Text text=">" style={themed(styles.$templateButtonArrow)} />
-              </View>
-              <Text text="미리 만들어진 양식으로 쉽게 작성하세요" style={themed(styles.$templateButtonSubText)} />
-            </TouchableOpacity>
-            
-            {formHook.selectedTemplate && (
-              <View style={themed(styles.$selectedTemplateIndicator)}>
-                <Text text={formHook.selectedTemplate.icon + " " + formHook.selectedTemplate.name + " 적용됨"} style={themed(styles.$selectedTemplateText)} />
-                <TouchableOpacity onPress={() => formHook.setSelectedTemplate(null)}>
-                  <Text text="✖" style={themed(styles.$removeTemplateButton)} />
-                </TouchableOpacity>
-              </View>
-            )}
+              남성
+            </OrphiButton>
+            <OrphiButton
+              variant={roleGender === 'female' ? 'primary' : 'text'}
+              size="sm"
+              onPress={() => setRoleGender('female')}
+              style={styles.genderButton}
+            >
+              여성
+            </OrphiButton>
+            <OrphiButton
+              variant={roleGender === 'any' ? 'primary' : 'text'}
+              size="sm"
+              onPress={() => setRoleGender('any')}
+              style={styles.genderButton}
+            >
+              무관
+            </OrphiButton>
           </View>
-        )}
 
-        {formHook.postMode === 'images' && (
-          <ImageUpload
-            selectedImages={formHook.selectedImages}
-            uploadingImages={formHook.uploadingImages}
-            onPickImages={formHook.pickImages}
-            onRemoveImage={formHook.removeImage}
+          <OrphiText variant="body" style={styles.label}>
+            나이대
+          </OrphiText>
+          <TextInput
+            style={styles.input}
+            value={roleAgeRange}
+            onChangeText={setRoleAgeRange}
+            placeholder="예: 25-35세"
+            placeholderTextColor={orphiTokens.colors.gray500}
           />
-        )}
 
-        <View style={themed(styles.$progressSection)}>
-          <View style={themed(styles.$progressHeader)}>
-            <Text text={"📊 작성 진행률: " + completeness + "%"} style={themed(styles.$progressTitle)} />
-          </View>
-          
-          <View style={themed(styles.$progressBarContainer)}>
-            <View
-              style={[
-                themed(styles.$progressBar),
-                { width: `${completeness}%` }
-              ]}
-            />
-          </View>
-          
-          <View style={themed(styles.$progressTips)}>
-            {completeness < 100 && (
-              <Text text="💡 모든 필수 정보를 입력하면 더 많은 지원자를 모집할 수 있어요!" style={themed(styles.$progressTipText)} />
-            )}
-            {completeness >= 100 && (
-              <Text text="✨ 완벽해요! 이제 게시글을 작성할 준비가 되었습니다." style={themed(styles.$progressCompletedText)} />
-            )}
-          </View>
-        </View>
-
-        <BasicInfoSection
-          postMode={formHook.postMode}
-          formData={formHook.formData}
-          updateFormData={formHook.updateFormData}
-          showDeadlinePicker={formHook.showDeadlinePicker}
-          setShowDeadlinePicker={formHook.setShowDeadlinePicker}
-        />
-
-        {formHook.postMode === 'text' && (
-          <RoleSection formData={formHook.formData} setFormData={formHook.setFormData} />
-        )}
-
-        {formHook.postMode === 'text' && (
-          <AuditionSection
-            formData={formHook.formData}
-            updateFormData={formHook.updateFormData}
-            showAuditionDatePicker={formHook.showAuditionDatePicker}
-            setShowAuditionDatePicker={formHook.setShowAuditionDatePicker}
-            showAuditionResultPicker={formHook.showAuditionResultPicker}
-            setShowAuditionResultPicker={formHook.setShowAuditionResultPicker}
+          <OrphiText variant="body" style={styles.label}>
+            모집 인원
+          </OrphiText>
+          <TextInput
+            style={styles.input}
+            value={roleCount}
+            onChangeText={setRoleCount}
+            placeholder="1"
+            keyboardType="number-pad"
+            placeholderTextColor={orphiTokens.colors.gray500}
           />
-        )}
 
-        {formHook.postMode === 'text' && (
-          <BenefitsSection formData={formHook.formData} updateFormData={formHook.updateFormData} />
-        )}
-
-        <ContactSection
-          postMode={formHook.postMode}
-          formData={formHook.formData}
-          updateFormData={formHook.updateFormData}
-        />
-
-        <View style={themed(styles.$formSection)}>
-          <Text text="⚙️ 모집 설정" style={themed(styles.$sectionHeader)} />
-          
-          <View style={themed(styles.$inputSection)}>
-            <View style={themed(styles.$switchContainer)}>
-              <View style={themed(styles.$switchLabelContainer)}>
-                <Text text="모집 상태" style={themed(styles.$label) as any} />
-                <Text 
-                  text={formHook.formData.status === "active" ? "🟢 모집중" : "🔴 모집마감"} 
-                  style={themed(styles.$statusText)} 
-                />
-              </View>
-              <Switch
-                value={formHook.formData.status === "active"}
-                onValueChange={(value) => formHook.updateFormData("status", value ? "active" : "closed")}
-                trackColor={{ false: colors.palette.neutral300, true: colors.palette.primary200 }}
-                thumbColor={formHook.formData.status === "active" ? colors.palette.primary500 : colors.palette.neutral400}
-                ios_backgroundColor={colors.palette.neutral300}
-              />
-            </View>
-            <Text 
-              text={formHook.formData.status === "active" ? "💡 지원자들이 이 게시글을 볼 수 있습니다" : "⏸️ 지원을 받지 않는 상태입니다"} 
-              style={themed(styles.$hintText)} 
-            />
-          </View>
-        </View>
-
-        <View style={themed(styles.$saveSection)}>
-          <Button
-            text={isEdit ? "수정 완료" : "게시글 작성"}
-            onPress={formHook.handleSave}
-            isLoading={formHook.loading}
-            style={themed(styles.$saveButton)}
+          <OrphiText variant="body" style={styles.label}>
+            요구사항
+          </OrphiText>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            value={roleRequirements}
+            onChangeText={setRoleRequirements}
+            placeholder="역할에 대한 요구사항을 입력해주세요"
+            placeholderTextColor={orphiTokens.colors.gray500}
+            multiline
+            numberOfLines={3}
+            textAlignVertical="top"
           />
-        </View>
-      </View>
+        </OrphiCard>
 
-      <Modal
-        visible={formHook.showTemplateModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => formHook.setShowTemplateModal(false)}
-      >
-        <View style={themed(styles.$modalOverlay)}>
-          <TouchableOpacity 
-            style={themed(styles.$modalContainer)}
-            activeOpacity={1}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <View style={themed(styles.$modalHeader)}>
-              <Text text="📝 템플릿 선택" style={themed(styles.$modalTitle)} />
-              <TouchableOpacity
-                onPress={() => formHook.setShowTemplateModal(false)}
-                style={themed(styles.$modalCloseButton)}
-              >
-                <Text text="✖" style={themed(styles.$modalCloseText)} />
-              </TouchableOpacity>
-            </View>
-            
-            <ScrollView style={themed(styles.$templateScrollView)} showsVerticalScrollIndicator={false}>
-              {POST_TEMPLATES.map((item) => (
-                <TouchableOpacity
-                  key={item.id}
-                  style={themed(styles.$templateItem)}
-                  onPress={() => formHook.applyTemplate(item)}
-                  activeOpacity={0.7}
-                >
-                  <View style={themed(styles.$templateItemHeader)}>
-                    <Text text={item.icon} style={themed(styles.$templateIcon)} />
-                    <View style={themed(styles.$templateInfo)}>
-                      <Text text={item.name} style={themed(styles.$templateName)} />
-                      <Text text={item.category} style={themed(styles.$templateCategory)} />
-                    </View>
-                  </View>
-                  <Text 
-                    text={item.template.description ? item.template.description.substring(0, 100) + "..." : "템플릿 미리보기"} 
-                    style={themed(styles.$templatePreview)} 
-                  />
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+        {/* 오디션 정보 */}
+        <OrphiCard style={styles.section}>
+          <OrphiText variant="h4" style={styles.sectionTitle}>
+            오디션 정보 (선택)
+          </OrphiText>
 
-      <AlertModal
-        visible={alertHook.alertState.visible}
-        title={alertHook.alertState.title}
-        message={alertHook.alertState.message}
-        buttons={alertHook.alertState.buttons}
-        onDismiss={alertHook.hideAlert}
-        dismissable={alertHook.alertState.dismissable}
-      />
-    </Screen>
+          <OrphiText variant="body" style={styles.label}>
+            오디션 일정
+          </OrphiText>
+          <TextInput
+            style={styles.input}
+            value={auditionDate}
+            onChangeText={setAuditionDate}
+            placeholder="예: 2025-01-15"
+            placeholderTextColor={orphiTokens.colors.gray500}
+          />
+
+          <OrphiText variant="body" style={styles.label}>
+            오디션 장소
+          </OrphiText>
+          <TextInput
+            style={styles.input}
+            value={auditionLocation}
+            onChangeText={setAuditionLocation}
+            placeholder="예: 홍대 연습실"
+            placeholderTextColor={orphiTokens.colors.gray500}
+          />
+
+          <OrphiText variant="body" style={styles.label}>
+            오디션 방식
+          </OrphiText>
+          <View style={styles.genderButtons}>
+            <OrphiButton
+              variant={auditionMethod === '대면' ? 'primary' : 'text'}
+              size="sm"
+              onPress={() => setAuditionMethod('대면')}
+              style={styles.genderButton}
+            >
+              대면
+            </OrphiButton>
+            <OrphiButton
+              variant={auditionMethod === '화상' ? 'primary' : 'text'}
+              size="sm"
+              onPress={() => setAuditionMethod('화상')}
+              style={styles.genderButton}
+            >
+              화상
+            </OrphiButton>
+            <OrphiButton
+              variant={auditionMethod === '서류' ? 'primary' : 'text'}
+              size="sm"
+              onPress={() => setAuditionMethod('서류')}
+              style={styles.genderButton}
+            >
+              서류
+            </OrphiButton>
+          </View>
+        </OrphiCard>
+
+        {/* 연락처 */}
+        <OrphiCard style={styles.section}>
+          <OrphiText variant="h4" style={styles.sectionTitle}>
+            연락처 *
+          </OrphiText>
+
+          <OrphiText variant="body" style={styles.label}>
+            이메일 *
+          </OrphiText>
+          <TextInput
+            style={styles.input}
+            value={contactEmail}
+            onChangeText={setContactEmail}
+            placeholder="예: contact@example.com"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            placeholderTextColor={orphiTokens.colors.gray500}
+          />
+
+          <OrphiText variant="body" style={styles.label}>
+            전화번호
+          </OrphiText>
+          <TextInput
+            style={styles.input}
+            value={contactPhone}
+            onChangeText={setContactPhone}
+            placeholder="예: 010-1234-5678"
+            keyboardType="phone-pad"
+            placeholderTextColor={orphiTokens.colors.gray500}
+          />
+
+          <OrphiText variant="body" style={styles.label}>
+            지원 방법
+          </OrphiText>
+          <TextInput
+            style={styles.input}
+            value={applicationMethod}
+            onChangeText={setApplicationMethod}
+            placeholder="예: 이메일로 이력서 제출"
+            placeholderTextColor={orphiTokens.colors.gray500}
+          />
+        </OrphiCard>
+
+        {/* Submit Button */}
+        <OrphiButton
+          variant="primary"
+          size="lg"
+          onPress={handleSubmit}
+          disabled={loading}
+          style={styles.submitButton}
+        >
+          {loading ? '등록 중...' : '공고 등록하기'}
+        </OrphiButton>
+      </ScrollView>
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: orphiTokens.colors.background,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  content: {
+    padding: orphiTokens.spacing.base,
+  },
+  section: {
+    marginBottom: orphiTokens.spacing.base,
+  },
+  sectionTitle: {
+    marginBottom: orphiTokens.spacing.md,
+  },
+  label: {
+    marginBottom: orphiTokens.spacing.xs,
+    marginTop: orphiTokens.spacing.sm,
+    fontWeight: '600',
+  },
+  input: {
+    backgroundColor: orphiTokens.colors.white,
+    borderWidth: 1,
+    borderColor: orphiTokens.colors.gray400,
+    borderRadius: orphiTokens.borderRadius.md,
+    padding: orphiTokens.spacing.md,
+    fontSize: 16,
+    color: orphiTokens.colors.gray900,
+  },
+  textArea: {
+    minHeight: 100,
+  },
+  genderButtons: {
+    flexDirection: 'row',
+    gap: orphiTokens.spacing.sm,
+    marginTop: orphiTokens.spacing.xs,
+  },
+  genderButton: {
+    flex: 1,
+  },
+  submitButton: {
+    marginTop: orphiTokens.spacing.md,
+    marginBottom: orphiTokens.spacing.xl,
+  },
+})

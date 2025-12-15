@@ -1,225 +1,179 @@
-import React, { useCallback, useState } from "react"
-import { View, FlatList } from "react-native"
-import { useNavigation } from "@react-navigation/native"
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import type { CompositeNavigationProp } from "@react-navigation/native"
+import React, { useState, useEffect } from 'react'
+import { View, StyleSheet, FlatList, RefreshControl, ActivityIndicator } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { OrphiHeader, OrphiText, OrphiCard, OrphiFAB, orphiTokens } from '@/design-system'
+import { PostCard } from '@/components/PostCard'
+import { postService } from '@/core/services/firestore'
+import type { Post } from '@/core/types/post'
+import type { AppStackParamList } from '@/core/navigators/types'
+import { Plus } from 'lucide-react-native'
 
-import { AlertModal } from "@/components/AlertModal"
-import { Button } from "@/components/Button"
-import { Icon } from "@/components/Icon"
-import { Screen } from "@/components/Screen"
-import { ScreenHeader } from "@/components/ScreenHeader"
-import { PostCard } from "@/components/PostCard"
-import { TabBar, OrganizationCard, EmptyState, LoadingState } from "@/components/BulletinBoard"
-import { organizationService, testDataService } from "@/services/firestore"
-import { useAppTheme } from "@/theme/context"
-import { useAlert } from "@/hooks/useAlert"
-import { usePostList } from "@/hooks/usePostList"
-import { BulletinBoardStackParamList, AppStackParamList } from "@/navigators/types"
-import { createComponentLogger } from "@/utils/logger"
-import { translate } from "@/i18n"
+type NavigationProp = NativeStackNavigationProp<AppStackParamList>
 
-type NavigationProp = CompositeNavigationProp<
-  NativeStackNavigationProp<BulletinBoardStackParamList>,
-  NativeStackNavigationProp<AppStackParamList>
->
-
-export const BulletinBoardScreen = () => {
+export const BulletinBoardScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>()
-  const { themed } = useAppTheme()
-  const { alertState, alert, hideAlert } = useAlert()
-  const log = createComponentLogger('BulletinBoardScreen')
-  
-  const [activeTab, setActiveTab] = useState<'announcements' | 'organizations'>('announcements')
-  const [selectedOrganizationId, setSelectedOrganizationId] = useState<string | null>(null)
-  
-  const {
-    organizations,
-    loading,
-    isOrganizer,
-    getFilteredPosts,
-  } = usePostList(selectedOrganizationId)
+  const [posts, setPosts] = useState<Post[]>([])
+  const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
+  const [unreadNotifications, setUnreadNotifications] = useState(0)
 
-  const handlePostPress = useCallback((postId: string) => {
-    navigation.navigate("PostDetail", { postId })
-  }, [navigation])
-
-  const handleCreatePost = useCallback(() => {
-    log.debug('권한 체크 시작')
-    
-    if (!isOrganizer) {
-      log.debug('권한 없음 - 알림 표시')
-      alert("권한 없음", "게시글 작성은 관리자만 가능합니다.")
-      return
-    }
-    
-    log.debug('권한 확인됨 - 게시글 작성 페이지로 이동')
-    navigation.navigate("CreatePost", { isEdit: false })
-  }, [navigation, isOrganizer, alert, log])
-
-  const handleOrganizationPress = useCallback((organizationId: string) => {
-    log.debug('단체 선택:', organizationId)
-    setSelectedOrganizationId(organizationId)
-    setActiveTab('announcements')
-  }, [log])
-
-  const handleBackToAllPosts = useCallback(() => {
-    setSelectedOrganizationId(null)
-    setActiveTab('organizations')
+  useEffect(() => {
+    loadPosts()
   }, [])
 
-  const handleTabChange = useCallback((tab: 'announcements' | 'organizations') => {
-    setActiveTab(tab)
-    if (tab === 'organizations') {
-      organizationService.updateAllActivePostCounts()
-    }
-  }, [])
-
-  const addTestData = async () => {
+  const loadPosts = async () => {
     try {
-      await testDataService.addTestData()
-      alert('성공', '테스트 데이터가 추가되었습니다!')
+      setLoading(true)
+      console.log('📋 공고 목록 로딩 시작...')
+
+      // Firebase에서 공고 목록 가져오기 (활성 공고만 서버 사이드 필터링)
+      const { posts: postList } = await postService.getPosts(20)
+
+      console.log(`✅ 공고 ${postList.length}개 로드 완료`)
+      setPosts(postList)
     } catch (error) {
-      console.error('테스트 데이터 추가 실패:', error)
-      alert('오류', '데이터 추가에 실패했습니다.')
+      console.error('❌ 공고 로딩 실패:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
-  if (loading && getFilteredPosts.length === 0) {
+  const handleRefresh = async () => {
+    setRefreshing(true)
+    await loadPosts()
+    setRefreshing(false)
+  }
+
+  const handlePostPress = (post: Post) => {
+    navigation.navigate('PostDetail', { postId: post.id })
+  }
+
+  const handleCreatePost = () => {
+    navigation.navigate('CreatePost', {})
+  }
+
+  const handleNotificationPress = () => {
+    navigation.navigate('NotificationCenter')
+  }
+
+  const renderPost = ({ item }: { item: Post }) => (
+    <PostCard post={item} onPress={() => handlePostPress(item)} />
+  )
+
+  const renderEmpty = () => (
+    <View style={styles.emptyContainer}>
+      <OrphiCard style={styles.emptyCard}>
+        <OrphiText variant="h3" style={styles.emptyTitle}>
+          등록된 공고가 없습니다
+        </OrphiText>
+        <OrphiText variant="body" color="gray600" style={styles.emptyDescription}>
+          첫 번째 공고를 등록해보세요!
+        </OrphiText>
+      </OrphiCard>
+    </View>
+  )
+
+  const renderFooter = () => {
+    if (!loading) return null
     return (
-      <Screen preset="fixed" safeAreaEdges={[]}>
-        <ScreenHeader 
-          title={translate("bulletinBoard:title")}
-          showBackButton={false}
-        />
-        <LoadingState />
-      </Screen>
+      <View style={styles.footer}>
+        <ActivityIndicator size="small" color={orphiTokens.colors.green600} />
+      </View>
     )
   }
 
-  const headerTitle = selectedOrganizationId ? 
-    organizations.find(org => org.id === selectedOrganizationId)?.name || translate("bulletinBoard:tabs.organizations") : 
-    translate("bulletinBoard:title")
-
-  return (
-    <Screen preset="fixed" safeAreaEdges={[]} contentContainerStyle={{ flex: 1 }}>
-      <ScreenHeader 
-        title={headerTitle}
-        showBackButton={!!selectedOrganizationId}
-        backButtonProps={{
-          onPress: handleBackToAllPosts
-        }}
-      />
-      <View style={themed($container)}>
-        <View style={themed($contentContainer)}>
-          {activeTab === 'announcements' ? (
-            <FlatList
-              data={getFilteredPosts}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <PostCard
-                  post={item}
-                  onPress={handlePostPress}
-                />
-              )}
-              ListHeaderComponent={() => (
-                <View>
-                  {!selectedOrganizationId && (
-                    <TabBar activeTab={activeTab} onTabChange={handleTabChange} />
-                  )}
-                  
-                  {isOrganizer && (
-                    <View style={themed($createPostButtonContainer)}>
-                      <Button
-                        text="새 공고 작성"
-                        onPress={handleCreatePost}
-                        style={themed($createPostButton)}
-                        LeftAccessory={(props) => (
-                          <Icon icon="more" size={20} color={props.style.color} />
-                        )}
-                      />
-                    </View>
-                  )}
-                </View>
-              )}
-              ListEmptyComponent={() => (
-                <EmptyState
-                  type="posts"
-                  hasOrganizationFilter={!!selectedOrganizationId}
-                  onExploreOrganizations={() => setActiveTab('organizations')}
-                  onAddSampleData={addTestData}
-                  showSampleData={__DEV__}
-                />
-              )}
-              style={themed($flatListContainer)}
-              showsVerticalScrollIndicator={false}
-              removeClippedSubviews={false}
-              maxToRenderPerBatch={5}
-              windowSize={5}
-              initialNumToRender={3}
-            />
-          ) : (
-            <FlatList
-              data={organizations}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <OrganizationCard
-                  organization={item}
-                  onPress={handleOrganizationPress}
-                />
-              )}
-              ListHeaderComponent={() => (
-                <TabBar activeTab={activeTab} onTabChange={handleTabChange} />
-              )}
-              ListEmptyComponent={() => (
-                <EmptyState type="organizations" />
-              )}
-              style={themed($flatListContainer)}
-              showsVerticalScrollIndicator={false}
-              removeClippedSubviews={false}
-              maxToRenderPerBatch={5}
-              windowSize={5}
-              initialNumToRender={3}
-            />
-          )}
+  if (loading && posts.length === 0) {
+    return (
+      <View style={styles.container}>
+        <OrphiHeader
+          title="공고 게시판"
+          showBell
+          bellBadgeCount={unreadNotifications}
+          onBellPress={handleNotificationPress}
+        />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={orphiTokens.colors.green600} />
+          <OrphiText variant="body" color="gray600" style={styles.loadingText}>
+            공고를 불러오는 중...
+          </OrphiText>
         </View>
       </View>
+    )
+  }
 
-      <AlertModal
-        visible={alertState.visible}
-        title={alertState.title}
-        message={alertState.message}
-        buttons={alertState.buttons}
-        onDismiss={hideAlert}
-        dismissable={alertState.dismissable}
+  return (
+    <View style={styles.container}>
+      <OrphiHeader
+        title="공고 게시판"
+        subtitle={`총 ${posts.length}개의 공고`}
+        showBell
+        bellBadgeCount={unreadNotifications}
+        onBellPress={handleNotificationPress}
       />
-    </Screen>
+
+      <FlatList
+        data={posts}
+        renderItem={renderPost}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={renderEmpty}
+        ListFooterComponent={renderFooter}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={orphiTokens.colors.green600}
+          />
+        }
+      />
+
+      {/* 공고 작성 FAB */}
+      <OrphiFAB
+        icon={<Plus size={32} color={orphiTokens.colors.white} strokeWidth={2.5} />}
+        onPress={handleCreatePost}
+        position="bottomRight"
+      />
+    </View>
   )
 }
 
-const $container = ({ spacing }) => ({
-  flex: 1,
-  backgroundColor: "transparent",
-  paddingHorizontal: spacing.lg,
-})
-
-const $contentContainer = () => ({
-  flex: 1,
-  minHeight: 500,
-})
-
-const $flatListContainer = ({ colors }) => ({
-  flex: 1,
-  backgroundColor: colors.background,
-  minHeight: 400,
-})
-
-const $createPostButtonContainer = ({ spacing }) => ({
-  marginBottom: spacing?.md || 12,
-})
-
-const $createPostButton = ({ colors, spacing }) => ({
-  backgroundColor: colors.tint,
-  paddingHorizontal: spacing?.md || 12,
-  paddingVertical: spacing?.sm || 8,
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: orphiTokens.colors.background,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: orphiTokens.spacing.md,
+  },
+  listContent: {
+    padding: orphiTokens.spacing.base,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: orphiTokens.spacing['3xl'],
+  },
+  emptyCard: {
+    alignItems: 'center',
+    paddingVertical: orphiTokens.spacing['2xl'],
+    paddingHorizontal: orphiTokens.spacing.xl,
+  },
+  emptyTitle: {
+    marginBottom: orphiTokens.spacing.md,
+    textAlign: 'center',
+  },
+  emptyDescription: {
+    textAlign: 'center',
+  },
+  footer: {
+    paddingVertical: orphiTokens.spacing.lg,
+    alignItems: 'center',
+  },
 })

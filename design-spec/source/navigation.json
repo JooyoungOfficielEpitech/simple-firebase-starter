@@ -1,0 +1,12 @@
+{
+  "links": [],
+  "buttons": [
+    {
+      "index": 0,
+      "text": "Lumi로 시작하기",
+      "classes": "w-full py-3 rounded-lg font-medium text-white shadow-lg transition-all hover:shadow-xl active:scale-95",
+      "type": "submit"
+    }
+  ],
+  "clickableElements": []
+}

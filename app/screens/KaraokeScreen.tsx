@@ -1,205 +1,305 @@
-import React, { useCallback, useState, useEffect, useMemo } from "react"
-import { View, ViewStyle, TextStyle } from "react-native"
-import { AVPlaybackStatus } from "expo-av"
+import React, { useState, useEffect, useRef } from 'react'
+import { View, ScrollView, StyleSheet, Alert } from 'react-native'
+import { OrphiHeader, orphiTokens } from '@/design-system'
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native'
+import TrackPlayer, { Capability } from 'react-native-track-player'
+import { useDualPlayer } from '@/core/hooks/useDualPlayer'
+import { useMetronome } from '@/core/hooks/useMetronome'
+import type { ABLoopState } from '@/core/types/audio.types'
+import type { Song } from '@/core/types/song'
+import type { PracticeStackParamList } from '@/core/navigators/types'
+import {
+  SongInfo,
+  PlaybackProgressBar,
+  PlaybackControls,
+  ABLoopControl,
+  PitchControl,
+  MetronomeControl,
+} from '@/components/MusicPlayer'
 
-import { AudioPlayer, SavedSection } from "@/components/AudioPlayer"
-import { SavedSectionsList } from "@/components/SavedSectionsList"
-import { Screen } from "@/components/Screen"
-import { ScreenHeader } from "@/components/ScreenHeader"
-import { Text } from "@/components/Text"
-import { useAppTheme } from "@/theme/context"
-import type { ThemedStyle } from "@/theme/types"
-import type { HomeStackScreenProps } from "@/navigators/HomeStackNavigator"
-import { loadSavedSections, saveSectionsToStorage } from "@/utils/audioHelpers"
+type KaraokeRouteProp = RouteProp<PracticeStackParamList, 'KaraokeScreen'>
 
-export function KaraokeScreen({ route, navigation }: HomeStackScreenProps<"KaraokeScreen">) {
-  const { themed } = useAppTheme()
+export const KaraokeScreen: React.FC = () => {
+  const navigation = useNavigation()
+  const route = useRoute<KaraokeRouteProp>()
   const { song } = route.params
 
-  // 곡 ID 생성 (song.id가 있으면 사용, 없으면 title 사용)
-  const songId = song.id || song.title
+  // 재생 상태
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [position, setPosition] = useState(0)
+  const [duration, setDuration] = useState(0)
 
-  // 전체 저장된 구간들 상태 관리 (모든 곡의 구간)
-  const [allSavedSections, setAllSavedSections] = useState<SavedSection[]>([])
-  // 로드할 구간 상태
-  const [sectionToLoad, setSectionToLoad] = useState<SavedSection | null>(null)
+  // Pitch 상태
+  const [pitchEnabled, setPitchEnabled] = useState(false)
+  const [pitchSemitones, setPitchSemitones] = useState(0)
 
-  // 현재 곡의 구간만 필터링
-  const currentSongSections = useMemo(() => {
-    return allSavedSections.filter(section => section.songId === songId)
-  }, [allSavedSections, songId])
+  // 메트로놈 상태
+  const [metronomeEnabled, setMetronomeEnabled] = useState(false)
+  const [bpm, setBpm] = useState(song.estimatedBPM || 120)
+  const [metronomeVolume, setMetronomeVolume] = useState(0.7)
 
-  // 초기 로드: 저장된 모든 구간 불러오기
+  // A-B 루프 상태
+  const [abLoop, setAbLoop] = useState<ABLoopState>({
+    a: null,
+    b: null,
+    enabled: false,
+  })
+
+  const loopCheckIntervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  // useDualPlayer 통합
+  const {
+    playerType,
+    isTransitioning,
+    switchToExpoAV,
+    switchToTrackPlayer,
+    updatePitch,
+    cleanup,
+  } = useDualPlayer({
+    audioUrl: song.mrUrl,
+    onPlaybackUpdate: (status) => {
+      if (status.isLoaded) {
+        setPosition(status.positionMillis / 1000)
+        setDuration(status.durationMillis ? status.durationMillis / 1000 : 0)
+        setIsPlaying(status.isPlaying)
+      }
+    },
+  })
+
+  // useMetronome 통합
+  const {
+    currentBeat,
+    totalBeats,
+    isReady: metronomeReady,
+    resetBeat,
+  } = useMetronome({
+    bpm,
+    enabled: metronomeEnabled,
+    volume: metronomeVolume,
+    timeSignature: { beats: 4, noteValue: 4 },
+  })
+
+  // TrackPlayer 초기화
   useEffect(() => {
-    const loadedSections = loadSavedSections()
-    setAllSavedSections(loadedSections)
-    console.log(`📚 전체 구간 로드: ${loadedSections.length}개, 현재 곡 구간: ${loadedSections.filter(s => s.songId === songId).length}개`)
+    setupPlayer()
+
+    return () => {
+      cleanup()
+      TrackPlayer.reset()
+      if (loopCheckIntervalRef.current) {
+        clearInterval(loopCheckIntervalRef.current)
+      }
+    }
   }, [])
 
-  // 🧪 임시 테스트: 여러 곡에 오디오 파일 설정
-  const testSong = {
-    ...song,
-    // 로컬 파일 설정 (assets/audio/ 폴더에 있는 파일들)
-    localMrFile: (() => {
-      switch (song.title) {
-        case "This is the Moment":
-          return "sample.mp3"
-        // 다른 곡들도 sample.mp3 사용하도록 설정
-        case "지킬 앤 하이드":
-        case "Jekyll & Hyde":
-          return "sample.mp3"
-        // 모든 곡에 sample.mp3 사용하고 싶다면 아래 주석 해제
-        // default:
-        //   return "sample.mp3"
-        default:
-          return song.localMrFile || "sample.mp3" // 기본값으로 sample.mp3 사용
+  const setupPlayer = async () => {
+    try {
+      await TrackPlayer.setupPlayer()
+      await TrackPlayer.updateOptions({
+        capabilities: [
+          Capability.Play,
+          Capability.Pause,
+          Capability.SeekTo,
+          Capability.Stop,
+        ],
+        compactCapabilities: [Capability.Play, Capability.Pause],
+      })
+
+      if (song.mrUrl) {
+        await TrackPlayer.add({
+          id: song.id,
+          url: song.mrUrl,
+          title: song.title,
+          artist: song.musical,
+          duration: song.audioDuration,
+        })
+        const trackDuration = await TrackPlayer.getDuration()
+        setDuration(trackDuration)
+      } else {
+        Alert.alert('오류', '음악 파일이 없습니다.')
       }
-    })(),
-    
-    // 또는 URL로 테스트하고 싶다면 아래 주석 해제
-    // mrUrl: song.title === "This is the Moment" ? "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" : song.mrUrl,
+    } catch (error) {
+      console.error('❌ TrackPlayer 초기화 실패:', error)
+      Alert.alert('오류', 'TrackPlayer 초기화에 실패했습니다.')
+    }
   }
 
-  console.log("🎯 MusicPlayer - Test song:", testSong)
+  // Pitch 토글
+  const handlePitchToggle = async (enabled: boolean) => {
+    setPitchEnabled(enabled)
+    if (enabled) {
+      await switchToExpoAV(pitchSemitones)
+    } else {
+      await switchToTrackPlayer()
+    }
+  }
 
-  // 오디오 재생 상태 업데이트 처리
-  const handlePlaybackStatusUpdate = useCallback((status: AVPlaybackStatus) => {
-    // 필요시 재생 상태 로깅
-    console.log("🎵 Playback status:", status.isLoaded ? `${Math.floor((status.positionMillis || 0) / 1000)}s` : "Not loaded")
-  }, [])
+  // Pitch 변경
+  const handlePitchChange = async (semitones: number) => {
+    setPitchSemitones(semitones)
+    if (pitchEnabled) {
+      await updatePitch(semitones)
+    }
+  }
 
-  // 저장된 구간 업데이트 처리
-  const handleSavedSectionsChange = useCallback((newSections: SavedSection[]) => {
-    // newSections는 현재 곡의 구간만 포함
-    // 전체 구간 배열을 업데이트: 다른 곡 구간 유지 + 현재 곡 구간 교체
-    setAllSavedSections(prev => {
-      const otherSongSections = prev.filter(s => s.songId !== songId)
-      return [...otherSongSections, ...newSections]
-    })
-    saveSectionsToStorage([...allSavedSections.filter(s => s.songId !== songId), ...newSections])
-  }, [songId, allSavedSections])
+  // Pitch 리셋
+  const handlePitchReset = async () => {
+    await handlePitchChange(0)
+  }
 
-  // 구간 로드 처리
-  const handleLoadSection = useCallback((section: SavedSection) => {
-    console.log("🎯 Loading section:", section.name)
-    setSectionToLoad(section)
-    // 로드 후 상태 초기화 (다음 로드를 위해)
-    setTimeout(() => setSectionToLoad(null), 100)
-  }, [])
+  // 재생/일시정지
+  const handlePlay = async () => {
+    if (playerType === 'trackplayer') {
+      await TrackPlayer.play()
+    }
+    setIsPlaying(true)
+  }
 
-  // 구간 삭제 처리
-  const handleDeleteSection = useCallback((sectionId: string) => {
-    setAllSavedSections(prev => {
-      const updatedSections = prev.filter(s => s.id !== sectionId)
-      // 로컬 스토리지에 업데이트된 구간들 저장
-      saveSectionsToStorage(updatedSections)
-      return updatedSections
-    })
-  }, [])
+  const handlePause = async () => {
+    if (playerType === 'trackplayer') {
+      await TrackPlayer.pause()
+    }
+    setIsPlaying(false)
+  }
 
-  const hasAudio = testSong.localMrFile || testSong.mrUrl
+  // Seek
+  const handleSeek = async (pos: number) => {
+    if (playerType === 'trackplayer') {
+      await TrackPlayer.seekTo(pos)
+    }
+    setPosition(pos)
+  }
+
+  const handleSeekBackward = () => {
+    handleSeek(Math.max(0, position - 10))
+  }
+
+  const handleSeekForward = () => {
+    handleSeek(Math.min(duration, position + 10))
+  }
+
+  // A-B 루프 핸들러
+  const handleSetA = () => {
+    setAbLoop((prev) => ({ ...prev, a: position }))
+  }
+
+  const handleSetB = () => {
+    setAbLoop((prev) => ({ ...prev, b: position }))
+  }
+
+  const handleLoopToggle = () => {
+    setAbLoop((prev) => ({ ...prev, enabled: !prev.enabled }))
+  }
+
+  const handleClearLoop = () => {
+    setAbLoop({ a: null, b: null, enabled: false })
+  }
+
+  // A-B 루프 로직
+  useEffect(() => {
+    if (!abLoop.enabled || abLoop.a === null || abLoop.b === null) {
+      if (loopCheckIntervalRef.current) {
+        clearInterval(loopCheckIntervalRef.current)
+        loopCheckIntervalRef.current = null
+      }
+      return
+    }
+
+    loopCheckIntervalRef.current = setInterval(async () => {
+      if (playerType === 'trackplayer') {
+        const currentPos = await TrackPlayer.getPosition()
+        if (currentPos >= abLoop.b!) {
+          await TrackPlayer.seekTo(abLoop.a!)
+          resetBeat()
+        }
+      }
+    }, 100)
+
+    return () => {
+      if (loopCheckIntervalRef.current) {
+        clearInterval(loopCheckIntervalRef.current)
+      }
+    }
+  }, [abLoop, playerType, resetBeat])
+
+  // 메트로놈 토글
+  const handleMetronomeToggle = () => {
+    setMetronomeEnabled(!metronomeEnabled)
+  }
+
+  const handleBpmChange = (newBpm: number) => {
+    setBpm(Math.max(40, Math.min(240, newBpm)))
+  }
 
   return (
-    <Screen preset="scroll" safeAreaEdges={[]}>
-      <ScreenHeader title={testSong.title} />
-      <View style={themed($container)}>
-        {/* 곡 정보 */}
-        <View style={themed($songInfoContainer)}>
-        </View>
+    <View style={styles.container}>
+      <OrphiHeader
+        title="노래방"
+        showBack
+        onBackPress={() => navigation.goBack()}
+      />
 
-        {/* 오디오 플레이어 */}
-        <View style={themed($playerContainer)}>
-          {hasAudio ? (
-            <AudioPlayer
-              audioFile={typeof testSong.localMrFile === 'string' ? testSong.localMrFile : undefined}
-              audioUrl={typeof testSong.mrUrl === 'string' ? testSong.mrUrl : undefined}
-              songId={songId}
-              onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
-              savedSections={currentSongSections}
-              onSavedSectionsChange={handleSavedSectionsChange}
-              onLoadSection={handleLoadSection}
-              loadSection={sectionToLoad}
-              style={themed($audioPlayer)}
-            />
-          ) : (
-            <View style={themed($noAudioContainer)}>
-              <Text
-                text="🎵"
-                style={themed($musicIcon)}
-              />
-              <Text
-                text="오디오 파일이 준비되지 않았습니다"
-                style={themed($noAudioText)}
-              />
-            </View>
-          )}
-        </View>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
+        <SongInfo song={song} />
 
-        {/* 저장된 구간 목록 (현재 곡만) */}
-        {hasAudio && (
-          <SavedSectionsList
-            sections={currentSongSections}
-            onLoadSection={handleLoadSection}
-            onDeleteSection={handleDeleteSection}
-            style={themed($savedSectionsContainer)}
-          />
-        )}
-      </View>
-    </Screen>
+        <PlaybackProgressBar
+          position={position}
+          duration={duration}
+          onSeek={handleSeek}
+          abLoop={abLoop}
+        />
+
+        <PlaybackControls
+          isPlaying={isPlaying}
+          onPlay={handlePlay}
+          onPause={handlePause}
+          onSeekBackward={handleSeekBackward}
+          onSeekForward={handleSeekForward}
+          disabled={!duration}
+        />
+
+        <ABLoopControl
+          abLoop={abLoop}
+          onSetA={handleSetA}
+          onSetB={handleSetB}
+          onToggle={handleLoopToggle}
+          onClear={handleClearLoop}
+        />
+
+        <PitchControl
+          enabled={pitchEnabled}
+          semitones={pitchSemitones}
+          onToggle={handlePitchToggle}
+          onPitchChange={handlePitchChange}
+          onReset={handlePitchReset}
+          isTransitioning={isTransitioning}
+        />
+
+        <MetronomeControl
+          enabled={metronomeEnabled}
+          bpm={bpm}
+          volume={metronomeVolume}
+          currentBeat={currentBeat}
+          totalBeats={totalBeats}
+          onToggle={handleMetronomeToggle}
+          onBpmChange={handleBpmChange}
+          onVolumeChange={setMetronomeVolume}
+          isReady={metronomeReady}
+        />
+      </ScrollView>
+    </View>
   )
 }
 
-const $container: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-  flex: 1,
-  backgroundColor: colors.background,
-  padding: spacing.lg,
-  justifyContent: "center",
-  minHeight: 400,
-})
-
-const $songInfoContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  alignItems: "center",
-  marginBottom: spacing.xxl,
-})
-
-const $songTitle: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-  textAlign: "center",
-  color: colors.text,
-  marginBottom: spacing.sm,
-})
-
-
-const $playerContainer: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
-  backgroundColor: colors.palette.neutral100,
-  borderRadius: 16,
-  padding: spacing.lg,
-  minHeight: 200,
-  justifyContent: "center",
-})
-
-const $audioPlayer: ThemedStyle<ViewStyle> = () => ({
-  backgroundColor: "transparent",
-})
-
-const $noAudioContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  alignItems: "center",
-  justifyContent: "center",
-  paddingVertical: spacing.xl,
-})
-
-const $musicIcon: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  fontSize: 48,
-  textAlign: "center",
-  marginBottom: spacing.md,
-})
-
-const $noAudioText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
-  textAlign: "center",
-  color: colors.textDim,
-  fontSize: 16,
-  fontFamily: typography.primary.normal,
-})
-
-const $savedSectionsContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  marginTop: spacing.lg,
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: orphiTokens.colors.background,
+  },
+  content: {
+    flex: 1,
+  },
+  contentContainer: {
+    paddingBottom: orphiTokens.spacing['2xl'],
+  },
 })

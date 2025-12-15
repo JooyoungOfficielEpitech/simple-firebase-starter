@@ -1,315 +1,448 @@
-import { View, TouchableOpacity, Modal, ScrollView } from "react-native"
-import { useRoute, useNavigation } from "@react-navigation/native"
-import type { RouteProp, NavigationProp } from "@react-navigation/native"
-import { Screen } from "@/components/Screen"
-import { ScreenHeader } from "@/components/ScreenHeader"
-import { Text } from "@/components/Text"
-import { TextField } from "@/components/TextField"
-import { AlertModal } from "@/components/AlertModal"
-import { ImageGallery } from "@/components/ImageGallery"
-import { HeroCard } from "@/components/PostDetail/HeroCard"
-import { RoleCard } from "@/components/PostDetail/RoleCard"
-import { AuditionCard } from "@/components/PostDetail/AuditionCard"
-import { PerformanceCard } from "@/components/PostDetail/PerformanceCard"
-import { BenefitsCard } from "@/components/PostDetail/BenefitsCard"
-import { ContactCard } from "@/components/PostDetail/ContactCard"
-import { translate } from "@/i18n"
-import { useAppTheme } from "@/theme/context"
-import { usePostDetail } from "@/hooks/usePostDetail"
-import { AppStackParamList } from "@/navigators/types"
-import {
-  $container,
-  $centerContainer,
-  $section,
-  $sectionTitle,
-  $descriptionText,
-  $tagsContainer,
-  $tag,
-  $tagText,
-  $actionButtonsContainer,
-  $editButton,
-  $editButtonText,
-  $deleteButton,
-  $deleteButtonText,
-  $buttonIcon,
-  $fullWidthImageSection,
-  $modalOverlay,
-  $modalContent,
-  $modalHeader,
-  $modalTitle,
-  $closeButton,
-  $closeButtonText,
-  $modalPostTitle,
-  $modalOrgName,
-  $modalScrollView,
-  $rolesSection,
-  $sectionLabel,
-  $roleItem,
-  $roleItemText,
-  $modalRoleDetailText,
-  $formInput,
-  $modalButtons,
-  $cancelButton,
-  $cancelButtonText,
-  $submitButton,
-  $submitButtonText,
-} from "./PostDetailScreen.styles"
+import React, { useState, useEffect } from 'react'
+import { View, StyleSheet, ScrollView, ActivityIndicator } from 'react-native'
+import { useRoute, useNavigation } from '@react-navigation/native'
+import type { RouteProp } from '@react-navigation/native'
+import { OrphiHeader, OrphiText, OrphiCard, OrphiBadge, OrphiButton, orphiTokens } from '@/design-system'
+import { postService } from '@/core/services/firestore'
+import type { Post } from '@/core/types/post'
+import type { AppStackParamList } from '@/core/navigators/types'
+import { MapPin, Calendar, Users, Mail, Phone, Award, Clock } from 'lucide-react-native'
 
-type RoutePropType = RouteProp<AppStackParamList, "PostDetail">
+type PostDetailRouteProp = RouteProp<AppStackParamList, 'PostDetail'>
 
-export const PostDetailScreen = () => {
-  const route = useRoute<RoutePropType>()
-  const navigation = useNavigation<NavigationProp<AppStackParamList>>()
+export const PostDetailScreen: React.FC = () => {
+  const route = useRoute<PostDetailRouteProp>()
+  const navigation = useNavigation()
   const { postId } = route.params
-  const { themed } = useAppTheme()
 
-  const {
-    post,
-    loading,
-    // userProfile, // Not used in this component
-    showApplicationModal,
-    applications,
-    hasApplied,
-    myApplication,
-    applicationMessage,
-    applicationPhoneNumber,
-    applicationExperience,
-    applicationRolePreference,
-    submittingApplication,
-    isMyPost,
-    alertState,
-    setShowApplicationModal,
-    setApplicationMessage,
-    setApplicationPhoneNumber,
-    setApplicationExperience,
-    setApplicationRolePreference,
-    handleDelete,
-    handleApplyButtonClick,
-    handleApply,
-    handleWithdrawApplication,
-    handleViewApplications,
-    hideAlert,
-  } = usePostDetail(postId)
+  const [post, setPost] = useState<Post | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadPost()
+  }, [postId])
+
+  const loadPost = async () => {
+    try {
+      setLoading(true)
+      console.log('📋 공고 상세 로딩:', postId)
+
+      // 조회수 증가
+      await postService.incrementViewCount(postId)
+
+      // 공고 상세 정보 가져오기
+      const postData = await postService.getPost(postId)
+
+      if (postData) {
+        console.log('✅ 공고 상세 로드 완료')
+        setPost(postData)
+      } else {
+        console.error('❌ 공고를 찾을 수 없음')
+      }
+    } catch (error) {
+      console.error('❌ 공고 로딩 실패:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const formatDate = (timestamp: any): string => {
+    if (!timestamp) return ''
+    try {
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp)
+      return date.toLocaleDateString('ko-KR')
+    } catch {
+      return ''
+    }
+  }
+
+  const calculateDDay = (deadline: string): number | null => {
+    if (!deadline) return null
+    const now = new Date()
+    const deadlineDate = new Date(deadline)
+    const diff = Math.ceil((deadlineDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    return diff
+  }
 
   if (loading) {
     return (
-      <Screen preset="fixed" safeAreaEdges={[]}>
-        <ScreenHeader title="게시글" />
-        <View style={themed($container)}>
-          <View style={themed($centerContainer) as any}>
-            <Text text="로딩 중..." />
-          </View>
+      <View style={styles.container}>
+        <OrphiHeader title="공고 상세" showBack onBackPress={() => navigation.goBack()} />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={orphiTokens.colors.green600} />
+          <OrphiText variant="body" color="gray600" style={styles.loadingText}>
+            공고를 불러오는 중...
+          </OrphiText>
         </View>
-      </Screen>
+      </View>
     )
   }
 
   if (!post) {
     return (
-      <Screen preset="fixed" safeAreaEdges={[]}>
-        <ScreenHeader title="게시글" />
-        <View style={themed($container)}>
-          <View style={themed($centerContainer) as any}>
-            <Text text="게시글을 찾을 수 없습니다." />
-          </View>
+      <View style={styles.container}>
+        <OrphiHeader title="공고 상세" showBack onBackPress={() => navigation.goBack()} />
+        <View style={styles.emptyContainer}>
+          <OrphiText variant="h3" color="gray600">
+            공고를 찾을 수 없습니다
+          </OrphiText>
         </View>
-      </Screen>
+      </View>
     )
   }
 
+  const dDay = post.deadline ? calculateDDay(post.deadline) : null
+
   return (
-    <Screen preset="scroll" safeAreaEdges={[]}>
-      <ScreenHeader title="모집 공고" />
-      <View style={themed($container)}>
-        {/* Hero Card */}
-        <HeroCard
-          post={post}
-          isMyPost={!!isMyPost}
-          applicationsCount={applications.length}
-          hasApplied={hasApplied}
-          myApplication={myApplication}
-          submittingApplication={submittingApplication}
-          onApplyClick={handleApplyButtonClick}
-          onWithdraw={handleWithdrawApplication}
-          onViewApplications={handleViewApplications}
-        />
+    <View style={styles.container}>
+      <OrphiHeader title="공고 상세" showBack onBackPress={() => navigation.goBack()} />
 
-        {/* Image Gallery */}
-        {(post.postType === 'images' || post.images?.length > 0) && post.images && post.images.length > 0 && (
-          <View style={themed($fullWidthImageSection)}>
-            <ImageGallery images={post.images} />
-          </View>
-        )}
-
-        {/* Description */}
-        <View style={themed($section)}>
-          <Text preset="subheading" text="상세 설명" style={themed($sectionTitle)} />
-          <Text text={post.description} style={themed($descriptionText)} />
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+        {/* Header - Status & D-Day */}
+        <View style={styles.headerBadges}>
+          <OrphiBadge variant={post.status === 'active' ? 'success' : 'neutral'}>
+            {post.status === 'active' ? '모집중' : '모집마감'}
+          </OrphiBadge>
+          {dDay !== null && dDay >= 0 && (
+            <OrphiBadge variant="info" style={styles.dDayBadge}>
+              D-{dDay}
+            </OrphiBadge>
+          )}
         </View>
 
-        {/* Role Cards */}
-        <RoleCard roles={post.roles} />
+        {/* Title & Organization */}
+        <OrphiText variant="h2" style={styles.title}>
+          {post.title}
+        </OrphiText>
+        <OrphiText variant="body" color="gray600" style={styles.organization}>
+          {post.organizationName}
+        </OrphiText>
+
+        {/* Basic Info */}
+        <OrphiCard style={styles.section}>
+          <OrphiText variant="h4" style={styles.sectionTitle}>
+            기본 정보
+          </OrphiText>
+
+          <View style={styles.infoRow}>
+            <Award size={20} color={orphiTokens.colors.gray600} />
+            <OrphiText variant="body" style={styles.infoLabel}>작품명</OrphiText>
+            <OrphiText variant="body" color="gray900">{post.production}</OrphiText>
+          </View>
+
+          <View style={styles.infoRow}>
+            <MapPin size={20} color={orphiTokens.colors.gray600} />
+            <OrphiText variant="body" style={styles.infoLabel}>장소</OrphiText>
+            <OrphiText variant="body" color="gray900">{post.location}</OrphiText>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Calendar size={20} color={orphiTokens.colors.gray600} />
+            <OrphiText variant="body" style={styles.infoLabel}>연습 일정</OrphiText>
+            <OrphiText variant="body" color="gray900">{post.rehearsalSchedule}</OrphiText>
+          </View>
+
+          {post.deadline && (
+            <View style={styles.infoRow}>
+              <Clock size={20} color={orphiTokens.colors.gray600} />
+              <OrphiText variant="body" style={styles.infoLabel}>마감일</OrphiText>
+              <OrphiText variant="body" color="gray900">
+                {new Date(post.deadline).toLocaleDateString('ko-KR')}
+              </OrphiText>
+            </View>
+          )}
+        </OrphiCard>
+
+        {/* Description */}
+        <OrphiCard style={styles.section}>
+          <OrphiText variant="h4" style={styles.sectionTitle}>
+            상세 설명
+          </OrphiText>
+          <OrphiText variant="body" color="gray700" style={styles.description}>
+            {post.description}
+          </OrphiText>
+        </OrphiCard>
+
+        {/* Roles */}
+        {post.roles && post.roles.length > 0 && (
+          <OrphiCard style={styles.section}>
+            <OrphiText variant="h4" style={styles.sectionTitle}>
+              모집 역할
+            </OrphiText>
+            {post.roles.map((role, index) => (
+              <View key={index} style={styles.roleCard}>
+                <View style={styles.roleHeader}>
+                  <OrphiText variant="h4" color="green600">{role.name}</OrphiText>
+                  <OrphiBadge variant="neutral" size="sm">
+                    {role.count}명 모집
+                  </OrphiBadge>
+                </View>
+                <OrphiText variant="caption" color="gray600" style={styles.roleDetail}>
+                  성별: {role.gender === 'any' ? '무관' : role.gender === 'male' ? '남성' : '여성'}
+                </OrphiText>
+                <OrphiText variant="caption" color="gray600" style={styles.roleDetail}>
+                  나이: {role.ageRange}
+                </OrphiText>
+                <OrphiText variant="body" color="gray700" style={styles.roleRequirements}>
+                  {role.requirements}
+                </OrphiText>
+              </View>
+            ))}
+          </OrphiCard>
+        )}
 
         {/* Audition Info */}
-        <AuditionCard audition={post.audition} />
+        {post.audition && (
+          <OrphiCard style={styles.section}>
+            <OrphiText variant="h4" style={styles.sectionTitle}>
+              오디션 정보
+            </OrphiText>
+            <View style={styles.infoRow}>
+              <OrphiText variant="body" style={styles.infoLabel}>일정</OrphiText>
+              <OrphiText variant="body" color="gray900">{post.audition.date}</OrphiText>
+            </View>
+            <View style={styles.infoRow}>
+              <OrphiText variant="body" style={styles.infoLabel}>장소</OrphiText>
+              <OrphiText variant="body" color="gray900">{post.audition.location}</OrphiText>
+            </View>
+            <View style={styles.infoRow}>
+              <OrphiText variant="body" style={styles.infoLabel}>방식</OrphiText>
+              <OrphiText variant="body" color="gray900">{post.audition.method}</OrphiText>
+            </View>
+            <View style={styles.infoRow}>
+              <OrphiText variant="body" style={styles.infoLabel}>결과 발표</OrphiText>
+              <OrphiText variant="body" color="gray900">{post.audition.resultDate}</OrphiText>
+            </View>
+            {post.audition.requirements.length > 0 && (
+              <>
+                <OrphiText variant="body" style={styles.requirementsTitle}>
+                  준비사항
+                </OrphiText>
+                {post.audition.requirements.map((req, idx) => (
+                  <OrphiText key={idx} variant="body" color="gray700" style={styles.requirement}>
+                    • {req}
+                  </OrphiText>
+                ))}
+              </>
+            )}
+          </OrphiCard>
+        )}
 
-        {/* Performance Info */}
-        <PerformanceCard performance={post.performance} />
-
-        {/* Benefits Info */}
-        <BenefitsCard benefits={post.benefits} />
+        {/* Benefits */}
+        {post.benefits && (
+          <OrphiCard style={styles.section}>
+            <OrphiText variant="h4" style={styles.sectionTitle}>
+              혜택
+            </OrphiText>
+            {post.benefits.fee && (
+              <View style={styles.infoRow}>
+                <OrphiText variant="body" style={styles.infoLabel}>출연료/활동비</OrphiText>
+                <OrphiText variant="body" color="gray900">{post.benefits.fee}</OrphiText>
+              </View>
+            )}
+            <View style={styles.benefitsList}>
+              {post.benefits.transportation && (
+                <OrphiBadge variant="success" size="sm" style={styles.benefitBadge}>
+                  교통비 지원
+                </OrphiBadge>
+              )}
+              {post.benefits.costume && (
+                <OrphiBadge variant="success" size="sm" style={styles.benefitBadge}>
+                  의상 제공
+                </OrphiBadge>
+              )}
+              {post.benefits.portfolio && (
+                <OrphiBadge variant="success" size="sm" style={styles.benefitBadge}>
+                  포트폴리오 제공
+                </OrphiBadge>
+              )}
+              {post.benefits.photography && (
+                <OrphiBadge variant="success" size="sm" style={styles.benefitBadge}>
+                  프로필 촬영
+                </OrphiBadge>
+              )}
+              {post.benefits.meals && (
+                <OrphiBadge variant="success" size="sm" style={styles.benefitBadge}>
+                  식사 제공
+                </OrphiBadge>
+              )}
+            </View>
+            {post.benefits.other && post.benefits.other.length > 0 && (
+              <>
+                <OrphiText variant="body" style={styles.requirementsTitle}>
+                  기타 혜택
+                </OrphiText>
+                {post.benefits.other.map((benefit, idx) => (
+                  <OrphiText key={idx} variant="body" color="gray700" style={styles.requirement}>
+                    • {benefit}
+                  </OrphiText>
+                ))}
+              </>
+            )}
+          </OrphiCard>
+        )}
 
         {/* Contact Info */}
-        <ContactCard contact={post.contact} />
-
-        {/* Tags */}
-        {post.tags && post.tags.length > 0 && (
-          <View style={themed($section)}>
-            <Text preset="subheading" text="태그" style={themed($sectionTitle)} />
-            <View style={themed($tagsContainer)}>
-              {post.tags.map((tag, index) => (
-                <View key={index} style={themed($tag)}>
-                  <Text text={tag} style={themed($tagText)} />
-                </View>
-              ))}
+        {post.contact && (
+          <OrphiCard style={styles.section}>
+            <OrphiText variant="h4" style={styles.sectionTitle}>
+              연락처 및 지원 방법
+            </OrphiText>
+            <View style={styles.infoRow}>
+              <Mail size={20} color={orphiTokens.colors.gray600} />
+              <OrphiText variant="body" style={styles.infoLabel}>이메일</OrphiText>
+              <OrphiText variant="body" color="gray900">{post.contact.email}</OrphiText>
             </View>
-          </View>
+            {post.contact.phone && (
+              <View style={styles.infoRow}>
+                <Phone size={20} color={orphiTokens.colors.gray600} />
+                <OrphiText variant="body" style={styles.infoLabel}>전화</OrphiText>
+                <OrphiText variant="body" color="gray900">{post.contact.phone}</OrphiText>
+              </View>
+            )}
+            <View style={styles.infoRow}>
+              <OrphiText variant="body" style={styles.infoLabel}>지원 방법</OrphiText>
+              <OrphiText variant="body" color="gray900">{post.contact.applicationMethod}</OrphiText>
+            </View>
+            {post.contact.requiredDocuments.length > 0 && (
+              <>
+                <OrphiText variant="body" style={styles.requirementsTitle}>
+                  제출 서류
+                </OrphiText>
+                {post.contact.requiredDocuments.map((doc, idx) => (
+                  <OrphiText key={idx} variant="body" color="gray700" style={styles.requirement}>
+                    • {doc}
+                  </OrphiText>
+                ))}
+              </>
+            )}
+          </OrphiCard>
         )}
 
-        {/* Admin Action Buttons */}
-        {isMyPost && (
-          <View style={themed($actionButtonsContainer)}>
-            <TouchableOpacity
-              style={themed($editButton)}
-              onPress={() => navigation.navigate("CreatePost", { postId: post.id, isEdit: true })}
-              accessibilityLabel={translate("bulletinBoard:actions.editPost")}
-            >
-              <Text text="✏️" style={themed($buttonIcon)} />
-              <Text text={translate("bulletinBoard:actions.edit")} style={themed($editButtonText)} />
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={themed($deleteButton)}
-              onPress={handleDelete}
-              accessibilityLabel={translate("bulletinBoard:actions.deletePost")}
-            >
-              <Text text="🗑️" style={themed($buttonIcon)} />
-              <Text text={translate("bulletinBoard:actions.delete")} style={themed($deleteButtonText)} />
-            </TouchableOpacity>
-          </View>
+        {/* Meta Info */}
+        <OrphiCard style={styles.section}>
+          <OrphiText variant="caption" color="gray500">
+            작성일: {formatDate(post.createdAt)}
+          </OrphiText>
+          <OrphiText variant="caption" color="gray500">
+            조회수: {post.viewCount || 0}
+          </OrphiText>
+        </OrphiCard>
+
+        {/* Apply Button */}
+        {post.status === 'active' && (
+          <OrphiButton
+            variant="primary"
+            size="lg"
+            onPress={() => {
+              // TODO: 지원하기 기능 구현
+              console.log('지원하기:', postId)
+            }}
+            style={styles.applyButton}
+          >
+            지원하기
+          </OrphiButton>
         )}
-
-        {/* Application Modal */}
-        <Modal
-          visible={showApplicationModal}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={() => setShowApplicationModal(false)}
-        >
-          <View style={themed($modalOverlay)}>
-            <View style={themed($modalContent)}>
-              <View style={themed($modalHeader)}>
-                <Text preset="subheading" text="지원하기" style={themed($modalTitle)} />
-                <TouchableOpacity 
-                  onPress={() => setShowApplicationModal(false)}
-                  style={themed($closeButton)}
-                >
-                  <Text text="✕" style={themed($closeButtonText)} />
-                </TouchableOpacity>
-              </View>
-
-              <ScrollView 
-                style={themed($modalScrollView)} 
-                showsVerticalScrollIndicator={false}
-              >
-                <Text text={post?.title || ""} style={themed($modalPostTitle)} />
-                <Text text={post?.organizationName || ""} style={themed($modalOrgName)} />
-
-                {post?.roles && post.roles.length > 0 && (
-                  <View style={themed($rolesSection)}>
-                    <Text text="모집 역할:" style={themed($sectionLabel)} />
-                    {post.roles.map((role, index) => (
-                      <View key={index} style={themed($roleItem)}>
-                        <Text text={`• ${role.name} (${role.count}명)`} style={themed($roleItemText)} />
-                        <Text text={`  ${role.gender === 'male' ? '남성' : role.gender === 'female' ? '여성' : '성별무관'}, ${role.ageRange}`} style={themed($modalRoleDetailText)} />
-                      </View>
-                    ))}
-                  </View>
-                )}
-
-                <TextField
-                  label="연락처 *"
-                  placeholder="전화번호를 입력해주세요"
-                  value={applicationPhoneNumber}
-                  onChangeText={setApplicationPhoneNumber}
-                  style={themed($formInput)}
-                  keyboardType="phone-pad"
-                />
-
-                {post?.roles && post.roles.length > 1 && (
-                  <TextField
-                    label="지원하고자 하는 역할"
-                    placeholder="희망하는 역할을 선택하거나 입력해주세요"
-                    value={applicationRolePreference}
-                    onChangeText={setApplicationRolePreference}
-                    style={themed($formInput)}
-                  />
-                )}
-
-                <TextField
-                  label="관련 경력 및 경험"
-                  placeholder="연기, 노래, 춤 등 관련 경험을 작성해주세요"
-                  value={applicationExperience}
-                  onChangeText={setApplicationExperience}
-                  multiline
-                  numberOfLines={3}
-                  style={themed($formInput)}
-                />
-
-                <TextField
-                  label="지원 동기 및 자기소개"
-                  placeholder="지원 동기나 자기소개를 작성해주세요"
-                  value={applicationMessage}
-                  onChangeText={setApplicationMessage}
-                  multiline
-                  numberOfLines={4}
-                  style={themed($formInput)}
-                />
-              </ScrollView>
-
-              <View style={themed($modalButtons)}>
-                <TouchableOpacity 
-                  style={themed($cancelButton)}
-                  onPress={() => setShowApplicationModal(false)}
-                >
-                  <Text text="취소" style={themed($cancelButtonText)} />
-                </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  style={themed($submitButton)}
-                  onPress={handleApply}
-                  disabled={submittingApplication}
-                >
-                  <Text 
-                    text={submittingApplication ? "지원 중..." : "지원하기"} 
-                    style={themed($submitButtonText)} 
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
-      </View>
-
-      {/* Alert Modal */}
-      <AlertModal
-        visible={alertState.visible}
-        title={alertState.title}
-        message={alertState.message}
-        buttons={alertState.buttons}
-        onDismiss={hideAlert}
-        dismissable={alertState.dismissable}
-      />
-    </Screen>
+      </ScrollView>
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: orphiTokens.colors.background,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: orphiTokens.spacing.md,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  content: {
+    padding: orphiTokens.spacing.base,
+  },
+  headerBadges: {
+    flexDirection: 'row',
+    gap: orphiTokens.spacing.sm,
+    marginBottom: orphiTokens.spacing.md,
+  },
+  dDayBadge: {
+    marginLeft: orphiTokens.spacing.xs,
+  },
+  title: {
+    marginBottom: orphiTokens.spacing.sm,
+  },
+  organization: {
+    marginBottom: orphiTokens.spacing.lg,
+  },
+  section: {
+    marginBottom: orphiTokens.spacing.base,
+  },
+  sectionTitle: {
+    marginBottom: orphiTokens.spacing.md,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: orphiTokens.spacing.sm,
+    gap: orphiTokens.spacing.sm,
+  },
+  infoLabel: {
+    flex: 1,
+    fontWeight: '600',
+  },
+  description: {
+    lineHeight: 24,
+  },
+  roleCard: {
+    backgroundColor: orphiTokens.colors.gray50,
+    padding: orphiTokens.spacing.md,
+    borderRadius: orphiTokens.borderRadius.md,
+    marginBottom: orphiTokens.spacing.md,
+  },
+  roleHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: orphiTokens.spacing.sm,
+  },
+  roleDetail: {
+    marginBottom: orphiTokens.spacing.xs,
+  },
+  roleRequirements: {
+    marginTop: orphiTokens.spacing.sm,
+  },
+  requirementsTitle: {
+    marginTop: orphiTokens.spacing.md,
+    marginBottom: orphiTokens.spacing.sm,
+    fontWeight: '600',
+  },
+  requirement: {
+    marginLeft: orphiTokens.spacing.md,
+    marginBottom: orphiTokens.spacing.xs,
+  },
+  benefitsList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: orphiTokens.spacing.sm,
+    marginTop: orphiTokens.spacing.sm,
+  },
+  benefitBadge: {
+    marginBottom: orphiTokens.spacing.xs,
+  },
+  applyButton: {
+    marginTop: orphiTokens.spacing.md,
+    marginBottom: orphiTokens.spacing.xl,
+  },
+})

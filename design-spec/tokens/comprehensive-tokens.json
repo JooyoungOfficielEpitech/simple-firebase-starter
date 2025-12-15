@@ -1,0 +1,68 @@
+{
+  "colors": [
+    "rgb(107, 114, 128)",
+    "rgb(233, 213, 255)",
+    "rgb(255, 255, 255)",
+    "rgb(31, 41, 55)",
+    "rgb(46, 125, 50)"
+  ],
+  "gradients": [
+    "linear-gradient(to right bottom, rgb(88, 28, 135), rgb(126, 34, 206), rgb(219, 39, 119))"
+  ],
+  "fontFamilies": [
+    "ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\""
+  ],
+  "fontSizes": [
+    "14px",
+    "16px",
+    "18px",
+    "24px",
+    "36px",
+    "60px"
+  ],
+  "fontWeights": [
+    "300",
+    "400",
+    "500",
+    "700"
+  ],
+  "lineHeights": [
+    "20px",
+    "24px",
+    "28px",
+    "32px",
+    "40px",
+    "60px"
+  ],
+  "letterSpacings": [],
+  "spacing": [
+    "0px 0px 16px",
+    "0px 0px 24px",
+    "0px 0px 48px",
+    "0px 0px 8px",
+    "0px 24px",
+    "12px",
+    "12px 0px",
+    "16px",
+    "24px",
+    "24px 0px 0px",
+    "32px",
+    "48px",
+    "48px 0px 0px",
+    "8px",
+    "8px 0px 0px"
+  ],
+  "borderRadius": [
+    "16px",
+    "8px"
+  ],
+  "boxShadows": [
+    "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px",
+    "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.25) 0px 25px 50px -12px"
+  ],
+  "transitions": [
+    "0.15s cubic-bezier(0.4, 0, 0.2, 1)",
+    "color 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), text-decoration-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), fill 0.2s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), filter 0.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+  ],
+  "transforms": []
+}

@@ -1,228 +1,160 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import Slider from '@react-native-community/slider';
+import React from 'react'
+import { View, StyleSheet, TouchableOpacity } from 'react-native'
+import { OrphiButton, OrphiText, OrphiBadge, orphiTokens } from '@/design-system'
+import { PITCH_RANGE } from '@/core/types/audio.types'
+import { useTheme } from '@/core/context/ThemeContext'
 
-/**
- * Pitch Control Component
- *
- * 음정(키) 조절을 위한 UI 컴포넌트
- * - 반음 단위 슬라이더 (-6 ~ +6)
- * - 현재 값 표시 (예: "+2 반음 (♯♯)")
- * - 프리셋 버튼 (남성 -2, 여성 +2, 초기화)
- * - Android 음질 제한 경고 메시지
- */
 interface PitchControlProps {
-  semitones: number;
-  onPitchChange: (semitones: number) => void;
-  onReset: () => void;
-  enabled: boolean;
-  onToggle: () => void;
+  enabled: boolean
+  semitones: number
+  onToggle: (enabled: boolean) => Promise<void>
+  onPitchChange: (semitones: number) => Promise<void>
+  onReset: () => Promise<void>
+  isTransitioning?: boolean
 }
 
 export const PitchControl: React.FC<PitchControlProps> = ({
+  enabled,
   semitones,
+  onToggle,
   onPitchChange,
   onReset,
-  enabled,
-  onToggle,
+  isTransitioning = false,
 }) => {
-  /**
-   * 피치 레이블 렌더링
-   * @param semitones - 반음 값
-   * @returns 포맷된 레이블 (예: "+2 반음 (♯♯)", "-3 반음 (♭♭♭)")
-   */
-  const renderPitchLabel = (semitones: number) => {
-    if (semitones === 0) return '원본 키';
+  const { currentTheme } = useTheme()
 
-    const symbol = semitones > 0 ? '♯' : '♭';
-    const count = Math.abs(semitones);
-    const symbols = symbol.repeat(count);
+  const handleIncrement = () => {
+    if (semitones < PITCH_RANGE.MAX) {
+      onPitchChange(semitones + 1)
+    }
+  }
 
-    return `${semitones > 0 ? '+' : ''}${semitones} 반음 (${symbols})`;
-  };
+  const handleDecrement = () => {
+    if (semitones > PITCH_RANGE.MIN) {
+      onPitchChange(semitones - 1)
+    }
+  }
 
   return (
     <View style={styles.container}>
-      {/* 헤더 */}
       <View style={styles.header}>
-        <Text style={styles.title}>키 조절 (Pitch)</Text>
-        <TouchableOpacity
-          style={[styles.toggleButton, enabled && styles.toggleButtonActive]}
-          onPress={onToggle}
-        >
-          <Text style={styles.toggleText}>{enabled ? 'ON' : 'OFF'}</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* 피치 슬라이더 */}
-      <View style={styles.control}>
-        <View style={styles.labelRow}>
-          <Text style={styles.rangeLabel}>-6 (낮게)</Text>
-          <Text style={styles.currentValue}>{renderPitchLabel(semitones)}</Text>
-          <Text style={styles.rangeLabel}>+6 (높게)</Text>
-        </View>
-
-        <Slider
-          style={styles.slider}
-          minimumValue={-6}
-          maximumValue={6}
-          step={1}
-          value={semitones}
-          onValueChange={onPitchChange}
-          minimumTrackTintColor="#FF9500"
-          maximumTrackTintColor="#ddd"
-          disabled={!enabled}
-        />
-      </View>
-
-      {/* 프리셋 버튼 */}
-      <View style={styles.presets}>
-        <TouchableOpacity
-          style={styles.presetButton}
-          onPress={() => onPitchChange(-2)}
-          disabled={!enabled}
-        >
-          <Text style={[styles.presetText, !enabled && styles.presetTextDisabled]}>
-            남성 -2
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.presetButton}
-          onPress={onReset}
-          disabled={!enabled}
-        >
-          <Text style={[styles.presetText, !enabled && styles.presetTextDisabled]}>
-            초기화 (0)
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.presetButton}
-          onPress={() => onPitchChange(2)}
-          disabled={!enabled}
-        >
-          <Text style={[styles.presetText, !enabled && styles.presetTextDisabled]}>
-            여성 +2
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* 설명 및 경고 메시지 */}
-      <View style={styles.hintContainer}>
-        <Text style={styles.hint}>
-          💡 반음 단위로 키를 조절할 수 있습니다. 템포는 변하지 않습니다.
-        </Text>
-
-        {/* Android 음질 경고 */}
-        {Platform.OS === 'android' && enabled && (
-          <Text style={styles.warning}>
-            ⚠️ Android에서는 음질이 iOS보다 낮을 수 있습니다.
-          </Text>
+        <OrphiText variant="h4">Pitch 조절</OrphiText>
+        {isTransitioning && (
+          <OrphiBadge variant="warning">전환 중...</OrphiBadge>
         )}
+        {enabled && !isTransitioning && (
+          <OrphiBadge variant="success">활성화</OrphiBadge>
+        )}
+      </View>
 
-        {/* 피치 활성화 안내 */}
-        {enabled && (
-          <Text style={styles.info}>
-            ℹ️ 피치 조절을 사용하려면 TrackPlayer를 일시정지하고 expo-av를 재생하세요.
-          </Text>
+      {/* Pitch 값 표시 */}
+      <View style={styles.valueContainer}>
+        <OrphiText
+          variant="h3"
+          style={{ color: enabled ? currentTheme.colors.primary600 : orphiTokens.colors.gray600 }}
+        >
+          {semitones > 0 ? '+' : ''}{semitones} semitones
+        </OrphiText>
+      </View>
+
+      {/* 조절 버튼들 */}
+      <View style={styles.controlGroup}>
+        <TouchableOpacity
+          onPress={handleDecrement}
+          disabled={!enabled || semitones <= PITCH_RANGE.MIN || isTransitioning}
+          style={[
+            styles.adjustButton,
+            { backgroundColor: currentTheme.colors.primary600 },
+            (!enabled || semitones <= PITCH_RANGE.MIN || isTransitioning) &&
+              styles.adjustButtonDisabled,
+          ]}
+        >
+          <OrphiText variant="h3">-</OrphiText>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={handleIncrement}
+          disabled={!enabled || semitones >= PITCH_RANGE.MAX || isTransitioning}
+          style={[
+            styles.adjustButton,
+            { backgroundColor: currentTheme.colors.primary600 },
+            (!enabled || semitones >= PITCH_RANGE.MAX || isTransitioning) &&
+              styles.adjustButtonDisabled,
+          ]}
+        >
+          <OrphiText variant="h3">+</OrphiText>
+        </TouchableOpacity>
+      </View>
+
+      {/* 토글 및 리셋 */}
+      <View style={styles.buttonGroup}>
+        <OrphiButton
+          variant={enabled ? 'secondary' : 'primary'}
+          size="sm"
+          onPress={() => onToggle(!enabled)}
+          style={styles.button}
+          disabled={isTransitioning}
+        >
+          {enabled ? 'Pitch 끄기' : 'Pitch 켜기'}
+        </OrphiButton>
+
+        {enabled && semitones !== 0 && (
+          <OrphiButton
+            variant="text"
+            size="sm"
+            onPress={onReset}
+            style={styles.button}
+            disabled={isTransitioning}
+          >
+            초기화
+          </OrphiButton>
         )}
       </View>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#f9f9f9',
-    padding: 15,
-    borderRadius: 10,
-    marginVertical: 10,
+    paddingVertical: orphiTokens.spacing.md,
+    paddingHorizontal: orphiTokens.spacing.base,
+    backgroundColor: orphiTokens.colors.gray50,
+    borderRadius: orphiTokens.borderRadius.md,
+    marginHorizontal: orphiTokens.spacing.base,
+    marginVertical: orphiTokens.spacing.sm,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: orphiTokens.spacing.sm,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  toggleButton: {
-    backgroundColor: '#ccc',
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  toggleButtonActive: {
-    backgroundColor: '#FF9500',
-  },
-  toggleText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  control: {
-    marginBottom: 15,
-  },
-  labelRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  valueContainer: {
     alignItems: 'center',
-    marginBottom: 5,
+    paddingVertical: orphiTokens.spacing.md,
   },
-  rangeLabel: {
-    fontSize: 12,
-    color: '#999',
-  },
-  currentValue: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FF9500',
-  },
-  slider: {
-    width: '100%',
-    height: 40,
-  },
-  presets: {
+  controlGroup: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 10,
+    justifyContent: 'center',
+    gap: orphiTokens.spacing.lg,
+    marginBottom: orphiTokens.spacing.md,
   },
-  presetButton: {
-    backgroundColor: '#e0e0e0',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 15,
+  adjustButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  presetText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#333',
+  adjustButtonDisabled: {
+    backgroundColor: orphiTokens.colors.gray400,
+    opacity: 0.5,
   },
-  presetTextDisabled: {
-    color: '#999',
+  buttonGroup: {
+    flexDirection: 'row',
+    gap: orphiTokens.spacing.sm,
   },
-  hintContainer: {
-    marginTop: 5,
+  button: {
+    flex: 1,
   },
-  hint: {
-    fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 5,
-  },
-  warning: {
-    fontSize: 12,
-    color: '#FF3B30',
-    textAlign: 'center',
-    marginTop: 5,
-    fontWeight: 'bold',
-  },
-  info: {
-    fontSize: 11,
-    color: '#007AFF',
-    textAlign: 'center',
-    marginTop: 5,
-  },
-});
+})

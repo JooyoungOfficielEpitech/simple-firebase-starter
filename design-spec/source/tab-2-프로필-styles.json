@@ -1,0 +1,1579 @@
+[
+  {
+    "tag": "html",
+    "class": "",
+    "text": "프로필\n🟢\n2000jooyoung\n\n배우\n\n기본 정보\n이메일\n2000jooyoung@gm",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "body",
+    "class": "",
+    "text": "프로필\n🟢\n2000jooyoung\n\n배우\n\n기본 정보\n이메일\n2000jooyoung@gm",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "",
+    "text": "프로필\n🟢\n2000jooyoung\n\n배우\n\n기본 정보\n이메일\n2000jooyoung@gm",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col max-w-md mx-auto shadow-2xl",
+    "text": "프로필\n🟢\n2000jooyoung\n\n배우\n\n기본 정보\n이메일\n2000jooyoung@gm",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "header",
+    "class": "sticky top-0 z-50 px-6 py-4 text-white shadow-lg backdrop-blur-sm bg-opacity-95 flex items-center justify-between rounded-b-3xl animate-slide-down",
+    "text": "프로필",
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px 0px 24px 24px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex-1",
+    "text": "프로필",
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex justify-between items-center",
+    "text": "프로필",
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "h1",
+    "class": "text-xl font-bold",
+    "text": "프로필",
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "20px",
+      "fontWeight": "700",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "button",
+    "class": "ml-4 relative active:scale-95 transition-transform p-2 hover:bg-white/20 rounded-full",
+    "text": "",
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "9999px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse",
+    "text": "",
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgb(239, 68, 68)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "9999px"
+    }
+  },
+  {
+    "tag": "main",
+    "class": "flex-1 overflow-y-auto pb-20",
+    "text": "🟢\n2000jooyoung\n\n배우\n\n기본 정보\n이메일\n2000jooyoung@gmail.",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "p-6 space-y-6",
+    "text": "🟢\n2000jooyoung\n\n배우\n\n기본 정보\n이메일\n2000jooyoung@gmail.",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "relative overflow-hidden rounded-3xl p-8 text-center shadow-xl",
+    "text": "🟢\n2000jooyoung\n\n배우",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "24px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl opacity-20",
+    "text": "",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(46, 125, 50)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "9999px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "relative",
+    "text": "🟢\n2000jooyoung\n\n배우",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl shadow-2xl",
+    "text": "🟢",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "36px",
+      "fontWeight": "400",
+      "borderRadius": "9999px"
+    }
+  },
+  {
+    "tag": "h2",
+    "class": "text-2xl font-bold text-gray-900 mb-1",
+    "text": "2000jooyoung",
+    "styles": {
+      "color": "rgb(17, 24, 39)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "24px",
+      "fontWeight": "700",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "p",
+    "class": "text-gray-600 text-sm flex items-center justify-center gap-2",
+    "text": "배우",
+    "styles": {
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(75, 85, 99)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "bg-white rounded-3xl p-6 shadow-lg border border-gray-100",
+    "text": "기본 정보\n이메일\n2000jooyoung@gmail.com\n전화번호\n미입력\n성별\n미입력\n생",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(255, 255, 255)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "24px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-3 mb-5",
+    "text": "기본 정보",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "w-10 h-10 rounded-xl flex items-center justify-center",
+    "text": "",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(46, 125, 50, 0.082)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "12px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "circle",
+    "class": {},
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "h3",
+    "class": "font-bold text-gray-900 text-lg",
+    "text": "기본 정보",
+    "styles": {
+      "color": "rgb(17, 24, 39)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "18px",
+      "fontWeight": "700",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "space-y-1",
+    "text": "이메일\n2000jooyoung@gmail.com\n전화번호\n미입력\n성별\n미입력\n생년월일\n미입",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex justify-between items-center py-4 px-3 rounded-xl hover:bg-gray-50 transition-colors",
+    "text": "이메일\n2000jooyoung@gmail.com",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "12px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-3",
+    "text": "이메일",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "text-gray-400",
+    "text": "",
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "rect",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-gray-700 font-medium",
+    "text": "이메일",
+    "styles": {
+      "color": "rgb(55, 65, 81)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "font-semibold text-sm text-gray-900",
+    "text": "2000jooyoung@gmail.com",
+    "styles": {
+      "color": "rgb(17, 24, 39)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex justify-between items-center py-4 px-3 rounded-xl hover:bg-gray-50 transition-colors",
+    "text": "전화번호\n미입력",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "12px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-3",
+    "text": "전화번호",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "text-gray-400",
+    "text": "",
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-gray-700 font-medium",
+    "text": "전화번호",
+    "styles": {
+      "color": "rgb(55, 65, 81)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "font-semibold text-sm text-gray-400",
+    "text": "미입력",
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex justify-between items-center py-4 px-3 rounded-xl hover:bg-gray-50 transition-colors",
+    "text": "성별\n미입력",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "12px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-3",
+    "text": "성별",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "text-gray-400",
+    "text": "",
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "circle",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-gray-700 font-medium",
+    "text": "성별",
+    "styles": {
+      "color": "rgb(55, 65, 81)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "font-semibold text-sm text-gray-400",
+    "text": "미입력",
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex justify-between items-center py-4 px-3 rounded-xl hover:bg-gray-50 transition-colors",
+    "text": "생년월일\n미입력",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "12px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-3",
+    "text": "생년월일",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "text-gray-400",
+    "text": "",
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "rect",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-gray-700 font-medium",
+    "text": "생년월일",
+    "styles": {
+      "color": "rgb(55, 65, 81)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "font-semibold text-sm text-gray-400",
+    "text": "미입력",
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex justify-between items-center py-4 px-3 rounded-xl hover:bg-gray-50 transition-colors",
+    "text": "키\n미입력",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "12px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-3",
+    "text": "키",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "text-gray-400",
+    "text": "",
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-gray-700 font-medium",
+    "text": "키",
+    "styles": {
+      "color": "rgb(55, 65, 81)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "font-semibold text-sm text-gray-400",
+    "text": "미입력",
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "bg-white rounded-3xl p-6 shadow-lg border border-gray-100",
+    "text": "계정 상태\n이메일 인증\n✓ 완료\n프로필 완성도\n20%",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(255, 255, 255)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "24px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-3 mb-5",
+    "text": "계정 상태",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "w-10 h-10 rounded-xl flex items-center justify-center",
+    "text": "",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(102, 187, 106, 0.082)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "12px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(102, 187, 106)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(102, 187, 106)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "h3",
+    "class": "font-bold text-gray-900 text-lg",
+    "text": "계정 상태",
+    "styles": {
+      "color": "rgb(17, 24, 39)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "18px",
+      "fontWeight": "700",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "space-y-1",
+    "text": "이메일 인증\n✓ 완료\n프로필 완성도\n20%",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex justify-between items-center py-4 px-3 rounded-xl hover:bg-gray-50 transition-colors",
+    "text": "이메일 인증\n✓ 완료",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "12px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-3",
+    "text": "이메일 인증",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "text-gray-400",
+    "text": "",
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-gray-700 font-medium",
+    "text": "이메일 인증",
+    "styles": {
+      "color": "rgb(55, 65, 81)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full",
+    "text": "✓ 완료",
+    "styles": {
+      "color": "rgb(21, 128, 61)",
+      "bgColor": "rgb(220, 252, 231)",
+      "fontSize": "12px",
+      "fontWeight": "600",
+      "borderRadius": "9999px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex justify-between items-center py-4 px-3 rounded-xl hover:bg-gray-50 transition-colors",
+    "text": "프로필 완성도\n20%",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "12px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-3",
+    "text": "프로필 완성도",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "text-gray-400",
+    "text": "",
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "circle",
+    "class": {},
+    "styles": {
+      "color": "rgb(156, 163, 175)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-gray-700 font-medium",
+    "text": "프로필 완성도",
+    "styles": {
+      "color": "rgb(55, 65, 81)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex items-center gap-2",
+    "text": "20%",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "w-20 h-2 bg-gray-200 rounded-full overflow-hidden",
+    "text": "",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgb(229, 231, 235)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "9999px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "h-full bg-gradient-to-r from-amber-400 to-amber-600 rounded-full",
+    "text": "",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "9999px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-sm font-bold text-amber-600",
+    "text": "20%",
+    "styles": {
+      "color": "rgb(217, 119, 6)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px",
+      "fontWeight": "700",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "space-y-3",
+    "text": "프로필 편집\n비밀번호 변경\n로그아웃",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "button",
+    "class": "w-full py-4 rounded-2xl font-semibold text-white shadow-lg transition-all active:scale-98 flex items-center justify-center gap-2 group",
+    "text": "프로필 편집",
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "16px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(255, 255, 255)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "button",
+    "class": "w-full py-4 rounded-2xl font-semibold bg-gradient-to-br from-gray-50 to-gray-100 text-gray-700 shadow-md transition-all active:scale-98 flex items-center justify-center gap-2 border border-gray-200",
+    "text": "비밀번호 변경",
+    "styles": {
+      "color": "rgb(55, 65, 81)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "16px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(55, 65, 81)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(55, 65, 81)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(55, 65, 81)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "circle",
+    "class": {},
+    "styles": {
+      "color": "rgb(55, 65, 81)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "button",
+    "class": "w-full py-4 rounded-2xl font-semibold bg-gradient-to-br from-red-50 to-red-100 text-red-600 shadow-md transition-all active:scale-98 flex items-center justify-center gap-2 border border-red-200",
+    "text": "로그아웃",
+    "styles": {
+      "color": "rgb(220, 38, 38)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "16px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(220, 38, 38)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(220, 38, 38)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(220, 38, 38)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "nav",
+    "class": "fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-md border-t border-gray-200 px-8 py-4 shadow-2xl rounded-t-3xl animate-slide-up",
+    "text": "홈\n연습실\n프로필\n설정",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(255, 255, 255, 0.95)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "24px 24px 0px 0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "flex justify-around items-center",
+    "text": "홈\n연습실\n프로필\n설정",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "a",
+    "class": "flex flex-col items-center gap-1 transition-all duration-200 opacity-60 hover:opacity-80",
+    "text": "홈",
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-xs font-medium",
+    "text": "홈",
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "a",
+    "class": "flex flex-col items-center gap-1 transition-all duration-200 opacity-60 hover:opacity-80",
+    "text": "연습실",
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "circle",
+    "class": {},
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "circle",
+    "class": {},
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-xs font-medium",
+    "text": "연습실",
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "a",
+    "class": "flex flex-col items-center gap-1 transition-all duration-200 scale-110",
+    "text": "프로필",
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "circle",
+    "class": {},
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-xs font-medium",
+    "text": "프로필",
+    "styles": {
+      "color": "rgb(46, 125, 50)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "a",
+    "class": "flex flex-col items-center gap-1 transition-all duration-200 opacity-60 hover:opacity-80",
+    "text": "설정",
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "svg",
+    "class": {},
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "path",
+    "class": {},
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "circle",
+    "class": {},
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "span",
+    "class": "text-xs font-medium",
+    "text": "설정",
+    "styles": {
+      "color": "rgb(107, 114, 128)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "borderRadius": "0px"
+    }
+  },
+  {
+    "tag": "div",
+    "class": "",
+    "text": "",
+    "styles": {
+      "color": "rgb(0, 0, 0)",
+      "bgColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "borderRadius": "0px"
+    }
+  }
+]

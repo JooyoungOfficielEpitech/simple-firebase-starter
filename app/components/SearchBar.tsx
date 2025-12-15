@@ -1,72 +1,51 @@
-import React, { forwardRef, ForwardedRef } from "react"
-import { View, TextInput, ViewStyle, TextStyle, TextInputProps } from "react-native"
+import React from 'react'
+import { View, TextInput, StyleSheet, ViewStyle } from 'react-native'
+import { Search } from 'lucide-react-native'
+import { orphiTokens } from '@/design-system'
 
-import { Icon } from "@/components/Icon"
-import { useAppTheme } from "@/theme/context"
-import type { ThemedStyle } from "@/theme/types"
-
-export interface SearchBarProps extends Omit<TextInputProps, 'style'> {
-  /**
-   * Container style override
-   */
-  containerStyle?: ViewStyle
-  /**
-   * Input style override
-   */
-  inputStyle?: TextStyle
+export interface SearchBarProps {
+  placeholder?: string
+  value?: string
+  onChangeText?: (text: string) => void
+  style?: ViewStyle
 }
 
-/**
- * SearchBar component for text search input with search icon
- */
-export const SearchBar = forwardRef<TextInput, SearchBarProps>(function SearchBar(
-  { containerStyle, inputStyle, placeholder = "검색...", ...inputProps },
-  ref: ForwardedRef<TextInput>
-) {
-  const { themed, theme } = useAppTheme()
-
+export const SearchBar: React.FC<SearchBarProps> = ({
+  placeholder = '검색',
+  value,
+  onChangeText,
+  style,
+}) => {
   return (
-    <View style={themed([$container, containerStyle])}>
-      <Icon
-        icon="view"
-        size={20}
-        color={theme.colors.textDim}
-        containerStyle={themed($searchIcon)}
-      />
+    <View style={[styles.container, style]}>
+      <Search size={20} color={orphiTokens.colors.gray500} strokeWidth={2} />
       <TextInput
-        ref={ref}
-        style={themed([$input, inputStyle])}
+        style={styles.input}
         placeholder={placeholder}
-        placeholderTextColor={theme.colors.textDim}
-        accessibilityLabel="검색어 입력"
-        accessibilityHint="검색하고 싶은 내용을 입력하세요"
-        accessibilityRole="search"
-        {...inputProps}
+        placeholderTextColor={orphiTokens.colors.gray400}
+        value={value}
+        onChangeText={onChangeText}
       />
     </View>
   )
-})
+}
 
-const $container: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-  flexDirection: "row",
-  alignItems: "center",
-  backgroundColor: colors.palette.neutral100,
-  borderRadius: 8, // Match other components
-  paddingHorizontal: spacing.md,
-  paddingVertical: spacing.md, // Consistent padding for better touch targets
-  borderWidth: 1,
-  borderColor: colors.border,
-  minHeight: 56, // Match button and textfield height
-})
-
-const $searchIcon: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  marginRight: spacing.sm,
-})
-
-const $input: ThemedStyle<TextStyle> = ({ colors, typography, spacing }) => ({
-  flex: 1,
-  fontSize: 16,
-  fontFamily: typography.primary.normal,
-  color: colors.text,
-  padding: 0, // Remove default padding to align properly
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: orphiTokens.colors.white,
+    borderRadius: orphiTokens.borderRadius.sm,
+    paddingHorizontal: orphiTokens.spacing.base,
+    paddingVertical: orphiTokens.spacing.md,
+    gap: orphiTokens.spacing.sm,
+    borderWidth: 1,
+    borderColor: orphiTokens.colors.gray200,
+  },
+  input: {
+    flex: 1,
+    fontSize: orphiTokens.typography.sizes.base,
+    color: orphiTokens.colors.gray900,
+    padding: 0,
+  },
 })

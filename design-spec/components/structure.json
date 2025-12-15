@@ -1,0 +1,11 @@
+{
+  "tag": "body",
+  "styles": {
+    "display": "block",
+    "position": "static",
+    "flexDirection": "row",
+    "justifyContent": "normal",
+    "alignItems": "normal"
+  },
+  "children": []
+}

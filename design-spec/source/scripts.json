@@ -1,0 +1,20 @@
+[
+  {
+    "index": 0,
+    "src": "https://mobile-app-design-1uruno.lumi.ing/assets/index-CpXq6RuI.js",
+    "content": "",
+    "type": "module"
+  },
+  {
+    "index": 1,
+    "src": "https://lumi.new/lumi.ing/badge.js",
+    "content": "",
+    "type": ""
+  },
+  {
+    "index": 2,
+    "src": "https://analytics.lumi.new/script.js",
+    "content": "",
+    "type": ""
+  }
+]

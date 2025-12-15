@@ -1,0 +1,79 @@
+{
+  "colors": [
+    "rgb(102, 187, 106)",
+    "rgb(107, 114, 128)",
+    "rgb(120, 53, 15)",
+    "rgb(156, 163, 175)",
+    "rgb(17, 24, 39)",
+    "rgb(180, 83, 9)",
+    "rgb(217, 119, 6)",
+    "rgb(229, 231, 235)",
+    "rgb(239, 68, 68)",
+    "rgb(249, 250, 251)",
+    "rgb(255, 251, 235)",
+    "rgb(255, 255, 255)",
+    "rgb(46, 125, 50)",
+    "rgb(55, 65, 81)",
+    "rgb(75, 85, 99)",
+    "rgba(102, 187, 106, 0.082)",
+    "rgba(255, 255, 255, 0.8)",
+    "rgba(255, 255, 255, 0.95)",
+    "rgba(46, 125, 50, 0.082)"
+  ],
+  "gradients": [
+    "linear-gradient(to right bottom, rgb(249, 250, 251), rgb(243, 244, 246))",
+    "linear-gradient(135deg, rgb(46, 125, 50) 0%, rgb(102, 187, 106) 100%)",
+    "linear-gradient(90deg, rgb(46, 125, 50), rgb(102, 187, 106))",
+    "linear-gradient(135deg, rgb(156, 163, 175), rgb(107, 114, 128))"
+  ],
+  "fontSizes": [
+    "12px",
+    "14px",
+    "16px",
+    "18px"
+  ],
+  "fontWeights": [
+    "400",
+    "500",
+    "700"
+  ],
+  "spacing": [
+    "0px 0px 0px 16px",
+    "0px 0px 128px",
+    "0px 0px 20px",
+    "0px 0px 4px",
+    "0px 0px 80px",
+    "0px 0px 8px",
+    "0px 24px 24px",
+    "0px 2px 1px",
+    "12px",
+    "12px 0px 0px",
+    "12px 16px",
+    "12px 16px 12px 48px",
+    "16px",
+    "16px 0px",
+    "16px 0px 0px",
+    "16px 24px",
+    "16px 32px",
+    "20px",
+    "20px 0px",
+    "24px",
+    "2px 0px 0px",
+    "4px",
+    "8px",
+    "8px 12px",
+    "normal"
+  ],
+  "borderRadius": [
+    "0px 0px 24px 24px",
+    "12px",
+    "16px",
+    "24px 24px 0px 0px",
+    "9999px"
+  ],
+  "boxShadows": [
+    "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.25) 0px 25px 50px -12px",
+    "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px",
+    "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px"
+  ]
+}
