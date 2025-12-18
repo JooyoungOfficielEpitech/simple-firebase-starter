@@ -10,10 +10,15 @@ module.exports = ({ config }) => {
 
   return {
     ...config,
+    name: "Orphy",
+    slug: "orphy",
+    version: "1.1.0",
+    icon: "./assets/icons/orphy_icon.png",
     scheme: "com.mmecoco.starter",
     ios: {
       ...config.ios,
       bundleIdentifier: "com.mmecoco.starter",
+      buildNumber: "1",
       googleServicesFile: "./GoogleService-Info.plist",
       // This privacyManifests is to get you started.
       // See Expo's guide on apple privacy manifests here:
@@ -33,6 +38,7 @@ module.exports = ({ config }) => {
     android: {
       ...config.android,
       package: "com.mmecoco.starter",
+      versionCode: 2,
       googleServicesFile: "./google-services.json",
     },
     plugins: [

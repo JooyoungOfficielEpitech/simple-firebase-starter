@@ -1,15 +1,55 @@
-import React from 'react'
-import { View, Text, ScrollView, StyleSheet } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { User, Mail, Phone, Calendar, Ruler, CheckCircle } from 'lucide-react-native'
 import { OrphiHeader, OrphiCard, OrphiButton, orphiTokens } from '@/design-system'
 import { useAuth } from '@/core/context/AuthContext'
+import { UserService } from '@/core/services/firestore/userService'
+import { UserProfile } from '@/core/types/user'
+import firestore from '@react-native-firebase/firestore'
 
 export const ProfileScreen: React.FC = () => {
   const navigation = useNavigation()
   const { user, logout } = useAuth()
+  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  const profileCompleteness = 20 // 프로필 완성도 (%)
+  const userService = new UserService(firestore())
+
+  useEffect(() => {
+    loadProfile()
+
+    // 화면이 포커스될 때마다 프로필 다시 로드
+    const unsubscribe = navigation.addListener('focus', () => {
+      loadProfile()
+    })
+
+    return unsubscribe
+  }, [navigation])
+
+  const loadProfile = async () => {
+    if (!user?.uid) return
+
+    try {
+      setLoading(true)
+      const userProfile = await userService.getUserProfile(user.uid)
+      setProfile(userProfile)
+    } catch (error) {
+      console.error('프로필 로드 실패:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const profileCompleteness = profile?.requiredProfileComplete
+    ? 100
+    : Math.round(
+        ((profile?.phoneNumber ? 25 : 0) +
+          (profile?.gender ? 25 : 0) +
+          (profile?.birthday ? 25 : 0) +
+          (profile?.heightCm ? 25 : 0)) *
+          1
+      )
 
   const handleEditProfile = () => {
     navigation.navigate('EditProfile' as never)
@@ -45,6 +85,23 @@ export const ProfileScreen: React.FC = () => {
     </View>
   )
 
+  const formatGender = (gender?: string) => {
+    if (gender === 'male') return '남성'
+    if (gender === 'female') return '여성'
+    return '미입력'
+  }
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <OrphiHeader title="프로필" />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={orphiTokens.colors.green600} />
+        </View>
+      </View>
+    )
+  }
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -61,8 +118,18 @@ export const ProfileScreen: React.FC = () => {
           </View>
 
           {/* User Info */}
-          <Text style={styles.username}>{user?.displayName || user?.email || '사용자'}</Text>
-          <Text style={styles.role}>배우</Text>
+          <Text style={styles.username}>{profile?.name || user?.displayName || user?.email || '사용자'}</Text>
+          <Text style={styles.role}>{profile?.userType === 'organizer' ? '운영자' : '배우'}</Text>
+
+          {/* Edit Profile Button */}
+          <OrphiButton
+            variant="primary"
+            size="sm"
+            onPress={handleEditProfile}
+            style={styles.editButton}
+          >
+            프로필 편집
+          </OrphiButton>
         </OrphiCard>
 
         {/* 기본 정보 Section */}
@@ -76,27 +143,27 @@ export const ProfileScreen: React.FC = () => {
             <InfoRow
               icon={<Mail size={16} color={orphiTokens.colors.gray500} strokeWidth={2} />}
               label="이메일"
-              value={user?.email || '미입력'}
+              value={profile?.email || user?.email || '미입력'}
             />
             <InfoRow
               icon={<Phone size={16} color={orphiTokens.colors.gray500} strokeWidth={2} />}
               label="전화번호"
-              value="미입력"
+              value={profile?.phoneNumber || '미입력'}
             />
             <InfoRow
               icon={<User size={16} color={orphiTokens.colors.gray500} strokeWidth={2} />}
               label="성별"
-              value="미입력"
+              value={formatGender(profile?.gender)}
             />
             <InfoRow
               icon={<Calendar size={16} color={orphiTokens.colors.gray500} strokeWidth={2} />}
               label="생년월일"
-              value="미입력"
+              value={profile?.birthday || '미입력'}
             />
             <InfoRow
               icon={<Ruler size={16} color={orphiTokens.colors.gray500} strokeWidth={2} />}
               label="키"
-              value="미입력"
+              value={profile?.heightCm ? `${profile.heightCm}cm` : '미입력'}
             />
           </View>
         </OrphiCard>
@@ -141,20 +208,11 @@ export const ProfileScreen: React.FC = () => {
 
         {/* Action Buttons */}
         <View style={styles.actions}>
-          <OrphiButton
-            variant="primary"
-            gradient
-            fullWidth
-            onPress={handleEditProfile}
-          >
-            프로필 편집 →
-          </OrphiButton>
-
-          <OrphiButton variant="secondary" fullWidth onPress={handleChangePassword}>
+          <OrphiButton variant="secondary" size="sm" onPress={handleChangePassword}>
             비밀번호 변경
           </OrphiButton>
 
-          <OrphiButton variant="danger" fullWidth onPress={handleLogout}>
+          <OrphiButton variant="danger" size="sm" onPress={handleLogout}>
             로그아웃
           </OrphiButton>
         </View>
@@ -167,6 +225,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: orphiTokens.colors.background,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   scrollContent: {
     padding: orphiTokens.spacing.base,
@@ -199,6 +262,9 @@ const styles = StyleSheet.create({
   role: {
     fontSize: orphiTokens.typography.sizes.base,
     color: orphiTokens.colors.gray600,
+  },
+  editButton: {
+    marginTop: orphiTokens.spacing.base,
   },
   section: {
     marginBottom: orphiTokens.spacing.base,
@@ -284,6 +350,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   actions: {
+    flexDirection: 'row',
     gap: orphiTokens.spacing.md,
     marginTop: orphiTokens.spacing.base,
   },

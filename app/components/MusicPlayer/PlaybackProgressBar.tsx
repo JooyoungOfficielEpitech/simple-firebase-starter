@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { View, StyleSheet } from 'react-native'
 import Slider from '@react-native-community/slider'
 import { OrphiText, orphiTokens } from '@/design-system'
+import { useTheme } from '@/core/context/ThemeContext'
 import type { ABLoopState } from '@/core/types/audio.types'
 
 interface PlaybackProgressBarProps {
@@ -25,12 +26,17 @@ export const PlaybackProgressBar: React.FC<PlaybackProgressBarProps> = ({
   abLoop,
   disabled = false,
 }) => {
+  const { currentTheme } = useTheme()
+  const [draggingPosition, setDraggingPosition] = useState<number | null>(null)
+
+  const displayPosition = draggingPosition !== null ? draggingPosition : position
+
   return (
     <View style={styles.container}>
       {/* 시간 표시 */}
       <View style={styles.timeContainer}>
         <OrphiText variant="caption" color="gray600">
-          {formatTime(position)}
+          {formatTime(displayPosition)}
         </OrphiText>
         <OrphiText variant="caption" color="gray600">
           {formatTime(duration)}
@@ -43,11 +49,15 @@ export const PlaybackProgressBar: React.FC<PlaybackProgressBarProps> = ({
           style={styles.slider}
           minimumValue={0}
           maximumValue={duration || 1}
-          value={position}
-          onSlidingComplete={onSeek}
-          minimumTrackTintColor={orphiTokens.colors.green600}
+          value={displayPosition}
+          onValueChange={(value) => setDraggingPosition(value)}
+          onSlidingComplete={(value) => {
+            setDraggingPosition(null)
+            onSeek(value)
+          }}
+          minimumTrackTintColor={currentTheme.colors.primary600}
           maximumTrackTintColor={orphiTokens.colors.gray400}
-          thumbTintColor={orphiTokens.colors.green600}
+          thumbTintColor={currentTheme.colors.primary600}
           disabled={disabled || !duration}
         />
 
@@ -58,8 +68,10 @@ export const PlaybackProgressBar: React.FC<PlaybackProgressBarProps> = ({
               <View
                 style={[
                   styles.marker,
-                  styles.markerA,
-                  { left: `${(abLoop.a / duration) * 100}%` },
+                  {
+                    backgroundColor: currentTheme.colors.primary600,
+                    left: `${(abLoop.a / duration) * 100}%`,
+                  },
                 ]}
               >
                 <OrphiText variant="caption" color="white" style={styles.markerText}>
@@ -71,8 +83,10 @@ export const PlaybackProgressBar: React.FC<PlaybackProgressBarProps> = ({
               <View
                 style={[
                   styles.marker,
-                  styles.markerB,
-                  { left: `${(abLoop.b / duration) * 100}%` },
+                  {
+                    backgroundColor: currentTheme.colors.primary400,
+                    left: `${(abLoop.b / duration) * 100}%`,
+                  },
                 ]}
               >
                 <OrphiText variant="caption" color="white" style={styles.markerText}>
@@ -122,12 +136,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  markerA: {
-    backgroundColor: orphiTokens.colors.green600,
-  },
-  markerB: {
-    backgroundColor: orphiTokens.colors.green600,
   },
   markerText: {
     fontSize: 10,

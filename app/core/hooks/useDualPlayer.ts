@@ -137,6 +137,79 @@ export const useDualPlayer = ({ audioUrl, onPlaybackUpdate }: UseDualPlayerProps
   }, [playerType]);
 
   /**
+   * Get current position (supports both players)
+   */
+  const getPosition = useCallback(async (): Promise<number> => {
+    try {
+      if (playerType === 'trackplayer') {
+        return await TrackPlayer.getPosition();
+      } else if (playerType === 'expoav') {
+        const sound = soundRef.current;
+        if (sound) {
+          const status = await sound.getStatusAsync();
+          if (status.isLoaded) {
+            return status.positionMillis / 1000;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('❌ Get Position 오류:', error);
+    }
+    return 0;
+  }, [playerType]);
+
+  /**
+   * Seek to position (supports both players)
+   */
+  const seekTo = useCallback(async (positionSeconds: number) => {
+    try {
+      if (playerType === 'trackplayer') {
+        await TrackPlayer.seekTo(positionSeconds);
+      } else if (playerType === 'expoav') {
+        const sound = soundRef.current;
+        if (sound) {
+          await sound.setPositionAsync(positionSeconds * 1000);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Seek 오류:', error);
+    }
+  }, [playerType]);
+
+  /**
+   * Play/Pause controls (supports both players)
+   */
+  const play = useCallback(async () => {
+    try {
+      if (playerType === 'trackplayer') {
+        await TrackPlayer.play();
+      } else if (playerType === 'expoav') {
+        const sound = soundRef.current;
+        if (sound) {
+          await sound.playAsync();
+        }
+      }
+    } catch (error) {
+      console.error('❌ Play 오류:', error);
+    }
+  }, [playerType]);
+
+  const pause = useCallback(async () => {
+    try {
+      if (playerType === 'trackplayer') {
+        await TrackPlayer.pause();
+      } else if (playerType === 'expoav') {
+        const sound = soundRef.current;
+        if (sound) {
+          await sound.pauseAsync();
+        }
+      }
+    } catch (error) {
+      console.error('❌ Pause 오류:', error);
+    }
+  }, [playerType]);
+
+  /**
    * Cleanup
    */
   const cleanup = useCallback(async () => {
@@ -157,6 +230,10 @@ export const useDualPlayer = ({ audioUrl, onPlaybackUpdate }: UseDualPlayerProps
     switchToExpoAV,
     switchToTrackPlayer,
     updatePitch,
+    getPosition,
+    seekTo,
+    play,
+    pause,
     cleanup,
     expoSound: soundRef.current,
   };

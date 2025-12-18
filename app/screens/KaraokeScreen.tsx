@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { View, ScrollView, StyleSheet, Alert } from 'react-native'
 import { OrphiHeader, orphiTokens } from '@/design-system'
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native'
-import TrackPlayer, { Capability } from 'react-native-track-player'
+import TrackPlayer, { Capability, useProgress } from 'react-native-track-player'
 import { useDualPlayer } from '@/core/hooks/useDualPlayer'
 import { useMetronome } from '@/core/hooks/useMetronome'
 import type { ABLoopState } from '@/core/types/audio.types'
@@ -23,6 +23,9 @@ export const KaraokeScreen: React.FC = () => {
   const navigation = useNavigation()
   const route = useRoute<KaraokeRouteProp>()
   const { song } = route.params
+
+  // TrackPlayer progress
+  const { position: trackPlayerPosition, duration: trackPlayerDuration } = useProgress()
 
   // 재생 상태
   const [isPlaying, setIsPlaying] = useState(false)
@@ -54,6 +57,10 @@ export const KaraokeScreen: React.FC = () => {
     switchToExpoAV,
     switchToTrackPlayer,
     updatePitch,
+    getPosition: dualPlayerGetPosition,
+    seekTo: dualPlayerSeek,
+    play: dualPlayerPlay,
+    pause: dualPlayerPause,
     cleanup,
   } = useDualPlayer({
     audioUrl: song.mrUrl,
@@ -79,6 +86,14 @@ export const KaraokeScreen: React.FC = () => {
     timeSignature: { beats: 4, noteValue: 4 },
   })
 
+  // TrackPlayer position/duration 업데이트
+  useEffect(() => {
+    if (playerType === 'trackplayer') {
+      setPosition(trackPlayerPosition)
+      setDuration(trackPlayerDuration)
+    }
+  }, [playerType, trackPlayerPosition, trackPlayerDuration])
+
   // TrackPlayer 초기화
   useEffect(() => {
     setupPlayer()
@@ -94,17 +109,37 @@ export const KaraokeScreen: React.FC = () => {
 
   const setupPlayer = async () => {
     try {
-      await TrackPlayer.setupPlayer()
+      // TrackPlayer 초기화 (이미 초기화되어 있으면 스킵)
+      try {
+        await TrackPlayer.setupPlayer()
+      } catch (error: any) {
+        // 이미 초기화된 경우 무시
+        if (error?.code !== 'player_already_initialized') {
+          throw error
+        }
+      }
+
+      // 옵션 설정
       await TrackPlayer.updateOptions({
         capabilities: [
           Capability.Play,
           Capability.Pause,
           Capability.SeekTo,
           Capability.Stop,
+          Capability.SkipToNext,
+          Capability.SkipToPrevious,
         ],
-        compactCapabilities: [Capability.Play, Capability.Pause],
-      })
+        compactCapabilities: [Capability.Play, Capability.Pause, Capability.SeekTo],
+        progressUpdateEventInterval: 0.1,
+        android: {
+          appKilledPlaybackBehavior: 'ContinuePlayback' as any,
+        },
+      } as any)
 
+      // 기존 트랙 제거
+      await TrackPlayer.reset()
+
+      // 트랙 추가
       if (song.mrUrl) {
         await TrackPlayer.add({
           id: song.id,
@@ -149,24 +184,18 @@ export const KaraokeScreen: React.FC = () => {
 
   // 재생/일시정지
   const handlePlay = async () => {
-    if (playerType === 'trackplayer') {
-      await TrackPlayer.play()
-    }
+    await dualPlayerPlay()
     setIsPlaying(true)
   }
 
   const handlePause = async () => {
-    if (playerType === 'trackplayer') {
-      await TrackPlayer.pause()
-    }
+    await dualPlayerPause()
     setIsPlaying(false)
   }
 
   // Seek
   const handleSeek = async (pos: number) => {
-    if (playerType === 'trackplayer') {
-      await TrackPlayer.seekTo(pos)
-    }
+    await dualPlayerSeek(pos)
     setPosition(pos)
   }
 
@@ -206,12 +235,10 @@ export const KaraokeScreen: React.FC = () => {
     }
 
     loopCheckIntervalRef.current = setInterval(async () => {
-      if (playerType === 'trackplayer') {
-        const currentPos = await TrackPlayer.getPosition()
-        if (currentPos >= abLoop.b!) {
-          await TrackPlayer.seekTo(abLoop.a!)
-          resetBeat()
-        }
+      const currentPos = await dualPlayerGetPosition()
+      if (currentPos >= abLoop.b!) {
+        await dualPlayerSeek(abLoop.a!)
+        resetBeat()
       }
     }, 100)
 
@@ -220,7 +247,7 @@ export const KaraokeScreen: React.FC = () => {
         clearInterval(loopCheckIntervalRef.current)
       }
     }
-  }, [abLoop, playerType, resetBeat])
+  }, [abLoop, resetBeat, dualPlayerGetPosition, dualPlayerSeek])
 
   // 메트로놈 토글
   const handleMetronomeToggle = () => {
