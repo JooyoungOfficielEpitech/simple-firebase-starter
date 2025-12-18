@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { User, Mail, Phone, Calendar, Ruler, CheckCircle } from 'lucide-react-native'
 import { OrphiHeader, OrphiCard, OrphiButton, orphiTokens } from '@/design-system'
 import { useAuth } from '@/core/context/AuthContext'
 import { UserService } from '@/core/services/firestore/userService'
 import { UserProfile } from '@/core/types/user'
+import type { AppStackParamList } from '@/core/navigators/types'
 import firestore from '@react-native-firebase/firestore'
 
+type NavigationProp = NativeStackNavigationProp<AppStackParamList>
+
 export const ProfileScreen: React.FC = () => {
-  const navigation = useNavigation()
+  const navigation = useNavigation<NavigationProp>()
   const { user, logout } = useAuth()
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
+  const [unreadNotifications, setUnreadNotifications] = useState(0)
 
   const userService = new UserService(firestore())
 
@@ -67,6 +72,10 @@ export const ProfileScreen: React.FC = () => {
     }
   }
 
+  const handleNotificationPress = () => {
+    navigation.navigate('NotificationCenter')
+  }
+
   const InfoRow = ({
     icon,
     label,
@@ -94,7 +103,12 @@ export const ProfileScreen: React.FC = () => {
   if (loading) {
     return (
       <View style={styles.container}>
-        <OrphiHeader title="프로필" />
+        <OrphiHeader
+          title="프로필"
+          showBell
+          bellBadgeCount={unreadNotifications}
+          onBellPress={handleNotificationPress}
+        />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={orphiTokens.colors.green600} />
         </View>
@@ -105,7 +119,12 @@ export const ProfileScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <OrphiHeader title="프로필" />
+      <OrphiHeader
+        title="프로필"
+        showBell
+        bellBadgeCount={unreadNotifications}
+        onBellPress={handleNotificationPress}
+      />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Profile Card */}

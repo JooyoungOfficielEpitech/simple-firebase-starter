@@ -1,21 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, FlatList, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { OrphiHeader, orphiTokens } from '@/design-system'
 import { SongCard } from '@/components/SongCard'
 import { SearchBar } from '@/components/SearchBar'
 import { SongService } from '@/core/services/firestore'
 import { Song } from '@/core/types/song'
-import type { PracticeStackParamList } from '@/core/navigators/types'
-
-type NavigationProp = NativeStackNavigationProp<PracticeStackParamList>
 
 export const MusicPlayerScreen: React.FC = () => {
-  const navigation = useNavigation<NavigationProp>()
+  const navigation = useNavigation()
   const [songs, setSongs] = useState<Song[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [filteredSongs, setFilteredSongs] = useState<Song[]>([])
+  const [unreadNotifications, setUnreadNotifications] = useState(0)
 
   useEffect(() => {
     loadSongs()
@@ -47,7 +44,11 @@ export const MusicPlayerScreen: React.FC = () => {
 
   const handlePlaySong = (song: Song) => {
     console.log('Playing song:', song.title)
-    navigation.navigate('KaraokeScreen', { song })
+    ;(navigation as any).navigate('KaraokeScreen', { song })
+  }
+
+  const handleNotificationPress = () => {
+    ;(navigation as any).navigate('NotificationCenter')
   }
 
   const renderSong = ({ item }: { item: Song }) => {
@@ -80,7 +81,13 @@ export const MusicPlayerScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <OrphiHeader title="연습실" subtitle="🎵 나만의 무대를 준비하세요" />
+      <OrphiHeader
+        title="연습실"
+        subtitle="🎵 나만의 무대를 준비하세요"
+        showBell
+        bellBadgeCount={unreadNotifications}
+        onBellPress={handleNotificationPress}
+      />
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>

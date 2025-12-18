@@ -1,14 +1,23 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Bell, Lock, Info, ChevronRight } from 'lucide-react-native'
 import { OrphiHeader, OrphiCard, orphiTokens } from '@/design-system'
 import { ThemeSelector } from '@/components'
 import { useTheme } from '@/core/context/ThemeContext'
+import type { AppStackParamList } from '@/core/navigators/types'
+
+type NavigationProp = NativeStackNavigationProp<AppStackParamList>
 
 export const SettingsScreen: React.FC = () => {
-  const navigation = useNavigation()
+  const navigation = useNavigation<NavigationProp>()
   const { currentTheme } = useTheme()
+  const [unreadNotifications, setUnreadNotifications] = useState(0)
+
+  const handleNotificationPress = () => {
+    navigation.navigate('NotificationCenter')
+  }
 
   const SettingRow = ({
     icon,
@@ -31,7 +40,12 @@ export const SettingsScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <OrphiHeader title="설정" />
+      <OrphiHeader
+        title="설정"
+        showBell
+        bellBadgeCount={unreadNotifications}
+        onBellPress={handleNotificationPress}
+      />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Theme Selector */}

@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { View, ScrollView, StyleSheet, Alert } from 'react-native'
-import { OrphiHeader, orphiTokens } from '@/design-system'
+import { View, ScrollView, StyleSheet, Alert, ActivityIndicator } from 'react-native'
+import { OrphiHeader, OrphiText, orphiTokens } from '@/design-system'
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native'
 import TrackPlayer, { Capability, useProgress } from 'react-native-track-player'
-import { useDualPlayer } from '@/core/hooks/useDualPlayer'
 import { useMetronome } from '@/core/hooks/useMetronome'
+import { usePitchShifterProgress } from '@/core/hooks/usePitchShifterProgress'
+import { usePitchShifterState } from '@/core/hooks/usePitchShifterState'
+import PitchShifterService from '@/core/services/pitchShifterService'
+import { useTheme } from '@/core/context/ThemeContext'
 import type { ABLoopState } from '@/core/types/audio.types'
 import type { Song } from '@/core/types/song'
 import type { PracticeStackParamList } from '@/core/navigators/types'
@@ -18,23 +21,38 @@ import {
 } from '@/components/MusicPlayer'
 
 type KaraokeRouteProp = RouteProp<PracticeStackParamList, 'KaraokeScreen'>
+type PlayerType = 'pitchshifter' | 'trackplayer'
 
 export const KaraokeScreen: React.FC = () => {
   const navigation = useNavigation()
   const route = useRoute<KaraokeRouteProp>()
   const { song } = route.params
+  const { currentTheme } = useTheme()
+
+  // Player type
+  const [playerType, setPlayerType] = useState<PlayerType>('trackplayer')
+
+  // PitchShifter progress & state
+  const pitchShifterProgress = usePitchShifterProgress()
+  const pitchShifterState = usePitchShifterState()
 
   // TrackPlayer progress
-  const { position: trackPlayerPosition, duration: trackPlayerDuration } = useProgress()
+  const trackPlayerProgress = useProgress()
 
-  // 재생 상태
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [position, setPosition] = useState(0)
-  const [duration, setDuration] = useState(0)
+  // Unified progress & state
+  const position = playerType === 'pitchshifter' ? pitchShifterProgress.position : trackPlayerProgress.position
+  const duration = playerType === 'pitchshifter' ? pitchShifterProgress.duration : trackPlayerProgress.duration
+
+  // TrackPlayer 재생 상태
+  const [trackPlayerIsPlaying, setTrackPlayerIsPlaying] = useState(false)
+
+  // Unified isPlaying
+  const isPlaying = playerType === 'pitchshifter' ? pitchShifterState.isPlaying : trackPlayerIsPlaying
 
   // Pitch 상태
-  const [pitchEnabled, setPitchEnabled] = useState(false)
   const [pitchSemitones, setPitchSemitones] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadingMessage, setLoadingMessage] = useState('플레이어 초기화 중...')
 
   // 메트로놈 상태
   const [metronomeEnabled, setMetronomeEnabled] = useState(false)
@@ -50,29 +68,6 @@ export const KaraokeScreen: React.FC = () => {
 
   const loopCheckIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  // useDualPlayer 통합
-  const {
-    playerType,
-    isTransitioning,
-    switchToExpoAV,
-    switchToTrackPlayer,
-    updatePitch,
-    getPosition: dualPlayerGetPosition,
-    seekTo: dualPlayerSeek,
-    play: dualPlayerPlay,
-    pause: dualPlayerPause,
-    cleanup,
-  } = useDualPlayer({
-    audioUrl: song.mrUrl,
-    onPlaybackUpdate: (status) => {
-      if (status.isLoaded) {
-        setPosition(status.positionMillis / 1000)
-        setDuration(status.durationMillis ? status.durationMillis / 1000 : 0)
-        setIsPlaying(status.isPlaying)
-      }
-    },
-  })
-
   // useMetronome 통합
   const {
     currentBeat,
@@ -86,38 +81,98 @@ export const KaraokeScreen: React.FC = () => {
     timeSignature: { beats: 4, noteValue: 4 },
   })
 
-  // TrackPlayer position/duration 업데이트
-  useEffect(() => {
-    if (playerType === 'trackplayer') {
-      setPosition(trackPlayerPosition)
-      setDuration(trackPlayerDuration)
-    }
-  }, [playerType, trackPlayerPosition, trackPlayerDuration])
-
-  // TrackPlayer 초기화
+  // Player 초기화
   useEffect(() => {
     setupPlayer()
 
     return () => {
       cleanup()
-      TrackPlayer.reset()
-      if (loopCheckIntervalRef.current) {
-        clearInterval(loopCheckIntervalRef.current)
-      }
     }
   }, [])
 
+  const cleanup = async () => {
+    if (playerType === 'pitchshifter') {
+      PitchShifterService.stop()
+    } else {
+      await TrackPlayer.reset()
+    }
+
+    if (loopCheckIntervalRef.current) {
+      clearInterval(loopCheckIntervalRef.current)
+    }
+  }
+
   const setupPlayer = async () => {
     try {
-      // TrackPlayer 초기화 (이미 초기화되어 있으면 스킵)
+      setIsLoading(true)
+      setLoadingMessage('플레이어 초기화 중...')
+
+      console.log('🎵 [KaraokeScreen] Song data:', JSON.stringify(song, null, 2))
+
+      if (!song.mrUrl) {
+        console.error('❌ [KaraokeScreen] No mrUrl found in song')
+        Alert.alert('오류', '음악 파일 URL이 없습니다. mrUrl을 설정해주세요.')
+        setIsLoading(false)
+        return
+      }
+
+      // PitchShifter 사용 가능 여부 확인
+      if (PitchShifterService.isAvailable()) {
+        console.log('✅ [KaraokeScreen] PitchShifter available - using PitchShifter mode')
+        setLoadingMessage('고급 오디오 엔진 로드 중...')
+        await setupPitchShifter()
+      } else {
+        console.log('⚠️ [KaraokeScreen] PitchShifter not available - using TrackPlayer fallback')
+        setLoadingMessage('오디오 플레이어 로드 중...')
+        await setupTrackPlayer()
+      }
+
+      setLoadingMessage('준비 완료!')
+      // 잠시 "준비 완료" 메시지 보여주기
+      await new Promise(resolve => setTimeout(resolve, 500))
+      setIsLoading(false)
+    } catch (error: any) {
+      console.error('❌ [KaraokeScreen] 초기화 실패:', error)
+      Alert.alert('오류', '오디오 플레이어 초기화에 실패했습니다.')
+      setIsLoading(false)
+    }
+  }
+
+  const setupPitchShifter = async () => {
+    try {
+      console.log('🎵 [KaraokeScreen] Loading audio file with PitchShifter:', song.mrUrl)
+      setLoadingMessage('오디오 파일 다운로드 중...')
+
+      // 오디오 파일 로드
+      const audioInfo = await PitchShifterService.loadAudioFile(song.mrUrl!)
+
+      console.log('✅ [KaraokeScreen] PitchShifter loaded successfully:', audioInfo)
+      setPlayerType('pitchshifter')
+    } catch (error: any) {
+      console.error('❌ [KaraokeScreen] PitchShifter 로드 실패:', error)
+      console.log('⚠️ [KaraokeScreen] Falling back to TrackPlayer')
+
+      // PitchShifter 실패시 TrackPlayer로 폴백
+      setLoadingMessage('대체 플레이어로 전환 중...')
+      await setupTrackPlayer()
+    }
+  }
+
+  const setupTrackPlayer = async () => {
+    try {
+      console.log('🎵 [KaraokeScreen] Setting up TrackPlayer')
+      setLoadingMessage('플레이어 초기화 중...')
+
+      // TrackPlayer 초기화
       try {
         await TrackPlayer.setupPlayer()
       } catch (error: any) {
-        // 이미 초기화된 경우 무시
         if (error?.code !== 'player_already_initialized') {
           throw error
         }
       }
+
+      setLoadingMessage('플레이어 설정 중...')
 
       // 옵션 설정
       await TrackPlayer.updateOptions({
@@ -126,54 +181,38 @@ export const KaraokeScreen: React.FC = () => {
           Capability.Pause,
           Capability.SeekTo,
           Capability.Stop,
-          Capability.SkipToNext,
-          Capability.SkipToPrevious,
         ],
         compactCapabilities: [Capability.Play, Capability.Pause, Capability.SeekTo],
         progressUpdateEventInterval: 0.1,
-        android: {
-          appKilledPlaybackBehavior: 'ContinuePlayback' as any,
-        },
       } as any)
 
       // 기존 트랙 제거
       await TrackPlayer.reset()
 
+      setLoadingMessage('오디오 파일 로드 중...')
+
       // 트랙 추가
-      if (song.mrUrl) {
-        await TrackPlayer.add({
-          id: song.id,
-          url: song.mrUrl,
-          title: song.title,
-          artist: song.musical,
-          duration: song.audioDuration,
-        })
-        const trackDuration = await TrackPlayer.getDuration()
-        setDuration(trackDuration)
-      } else {
-        Alert.alert('오류', '음악 파일이 없습니다.')
-      }
+      await TrackPlayer.add({
+        id: song.id,
+        url: song.mrUrl!,
+        title: song.title,
+        artist: song.musical,
+        duration: song.audioDuration,
+      })
+
+      console.log('✅ [KaraokeScreen] TrackPlayer setup complete')
+      setPlayerType('trackplayer')
     } catch (error) {
-      console.error('❌ TrackPlayer 초기화 실패:', error)
-      Alert.alert('오류', 'TrackPlayer 초기화에 실패했습니다.')
+      console.error('❌ [KaraokeScreen] TrackPlayer setup failed:', error)
+      throw error
     }
   }
 
-  // Pitch 토글
-  const handlePitchToggle = async (enabled: boolean) => {
-    setPitchEnabled(enabled)
-    if (enabled) {
-      await switchToExpoAV(pitchSemitones)
-    } else {
-      await switchToTrackPlayer()
-    }
-  }
-
-  // Pitch 변경
+  // Pitch 변경 (PitchShifter 모드만)
   const handlePitchChange = async (semitones: number) => {
     setPitchSemitones(semitones)
-    if (pitchEnabled) {
-      await updatePitch(semitones)
+    if (playerType === 'pitchshifter') {
+      PitchShifterService.setPitch(semitones)
     }
   }
 
@@ -184,19 +223,43 @@ export const KaraokeScreen: React.FC = () => {
 
   // 재생/일시정지
   const handlePlay = async () => {
-    await dualPlayerPlay()
-    setIsPlaying(true)
+    try {
+      if (playerType === 'pitchshifter') {
+        await PitchShifterService.play()
+      } else {
+        await TrackPlayer.play()
+        setTrackPlayerIsPlaying(true)
+      }
+    } catch (error) {
+      console.error('❌ Play error:', error)
+      Alert.alert('오류', '재생에 실패했습니다.')
+    }
   }
 
   const handlePause = async () => {
-    await dualPlayerPause()
-    setIsPlaying(false)
+    try {
+      if (playerType === 'pitchshifter') {
+        PitchShifterService.pause()
+      } else {
+        await TrackPlayer.pause()
+        setTrackPlayerIsPlaying(false)
+      }
+    } catch (error) {
+      console.error('❌ Pause error:', error)
+    }
   }
 
   // Seek
   const handleSeek = async (pos: number) => {
-    await dualPlayerSeek(pos)
-    setPosition(pos)
+    try {
+      if (playerType === 'pitchshifter') {
+        await PitchShifterService.seek(pos)
+      } else {
+        await TrackPlayer.seekTo(pos)
+      }
+    } catch (error) {
+      console.error('❌ Seek error:', error)
+    }
   }
 
   const handleSeekBackward = () => {
@@ -209,45 +272,54 @@ export const KaraokeScreen: React.FC = () => {
 
   // A-B 루프 핸들러
   const handleSetA = () => {
-    setAbLoop((prev) => ({ ...prev, a: position }))
+    setAbLoop((prev) => ({ ...prev, a: position, enabled: true }))
   }
 
   const handleSetB = () => {
-    setAbLoop((prev) => ({ ...prev, b: position }))
-  }
-
-  const handleLoopToggle = () => {
-    setAbLoop((prev) => ({ ...prev, enabled: !prev.enabled }))
+    setAbLoop((prev) => ({ ...prev, b: position, enabled: true }))
   }
 
   const handleClearLoop = () => {
     setAbLoop({ a: null, b: null, enabled: false })
+    if (playerType === 'pitchshifter') {
+      PitchShifterService.setABLoop(false, 0, 0)
+    }
   }
 
-  // A-B 루프 로직
+  // A-B 루프 적용
   useEffect(() => {
-    if (!abLoop.enabled || abLoop.a === null || abLoop.b === null) {
+    if (playerType === 'pitchshifter') {
+      // PitchShifter: 네이티브 A-B 루프 사용
+      if (abLoop.a !== null && abLoop.b !== null && abLoop.enabled) {
+        PitchShifterService.setABLoop(true, abLoop.a, abLoop.b)
+      } else {
+        PitchShifterService.setABLoop(false, 0, 0)
+      }
+    } else {
+      // TrackPlayer: JS로 A-B 루프 구현
       if (loopCheckIntervalRef.current) {
         clearInterval(loopCheckIntervalRef.current)
         loopCheckIntervalRef.current = null
       }
-      return
-    }
 
-    loopCheckIntervalRef.current = setInterval(async () => {
-      const currentPos = await dualPlayerGetPosition()
-      if (currentPos >= abLoop.b!) {
-        await dualPlayerSeek(abLoop.a!)
-        resetBeat()
+      if (abLoop.a !== null && abLoop.b !== null && abLoop.enabled && trackPlayerIsPlaying) {
+        loopCheckIntervalRef.current = setInterval(async () => {
+          const currentPos = await TrackPlayer.getPosition()
+          if (currentPos >= abLoop.b!) {
+            await TrackPlayer.seekTo(abLoop.a!)
+            resetBeat()
+          }
+        }, 100)
       }
-    }, 100)
+    }
 
     return () => {
       if (loopCheckIntervalRef.current) {
         clearInterval(loopCheckIntervalRef.current)
+        loopCheckIntervalRef.current = null
       }
     }
-  }, [abLoop, resetBeat, dualPlayerGetPosition, dualPlayerSeek])
+  }, [playerType, abLoop.a, abLoop.b, abLoop.enabled, trackPlayerIsPlaying, resetBeat])
 
   // 메트로놈 토글
   const handleMetronomeToggle = () => {
@@ -274,6 +346,8 @@ export const KaraokeScreen: React.FC = () => {
           duration={duration}
           onSeek={handleSeek}
           abLoop={abLoop}
+          onSetA={handleSetA}
+          onSetB={handleSetB}
         />
 
         <PlaybackControls
@@ -287,20 +361,16 @@ export const KaraokeScreen: React.FC = () => {
 
         <ABLoopControl
           abLoop={abLoop}
-          onSetA={handleSetA}
-          onSetB={handleSetB}
-          onToggle={handleLoopToggle}
           onClear={handleClearLoop}
         />
 
-        <PitchControl
-          enabled={pitchEnabled}
-          semitones={pitchSemitones}
-          onToggle={handlePitchToggle}
-          onPitchChange={handlePitchChange}
-          onReset={handlePitchReset}
-          isTransitioning={isTransitioning}
-        />
+        {playerType === 'pitchshifter' && (
+          <PitchControl
+            semitones={pitchSemitones}
+            onPitchChange={handlePitchChange}
+            onReset={handlePitchReset}
+          />
+        )}
 
         <MetronomeControl
           enabled={metronomeEnabled}
@@ -314,6 +384,23 @@ export const KaraokeScreen: React.FC = () => {
           isReady={metronomeReady}
         />
       </ScrollView>
+
+      {/* 로딩 오버레이 */}
+      {isLoading && (
+        <View style={styles.loadingOverlay}>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={currentTheme.colors.primary600} />
+            <OrphiText variant="h4" style={styles.loadingText}>
+              {loadingMessage}
+            </OrphiText>
+            {loadingMessage !== '준비 완료!' && (
+              <OrphiText variant="body" style={styles.loadingSubtext}>
+                잠시만 기다려주세요
+              </OrphiText>
+            )}
+          </View>
+        </View>
+      )}
     </View>
   )
 }
@@ -328,5 +415,35 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingBottom: orphiTokens.spacing['2xl'],
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingContainer: {
+    backgroundColor: orphiTokens.colors.white,
+    borderRadius: orphiTokens.borderRadius.lg,
+    padding: orphiTokens.spacing.xl,
+    alignItems: 'center',
+    minWidth: 200,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  loadingText: {
+    marginTop: orphiTokens.spacing.md,
+    color: orphiTokens.colors.gray900,
+  },
+  loadingSubtext: {
+    marginTop: orphiTokens.spacing.xs,
+    color: orphiTokens.colors.gray600,
   },
 })

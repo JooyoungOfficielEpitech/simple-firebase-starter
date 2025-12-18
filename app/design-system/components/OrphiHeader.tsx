@@ -2,6 +2,7 @@ import React from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { Bell, ChevronLeft } from 'lucide-react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { orphiTokens } from '../tokens'
 import { useTheme } from '@/core/context/ThemeContext'
 
@@ -27,13 +28,14 @@ export const OrphiHeader: React.FC<OrphiHeaderProps> = ({
   style,
 }) => {
   const { currentTheme } = useTheme()
+  const { top } = useSafeAreaInsets()
 
   return (
     <LinearGradient
       colors={currentTheme.colors.gradient}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
-      style={[styles.container, style]}
+      style={[styles.container, { paddingTop: top + orphiTokens.spacing.md }, style]}
     >
       <View style={styles.content}>
         {showBack && (
@@ -77,7 +79,6 @@ export const OrphiHeader: React.FC<OrphiHeaderProps> = ({
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: orphiTokens.spacing.xl,
-    paddingTop: orphiTokens.spacing.xl,
     paddingBottom: orphiTokens.spacing.base,
     ...orphiTokens.borderRadius.header,
     ...orphiTokens.shadows.md,

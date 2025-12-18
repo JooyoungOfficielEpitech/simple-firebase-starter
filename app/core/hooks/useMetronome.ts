@@ -122,9 +122,20 @@ export const useMetronome = ({
         highTick.current = high;
         lowTick.current = low;
 
-        // 볼륨 설정
-        await high.setVolumeAsync(volume);
-        await low.setVolumeAsync(volume);
+        // 볼륨 설정 (사운드가 로드된 경우만)
+        try {
+          const highStatus = await high.getStatusAsync();
+          const lowStatus = await low.getStatusAsync();
+
+          if (highStatus.isLoaded) {
+            await high.setVolumeAsync(volume);
+          }
+          if (lowStatus.isLoaded) {
+            await low.setVolumeAsync(volume);
+          }
+        } catch (volumeError) {
+          console.warn('⚠️ 볼륨 설정 실패 (무시하고 계속):', volumeError);
+        }
 
         setIsReady(true);
         setError(null);
@@ -176,13 +187,19 @@ export const useMetronome = ({
     const updateVolume = async () => {
       try {
         if (highTick.current) {
-          await highTick.current.setVolumeAsync(volume);
+          const status = await highTick.current.getStatusAsync();
+          if (status.isLoaded) {
+            await highTick.current.setVolumeAsync(volume);
+          }
         }
         if (lowTick.current) {
-          await lowTick.current.setVolumeAsync(volume);
+          const status = await lowTick.current.getStatusAsync();
+          if (status.isLoaded) {
+            await lowTick.current.setVolumeAsync(volume);
+          }
         }
       } catch (error) {
-        console.error('볼륨 설정 오류:', error);
+        console.warn('⚠️ 볼륨 설정 오류 (무시하고 계속):', error);
       }
     };
 

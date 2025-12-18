@@ -20,6 +20,10 @@ module.exports = ({ config }) => {
       bundleIdentifier: "com.mmecoco.starter",
       buildNumber: "1",
       googleServicesFile: "./GoogleService-Info.plist",
+      // Background audio playback support
+      infoPlist: {
+        UIBackgroundModes: ["audio"],
+      },
       // This privacyManifests is to get you started.
       // See Expo's guide on apple privacy manifests here:
       // https://docs.expo.dev/guides/apple-privacy/
@@ -53,6 +57,7 @@ module.exports = ({ config }) => {
           },
         },
       ],
+      "./plugins/withPitchShifter.js",
     ],
   }
 }
