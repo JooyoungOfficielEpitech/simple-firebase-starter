@@ -13,8 +13,6 @@ import { useIsMounted } from "@/utils/useIsMounted"
 
 import type { AppStackParamList, NavigationProps } from "./AppNavigator"
 
-type Storage = typeof storage
-
 /**
  * Reference to the root App Navigator.
  *
@@ -111,11 +109,10 @@ function navigationRestoredDefaultState(persistNavigation: PersistNavigationConf
 
 /**
  * Custom hook for persisting navigation state.
- * @param {Storage} storage - The storage utility to use.
  * @param {string} persistenceKey - The key to use for storing the navigation state.
  * @returns {object} - The navigation state and persistence functions.
  */
-export function useNavigationPersistence(storage: Storage, persistenceKey: string) {
+export function useNavigationPersistence(persistenceKey: string) {
   const [initialNavigationState, setInitialNavigationState] =
     useState<NavigationProps["initialState"]>()
   const isMounted = useIsMounted()

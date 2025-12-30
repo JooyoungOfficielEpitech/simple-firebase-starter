@@ -1,10 +1,8 @@
-import { FC, useCallback } from "react"
-import { Image, ImageStyle, TextStyle, View, ViewStyle, Alert } from "react-native"
+import { FC } from "react"
+import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
 
-import { Button } from "@/components/Button"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
-import { useAuth } from "@/context/AuthContext"
 import { isRTL } from "@/i18n"
 import { useAppTheme } from "@/theme/context"
 import { $styles } from "@/theme/styles"
@@ -16,21 +14,8 @@ const welcomeFace = require("@assets/images/welcome-face.png")
 
 export const WelcomeScreen: FC = function WelcomeScreen() {
   const { themed, theme } = useAppTheme()
-  const { logout, user, isLoading } = useAuth()
 
   const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
-
-  const handleLogout = useCallback(async () => {
-    try {
-      await logout()
-    } catch (error) {
-      console.warn("Logout failed in WelcomeScreen:", error)
-      Alert.alert("오류", "로그아웃에 실패했습니다")
-    }
-  }, [logout])
-
-  // 로딩 중일 때는 로그아웃 버튼을 비활성화
-  const isLoggingOut = isLoading
 
   return (
     <Screen preset="fixed" contentContainerStyle={$styles.flex1}>
@@ -54,20 +39,6 @@ export const WelcomeScreen: FC = function WelcomeScreen() {
 
       <View style={themed([$bottomContainer, $bottomContainerInsets])}>
         <Text tx="welcomeScreen:postscript" size="md" />
-
-        {/* 사용자 정보 표시 */}
-        {user && (
-          <Text
-            text={`안녕하세요, ${user.displayName || user.email || "사용자"}님!`}
-            style={themed($userInfo)}
-          />
-        )}
-
-        <Button
-          text={isLoggingOut ? "로그아웃 중..." : "로그아웃"}
-          onPress={handleLogout}
-          disabled={isLoggingOut}
-        />
       </View>
     </Screen>
   )
@@ -109,9 +80,4 @@ const $welcomeFace: ImageStyle = {
 
 const $welcomeHeading: ThemedStyle<TextStyle> = ({ spacing }) => ({
   marginBottom: spacing.md,
-})
-
-const $userInfo: ThemedStyle<TextStyle> = ({ spacing }) => ({
-  marginBottom: spacing.md,
-  textAlign: "center",
 })

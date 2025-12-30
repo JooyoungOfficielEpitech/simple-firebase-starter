@@ -1,4 +1,4 @@
-import auth from "@react-native-firebase/auth"
+// import auth from "@react-native-firebase/auth"
 import firestore, { FirebaseFirestoreTypes } from "@react-native-firebase/firestore"
 
 import { translate } from "../../i18n/translate"
@@ -11,6 +11,7 @@ import {
 
 /**
  * 사용자 관련 Firestore 서비스
+ * NOTE: Auth 기능은 현재 비활성화됨
  */
 export class UserService {
   private db: FirebaseFirestoreTypes.Module
@@ -21,13 +22,15 @@ export class UserService {
 
   /**
    * 현재 사용자 ID 가져오기
+   * TODO: Auth 기능 활성화 시 구현 필요
    */
   private getCurrentUserId(): string {
-    const user = auth().currentUser
-    if (!user) {
-      throw new Error(translate("matching:errors.userNotFound"))
-    }
-    return user.uid
+    // const user = auth().currentUser
+    // if (!user) {
+    //   throw new Error(translate("matching:errors.userNotFound"))
+    // }
+    // return user.uid
+    throw new Error("Auth not implemented")
   }
 
   /**
@@ -39,30 +42,32 @@ export class UserService {
 
   /**
    * 사용자 프로필 생성
+   * TODO: Auth 기능 활성화 시 구현 필요
    */
   async createUserProfile(profileData: CreateUserProfile): Promise<void> {
-    const userId = this.getCurrentUserId()
-    const user = auth().currentUser
+    throw new Error("Auth not implemented")
+    // const userId = this.getCurrentUserId()
+    // const user = auth().currentUser
 
-    if (!user?.email) {
-      throw new Error(translate("matching:errors.userNotFound"))
-    }
+    // if (!user?.email) {
+    //   throw new Error(translate("matching:errors.userNotFound"))
+    // }
 
-    const now = new Date() as unknown as FirebaseFirestoreTypes.Timestamp
-    const profile: UserProfile = {
-      uid: userId,
-      email: user.email,
-      name: profileData.name,
-      gender: profileData.gender,
-      birthday: profileData.birthday,
-      heightCm: profileData.heightCm,
-      media: [],
-      requiredProfileComplete: false,
-      createdAt: now,
-      updatedAt: now,
-    }
+    // const now = new Date() as unknown as FirebaseFirestoreTypes.Timestamp
+    // const profile: UserProfile = {
+    //   uid: userId,
+    //   email: user.email,
+    //   name: profileData.name,
+    //   gender: profileData.gender,
+    //   birthday: profileData.birthday,
+    //   heightCm: profileData.heightCm,
+    //   media: [],
+    //   requiredProfileComplete: false,
+    //   createdAt: now,
+    //   updatedAt: now,
+    // }
 
-    await this.db.collection("users").doc(userId).set(profile)
+    // await this.db.collection("users").doc(userId).set(profile)
   }
 
   /**
@@ -82,70 +87,72 @@ export class UserService {
 
   /**
    * 사용자 프로필 업데이트
+   * TODO: Auth 기능 활성화 시 구현 필요
    */
   async updateUserProfile(updateData: UpdateUserProfile): Promise<void> {
-    const userId = this.getCurrentUserId()
+    throw new Error("Auth not implemented")
+    // const userId = this.getCurrentUserId()
 
-    const currentProfile = await this.getUserProfile(userId)
-    const user = auth().currentUser
-    if (!user) {
-      throw new Error(translate("matching:errors.userNotFound"))
-    }
+    // const currentProfile = await this.getUserProfile(userId)
+    // const user = auth().currentUser
+    // if (!user) {
+    //   throw new Error(translate("matching:errors.userNotFound"))
+    // }
 
-    // If profile doesn't exist yet (first-time completion), upsert a new document
-    const baseProfile: Partial<UserProfile> = currentProfile ?? {
-      uid: userId,
-      email: user.email ?? "",
-      name: user.displayName || user.email?.split("@")[0] || "User",
-      media: [],
-      requiredProfileComplete: false,
-      createdAt: new Date() as unknown as FirebaseFirestoreTypes.Timestamp,
-      updatedAt: new Date() as unknown as FirebaseFirestoreTypes.Timestamp,
-    }
+    // // If profile doesn't exist yet (first-time completion), upsert a new document
+    // const baseProfile: Partial<UserProfile> = currentProfile ?? {
+    //   uid: userId,
+    //   email: user.email ?? "",
+    //   name: user.displayName || user.email?.split("@")[0] || "User",
+    //   media: [],
+    //   requiredProfileComplete: false,
+    //   createdAt: new Date() as unknown as FirebaseFirestoreTypes.Timestamp,
+    //   updatedAt: new Date() as unknown as FirebaseFirestoreTypes.Timestamp,
+    // }
 
-    const updatedProfile = { ...baseProfile, ...updateData }
+    // const updatedProfile = { ...baseProfile, ...updateData }
 
-    const minPhotosDone = Array.isArray(updatedProfile.media)
-      ? updatedProfile.media.length >= MIN_PROFILE_PHOTOS
-      : false
-    const requiredProfileComplete = Boolean(
-      updatedProfile.gender &&
-        updatedProfile.birthday &&
-        typeof updatedProfile.heightCm === "number" &&
-        minPhotosDone,
-    )
+    // const minPhotosDone = Array.isArray(updatedProfile.media)
+    //   ? updatedProfile.media.length >= MIN_PROFILE_PHOTOS
+    //   : false
+    // const requiredProfileComplete = Boolean(
+    //   updatedProfile.gender &&
+    //     updatedProfile.birthday &&
+    //     typeof updatedProfile.heightCm === "number" &&
+    //     minPhotosDone,
+    // )
 
-    const commonPayload: UpdateUserProfile & {
-      updatedAt: FirebaseFirestoreTypes.FieldValue
-      requiredProfileComplete: boolean
-    } = {
-      ...updateData,
-      requiredProfileComplete,
-      updatedAt: this.getServerTimestamp(),
-    }
+    // const commonPayload: UpdateUserProfile & {
+    //   updatedAt: FirebaseFirestoreTypes.FieldValue
+    //   requiredProfileComplete: boolean
+    // } = {
+    //   ...updateData,
+    //   requiredProfileComplete,
+    //   updatedAt: this.getServerTimestamp(),
+    // }
 
-    const docRef = this.db.collection("users").doc(userId)
+    // const docRef = this.db.collection("users").doc(userId)
 
-    if (!currentProfile) {
-      // Create the full document with allowed fields only
-      const now = new Date() as unknown as FirebaseFirestoreTypes.Timestamp
-      const newDoc: UserProfile = {
-        uid: userId,
-        email: user.email ?? "",
-        name: (updatedProfile.name as string) ?? baseProfile.name!,
-        gender: updatedProfile.gender as UserProfile["gender"],
-        birthday: updatedProfile.birthday as UserProfile["birthday"],
-        heightCm: updatedProfile.heightCm as UserProfile["heightCm"],
-        media: Array.isArray(updatedProfile.media) ? (updatedProfile.media as string[]) : [],
-        requiredProfileComplete,
-        createdAt: now,
-        updatedAt: now,
-      }
-      await docRef.set(newDoc)
-      return
-    }
+    // if (!currentProfile) {
+    //   // Create the full document with allowed fields only
+    //   const now = new Date() as unknown as FirebaseFirestoreTypes.Timestamp
+    //   const newDoc: UserProfile = {
+    //     uid: userId,
+    //     email: user.email ?? "",
+    //     name: (updatedProfile.name as string) ?? baseProfile.name!,
+    //     gender: updatedProfile.gender as UserProfile["gender"],
+    //     birthday: updatedProfile.birthday as UserProfile["birthday"],
+    //     heightCm: updatedProfile.heightCm as UserProfile["heightCm"],
+    //     media: Array.isArray(updatedProfile.media) ? (updatedProfile.media as string[]) : [],
+    //     requiredProfileComplete,
+    //     createdAt: now,
+    //     updatedAt: now,
+    //   }
+    //   await docRef.set(newDoc)
+    //   return
+    // }
 
-    await docRef.update(commonPayload)
+    // await docRef.update(commonPayload)
   }
 
   /**

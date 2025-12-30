@@ -1,11 +1,18 @@
 import { MMKV } from "react-native-mmkv"
 
+/**
+ * MMKV Storage Instance
+ *
+ * Note: Encryption is disabled as it's unnecessary for most use cases:
+ * - iOS/Android devices are already encrypted at the OS level
+ * - MMKV data is sandboxed per app and not accessible by other apps
+ * - Adding encryption adds complexity without meaningful security benefits
+ *
+ * If you need encryption for specific sensitive data (e.g., API tokens),
+ * consider using device keychain/keystore instead.
+ */
 export const storage = new MMKV({
-  id: "mmecoco-encrypted-storage",
-  encryptionKey: (() =>
-    __DEV__
-      ? process.env.EXPO_PUBLIC_ENCRYPTION_KEY_DEV
-      : process.env.EXPO_PUBLIC_ENCRYPTION_KEY_PROD)(),
+  id: "mmecoco-storage",
 })
 
 /**

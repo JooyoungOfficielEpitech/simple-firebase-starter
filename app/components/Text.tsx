@@ -7,10 +7,9 @@ import { isRTL, TxKeyPath } from "@/i18n"
 import { translate } from "@/i18n/translate"
 import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle, ThemedStyleArray } from "@/theme/types"
-import { typography } from "@/theme/typography"
 
 type Sizes = keyof typeof $sizeStyles
-type Weights = keyof typeof typography.primary
+type Weights = "regular" | "bold"
 type Presets = "default" | "bold" | "heading" | "subheading" | "formLabel" | "formHelper"
 
 export interface TextProps extends RNTextProps {
@@ -89,19 +88,20 @@ const $sizeStyles = {
   xxs: { fontSize: 12, lineHeight: 18 } satisfies TextStyle,
 }
 
-const $fontWeightStyles = Object.entries(typography.primary).reduce((acc, [weight, fontFamily]) => {
-  return { ...acc, [weight]: { fontFamily } }
-}, {}) as Record<Weights, TextStyle>
+const $fontWeightStyles: Record<Weights, TextStyle> = {
+  regular: { fontWeight: "400" },
+  bold: { fontWeight: "700" },
+}
 
 const $baseStyle: ThemedStyle<TextStyle> = (theme) => ({
   ...$sizeStyles.sm,
-  ...$fontWeightStyles.normal,
-  color: theme.colors.text,
+  ...$fontWeightStyles.regular,
+  color: theme.colors.text.primary,
 })
 
 const $presets: Record<Presets, ThemedStyleArray<TextStyle>> = {
   default: [$baseStyle],
-  bold: [$baseStyle, { ...$fontWeightStyles.bold }],
+  bold: [$baseStyle, $fontWeightStyles.bold],
   heading: [
     $baseStyle,
     {
@@ -109,8 +109,8 @@ const $presets: Record<Presets, ThemedStyleArray<TextStyle>> = {
       ...$fontWeightStyles.bold,
     },
   ],
-  subheading: [$baseStyle, { ...$sizeStyles.lg, ...$fontWeightStyles.medium }],
-  formLabel: [$baseStyle, { ...$fontWeightStyles.medium }],
-  formHelper: [$baseStyle, { ...$sizeStyles.sm, ...$fontWeightStyles.normal }],
+  subheading: [$baseStyle, { ...$sizeStyles.lg, ...$fontWeightStyles.bold }],
+  formLabel: [$baseStyle, $fontWeightStyles.bold],
+  formHelper: [$baseStyle, { ...$sizeStyles.sm, ...$fontWeightStyles.regular }],
 }
 const $rtlStyle: TextStyle = isRTL ? { writingDirection: "rtl" } : {}

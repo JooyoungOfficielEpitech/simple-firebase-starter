@@ -17,10 +17,10 @@ module.exports = ({ config }: ConfigContext): Partial<ExpoConfig> => {
 
   return {
     ...config,
-    scheme: "com.mmecoco.starter",
+    scheme: "com.mmecoco.yangdo",
     ios: {
       ...config.ios,
-      bundleIdentifier: "com.mmecoco.starter",
+      bundleIdentifier: "com.mmecoco.yangdo",
       googleServicesFile: "./GoogleService-Info.plist",
       // This privacyManifests is to get you started.
       // See Expo's guide on apple privacy manifests here:
@@ -39,7 +39,7 @@ module.exports = ({ config }: ConfigContext): Partial<ExpoConfig> => {
     },
     android: {
       ...config.android,
-      package: "com.mmecoco.starter",
+      package: "com.mmecoco.yangdo",
       googleServicesFile: "./google-services.json",
     },
     plugins: [

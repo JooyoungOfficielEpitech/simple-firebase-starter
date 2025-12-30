@@ -1,43 +1,26 @@
 {
   "project_info": {
-    "project_number": "844595402934",
-    "project_id": "starter-82ab0",
-    "storage_bucket": "starter-82ab0.firebasestorage.app"
+    "project_number": "680637198534",
+    "project_id": "yangdo-1319c",
+    "storage_bucket": "yangdo-1319c.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:844595402934:android:0f493a7041f8c90a81ae17",
+        "mobilesdk_app_id": "1:680637198534:android:5f420d3c0c8f65ae1967c7",
         "android_client_info": {
-          "package_name": "com.mmecoco.starter"
+          "package_name": "com.mmecoco.yangdo"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "844595402934-9hj73f80fdbuieuqu9t4bbagiqs1285i.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBBAYU4qMXp0ciBP54oYvceukhVzbZEiJM"
+          "current_key": "AIzaSyAJt2sEBqIIFYT6Y4N-quUeni6d7jdxb20"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "844595402934-9hj73f80fdbuieuqu9t4bbagiqs1285i.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "844595402934-g16imkv8hc071q9m9ng4fd4ppcjipb8j.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.mmecoco.starter"
-              }
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

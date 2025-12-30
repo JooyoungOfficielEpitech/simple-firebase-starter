@@ -4,7 +4,8 @@
     "paths": {
       "@/*": ["./app/*"],
       "@assets/*": ["./assets/*"]
-    }
+    },
+    "resolveJsonModule": true
   },
   "extends": "expo/tsconfig.base"
 }

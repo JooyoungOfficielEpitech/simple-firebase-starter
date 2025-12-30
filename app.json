@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "양도합니다",
+    "slug": "yangdo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./app/assets/yangdo_logo.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./app/assets/yangdo_logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "icon": "./app/assets/yangdo_logo.png"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./app/assets/yangdo_logo.png",
+        "backgroundColor": "#ffffff"
+      },
+      "icon": "./app/assets/yangdo_logo.png"
+    },
+    "web": {
+      "favicon": "./app/assets/yangdo_logo.png"
+    }
+  }
+}

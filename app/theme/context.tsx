@@ -93,6 +93,9 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
   }, [themeContext])
 
   const theme: Theme = useMemo(() => {
+    console.log("🎨 themeContext:", themeContext)
+    console.log("🎨 lightTheme:", lightTheme)
+    console.log("🎨 darkTheme:", darkTheme)
     switch (themeContext) {
       case "dark":
         return darkTheme

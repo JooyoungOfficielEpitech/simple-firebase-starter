@@ -38,7 +38,20 @@ const palette = {
 export const colors = {
   palette,
   transparent: "rgba(0, 0, 0, 0)",
-  text: palette.neutral800,
+
+  /**
+   * Text colors - matching light theme structure
+   */
+  text: {
+    primary: palette.neutral800,
+    secondary: palette.neutral700,
+    muted: palette.neutral600,
+    disabled: palette.neutral500,
+  },
+
+  /**
+   * Legacy compatibility - deprecated, use text.* instead
+   */
   textDim: palette.neutral600,
   background: palette.neutral200,
   border: palette.neutral400,

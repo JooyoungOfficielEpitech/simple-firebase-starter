@@ -25,14 +25,12 @@ import * as SplashScreen from "expo-splash-screen"
 import { KeyboardProvider } from "react-native-keyboard-controller"
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context"
 
-import { AuthProvider } from "./context/AuthContext"
 import { initI18n } from "./i18n"
 import { AppNavigator } from "./navigators/AppNavigator"
 import { useNavigationPersistence } from "./navigators/navigationUtilities"
 import { ThemeProvider } from "./theme/context"
 import { customFontsToLoad } from "./theme/typography"
 import { loadDateFnsLocale } from "./utils/formatDate"
-import * as storage from "./utils/storage"
 
 // Splash screen이 자동으로 숨겨지는 것을 방지
 SplashScreen.preventAutoHideAsync()
@@ -61,15 +59,13 @@ const config = {
 
 /**
  * This is the root component of our app.
- * @param {AppProps} props - The props for the `App` component.
- * @returns {JSX.Element} The rendered `App` component.
  */
 export function App() {
   const {
     initialNavigationState,
     onNavigationStateChange,
     isRestored: isNavigationStateRestored,
-  } = useNavigationPersistence(storage, NAVIGATION_PERSISTENCE_KEY)
+  } = useNavigationPersistence(NAVIGATION_PERSISTENCE_KEY)
 
   const [areFontsLoaded, fontLoadError] = useFonts(customFontsToLoad)
   const [isI18nInitialized, setIsI18nInitialized] = useState(false)
@@ -108,15 +104,13 @@ export function App() {
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <KeyboardProvider>
-        <AuthProvider>
-          <ThemeProvider>
-            <AppNavigator
-              linking={linking}
-              initialState={initialNavigationState}
-              onStateChange={onNavigationStateChange}
-            />
-          </ThemeProvider>
-        </AuthProvider>
+        <ThemeProvider>
+          <AppNavigator
+            linking={linking}
+            initialState={initialNavigationState}
+            onStateChange={onNavigationStateChange}
+          />
+        </ThemeProvider>
       </KeyboardProvider>
     </SafeAreaProvider>
   )

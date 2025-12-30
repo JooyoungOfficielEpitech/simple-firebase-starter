@@ -1,19 +1,12 @@
 /**
- * The app navigator (formerly "AppNavigator" and "MainNavigator") is used for the primary
- * navigation flows of your app.
- * Generally speaking, it will contain an auth flow (registration, signin, forgot password)
- * and a "main" flow which the user will use once logged in.
+ * The app navigator is used for the primary navigation flows of your app.
  */
 import { ComponentProps } from "react"
 import { NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
 
 import Config from "@/config"
-import { useAuth } from "@/context/AuthContext"
 import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary"
-import { ForgotPasswordScreen } from "@/screens/ForgotPasswordScreen"
-import { SignInScreen } from "@/screens/SignInScreen"
-import { SignUpScreen } from "@/screens/SignUpScreen"
 import { useAppTheme } from "@/theme/context"
 
 import { MainNavigator } from "./MainNavigator"
@@ -30,10 +23,6 @@ import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
  */
 export type AppStackParamList = {
   Main: undefined
-  Welcome: undefined
-  SignIn: undefined
-  SignUp: undefined
-  ForgotPassword: undefined
 }
 
 /**
@@ -54,16 +43,6 @@ const AppStack = () => {
   const {
     theme: { colors },
   } = useAppTheme()
-  const { isAuthenticated } = useAuth()
-
-  // 초기 라우트 결정 로직
-  const getInitialRouteName = (): keyof AppStackParamList => {
-    if (!isAuthenticated) {
-      return "SignIn"
-    }
-
-    return "Main"
-  }
 
   return (
     <Stack.Navigator
@@ -74,21 +53,9 @@ const AppStack = () => {
           backgroundColor: colors.background,
         },
       }}
-      initialRouteName={getInitialRouteName()}
+      initialRouteName="Main"
     >
-      {!isAuthenticated ? (
-        // 미인증 사용자 화면들
-        <>
-          <Stack.Screen name="SignIn" component={SignInScreen} />
-          <Stack.Screen name="SignUp" component={SignUpScreen} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-        </>
-      ) : (
-        // 인증된 사용자
-        <>
-          <Stack.Screen name="Main" component={MainNavigator} />
-        </>
-      )}
+      <Stack.Screen name="Main" component={MainNavigator} />
     </Stack.Navigator>
   )
 }
