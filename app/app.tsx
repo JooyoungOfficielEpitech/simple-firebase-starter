@@ -14,33 +14,38 @@ if (__DEV__) {
   // Load Reactotron in development only.
   // Note that you must be using metro's `inlineRequires` for this to work.
   // If you turn it off in metro.config.js, you'll have to manually import it.
-  require("./devtools/ReactotronConfig.ts")
+  require("./devtools/ReactotronConfig.ts");
 }
-import "./utils/gestureHandler"
+import "./utils/gestureHandler";
 
-import { useEffect, useState } from "react"
-import { useFonts } from "expo-font"
-import * as Linking from "expo-linking"
-import * as SplashScreen from "expo-splash-screen"
-import { KeyboardProvider } from "react-native-keyboard-controller"
-import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context"
+import { useEffect, useState } from "react";
+import { useFonts } from "expo-font";
+import * as Linking from "expo-linking";
+import * as SplashScreen from "expo-splash-screen";
+import { KeyboardProvider } from "react-native-keyboard-controller";
+import {
+  initialWindowMetrics,
+  SafeAreaProvider,
+} from "react-native-safe-area-context";
 
-import { AuthProvider } from "./context/AuthContext"
-import { initI18n } from "./i18n"
-import { AppNavigator } from "./navigators/AppNavigator"
-import { useNavigationPersistence } from "./navigators/navigationUtilities"
-import { ThemeProvider } from "./theme/context"
-import { customFontsToLoad } from "./theme/typography"
-import { loadDateFnsLocale } from "./utils/formatDate"
-import * as storage from "./utils/storage"
+import { AuthProvider } from "./context/AuthContext";
+import { NetworkProvider } from "./context/NetworkContext";
+import { NotificationProvider } from "./context/NotificationContext";
+import { initI18n } from "./i18n";
+import { AppNavigator } from "./navigators/AppNavigator";
+import { useNavigationPersistence } from "./navigators/navigationUtilities";
+import { ThemeProvider } from "./theme/context";
+import { customFontsToLoad } from "./theme/typography";
+import { loadDateFnsLocale } from "./utils/formatDate";
+import * as storage from "./utils/storage";
 
 // Splash screen이 자동으로 숨겨지는 것을 방지
-SplashScreen.preventAutoHideAsync()
+SplashScreen.preventAutoHideAsync();
 
-export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
+export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE";
 
 // Web linking configuration
-const prefix = Linking.createURL("/")
+const prefix = Linking.createURL("/");
 const config = {
   screens: {
     SignIn: "signin",
@@ -57,7 +62,7 @@ const config = {
       },
     },
   },
-}
+};
 
 /**
  * This is the root component of our app.
@@ -69,25 +74,34 @@ export function App() {
     initialNavigationState,
     onNavigationStateChange,
     isRestored: isNavigationStateRestored,
-  } = useNavigationPersistence(storage, NAVIGATION_PERSISTENCE_KEY)
+  } = useNavigationPersistence(storage, NAVIGATION_PERSISTENCE_KEY);
 
-  const [areFontsLoaded, fontLoadError] = useFonts(customFontsToLoad)
-  const [isI18nInitialized, setIsI18nInitialized] = useState(false)
+  const [areFontsLoaded, fontLoadError] = useFonts(customFontsToLoad);
+  const [isI18nInitialized, setIsI18nInitialized] = useState(false);
 
   useEffect(() => {
     initI18n()
       .then(() => setIsI18nInitialized(true))
-      .then(() => loadDateFnsLocale())
-  }, [])
+      .then(() => loadDateFnsLocale());
+  }, []);
 
   // 모든 초기화가 완료되면 splash screen을 숨김
   useEffect(() => {
-    if (isNavigationStateRestored && isI18nInitialized && (areFontsLoaded || fontLoadError)) {
+    if (
+      isNavigationStateRestored &&
+      isI18nInitialized &&
+      (areFontsLoaded || fontLoadError)
+    ) {
       SplashScreen.hideAsync().catch(() => {
         // 에러가 발생해도 앱은 계속 실행
-      })
+      });
     }
-  }, [isNavigationStateRestored, isI18nInitialized, areFontsLoaded, fontLoadError])
+  }, [
+    isNavigationStateRestored,
+    isI18nInitialized,
+    areFontsLoaded,
+    fontLoadError,
+  ]);
 
   // Before we show the app, we have to wait for our state to be ready.
   // In the meantime, don't render anything. This will be the background
@@ -95,29 +109,37 @@ export function App() {
   // In iOS: application:didFinishLaunchingWithOptions:
   // In Android: https://stackoverflow.com/a/45838109/204044
   // You can replace with your own loading component if you wish.
-  if (!isNavigationStateRestored || !isI18nInitialized || (!areFontsLoaded && !fontLoadError)) {
-    return null
+  if (
+    !isNavigationStateRestored ||
+    !isI18nInitialized ||
+    (!areFontsLoaded && !fontLoadError)
+  ) {
+    return null;
   }
 
   const linking = {
     prefixes: [prefix],
     config,
-  }
+  };
 
   // otherwise, we're ready to render the app
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <KeyboardProvider>
-        <AuthProvider>
-          <ThemeProvider>
-            <AppNavigator
-              linking={linking}
-              initialState={initialNavigationState}
-              onStateChange={onNavigationStateChange}
-            />
-          </ThemeProvider>
-        </AuthProvider>
+        <NetworkProvider>
+          <AuthProvider>
+            <NotificationProvider>
+              <ThemeProvider>
+                <AppNavigator
+                  linking={linking}
+                  initialState={initialNavigationState}
+                  onStateChange={onNavigationStateChange}
+                />
+              </ThemeProvider>
+            </NotificationProvider>
+          </AuthProvider>
+        </NetworkProvider>
       </KeyboardProvider>
     </SafeAreaProvider>
-  )
+  );
 }

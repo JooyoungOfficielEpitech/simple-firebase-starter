@@ -1,0 +1,44 @@
+# Authentication Flow E2E Test
+# Tests sign in and sign up flows
+
+appId: com.fastmatching.app
+
+---
+- launchApp
+
+# Test Sign In Screen
+- assertVisible: "Welcome to Amie"
+- assertVisible: "Sign in to your account"
+
+# Test Email Input
+- tapOn: "Email"
+- inputText: "test@example.com"
+
+# Test Password Input
+- tapOn: "Password"
+- inputText: "TestPassword123!"
+
+# Test Sign In Button
+- assertVisible: "Sign In"
+
+# Test Forgot Password Link
+- assertVisible: "Forgot Password?"
+
+# Test Google Sign In Button
+- assertVisible:
+    text: "Continue with Google"
+    optional: true
+
+# Test Sign Up Navigation
+- tapOn: "Don't have an account? Sign Up"
+- assertVisible: "Create Account"
+
+# Test Sign Up Form
+- assertVisible: "Display Name"
+- assertVisible: "Email"
+- assertVisible: "Password"
+- assertVisible: "Confirm Password"
+
+# Navigate back to Sign In
+- tapOn: "Already have an account? Sign In"
+- assertVisible: "Welcome to Amie"

@@ -1,0 +1,102 @@
+name: PR Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-validation:
+    name: PR Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Check formatting
+        run: |
+          yarn lint:check
+          if [ $? -ne 0 ]; then
+            echo "❌ ESLint errors found. Please run 'yarn lint' to fix."
+            exit 1
+          fi
+
+      - name: Type check
+        run: |
+          yarn compile
+          if [ $? -ne 0 ]; then
+            echo "❌ TypeScript errors found. Please fix the type errors."
+            exit 1
+          fi
+
+      - name: Run tests
+        run: yarn test --passWithNoTests
+
+      - name: Check bundle size
+        run: |
+          echo "📦 Checking bundle size..."
+          # Create temporary bundle for size check
+          mkdir -p ./bundle-analysis
+          npx react-native bundle \
+            --platform android \
+            --dev false \
+            --entry-file index.tsx \
+            --bundle-output ./bundle-analysis/android.bundle \
+            --sourcemap-output ./bundle-analysis/android.map || true
+
+          if [ -f "./bundle-analysis/android.bundle" ]; then
+            BUNDLE_SIZE=$(du -sh ./bundle-analysis/android.bundle | cut -f1)
+            echo "Bundle size: $BUNDLE_SIZE"
+          fi
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          allow-licenses: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC
+
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Check for console.log statements
+        run: |
+          if grep -r "console\.log" --include="*.ts" --include="*.tsx" app/ | grep -v ".test." | grep -v "__tests__" | head -20; then
+            echo "⚠️ Warning: console.log statements found in production code"
+          fi
+
+      - name: Check for TODO comments
+        run: |
+          TODO_COUNT=$(grep -r "TODO\|FIXME\|HACK" --include="*.ts" --include="*.tsx" app/ | wc -l)
+          echo "📝 Found $TODO_COUNT TODO/FIXME/HACK comments"

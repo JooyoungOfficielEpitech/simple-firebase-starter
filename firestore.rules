@@ -1,0 +1,200 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ==========================================
+    // Helper Functions
+    // ==========================================
+
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if user is the owner
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Check if user is a participant in the chat
+    function isChatParticipant(chatId) {
+      return isAuthenticated() &&
+        request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+    }
+
+    // Validate string length
+    function isValidString(field, minLen, maxLen) {
+      return field is string && field.size() >= minLen && field.size() <= maxLen;
+    }
+
+    // ==========================================
+    // Users Collection
+    // ==========================================
+    match /users/{userId} {
+      // Anyone authenticated can read user profiles
+      allow read: if isAuthenticated();
+
+      // Only the owner can create/update their own profile
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+
+      // Only the owner can delete their profile
+      allow delete: if isOwner(userId);
+
+      // User's FCM tokens subcollection
+      match /fcmTokens/{tokenId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // User's private data subcollection
+      match /private/{docId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // ==========================================
+    // Chats Collection
+    // ==========================================
+    match /chats/{chatId} {
+      // Only participants can read the chat
+      allow read: if isChatParticipant(chatId);
+
+      // Authenticated users can create chats (if they're a participant)
+      allow create: if isAuthenticated() &&
+        request.auth.uid in request.resource.data.participants;
+
+      // Only participants can update the chat
+      allow update: if isChatParticipant(chatId);
+
+      // Only participants can delete the chat
+      allow delete: if isChatParticipant(chatId);
+
+      // Messages subcollection
+      match /messages/{messageId} {
+        // Only chat participants can read messages
+        allow read: if isChatParticipant(chatId);
+
+        // Only chat participants can create messages
+        // Sender must be the authenticated user
+        allow create: if isChatParticipant(chatId) &&
+          request.resource.data.senderId == request.auth.uid;
+
+        // Only allow updating readBy field
+        allow update: if isChatParticipant(chatId) &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['readBy']);
+
+        // Prevent message deletion (or allow only for sender)
+        allow delete: if isChatParticipant(chatId) &&
+          resource.data.senderId == request.auth.uid;
+      }
+
+      // Typing status subcollection
+      match /typing/{odId} {
+        allow read: if isChatParticipant(chatId);
+        allow write: if isChatParticipant(chatId) && odId == request.auth.uid;
+      }
+    }
+
+    // ==========================================
+    // User Profiles Collection (Public)
+    // ==========================================
+    match /profiles/{profileId} {
+      // Anyone authenticated can read profiles
+      allow read: if isAuthenticated();
+
+      // Only the owner can write their profile
+      allow write: if isOwner(profileId);
+    }
+
+    // ==========================================
+    // Matching Queue Collection
+    // ==========================================
+    match /matchingQueue/{odId} {
+      // Only the owner can read their queue entry
+      allow read: if isOwner(odId);
+
+      // Only the owner can create/update their queue entry
+      allow create, update: if isOwner(odId);
+
+      // Only the owner can delete their queue entry
+      allow delete: if isOwner(odId);
+    }
+
+    // ==========================================
+    // Matches Collection
+    // ==========================================
+    match /matches/{matchId} {
+      // Participants can read the match
+      allow read: if isAuthenticated() &&
+        (request.auth.uid == resource.data.userId1 ||
+         request.auth.uid == resource.data.userId2);
+
+      // System creates matches (via Cloud Functions)
+      // Users can update match status if they're a participant
+      allow update: if isAuthenticated() &&
+        (request.auth.uid == resource.data.userId1 ||
+         request.auth.uid == resource.data.userId2);
+
+      // Prevent direct creation/deletion by users
+      allow create, delete: if false;
+    }
+
+    // ==========================================
+    // Reports Collection
+    // ==========================================
+    match /reports/{reportId} {
+      // Only the reporter can read their own reports
+      allow read: if isAuthenticated() &&
+        request.auth.uid == resource.data.reporterId;
+
+      // Authenticated users can create reports
+      allow create: if isAuthenticated() &&
+        request.resource.data.reporterId == request.auth.uid;
+
+      // Prevent updates and deletes
+      allow update, delete: if false;
+    }
+
+    // ==========================================
+    // Blocked Users Collection
+    // ==========================================
+    match /blockedUsers/{odId} {
+      // Only the owner can manage their blocked list
+      allow read, write: if isOwner(odId);
+
+      match /blocked/{blockedUserId} {
+        allow read, write: if isOwner(odId);
+      }
+    }
+
+    // ==========================================
+    // Notifications Collection
+    // ==========================================
+    match /notifications/{notificationId} {
+      // Only the recipient can read their notifications
+      allow read: if isAuthenticated() &&
+        request.auth.uid == resource.data.userId;
+
+      // System creates notifications (via Cloud Functions)
+      allow create: if false;
+
+      // User can update read status
+      allow update: if isAuthenticated() &&
+        request.auth.uid == resource.data.userId &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read', 'readAt']);
+
+      // User can delete their own notifications
+      allow delete: if isAuthenticated() &&
+        request.auth.uid == resource.data.userId;
+    }
+
+    // ==========================================
+    // App Config Collection (Read Only)
+    // ==========================================
+    match /config/{configId} {
+      allow read: if isAuthenticated();
+      allow write: if false;
+    }
+  }
+}

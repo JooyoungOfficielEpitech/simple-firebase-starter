@@ -1,4 +1,4 @@
-import { Translations } from "./en"
+import { Translations } from "./en";
 
 const ja: Translations = {
   common: {
@@ -12,9 +12,83 @@ const ja: Translations = {
     exciting: "Exciting!",
   },
   mainNavigator: {
-    matchingTab: "Matching",
-    profileTab: "Profile",
-    settingsTab: "Settings",
+    homeTab: "ホーム",
+    componentsTab: "コンポーネント",
+    featuresTab: "機能",
+    chatTab: "チャット",
+    settingsTab: "設定",
+  },
+  homeScreen: {
+    hero: {
+      title: "React Native Firebase ボイラープレート",
+      subtitle: "Firebase、Expo SDK 53、TypeScriptを含む本番環境対応スターターテンプレート",
+      welcome: "おかえりなさい、{{name}}さん！",
+    },
+    sections: {
+      features: "主な機能",
+      quickStart: "クイックスタート",
+      techStack: "技術スタック",
+    },
+    features: {
+      firebase: {
+        title: "Firebase統合",
+        description: "Auth、Firestore、Storage、FCMを完全統合",
+      },
+      auth: {
+        title: "認証システム",
+        description: "メールとGoogleログイン、セキュアなトークン管理",
+      },
+      chat: {
+        title: "リアルタイムチャット",
+        description: "タイピングインジケーター付きの完全なチャットシステム",
+      },
+      offline: {
+        title: "オフラインサポート",
+        description: "自動同期でシームレスなオフライン体験",
+      },
+    },
+    quickStart: {
+      step1: {
+        title: "クローン＆インストール",
+        description: "リポジトリをクローンしてyarn installを実行",
+      },
+      step2: {
+        title: "Firebase設定",
+        description: "Firebase設定を追加し、認証を構成",
+      },
+      step3: {
+        title: "開発開始",
+        description: "expo startを実行してアプリ開発を開始",
+      },
+    },
+    stats: {
+      components: "コンポーネント",
+      features: "機能",
+      languages: "言語",
+      typescript: "TypeScript",
+    },
+    cta: {
+      viewDocs: "ドキュメントを見る",
+      viewGithub: "GitHubで見る",
+    },
+    footer: {
+      madeWith: "React Native & Expoで❤️を込めて作成",
+    },
+  },
+  chatScreen: {
+    title: "チャット",
+    emptyTitle: "チャットはありません",
+    emptyDescription: "新しい会話を始めましょう！",
+    newChat: "新しいチャット",
+    chatCount: "{{count}}件の会話",
+    loadingChats: "チャットを読み込み中...",
+    loadingMessages: "メッセージを読み込み中...",
+    loadingMoreMessages: "以前のメッセージを読み込み中...",
+    sendMessagePlaceholder: "{{name}}さんにメッセージを送信...",
+    unknown: "不明",
+  },
+  matchingScreen: {
+    matchingButton: "Start Matching",
   },
   signInScreen: {
     title: "Welcome to Amie",
@@ -46,7 +120,8 @@ const ja: Translations = {
   },
   forgotPasswordScreen: {
     title: "Reset Password",
-    subtitle: "Enter your email address and we'll send you a password reset link.",
+    subtitle:
+      "Enter your email address and we'll send you a password reset link.",
     subtitleSent: "We've sent you a password reset link!",
     emailPlaceholder: "Email",
     sendButton: "Send Reset Link",
@@ -68,7 +143,8 @@ const ja: Translations = {
       emailInvalid: "Please enter a valid email address",
       passwordRequired: "Please enter your password",
       passwordMinLength: "Password must be at least 6 characters",
-      passwordPattern: "Password must contain letters, numbers, and special characters",
+      passwordPattern:
+        "Password must contain letters, numbers, and special characters",
       passwordMismatch: "Passwords do not match",
       nameRequired: "Please enter your name",
       nameMinLength: "Name must be at least 2 characters",
@@ -80,6 +156,9 @@ const ja: Translations = {
       signInFailed: "Sign in failed",
       signUpFailed: "Sign up failed",
       googleSignInFailed: "Google sign in failed",
+      signInInProgress: "Sign in operation is already in progress",
+      playServicesNotAvailable:
+        "Google Play Services not available or outdated",
       logoutFailed: "Logout failed",
       userNotFound: "User not found",
       emailVerificationFailed: "Failed to send email verification",
@@ -96,7 +175,8 @@ const ja: Translations = {
   emptyStateComponent: {
     generic: {
       heading: "So empty... so sad",
-      content: "No data here yet. Try clicking the button to refresh or reload the app.",
+      content:
+        "No data here yet. Try clicking the button to refresh or reload the app.",
       button: "Let's try this again",
     },
   },
@@ -222,12 +302,120 @@ const ja: Translations = {
       monthlyMatches: "Monthly Matches",
     },
   },
+  notifications: {
+    title: "通知",
+    emptyTitle: "通知はありません",
+    emptyDescription: "まだ通知はありません",
+    markAllRead: "すべて既読にする",
+    settings: "通知設定",
+    enablePush: "プッシュ通知を有効にする",
+    enablePushDescription: "マッチング、メッセージなどの通知を受け取る",
+    chatNotifications: "チャット通知",
+    chatNotificationsDescription: "新しいメッセージの通知を受け取る",
+    matchNotifications: "マッチング通知",
+    matchNotificationsDescription: "新しいマッチングの通知を受け取る",
+    likeNotifications: "いいね通知",
+    likeNotificationsDescription: "誰かがあなたにいいねした時に通知を受け取る",
+    systemNotifications: "システム通知",
+    systemNotificationsDescription: "重要なアップデートとお知らせ",
+    permissionRequired: "権限が必要です",
+    permissionDescription: "通知を受け取るには権限を有効にしてください",
+    enableButton: "通知を有効にする",
+    types: {
+      chat_message: "新しいメッセージ",
+      new_match: "新しいマッチング",
+      new_like: "新しいいいね",
+      match_expiring: "マッチング期限切れ間近",
+      system: "システム",
+    },
+  },
+  payment: {
+    title: "プレミアム",
+    subscribe: "今すぐ登録",
+    restore: "購入を復元",
+    restoring: "復元中...",
+    processing: "処理中...",
+    currentPlan: "現在のプラン",
+    changePlan: "プラン変更",
+    cancelSubscription: "登録をキャンセル",
+    cancelConfirmTitle: "登録をキャンセル",
+    cancelConfirmMessage:
+      "本当にキャンセルしますか？現在の請求期間が終了するまで引き続きご利用いただけます。",
+    keepSubscription: "登録を維持",
+    cancelled: "登録がキャンセルされました",
+    cancelledMessage:
+      "登録がキャンセルされました。現在の請求期間が終了するまでご利用いただけます。",
+    noPurchases: "購入履歴がありません",
+    noPurchasesMessage: "復元する購入履歴が見つかりません。",
+    restoreSuccess: "購入が復元されました",
+    restoreSuccessMessage: "購入が復元されました。",
+    purchaseFailed: "購入に失敗しました",
+    purchaseFailedMessage:
+      "購入中にエラーが発生しました。もう一度お試しください。",
+    features: {
+      unlimitedMatches: "無制限マッチング",
+      seeWhoLikes: "いいねした人を見る",
+      advancedFilters: "高度なフィルター",
+      noAds: "広告なし",
+      prioritySupport: "優先サポート",
+      boosts: "プロフィールブースト",
+    },
+    plans: {
+      monthly: "月額",
+      yearly: "年額",
+      lifetime: "永久",
+      bestValue: "最もお得",
+      mostPopular: "最も人気",
+    },
+    terms:
+      "登録すると、利用規約とプライバシーポリシーに同意したことになります。登録は、現在の期間終了の少なくとも24時間前にキャンセルしない限り、自動的に更新されます。",
+    success: {
+      title: "プレミアムへようこそ！",
+      message: "すべてのプレミアム機能をご利用いただけるようになりました。",
+      continueButton: "続ける",
+    },
+    status: {
+      active: "有効",
+      trialing: "トライアル",
+      cancelled: "キャンセル済み",
+      expired: "期限切れ",
+    },
+    daysRemaining: "残り{{days}}日",
+    willRenew: "自動更新",
+    willNotRenew: "更新しない",
+  },
+  offline: {
+    banner: "オフラインです",
+    bannerMessage: "一部の機能が制限される場合があります",
+    reconnecting: "再接続中...",
+    syncPending: "同期保留中",
+    syncComplete: "同期完了",
+    syncFailed: "同期に失敗しました",
+    retrySync: "再試行",
+    offlineMode: "オフラインモード",
+    offlineModeDescription: "オンラインになるとデータが同期されます",
+  },
+  imageUpload: {
+    selectImage: "画像を選択",
+    takePhoto: "写真を撮る",
+    chooseFromGallery: "ギャラリーから選択",
+    uploading: "アップロード中...",
+    uploadComplete: "アップロード完了",
+    uploadFailed: "アップロードに失敗しました",
+    retryUpload: "再アップロード",
+    removeImage: "画像を削除",
+    imageTooLarge: "画像が大きすぎます。最大サイズは{{maxSize}}MBです。",
+    unsupportedFormat: "サポートされていない画像形式です",
+    permissionDenied: "権限が拒否されました。設定で権限を許可してください。",
+    compressing: "画像を圧縮中...",
+  },
   emailVerificationScreen: {
     title: "Verify Your Email",
     subtitle: "We've sent a verification link to {{email}}",
     checkEmailMessage:
       "Please check your email and click the verification link to activate your account.",
-    instructionsMessage: "If you don't see the email, check your spam folder or request a new one.",
+    instructionsMessage:
+      "If you don't see the email, check your spam folder or request a new one.",
     currentEmail: "Current Email",
     openEmailApp: "Open Email App",
     checkVerification: "I've Verified My Email",
@@ -262,8 +450,9 @@ const ja: Translations = {
 
     // Status messages
     notVerifiedTitle: "Email Not Yet Verified",
-    notVerifiedMessage: "Please click the verification link in your email first.",
+    notVerifiedMessage:
+      "Please click the verification link in your email first.",
   },
-}
+};
 
-export default ja
+export default ja;

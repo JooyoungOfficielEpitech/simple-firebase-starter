@@ -1,10 +1,10 @@
-import { ExpoConfig, ConfigContext } from "@expo/config"
+import { ExpoConfig, ConfigContext } from "@expo/config";
 
 /**
  * Use ts-node here so we can use TypeScript for our Config Plugins
  * and not have to compile them to JavaScript
  */
-require("ts-node/register")
+require("ts-node/register");
 
 /**
  * @param config ExpoConfig coming from the static config app.json if it exists
@@ -13,7 +13,7 @@ require("ts-node/register")
  * https://docs.expo.dev/workflow/configuration/#configuration-resolution-rules
  */
 module.exports = ({ config }: ConfigContext): Partial<ExpoConfig> => {
-  const existingPlugins = config.plugins ?? []
+  const existingPlugins = config.plugins ?? [];
 
   return {
     ...config,
@@ -31,10 +31,18 @@ module.exports = ({ config }: ConfigContext): Partial<ExpoConfig> => {
       privacyManifests: {
         NSPrivacyAccessedAPITypes: [
           {
-            NSPrivacyAccessedAPIType: "NSPrivacyAccessedAPICategoryUserDefaults",
+            NSPrivacyAccessedAPIType:
+              "NSPrivacyAccessedAPICategoryUserDefaults",
             NSPrivacyAccessedAPITypeReasons: ["CA92.1"], // CA92.1 = "Access info from same app, per documentation"
           },
         ],
+      },
+      infoPlist: {
+        UIBackgroundModes: ["remote-notification"],
+        NSCameraUsageDescription:
+          "프로필 사진 촬영을 위해 카메라 접근 권한이 필요합니다.",
+        NSPhotoLibraryUsageDescription:
+          "프로필 사진 선택을 위해 사진 라이브러리 접근 권한이 필요합니다.",
       },
     },
     android: {
@@ -46,6 +54,22 @@ module.exports = ({ config }: ConfigContext): Partial<ExpoConfig> => {
       ...existingPlugins,
       ["@react-native-firebase/app"],
       [
+        "@react-native-firebase/messaging",
+        {
+          // iOS APNs settings will be configured in Apple Developer Portal
+          // Android FCM settings are configured via google-services.json
+        },
+      ],
+      [
+        "expo-notifications",
+        {
+          icon: "./assets/images/notification-icon.png",
+          color: "#ffffff",
+          sounds: ["./assets/sounds/notification.wav"],
+          mode: "production",
+        },
+      ],
+      [
         "expo-build-properties",
         {
           ios: {
@@ -54,6 +78,15 @@ module.exports = ({ config }: ConfigContext): Partial<ExpoConfig> => {
           },
         },
       ],
+      [
+        "expo-image-picker",
+        {
+          photosPermission:
+            "프로필 사진 선택을 위해 사진 라이브러리 접근 권한이 필요합니다.",
+          cameraPermission:
+            "프로필 사진 촬영을 위해 카메라 접근 권한이 필요합니다.",
+        },
+      ],
     ],
-  }
-}
+  };
+};

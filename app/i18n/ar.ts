@@ -1,4 +1,4 @@
-import { Translations } from "./en"
+import { Translations } from "./en";
 
 const ar: Translations = {
   common: {
@@ -13,9 +13,83 @@ const ar: Translations = {
     exciting: "اوه هذا مثير",
   },
   mainNavigator: {
-    matchingTab: "Matching",
-    profileTab: "Profile",
-    settingsTab: "Settings",
+    homeTab: "الرئيسية",
+    componentsTab: "المكونات",
+    featuresTab: "الميزات",
+    chatTab: "الدردشة",
+    settingsTab: "الإعدادات",
+  },
+  homeScreen: {
+    hero: {
+      title: "قالب React Native Firebase",
+      subtitle: "قالب بداية جاهز للإنتاج مع Firebase و Expo SDK 53 و TypeScript",
+      welcome: "مرحباً بعودتك، {{name}}!",
+    },
+    sections: {
+      features: "الميزات الرئيسية",
+      quickStart: "البدء السريع",
+      techStack: "التقنيات المستخدمة",
+    },
+    features: {
+      firebase: {
+        title: "تكامل Firebase",
+        description: "Auth و Firestore و Storage و FCM مدمجة بالكامل",
+      },
+      auth: {
+        title: "المصادقة",
+        description: "تسجيل الدخول بالبريد الإلكتروني و Google مع إدارة آمنة للرموز",
+      },
+      chat: {
+        title: "دردشة في الوقت الفعلي",
+        description: "نظام دردشة كامل مع مؤشرات الكتابة",
+      },
+      offline: {
+        title: "دعم وضع عدم الاتصال",
+        description: "تجربة سلسة بدون اتصال مع مزامنة تلقائية",
+      },
+    },
+    quickStart: {
+      step1: {
+        title: "استنساخ وتثبيت",
+        description: "استنسخ المستودع وقم بتشغيل yarn install للبدء",
+      },
+      step2: {
+        title: "تكوين Firebase",
+        description: "أضف تكوين Firebase الخاص بك وقم بإعداد المصادقة",
+      },
+      step3: {
+        title: "ابدأ البناء",
+        description: "قم بتشغيل expo start وابدأ في تطوير تطبيقك",
+      },
+    },
+    stats: {
+      components: "مكونات",
+      features: "ميزات",
+      languages: "لغات",
+      typescript: "TypeScript",
+    },
+    cta: {
+      viewDocs: "عرض الوثائق",
+      viewGithub: "عرض على GitHub",
+    },
+    footer: {
+      madeWith: "صنع بـ ❤️ باستخدام React Native و Expo",
+    },
+  },
+  chatScreen: {
+    title: "الدردشة",
+    emptyTitle: "لا توجد محادثات",
+    emptyDescription: "ابدأ محادثة جديدة!",
+    newChat: "محادثة جديدة",
+    chatCount: "{{count}} محادثات",
+    loadingChats: "جاري تحميل المحادثات...",
+    loadingMessages: "جاري تحميل الرسائل...",
+    loadingMoreMessages: "جاري تحميل المزيد من الرسائل...",
+    sendMessagePlaceholder: "أرسل رسالة إلى {{name}}...",
+    unknown: "غير معروف",
+  },
+  matchingScreen: {
+    matchingButton: "Start Matching",
   },
   signInScreen: {
     title: "Welcome to Amie",
@@ -47,7 +121,8 @@ const ar: Translations = {
   },
   forgotPasswordScreen: {
     title: "Reset Password",
-    subtitle: "Enter your email address and we'll send you a password reset link.",
+    subtitle:
+      "Enter your email address and we'll send you a password reset link.",
     subtitleSent: "We've sent you a password reset link!",
     emailPlaceholder: "Email",
     sendButton: "Send Reset Link",
@@ -81,6 +156,8 @@ const ar: Translations = {
       signInFailed: "فشل تسجيل الدخول",
       signUpFailed: "فشل التسجيل",
       googleSignInFailed: "فشل تسجيل الدخول بجوجل",
+      signInInProgress: "عملية تسجيل الدخول جارية بالفعل",
+      playServicesNotAvailable: "خدمات Google Play غير متوفرة أو قديمة",
       logoutFailed: "فشل تسجيل الخروج",
       userNotFound: "لم يتم العثور على المستخدم",
       emailVerificationFailed: "فشل في إرسال بريد التحقق",
@@ -97,7 +174,8 @@ const ar: Translations = {
   emptyStateComponent: {
     generic: {
       heading: "فارغة جداً....حزين",
-      content: "لا توجد بيانات حتى الآن. حاول النقر فوق الزر لتحديث التطبيق او اعادة تحميله.",
+      content:
+        "لا توجد بيانات حتى الآن. حاول النقر فوق الزر لتحديث التطبيق او اعادة تحميله.",
       button: "لنحاول هذا مرّة أخرى",
     },
   },
@@ -223,10 +301,118 @@ const ar: Translations = {
       monthlyMatches: "المطابقات الشهرية",
     },
   },
+  notifications: {
+    title: "الإشعارات",
+    emptyTitle: "لا توجد إشعارات",
+    emptyDescription: "ليس لديك أي إشعارات بعد",
+    markAllRead: "تعيين الكل كمقروء",
+    settings: "إعدادات الإشعارات",
+    enablePush: "تفعيل الإشعارات الفورية",
+    enablePushDescription: "تلقي إشعارات حول المطابقات والرسائل والمزيد",
+    chatNotifications: "إشعارات الدردشة",
+    chatNotificationsDescription: "تلقي إشعارات عن الرسائل الجديدة",
+    matchNotifications: "إشعارات المطابقة",
+    matchNotificationsDescription: "تلقي إشعارات عن المطابقات الجديدة",
+    likeNotifications: "إشعارات الإعجاب",
+    likeNotificationsDescription: "تلقي إشعار عندما يعجب بك شخص ما",
+    systemNotifications: "إشعارات النظام",
+    systemNotificationsDescription: "تحديثات وإعلانات مهمة",
+    permissionRequired: "الإذن مطلوب",
+    permissionDescription: "يرجى تفعيل الإشعارات للبقاء على اطلاع",
+    enableButton: "تفعيل الإشعارات",
+    types: {
+      chat_message: "رسالة جديدة",
+      new_match: "مطابقة جديدة",
+      new_like: "إعجاب جديد",
+      match_expiring: "المطابقة على وشك الانتهاء",
+      system: "النظام",
+    },
+  },
+  payment: {
+    title: "بريميوم",
+    subscribe: "اشترك الآن",
+    restore: "استعادة المشتريات",
+    restoring: "جاري الاستعادة...",
+    processing: "جاري المعالجة...",
+    currentPlan: "الخطة الحالية",
+    changePlan: "تغيير الخطة",
+    cancelSubscription: "إلغاء الاشتراك",
+    cancelConfirmTitle: "إلغاء الاشتراك",
+    cancelConfirmMessage:
+      "هل أنت متأكد من رغبتك في الإلغاء؟ ستستمر في الوصول حتى نهاية فترة الفوترة.",
+    keepSubscription: "الاحتفاظ بالاشتراك",
+    cancelled: "تم إلغاء الاشتراك",
+    cancelledMessage:
+      "تم إلغاء اشتراكك. ستتمتع بالوصول حتى نهاية فترة الفوترة الحالية.",
+    noPurchases: "لا توجد مشتريات",
+    noPurchasesMessage: "لم يتم العثور على مشتريات سابقة للاستعادة.",
+    restoreSuccess: "تم استعادة المشتريات",
+    restoreSuccessMessage: "تم استعادة مشترياتك.",
+    purchaseFailed: "فشل الشراء",
+    purchaseFailedMessage: "حدث خطأ أثناء الشراء. يرجى المحاولة مرة أخرى.",
+    features: {
+      unlimitedMatches: "مطابقات غير محدودة",
+      seeWhoLikes: "شاهد من أعجب بك",
+      advancedFilters: "فلاتر متقدمة",
+      noAds: "بدون إعلانات",
+      prioritySupport: "دعم ذو أولوية",
+      boosts: "تعزيزات الملف الشخصي",
+    },
+    plans: {
+      monthly: "شهري",
+      yearly: "سنوي",
+      lifetime: "مدى الحياة",
+      bestValue: "أفضل قيمة",
+      mostPopular: "الأكثر شعبية",
+    },
+    terms:
+      "بالاشتراك، فإنك توافق على شروط الخدمة وسياسة الخصوصية. تتجدد الاشتراكات تلقائياً ما لم يتم إلغاؤها قبل 24 ساعة على الأقل من نهاية الفترة الحالية.",
+    success: {
+      title: "مرحباً بك في بريميوم!",
+      message: "لديك الآن وصول إلى جميع الميزات المميزة.",
+      continueButton: "متابعة",
+    },
+    status: {
+      active: "نشط",
+      trialing: "تجريبي",
+      cancelled: "ملغي",
+      expired: "منتهي الصلاحية",
+    },
+    daysRemaining: "{{days}} أيام متبقية",
+    willRenew: "تجديد تلقائي",
+    willNotRenew: "لن يتم التجديد",
+  },
+  offline: {
+    banner: "أنت غير متصل",
+    bannerMessage: "قد تكون بعض الميزات محدودة",
+    reconnecting: "جاري إعادة الاتصال...",
+    syncPending: "المزامنة معلقة",
+    syncComplete: "اكتملت المزامنة",
+    syncFailed: "فشلت المزامنة",
+    retrySync: "إعادة المحاولة",
+    offlineMode: "وضع عدم الاتصال",
+    offlineModeDescription: "سيتم مزامنة البيانات عند اتصالك بالإنترنت",
+  },
+  imageUpload: {
+    selectImage: "اختيار صورة",
+    takePhoto: "التقاط صورة",
+    chooseFromGallery: "اختيار من المعرض",
+    uploading: "جاري الرفع...",
+    uploadComplete: "اكتمل الرفع",
+    uploadFailed: "فشل الرفع",
+    retryUpload: "إعادة الرفع",
+    removeImage: "حذف الصورة",
+    imageTooLarge:
+      "الصورة كبيرة جداً. الحد الأقصى للحجم هو {{maxSize}} ميجابايت.",
+    unsupportedFormat: "صيغة الصورة غير مدعومة",
+    permissionDenied: "تم رفض الإذن. يرجى السماح بالوصول من الإعدادات.",
+    compressing: "جاري ضغط الصورة...",
+  },
   emailVerificationScreen: {
     title: "تحقق من البريد الإلكتروني",
     subtitle: "لقد أرسلنا رابط التحقق إلى {{email}}",
-    checkEmailMessage: "يرجى فحص بريدك الإلكتروني والنقر على رابط التحقق لتفعيل حسابك.",
+    checkEmailMessage:
+      "يرجى فحص بريدك الإلكتروني والنقر على رابط التحقق لتفعيل حسابك.",
     instructionsMessage:
       "إذا لم تجد البريد الإلكتروني، تحقق من مجلد الرسائل غير المرغوب فيها أو اطلب واحدًا جديدًا.",
     currentEmail: "البريد الإلكتروني الحالي",
@@ -265,6 +451,6 @@ const ar: Translations = {
     notVerifiedTitle: "لم يتم التحقق من البريد الإلكتروني بعد",
     notVerifiedMessage: "يرجى النقر على رابط التحقق في بريدك الإلكتروني أولاً.",
   },
-}
+};
 
-export default ar
+export default ar;

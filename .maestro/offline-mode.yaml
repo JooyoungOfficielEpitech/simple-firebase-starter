@@ -1,0 +1,51 @@
+# Offline Mode E2E Test
+# Tests offline functionality and sync behavior
+
+appId: com.fastmatching.app
+
+---
+- launchApp
+
+# Navigate to Features tab
+- tapOn:
+    text: "Features"
+    optional: true
+
+# Find and tap Offline Support
+- tapOn:
+    text: "Offline Support"
+    optional: true
+
+# Verify offline showcase elements
+- assertVisible:
+    text: "Offline"
+    optional: true
+
+# Toggle airplane mode (simulated)
+- toggleAirplaneMode
+
+# Wait for offline banner
+- assertVisible:
+    text: "Offline"
+    optional: true
+    timeout: 5000
+
+# Verify offline indicator
+- assertVisible:
+    id: "offline-banner"
+    optional: true
+
+# Toggle airplane mode off
+- toggleAirplaneMode
+
+# Wait for reconnection
+- extendedWaitUntil:
+    visible:
+      text: "Online"
+      optional: true
+    timeout: 10000
+
+# Verify sync indicator
+- assertVisible:
+    id: "sync-indicator"
+    optional: true

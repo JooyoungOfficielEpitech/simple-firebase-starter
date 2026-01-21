@@ -7,5 +7,5 @@ export function hasValidStringProp(props: unknown, propName: string): boolean {
     typeof props === "object" &&
     propName in props &&
     typeof (props as Record<string, unknown>)[propName] === "string"
-  )
+  );
 }

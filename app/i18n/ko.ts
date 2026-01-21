@@ -1,4 +1,4 @@
-import { Translations } from "./en"
+import { Translations } from "./en";
 
 const ko: Translations = {
   common: {
@@ -13,8 +13,80 @@ const ko: Translations = {
     exciting: "(오, 이거 신나는데요!)",
   },
   mainNavigator: {
-    welcomeTab: "홈",
+    homeTab: "홈",
+    componentsTab: "컴포넌트",
+    featuresTab: "기능",
+    chatTab: "채팅",
     settingsTab: "설정",
+  },
+  homeScreen: {
+    hero: {
+      title: "React Native Firebase 보일러플레이트",
+      subtitle: "Firebase, Expo SDK 53, TypeScript가 포함된 프로덕션 준비 스타터 템플릿",
+      welcome: "다시 오신 것을 환영합니다, {{name}}님!",
+    },
+    sections: {
+      features: "주요 기능",
+      quickStart: "빠른 시작",
+      techStack: "기술 스택",
+    },
+    features: {
+      firebase: {
+        title: "Firebase 통합",
+        description: "Auth, Firestore, Storage, FCM 완벽 통합",
+      },
+      auth: {
+        title: "인증 시스템",
+        description: "이메일 및 Google 로그인과 보안 토큰 관리",
+      },
+      chat: {
+        title: "실시간 채팅",
+        description: "타이핑 인디케이터가 포함된 완전한 채팅 시스템",
+      },
+      offline: {
+        title: "오프라인 지원",
+        description: "자동 동기화로 매끄러운 오프라인 경험",
+      },
+    },
+    quickStart: {
+      step1: {
+        title: "클론 & 설치",
+        description: "저장소를 클론하고 yarn install을 실행하여 시작하세요",
+      },
+      step2: {
+        title: "Firebase 설정",
+        description: "Firebase 설정을 추가하고 인증을 구성하세요",
+      },
+      step3: {
+        title: "개발 시작",
+        description: "expo start를 실행하고 앱 개발을 시작하세요",
+      },
+    },
+    stats: {
+      components: "컴포넌트",
+      features: "기능",
+      languages: "언어",
+      typescript: "타입스크립트",
+    },
+    cta: {
+      viewDocs: "문서 보기",
+      viewGithub: "GitHub에서 보기",
+    },
+    footer: {
+      madeWith: "React Native & Expo로 ❤️을 담아 제작",
+    },
+  },
+  chatScreen: {
+    title: "채팅",
+    emptyTitle: "채팅이 없습니다",
+    emptyDescription: "새로운 대화를 시작해보세요!",
+    newChat: "새 채팅 시작",
+    chatCount: "{{count}}개의 대화",
+    loadingChats: "채팅 목록을 불러오는 중...",
+    loadingMessages: "메시지를 불러오는 중...",
+    loadingMoreMessages: "이전 메시지 불러오는 중...",
+    sendMessagePlaceholder: "{{name}}님에게 메시지 보내기...",
+    unknown: "알 수 없음",
   },
   matchingScreen: {
     matchingButton: "매칭 시작",
@@ -84,7 +156,8 @@ const ko: Translations = {
       signUpFailed: "회원가입에 실패했습니다",
       googleSignInFailed: "Google 로그인에 실패했습니다",
       signInInProgress: "로그인 작업이 이미 진행 중입니다",
-      playServicesNotAvailable: "Google Play 서비스가 사용 불가능하거나 오래되었습니다",
+      playServicesNotAvailable:
+        "Google Play 서비스가 사용 불가능하거나 오래되었습니다",
       logoutFailed: "로그아웃에 실패했습니다",
       userNotFound: "사용자를 찾을 수 없습니다",
       emailVerificationFailed: "이메일 검증 메일 발송에 실패했습니다",
@@ -101,7 +174,8 @@ const ko: Translations = {
   emptyStateComponent: {
     generic: {
       heading: "너무 텅 비어서.. 너무 슬퍼요..",
-      content: "데이터가 없습니다. 버튼을 눌러서 리프레쉬 하시거나 앱을 리로드하세요.",
+      content:
+        "데이터가 없습니다. 버튼을 눌러서 리프레쉬 하시거나 앱을 리로드하세요.",
       button: "다시 시도해봅시다",
     },
   },
@@ -227,11 +301,126 @@ const ko: Translations = {
       monthlyMatches: "월간 매칭",
     },
   },
+  notifications: {
+    title: "알림",
+    emptyTitle: "알림이 없습니다",
+    emptyDescription: "아직 받은 알림이 없습니다",
+    markAllRead: "모두 읽음 처리",
+    settings: "알림 설정",
+    enablePush: "푸시 알림 활성화",
+    enablePushDescription: "매칭, 메시지 등의 알림을 받으세요",
+    chatNotifications: "채팅 알림",
+    chatNotificationsDescription: "새 메시지 알림 받기",
+    matchNotifications: "매칭 알림",
+    matchNotificationsDescription: "새 매칭 알림 받기",
+    likeNotifications: "좋아요 알림",
+    likeNotificationsDescription: "누군가 나를 좋아할 때 알림 받기",
+    systemNotifications: "시스템 알림",
+    systemNotificationsDescription: "중요 업데이트 및 공지사항",
+    permissionRequired: "권한이 필요합니다",
+    permissionDescription: "알림을 받으려면 권한을 활성화해주세요",
+    enableButton: "알림 활성화",
+    permissionPrompt: {
+      title: "알림 허용",
+      description:
+        "알림을 허용하시면 중요한 정보와 업데이트를 실시간으로 받아보실 수 있습니다.",
+      allow: "허용",
+      later: "나중에",
+    },
+    types: {
+      chat_message: "새 메시지",
+      new_match: "새 매칭",
+      new_like: "새 좋아요",
+      match_expiring: "매칭 만료 예정",
+      system: "시스템",
+    },
+  },
+  payment: {
+    title: "프리미엄",
+    subscribe: "구독하기",
+    restore: "구매 복원",
+    restoring: "복원 중...",
+    processing: "처리 중...",
+    currentPlan: "현재 플랜",
+    changePlan: "플랜 변경",
+    cancelSubscription: "구독 취소",
+    cancelConfirmTitle: "구독 취소",
+    cancelConfirmMessage:
+      "정말 취소하시겠습니까? 현재 결제 기간이 끝날 때까지 계속 이용하실 수 있습니다.",
+    keepSubscription: "구독 유지",
+    cancelled: "구독 취소됨",
+    cancelledMessage:
+      "구독이 취소되었습니다. 현재 결제 기간이 끝날 때까지 이용하실 수 있습니다.",
+    noPurchases: "구매 내역 없음",
+    noPurchasesMessage: "복원할 이전 구매 내역을 찾을 수 없습니다.",
+    restoreSuccess: "구매 복원 완료",
+    restoreSuccessMessage: "구매가 복원되었습니다.",
+    purchaseFailed: "구매 실패",
+    purchaseFailedMessage: "구매 중 오류가 발생했습니다. 다시 시도해주세요.",
+    features: {
+      unlimitedMatches: "무제한 매칭",
+      seeWhoLikes: "누가 좋아하는지 보기",
+      advancedFilters: "고급 필터",
+      noAds: "광고 없음",
+      prioritySupport: "우선 지원",
+      boosts: "프로필 부스트",
+    },
+    plans: {
+      monthly: "월간",
+      yearly: "연간",
+      lifetime: "평생",
+      bestValue: "최고 가성비",
+      mostPopular: "가장 인기",
+    },
+    terms:
+      "구독하면 서비스 약관 및 개인정보 처리방침에 동의하게 됩니다. 구독은 현재 기간이 끝나기 최소 24시간 전에 취소하지 않으면 자동으로 갱신됩니다.",
+    success: {
+      title: "프리미엄에 오신 것을 환영합니다!",
+      message: "이제 모든 프리미엄 기능을 이용하실 수 있습니다.",
+      continueButton: "계속하기",
+    },
+    status: {
+      active: "활성",
+      trialing: "체험",
+      cancelled: "취소됨",
+      expired: "만료됨",
+    },
+    daysRemaining: "{{days}}일 남음",
+    willRenew: "자동 갱신",
+    willNotRenew: "갱신 안 함",
+  },
+  offline: {
+    banner: "오프라인 상태입니다",
+    bannerMessage: "일부 기능이 제한될 수 있습니다",
+    reconnecting: "재연결 중...",
+    syncPending: "동기화 대기 중",
+    syncComplete: "동기화 완료",
+    syncFailed: "동기화 실패",
+    retrySync: "다시 시도",
+    offlineMode: "오프라인 모드",
+    offlineModeDescription: "온라인 상태가 되면 데이터가 동기화됩니다",
+  },
+  imageUpload: {
+    selectImage: "이미지 선택",
+    takePhoto: "사진 촬영",
+    chooseFromGallery: "갤러리에서 선택",
+    uploading: "업로드 중...",
+    uploadComplete: "업로드 완료",
+    uploadFailed: "업로드 실패",
+    retryUpload: "다시 업로드",
+    removeImage: "이미지 삭제",
+    imageTooLarge: "이미지가 너무 큽니다. 최대 크기는 {{maxSize}}MB입니다.",
+    unsupportedFormat: "지원하지 않는 이미지 형식입니다",
+    permissionDenied: "권한이 거부되었습니다. 설정에서 권한을 허용해주세요.",
+    compressing: "이미지 압축 중...",
+  },
   emailVerificationScreen: {
     title: "이메일 인증",
     subtitle: "{{email}}로 인증 링크를 보냈습니다",
-    checkEmailMessage: "이메일을 확인하고 인증 링크를 클릭하여 계정을 활성화해주세요.",
-    instructionsMessage: "이메일이 보이지 않으면 스팸 폴더를 확인하거나 새로 요청해주세요.",
+    checkEmailMessage:
+      "이메일을 확인하고 인증 링크를 클릭하여 계정을 활성화해주세요.",
+    instructionsMessage:
+      "이메일이 보이지 않으면 스팸 폴더를 확인하거나 새로 요청해주세요.",
     currentEmail: "현재 이메일",
     openEmailApp: "이메일 앱 열기",
     checkVerification: "이메일 인증 완료했어요",
@@ -249,7 +438,8 @@ const ko: Translations = {
 
     // Messages
     verificationComplete: "이메일 인증 완료!",
-    welcomeMessage: "Amie에 오신 것을 환영합니다! 이제 모든 기능을 사용하실 수 있습니다.",
+    welcomeMessage:
+      "Amie에 오신 것을 환영합니다! 이제 모든 기능을 사용하실 수 있습니다.",
     resendTitle: "인증 이메일 발송 완료",
     resendMessage: "{{email}}로 새로운 인증 이메일을 보냈습니다",
     emailChangeSuccess: "이메일 변경 완료",
@@ -268,6 +458,6 @@ const ko: Translations = {
     notVerifiedTitle: "아직 이메일 인증이 안됨",
     notVerifiedMessage: "먼저 이메일의 인증 링크를 클릭해주세요.",
   },
-}
+};
 
-export default ko
+export default ko;

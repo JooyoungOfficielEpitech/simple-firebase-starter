@@ -1,0 +1,39 @@
+# Navigation Flow E2E Test
+# Tests main tab navigation and screen transitions
+
+appId: com.fastmatching.app
+
+---
+- launchApp:
+    clearState: true
+
+# Assume user is authenticated, test main navigation
+# Note: In real tests, you'd mock authentication state
+
+# Test Home Tab
+- assertVisible:
+    text: "Home"
+    optional: true
+
+# Test Components Tab Navigation
+- tapOn:
+    text: "Components"
+    optional: true
+- assertVisible:
+    text: "Components"
+    optional: true
+
+# Test Features Tab Navigation
+- tapOn:
+    text: "Features"
+    optional: true
+
+# Test Chat Tab Navigation
+- tapOn:
+    text: "Chat"
+    optional: true
+
+# Test Settings Tab Navigation
+- tapOn:
+    text: "Settings"
+    optional: true

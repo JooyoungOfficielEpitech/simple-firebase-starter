@@ -1,4 +1,4 @@
-import { Translations } from "./en"
+import { Translations } from "./en";
 
 const fr: Translations = {
   common: {
@@ -12,9 +12,83 @@ const fr: Translations = {
     exciting: "Exciting!",
   },
   mainNavigator: {
-    matchingTab: "Matching",
-    profileTab: "Profile",
-    settingsTab: "Settings",
+    homeTab: "Accueil",
+    componentsTab: "Composants",
+    featuresTab: "Fonctionnalités",
+    chatTab: "Chat",
+    settingsTab: "Paramètres",
+  },
+  homeScreen: {
+    hero: {
+      title: "Modèle React Native Firebase",
+      subtitle: "Modèle de démarrage prêt pour la production avec Firebase, Expo SDK 53 et TypeScript",
+      welcome: "Bienvenue, {{name}} !",
+    },
+    sections: {
+      features: "Fonctionnalités Clés",
+      quickStart: "Démarrage Rapide",
+      techStack: "Stack Technique",
+    },
+    features: {
+      firebase: {
+        title: "Intégration Firebase",
+        description: "Auth, Firestore, Storage et FCM entièrement intégrés",
+      },
+      auth: {
+        title: "Authentification",
+        description: "Connexion email et Google avec gestion sécurisée des tokens",
+      },
+      chat: {
+        title: "Chat en Temps Réel",
+        description: "Système de chat complet avec indicateurs de frappe",
+      },
+      offline: {
+        title: "Support Hors Ligne",
+        description: "Expérience hors ligne transparente avec synchronisation automatique",
+      },
+    },
+    quickStart: {
+      step1: {
+        title: "Cloner et Installer",
+        description: "Clonez le dépôt et exécutez yarn install pour commencer",
+      },
+      step2: {
+        title: "Configurer Firebase",
+        description: "Ajoutez votre configuration Firebase et configurez l'authentification",
+      },
+      step3: {
+        title: "Commencer à Développer",
+        description: "Exécutez expo start et commencez à développer votre application",
+      },
+    },
+    stats: {
+      components: "Composants",
+      features: "Fonctionnalités",
+      languages: "Langues",
+      typescript: "TypeScript",
+    },
+    cta: {
+      viewDocs: "Voir la Documentation",
+      viewGithub: "Voir sur GitHub",
+    },
+    footer: {
+      madeWith: "Fait avec ❤️ en utilisant React Native et Expo",
+    },
+  },
+  chatScreen: {
+    title: "Chat",
+    emptyTitle: "Pas de chats",
+    emptyDescription: "Commencez une nouvelle conversation!",
+    newChat: "Nouveau chat",
+    chatCount: "{{count}} conversations",
+    loadingChats: "Chargement des chats...",
+    loadingMessages: "Chargement des messages...",
+    loadingMoreMessages: "Chargement de plus de messages...",
+    sendMessagePlaceholder: "Envoyer un message à {{name}}...",
+    unknown: "Inconnu",
+  },
+  matchingScreen: {
+    matchingButton: "Start Matching",
   },
   signInScreen: {
     title: "Welcome to Amie",
@@ -46,7 +120,8 @@ const fr: Translations = {
   },
   forgotPasswordScreen: {
     title: "Reset Password",
-    subtitle: "Enter your email address and we'll send you a password reset link.",
+    subtitle:
+      "Enter your email address and we'll send you a password reset link.",
     subtitleSent: "We've sent you a password reset link!",
     emailPlaceholder: "Email",
     sendButton: "Send Reset Link",
@@ -68,7 +143,8 @@ const fr: Translations = {
       emailInvalid: "Please enter a valid email address",
       passwordRequired: "Please enter your password",
       passwordMinLength: "Password must be at least 6 characters",
-      passwordPattern: "Password must contain letters, numbers, and special characters",
+      passwordPattern:
+        "Password must contain letters, numbers, and special characters",
       passwordMismatch: "Passwords do not match",
       nameRequired: "Please enter your name",
       nameMinLength: "Name must be at least 2 characters",
@@ -80,6 +156,9 @@ const fr: Translations = {
       signInFailed: "Sign in failed",
       signUpFailed: "Sign up failed",
       googleSignInFailed: "Google sign in failed",
+      signInInProgress: "Sign in operation is already in progress",
+      playServicesNotAvailable:
+        "Google Play Services not available or outdated",
       logoutFailed: "Logout failed",
       userNotFound: "User not found",
       emailVerificationFailed: "Failed to send email verification",
@@ -96,7 +175,8 @@ const fr: Translations = {
   emptyStateComponent: {
     generic: {
       heading: "So empty... so sad",
-      content: "No data here yet. Try clicking the button to refresh or reload the app.",
+      content:
+        "No data here yet. Try clicking the button to refresh or reload the app.",
       button: "Let's try this again",
     },
   },
@@ -222,12 +302,126 @@ const fr: Translations = {
       monthlyMatches: "Monthly Matches",
     },
   },
+  notifications: {
+    title: "Notifications",
+    emptyTitle: "Aucune notification",
+    emptyDescription: "Vous n'avez pas encore de notifications",
+    markAllRead: "Tout marquer comme lu",
+    settings: "Paramètres de notification",
+    enablePush: "Activer les notifications push",
+    enablePushDescription:
+      "Recevez des notifications sur les matchs, messages et plus",
+    chatNotifications: "Notifications de chat",
+    chatNotificationsDescription: "Être notifié des nouveaux messages",
+    matchNotifications: "Notifications de match",
+    matchNotificationsDescription: "Être notifié des nouveaux matchs",
+    likeNotifications: "Notifications de j'aime",
+    likeNotificationsDescription: "Être notifié quand quelqu'un vous aime",
+    systemNotifications: "Notifications système",
+    systemNotificationsDescription: "Mises à jour et annonces importantes",
+    permissionRequired: "Permission requise",
+    permissionDescription:
+      "Veuillez activer les notifications pour rester informé",
+    enableButton: "Activer les notifications",
+    types: {
+      chat_message: "Nouveau message",
+      new_match: "Nouveau match",
+      new_like: "Nouveau j'aime",
+      match_expiring: "Match bientôt expiré",
+      system: "Système",
+    },
+  },
+  payment: {
+    title: "Premium",
+    subscribe: "S'abonner maintenant",
+    restore: "Restaurer les achats",
+    restoring: "Restauration...",
+    processing: "Traitement...",
+    currentPlan: "Plan actuel",
+    changePlan: "Changer de plan",
+    cancelSubscription: "Annuler l'abonnement",
+    cancelConfirmTitle: "Annuler l'abonnement",
+    cancelConfirmMessage:
+      "Êtes-vous sûr de vouloir annuler? Vous continuerez à avoir accès jusqu'à la fin de la période de facturation.",
+    keepSubscription: "Garder l'abonnement",
+    cancelled: "Abonnement annulé",
+    cancelledMessage:
+      "Votre abonnement a été annulé. Vous aurez accès jusqu'à la fin de la période de facturation actuelle.",
+    noPurchases: "Aucun achat trouvé",
+    noPurchasesMessage: "Aucun achat précédent n'a été trouvé à restaurer.",
+    restoreSuccess: "Achats restaurés",
+    restoreSuccessMessage: "Vos achats ont été restaurés.",
+    purchaseFailed: "Échec de l'achat",
+    purchaseFailedMessage:
+      "Une erreur s'est produite lors de l'achat. Veuillez réessayer.",
+    features: {
+      unlimitedMatches: "Matchs illimités",
+      seeWhoLikes: "Voir qui vous aime",
+      advancedFilters: "Filtres avancés",
+      noAds: "Sans publicités",
+      prioritySupport: "Support prioritaire",
+      boosts: "Boosts de profil",
+    },
+    plans: {
+      monthly: "Mensuel",
+      yearly: "Annuel",
+      lifetime: "À vie",
+      bestValue: "Meilleur rapport qualité-prix",
+      mostPopular: "Le plus populaire",
+    },
+    terms:
+      "En vous abonnant, vous acceptez nos Conditions d'utilisation et notre Politique de confidentialité. Les abonnements se renouvellent automatiquement sauf annulation au moins 24 heures avant la fin de la période en cours.",
+    success: {
+      title: "Bienvenue dans Premium!",
+      message:
+        "Vous avez maintenant accès à toutes les fonctionnalités premium.",
+      continueButton: "Continuer",
+    },
+    status: {
+      active: "Actif",
+      trialing: "Essai",
+      cancelled: "Annulé",
+      expired: "Expiré",
+    },
+    daysRemaining: "{{days}} jours restants",
+    willRenew: "Renouvellement automatique",
+    willNotRenew: "Ne sera pas renouvelé",
+  },
+  offline: {
+    banner: "Vous êtes hors ligne",
+    bannerMessage: "Certaines fonctionnalités peuvent être limitées",
+    reconnecting: "Reconnexion...",
+    syncPending: "Synchronisation en attente",
+    syncComplete: "Synchronisation terminée",
+    syncFailed: "Échec de la synchronisation",
+    retrySync: "Réessayer",
+    offlineMode: "Mode hors ligne",
+    offlineModeDescription:
+      "Les données seront synchronisées lorsque vous serez de nouveau en ligne",
+  },
+  imageUpload: {
+    selectImage: "Sélectionner une image",
+    takePhoto: "Prendre une photo",
+    chooseFromGallery: "Choisir dans la galerie",
+    uploading: "Téléchargement...",
+    uploadComplete: "Téléchargement terminé",
+    uploadFailed: "Échec du téléchargement",
+    retryUpload: "Réessayer le téléchargement",
+    removeImage: "Supprimer l'image",
+    imageTooLarge:
+      "L'image est trop grande. La taille maximale est de {{maxSize}}Mo.",
+    unsupportedFormat: "Format d'image non pris en charge",
+    permissionDenied:
+      "Permission refusée. Veuillez autoriser l'accès dans les paramètres.",
+    compressing: "Compression de l'image...",
+  },
   emailVerificationScreen: {
     title: "Verify Your Email",
     subtitle: "We've sent a verification link to {{email}}",
     checkEmailMessage:
       "Please check your email and click the verification link to activate your account.",
-    instructionsMessage: "If you don't see the email, check your spam folder or request a new one.",
+    instructionsMessage:
+      "If you don't see the email, check your spam folder or request a new one.",
     currentEmail: "Current Email",
     openEmailApp: "Open Email App",
     checkVerification: "I've Verified My Email",
@@ -262,8 +456,9 @@ const fr: Translations = {
 
     // Status messages
     notVerifiedTitle: "Email Not Yet Verified",
-    notVerifiedMessage: "Please click the verification link in your email first.",
+    notVerifiedMessage:
+      "Please click the verification link in your email first.",
   },
-}
+};
 
-export default fr
+export default fr;

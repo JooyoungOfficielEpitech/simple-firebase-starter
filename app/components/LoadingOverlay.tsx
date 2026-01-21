@@ -1,25 +1,31 @@
-import { type FC } from "react"
-import { ActivityIndicator, Modal, type TextStyle, View, type ViewStyle } from "react-native"
+import { type FC } from "react";
+import {
+  ActivityIndicator,
+  Modal,
+  type TextStyle,
+  View,
+  type ViewStyle,
+} from "react-native";
 
-import { Text } from "./Text"
-import { useAppTheme } from "../theme/context"
-import { type ThemedStyle } from "../theme/types"
+import { Text } from "./Text";
+import { useAppTheme } from "../theme/context";
+import { type ThemedStyle } from "../theme/types";
 
 export interface LoadingOverlayProps {
   /** Controls the visibility of the overlay */
-  visible: boolean
+  visible: boolean;
   /** Message shown under the spinner (default: "Loading...") */
-  message?: string
+  message?: string;
   /** Accessibility label announced by screen readers */
-  accessibilityLabel?: string
+  accessibilityLabel?: string;
   /** Optional spinner color (defaults to theme primary) */
-  spinnerColor?: string
+  spinnerColor?: string;
   /** Spinner size */
-  spinnerSize?: number | "small" | "large"
+  spinnerSize?: number | "small" | "large";
   /** Android back button / iOS swipe to close handler */
-  onRequestClose?: () => void
+  onRequestClose?: () => void;
   /** Optional testID for E2E/UI tests */
-  testID?: string
+  testID?: string;
 }
 
 /**
@@ -35,7 +41,7 @@ export const LoadingOverlay: FC<LoadingOverlayProps> = function LoadingOverlay({
   onRequestClose,
   testID,
 }) {
-  const { themed, theme } = useAppTheme()
+  const { themed, theme } = useAppTheme();
 
   return (
     <Modal
@@ -61,14 +67,18 @@ export const LoadingOverlay: FC<LoadingOverlayProps> = function LoadingOverlay({
             style={themed($spinner)}
             accessibilityLabel="Loading spinner"
           />
-          <Text style={themed($message)} accessibilityRole="text" accessibilityLiveRegion="polite">
+          <Text
+            style={themed($message)}
+            accessibilityRole="text"
+            accessibilityLiveRegion="polite"
+          >
             {message}
           </Text>
         </View>
       </View>
     </Modal>
-  )
-}
+  );
+};
 
 const $overlay: ThemedStyle<ViewStyle> = () => ({
   position: "absolute",
@@ -80,7 +90,7 @@ const $overlay: ThemedStyle<ViewStyle> = () => ({
   justifyContent: "center",
   alignItems: "center",
   zIndex: 1000,
-})
+});
 
 const $container: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   backgroundColor: colors.palette.neutral100,
@@ -97,17 +107,17 @@ const $container: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   shadowOpacity: 0.15,
   shadowRadius: 12,
   elevation: 8,
-})
+});
 
 const $spinner: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   marginBottom: spacing.sm,
-})
+});
 
 const $message: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   fontSize: 16,
   fontFamily: typography.primary.medium,
   color: colors.text,
   textAlign: "center",
-})
+});
 
-export default LoadingOverlay
+export default LoadingOverlay;

@@ -15,6 +15,10 @@ const db = admin.firestore()
 // Set global options for cost control and align region with Firestore location
 setGlobalOptions({ maxInstances: 10, region: "asia-northeast3" })
 
+// Export notification functions
+export { onNewMessage, onMessagesRead } from "./notifications/chatNotifications"
+export { onNewMatch, onNewLike, onMatchExpiringSoon } from "./notifications/matchNotifications"
+
 /**
  * Cloud Function that triggers when a new document is added to matchingQueue
  * Implements the matching logic as specified in matching.txt

@@ -1,90 +1,237 @@
-# Simple Firebase Starter
+# React Native Firebase Boilerplate
 
-Firebase와 Google Authentication이 설정된 간단한 React Native + Expo 앱 스타터입니다.
+Production-ready React Native + Expo boilerplate with Firebase integration, featuring 66+ UI components, real-time chat, push notifications, offline support, and more.
 
-## 🚀 기능
+## 🚀 Features
 
-- ✅ Firebase Authentication (이메일/비밀번호, Google 로그인)
-- ✅ Firebase Firestore 연동
-- ✅ Firebase Analytics
-- ✅ React Navigation (Bottom Tabs)
-- ✅ i18n 다국어 지원
-- ✅ 테마 시스템 (다크모드 지원)
-- ✅ Expo Dev Client 지원
+### Core Features
+- ✅ **Firebase Authentication** - Email/Password, Google Sign-In
+- ✅ **Firebase Firestore** - Real-time database with offline support
+- ✅ **Firebase Storage** - Image upload with compression
+- ✅ **Firebase Cloud Messaging** - Push notifications
+- ✅ **Firebase Analytics** - Usage tracking
 
-## 📱 화면 구성
+### App Features
+- ✅ **Real-time Chat** - 1:1 messaging with typing indicators
+- ✅ **Push Notifications** - Remote & local notifications
+- ✅ **Image Upload** - Camera/gallery picker with compression
+- ✅ **Offline Support** - Automatic sync when back online
+- ✅ **Payment Template** - Subscription & IAP ready
+- ✅ **Theming** - Light/Dark mode with custom themes
+- ✅ **i18n** - 7 languages (EN, KO, JA, ES, FR, AR, HI)
 
-- **로그인/회원가입**: Firebase Auth 기반 인증
-- **홈 화면**: 기본 Welcome 화면
-- **설정 화면**: 기본 설정 메뉴
+### Developer Experience
+- ✅ **66+ UI Components** - Full component library
+- ✅ **5 Code Generators** - Screen, Component, Service, Function, i18n
+- ✅ **TypeScript** - Full type safety
+- ✅ **ESLint + Prettier** - Code quality
+- ✅ **Jest + Testing Library** - Unit testing
+- ✅ **Maestro** - E2E testing
+- ✅ **CI/CD** - GitHub Actions workflows
 
-## 🛠 설정 방법
+## 📱 Screens
 
-### 1. 프로젝트 설정
+### Main Screens
+- Home, Settings, Profile Edit
+- Sign In, Sign Up, Forgot Password
+- Chat List, Chat Room
+- Notifications, Subscription
+
+### Showcase Screens
+- **7 Component Showcases** - Button, Card, Text, Toggle, Form, Layout, Feedback
+- **8 Feature Showcases** - Auth, Notifications, Offline, Chat, Theme, i18n, Error Handling, Network
+
+## 🧩 Components (66+)
+
+### UI Components
+Badge, Button, Card, Chip, Icon, Text, Avatar, Tabs, Tooltip, Rating
+
+### Form Components
+TextField, FormTextField, Toggle, Checkbox, Radio, Switch, Select, Slider, DatePicker, TimePicker, ColorPicker, SearchBar
+
+### Layout Components
+Screen, Header, ListItem, ListView, Grid, Container, Divider, Spacer, Accordion
+
+### Feedback Components
+Toast, Snackbar, AlertDialog, ConfirmDialog, LoadingOverlay, ProgressBar, Skeleton, BottomSheet, EmptyState
+
+### Media Components
+AutoImage, ImageGallery, ImagePickerButton, ImageUploadProgress, CodeBlock
+
+### Chat Components
+ChatListItem, MessageBubble, MessageInput, TypingIndicator, DateSeparator, MessageImage
+
+### Network Components
+OfflineBanner, SyncIndicator, NetworkStatusIcon
+
+### Payment Components
+PricingCard, PaymentSuccessModal
+
+## 🛠 Setup
+
+### Prerequisites
+- Node.js >= 20.0.0
+- Yarn
+- Xcode (for iOS)
+- Android Studio (for Android)
+
+### Installation
 
 ```bash
-cd simple-firebase-starter
-npm install
+# Clone the repository
+git clone <repository-url>
+cd fast-matching
+
+# Install dependencies
+yarn install
+
+# iOS setup
+cd ios && pod install && cd ..
 ```
 
-### 2. Firebase 설정
+### Firebase Configuration
 
-1. Firebase 콘솔에서 새 프로젝트 생성
-2. `google-services.json` (Android) 및 `GoogleService-Info.plist` (iOS) 파일 교체
-3. `.env` 파일 생성하고 환경 변수 설정:
+1. Create a Firebase project at [Firebase Console](https://console.firebase.google.com)
+2. Enable Authentication, Firestore, Storage, and Cloud Messaging
+3. Download configuration files:
+   - `google-services.json` → `android/app/`
+   - `GoogleService-Info.plist` → `ios/`
+4. Set environment variables in `.env`:
+   ```
+   EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=your-web-client-id
+   ```
+
+### Running the App
 
 ```bash
-cp .env.example .env
+# Start Metro bundler
+yarn start
+
+# Run on iOS
+yarn ios
+
+# Run on Android
+yarn android
 ```
 
-`.env` 파일에서 다음 값들을 설정:
-- `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`: Google Web Client ID
-
-### 3. iOS 빌드
-
-```bash
-npm run ios
-```
-
-## 📁 프로젝트 구조
+## 📁 Project Structure
 
 ```
 app/
-├── components/          # 재사용 가능한 컴포넌트
-├── context/            # React Context (AuthContext 등)
-├── i18n/              # 다국어 번역 파일
-├── navigators/        # React Navigation 설정
-├── screens/           # 화면 컴포넌트
-├── services/          # Firebase 서비스
-├── theme/             # 테마 및 스타일 시스템
-└── types/             # TypeScript 타입 정의
+├── components/           # 66+ UI components
+│   ├── chat/            # Chat-specific components
+│   └── payment/         # Payment components
+├── context/             # React Context providers
+├── i18n/                # Translations (7 languages)
+├── navigators/          # React Navigation setup
+├── screens/             # Screen components
+│   ├── components/      # Component showcase screens
+│   └── features/        # Feature showcase screens
+├── services/            # Business logic services
+│   ├── chat/           # Chat service
+│   ├── firestore/      # Firestore service
+│   ├── network/        # Network monitoring
+│   ├── notifications/  # Push notifications
+│   ├── payment/        # Payment service
+│   └── storage/        # Image storage
+├── theme/               # Theming system
+├── types/               # TypeScript types
+└── utils/               # Utility functions
+
+functions/               # Firebase Cloud Functions
+scripts/                 # Build & generator scripts
+.maestro/               # E2E test flows
+.github/workflows/      # CI/CD pipelines
+docs/                   # Documentation
 ```
 
-## 🔧 개발
+## 🔧 Scripts
 
-- `npm start`: Expo Dev Server 시작
-- `npm run ios`: iOS 시뮬레이터에서 실행
-- `npm run android`: Android 에뮬레이터에서 실행
-- `npm run lint`: ESLint 실행
-- `npm run compile`: TypeScript 타입 체크
+### Development
+```bash
+yarn start              # Start Expo dev server
+yarn ios                # Run on iOS
+yarn android            # Run on Android
+yarn lint               # Run ESLint
+yarn compile            # TypeScript check
+```
 
-## 📦 주요 의존성
+### Testing
+```bash
+yarn test               # Run unit tests
+yarn test:watch         # Watch mode
+yarn test:e2e           # Run Maestro E2E tests
+yarn test:e2e:auth      # Run auth flow test
+```
 
-- **React Native**: 0.79.5
-- **Expo**: 53.0.20
-- **Firebase**: ^22.4.0
-- **React Navigation**: ^7.x
-- **TypeScript**: ~5.8.3
+### Code Generation
+```bash
+yarn generate                           # Interactive generator
+yarn generate:screen MyScreen           # Generate screen
+yarn generate:component MyComponent     # Generate component
+yarn generate:service myService         # Generate service
+yarn generate:function myFunction       # Generate Cloud Function
+yarn generate:i18n namespace key "value" # Add i18n key
+```
 
-## 🎯 새로운 앱 만들기
+### Build & Analysis
+```bash
+yarn build:ios:sim       # Build iOS for simulator
+yarn build:android:sim   # Build Android for emulator
+yarn analyze:bundle      # Analyze bundle size
+yarn analyze:startup     # Check startup optimization
+```
 
-이 스타터 템플릿을 기반으로 새로운 앱을 만들려면:
+## 📚 Documentation
 
-1. 이름 변경 및 컨셉 정하기
-2. firebase 에 프로젝트 등록 후 bundle id 등등을 설정한다
-3. oauth2 authentifications 들을 설정한다
-4. google services 들을 root 에서 세팅한다
+- [Architecture Guide](docs/ARCHITECTURE.md)
+- [Components Reference](docs/COMPONENTS.md)
+- [Generators Guide](docs/GENERATORS.md)
+- [iOS APNs Setup](docs/setup/ios-apns-setup.md)
+- [Android FCM Setup](docs/setup/android-fcm-setup.md)
+- [Firebase Storage Rules](docs/setup/firebase-storage-rules.md)
 
-## 📝 라이센스
+## 🧪 Testing
+
+### Unit Tests (Jest)
+- 15+ test files covering components and services
+- Run with `yarn test`
+
+### E2E Tests (Maestro)
+- 5 test flows: auth, navigation, components, chat, offline
+- Run with `yarn test:e2e`
+
+## 🔄 CI/CD
+
+### GitHub Actions Workflows
+- **ci.yml** - Lint, typecheck, and test on push
+- **pr-check.yml** - PR validation
+- **release.yml** - Production build
+- **functions.yml** - Cloud Functions deployment
+- **e2e.yml** - Maestro E2E tests
+
+## 📦 Tech Stack
+
+| Category | Technology |
+|----------|------------|
+| Framework | React Native 0.79.5, Expo 53 |
+| Language | TypeScript 5.8 |
+| Backend | Firebase (Auth, Firestore, Storage, FCM) |
+| Navigation | React Navigation 7 |
+| State | React Context |
+| Forms | React Hook Form + Zod |
+| Styling | Themed StyleSheet |
+| Animation | Reanimated 3 |
+| Testing | Jest, Testing Library, Maestro |
+
+## 📝 License
 
 MIT License
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request

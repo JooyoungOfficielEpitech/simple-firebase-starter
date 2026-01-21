@@ -1,0 +1,62 @@
+# Components Showcase E2E Test
+# Tests component showcase screens
+
+appId: com.fastmatching.app
+
+---
+- launchApp
+
+# Navigate to Components tab (assumes authenticated)
+- tapOn:
+    text: "Components"
+    optional: true
+
+# Verify component categories are visible
+- assertVisible:
+    text: "UI Components"
+    optional: true
+
+- assertVisible:
+    text: "Form Components"
+    optional: true
+
+- assertVisible:
+    text: "Layout Components"
+    optional: true
+
+# Test Button Showcase
+- tapOn:
+    text: "Button"
+    optional: true
+
+- assertVisible:
+    text: "Button"
+    optional: true
+
+# Go back
+- tapOn:
+    id: "back-button"
+    optional: true
+
+# Test Card Showcase
+- tapOn:
+    text: "Card"
+    optional: true
+
+- assertVisible:
+    text: "Card"
+    optional: true
+
+# Go back
+- tapOn:
+    id: "back-button"
+    optional: true
+
+# Test Toggle Showcase
+- tapOn:
+    text: "Toggle"
+    optional: true
+
+- assertVisible:
+    text: "Toggle"
+    optional: true

@@ -1,41 +1,52 @@
-import { FC, useCallback } from "react"
-import { Image, ImageStyle, TextStyle, View, ViewStyle, Alert } from "react-native"
+import { FC, useCallback } from "react";
+import {
+  Image,
+  ImageStyle,
+  TextStyle,
+  View,
+  ViewStyle,
+  Alert,
+} from "react-native";
 
-import { Button } from "@/components/Button"
-import { Screen } from "@/components/Screen"
-import { Text } from "@/components/Text"
-import { useAuth } from "@/context/AuthContext"
-import { isRTL } from "@/i18n"
-import { useAppTheme } from "@/theme/context"
-import { $styles } from "@/theme/styles"
-import type { ThemedStyle } from "@/theme/types"
-import { useSafeAreaInsetsStyle } from "@/utils/useSafeAreaInsetsStyle"
+import { Button } from "@/components/Button";
+import { Screen } from "@/components/Screen";
+import { Text } from "@/components/Text";
+import { useAuth } from "@/context/AuthContext";
+import { isRTL } from "@/i18n";
+import { useAppTheme } from "@/theme/context";
+import { $styles } from "@/theme/styles";
+import type { ThemedStyle } from "@/theme/types";
+import { useSafeAreaInsetsStyle } from "@/utils/useSafeAreaInsetsStyle";
 
-const welcomeLogo = require("@assets/images/logo.png")
-const welcomeFace = require("@assets/images/welcome-face.png")
+const welcomeLogo = require("@assets/images/logo.png");
+const welcomeFace = require("@assets/images/welcome-face.png");
 
 export const WelcomeScreen: FC = function WelcomeScreen() {
-  const { themed, theme } = useAppTheme()
-  const { logout, user, isLoading } = useAuth()
+  const { themed, theme } = useAppTheme();
+  const { logout, user, isLoading } = useAuth();
 
-  const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
+  const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"]);
 
   const handleLogout = useCallback(async () => {
     try {
-      await logout()
+      await logout();
     } catch (error) {
-      console.warn("Logout failed in WelcomeScreen:", error)
-      Alert.alert("오류", "로그아웃에 실패했습니다")
+      console.warn("Logout failed in WelcomeScreen:", error);
+      Alert.alert("오류", "로그아웃에 실패했습니다");
     }
-  }, [logout])
+  }, [logout]);
 
   // 로딩 중일 때는 로그아웃 버튼을 비활성화
-  const isLoggingOut = isLoading
+  const isLoggingOut = isLoading;
 
   return (
     <Screen preset="fixed" contentContainerStyle={$styles.flex1}>
       <View style={themed($topContainer)}>
-        <Image style={themed($welcomeLogo)} source={welcomeLogo} resizeMode="contain" />
+        <Image
+          style={themed($welcomeLogo)}
+          source={welcomeLogo}
+          resizeMode="contain"
+        />
         <Text
           testID="welcome-heading"
           style={themed($welcomeHeading)}
@@ -70,8 +81,8 @@ export const WelcomeScreen: FC = function WelcomeScreen() {
         />
       </View>
     </Screen>
-  )
-}
+  );
+};
 
 const $topContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   flexShrink: 1,
@@ -79,7 +90,7 @@ const $topContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   flexBasis: "57%",
   justifyContent: "center",
   paddingHorizontal: spacing.lg,
-})
+});
 
 const $bottomContainer: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   flexShrink: 1,
@@ -90,13 +101,13 @@ const $bottomContainer: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   borderTopRightRadius: 16,
   paddingHorizontal: spacing.lg,
   justifyContent: "space-around",
-})
+});
 
 const $welcomeLogo: ThemedStyle<ImageStyle> = ({ spacing }) => ({
   height: 88,
   width: "100%",
   marginBottom: spacing.xxl,
-})
+});
 
 const $welcomeFace: ImageStyle = {
   height: 169,
@@ -105,13 +116,13 @@ const $welcomeFace: ImageStyle = {
   bottom: -47,
   right: -80,
   transform: [{ scaleX: isRTL ? -1 : 1 }],
-}
+};
 
 const $welcomeHeading: ThemedStyle<TextStyle> = ({ spacing }) => ({
   marginBottom: spacing.md,
-})
+});
 
 const $userInfo: ThemedStyle<TextStyle> = ({ spacing }) => ({
   marginBottom: spacing.md,
   textAlign: "center",
-})
+});

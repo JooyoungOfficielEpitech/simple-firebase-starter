@@ -1,4 +1,4 @@
-import { Translations } from "./en"
+import { Translations } from "./en";
 
 const hi: Translations = {
   common: {
@@ -12,9 +12,83 @@ const hi: Translations = {
     exciting: "Exciting!",
   },
   mainNavigator: {
-    matchingTab: "Matching",
-    profileTab: "Profile",
-    settingsTab: "Settings",
+    homeTab: "होम",
+    componentsTab: "कंपोनेंट्स",
+    featuresTab: "फीचर्स",
+    chatTab: "चैट",
+    settingsTab: "सेटिंग्स",
+  },
+  homeScreen: {
+    hero: {
+      title: "React Native Firebase बॉयलरप्लेट",
+      subtitle: "Firebase, Expo SDK 53, और TypeScript के साथ प्रोडक्शन-रेडी स्टार्टर टेम्पलेट",
+      welcome: "वापसी पर स्वागत है, {{name}}!",
+    },
+    sections: {
+      features: "मुख्य विशेषताएं",
+      quickStart: "त्वरित शुरुआत",
+      techStack: "टेक स्टैक",
+    },
+    features: {
+      firebase: {
+        title: "Firebase इंटीग्रेशन",
+        description: "Auth, Firestore, Storage, और FCM पूरी तरह से एकीकृत",
+      },
+      auth: {
+        title: "प्रमाणीकरण",
+        description: "ईमेल और Google साइन-इन सुरक्षित टोकन प्रबंधन के साथ",
+      },
+      chat: {
+        title: "रीयल-टाइम चैट",
+        description: "टाइपिंग इंडिकेटर के साथ पूर्ण चैट सिस्टम",
+      },
+      offline: {
+        title: "ऑफलाइन सपोर्ट",
+        description: "स्वचालित सिंक के साथ सहज ऑफलाइन अनुभव",
+      },
+    },
+    quickStart: {
+      step1: {
+        title: "क्लोन और इंस्टॉल",
+        description: "रेपो क्लोन करें और शुरू करने के लिए yarn install चलाएं",
+      },
+      step2: {
+        title: "Firebase कॉन्फ़िगर करें",
+        description: "अपना Firebase कॉन्फ़िग जोड़ें और प्रमाणीकरण सेट करें",
+      },
+      step3: {
+        title: "बिल्डिंग शुरू करें",
+        description: "expo start चलाएं और अपना ऐप विकसित करना शुरू करें",
+      },
+    },
+    stats: {
+      components: "कंपोनेंट्स",
+      features: "फीचर्स",
+      languages: "भाषाएं",
+      typescript: "TypeScript",
+    },
+    cta: {
+      viewDocs: "डॉक्यूमेंटेशन देखें",
+      viewGithub: "GitHub पर देखें",
+    },
+    footer: {
+      madeWith: "React Native और Expo के साथ ❤️ से बनाया गया",
+    },
+  },
+  chatScreen: {
+    title: "चैट",
+    emptyTitle: "कोई चैट नहीं",
+    emptyDescription: "एक नई बातचीत शुरू करें!",
+    newChat: "नई चैट",
+    chatCount: "{{count}} बातचीत",
+    loadingChats: "चैट लोड हो रहे हैं...",
+    loadingMessages: "संदेश लोड हो रहे हैं...",
+    loadingMoreMessages: "और संदेश लोड हो रहे हैं...",
+    sendMessagePlaceholder: "{{name}} को संदेश भेजें...",
+    unknown: "अज्ञात",
+  },
+  matchingScreen: {
+    matchingButton: "Start Matching",
   },
   signInScreen: {
     title: "Welcome to Amie",
@@ -46,7 +120,8 @@ const hi: Translations = {
   },
   forgotPasswordScreen: {
     title: "Reset Password",
-    subtitle: "Enter your email address and we'll send you a password reset link.",
+    subtitle:
+      "Enter your email address and we'll send you a password reset link.",
     subtitleSent: "We've sent you a password reset link!",
     emailPlaceholder: "Email",
     sendButton: "Send Reset Link",
@@ -68,7 +143,8 @@ const hi: Translations = {
       emailInvalid: "Please enter a valid email address",
       passwordRequired: "Please enter your password",
       passwordMinLength: "Password must be at least 6 characters",
-      passwordPattern: "Password must contain letters, numbers, and special characters",
+      passwordPattern:
+        "Password must contain letters, numbers, and special characters",
       passwordMismatch: "Passwords do not match",
       nameRequired: "Please enter your name",
       nameMinLength: "Name must be at least 2 characters",
@@ -80,6 +156,9 @@ const hi: Translations = {
       signInFailed: "Sign in failed",
       signUpFailed: "Sign up failed",
       googleSignInFailed: "Google sign in failed",
+      signInInProgress: "Sign in operation is already in progress",
+      playServicesNotAvailable:
+        "Google Play Services not available or outdated",
       logoutFailed: "Logout failed",
       userNotFound: "User not found",
       emailVerificationFailed: "Failed to send email verification",
@@ -96,7 +175,8 @@ const hi: Translations = {
   emptyStateComponent: {
     generic: {
       heading: "So empty... so sad",
-      content: "No data here yet. Try clicking the button to refresh or reload the app.",
+      content:
+        "No data here yet. Try clicking the button to refresh or reload the app.",
       button: "Let's try this again",
     },
   },
@@ -222,12 +302,122 @@ const hi: Translations = {
       monthlyMatches: "Monthly Matches",
     },
   },
+  notifications: {
+    title: "सूचनाएं",
+    emptyTitle: "कोई सूचना नहीं",
+    emptyDescription: "आपके पास अभी तक कोई सूचना नहीं है",
+    markAllRead: "सभी पढ़ा हुआ चिह्नित करें",
+    settings: "सूचना सेटिंग्स",
+    enablePush: "पुश नोटिफिकेशन सक्षम करें",
+    enablePushDescription:
+      "मैच, संदेश और अन्य के बारे में सूचनाएं प्राप्त करें",
+    chatNotifications: "चैट सूचनाएं",
+    chatNotificationsDescription: "नए संदेशों के बारे में सूचित किया जाए",
+    matchNotifications: "मैच सूचनाएं",
+    matchNotificationsDescription: "नए मैच के बारे में सूचित किया जाए",
+    likeNotifications: "लाइक सूचनाएं",
+    likeNotificationsDescription: "जब कोई आपको लाइक करे तो सूचित किया जाए",
+    systemNotifications: "सिस्टम सूचनाएं",
+    systemNotificationsDescription: "महत्वपूर्ण अपडेट और घोषणाएं",
+    permissionRequired: "अनुमति आवश्यक",
+    permissionDescription: "अपडेट रहने के लिए कृपया सूचनाएं सक्षम करें",
+    enableButton: "सूचनाएं सक्षम करें",
+    types: {
+      chat_message: "नया संदेश",
+      new_match: "नया मैच",
+      new_like: "नया लाइक",
+      match_expiring: "मैच समाप्त हो रहा है",
+      system: "सिस्टम",
+    },
+  },
+  payment: {
+    title: "प्रीमियम",
+    subscribe: "अभी सब्सक्राइब करें",
+    restore: "खरीदारी पुनर्स्थापित करें",
+    restoring: "पुनर्स्थापित हो रहा है...",
+    processing: "प्रोसेसिंग...",
+    currentPlan: "वर्तमान प्लान",
+    changePlan: "प्लान बदलें",
+    cancelSubscription: "सदस्यता रद्द करें",
+    cancelConfirmTitle: "सदस्यता रद्द करें",
+    cancelConfirmMessage:
+      "क्या आप वाकई रद्द करना चाहते हैं? आपके पास बिलिंग अवधि के अंत तक पहुंच रहेगी।",
+    keepSubscription: "सदस्यता रखें",
+    cancelled: "सदस्यता रद्द",
+    cancelledMessage:
+      "आपकी सदस्यता रद्द कर दी गई है। आपके पास वर्तमान बिलिंग अवधि के अंत तक पहुंच रहेगी।",
+    noPurchases: "कोई खरीदारी नहीं मिली",
+    noPurchasesMessage: "पुनर्स्थापित करने के लिए कोई पिछली खरीदारी नहीं मिली।",
+    restoreSuccess: "खरीदारी पुनर्स्थापित",
+    restoreSuccessMessage: "आपकी खरीदारी पुनर्स्थापित कर दी गई है।",
+    purchaseFailed: "खरीदारी विफल",
+    purchaseFailedMessage:
+      "खरीदारी के दौरान एक त्रुटि हुई। कृपया पुनः प्रयास करें।",
+    features: {
+      unlimitedMatches: "असीमित मैच",
+      seeWhoLikes: "देखें किसने आपको लाइक किया",
+      advancedFilters: "उन्नत फिल्टर",
+      noAds: "कोई विज्ञापन नहीं",
+      prioritySupport: "प्राथमिकता सहायता",
+      boosts: "प्रोफाइल बूस्ट",
+    },
+    plans: {
+      monthly: "मासिक",
+      yearly: "वार्षिक",
+      lifetime: "आजीवन",
+      bestValue: "सर्वोत्तम मूल्य",
+      mostPopular: "सबसे लोकप्रिय",
+    },
+    terms:
+      "सब्सक्राइब करके, आप हमारी सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं। सदस्यताएं स्वचालित रूप से नवीनीकृत होती हैं जब तक कि वर्तमान अवधि समाप्त होने से कम से कम 24 घंटे पहले रद्द न किया जाए।",
+    success: {
+      title: "प्रीमियम में आपका स्वागत है!",
+      message: "अब आपके पास सभी प्रीमियम सुविधाओं तक पहुंच है।",
+      continueButton: "जारी रखें",
+    },
+    status: {
+      active: "सक्रिय",
+      trialing: "ट्रायल",
+      cancelled: "रद्द",
+      expired: "समाप्त",
+    },
+    daysRemaining: "{{days}} दिन शेष",
+    willRenew: "स्वतः-नवीनीकरण",
+    willNotRenew: "नवीनीकृत नहीं होगा",
+  },
+  offline: {
+    banner: "आप ऑफलाइन हैं",
+    bannerMessage: "कुछ सुविधाएं सीमित हो सकती हैं",
+    reconnecting: "पुन: कनेक्ट हो रहा है...",
+    syncPending: "सिंक लंबित",
+    syncComplete: "सिंक पूर्ण",
+    syncFailed: "सिंक विफल",
+    retrySync: "पुनः प्रयास करें",
+    offlineMode: "ऑफलाइन मोड",
+    offlineModeDescription: "जब आप वापस ऑनलाइन होंगे तब डेटा सिंक होगा",
+  },
+  imageUpload: {
+    selectImage: "छवि चुनें",
+    takePhoto: "फोटो लें",
+    chooseFromGallery: "गैलरी से चुनें",
+    uploading: "अपलोड हो रहा है...",
+    uploadComplete: "अपलोड पूर्ण",
+    uploadFailed: "अपलोड विफल",
+    retryUpload: "अपलोड पुनः प्रयास करें",
+    removeImage: "छवि हटाएं",
+    imageTooLarge: "छवि बहुत बड़ी है। अधिकतम आकार {{maxSize}}MB है।",
+    unsupportedFormat: "असमर्थित छवि प्रारूप",
+    permissionDenied:
+      "अनुमति अस्वीकृत। कृपया सेटिंग्स में पहुंच की अनुमति दें।",
+    compressing: "छवि संपीड़ित हो रही है...",
+  },
   emailVerificationScreen: {
     title: "Verify Your Email",
     subtitle: "We've sent a verification link to {{email}}",
     checkEmailMessage:
       "Please check your email and click the verification link to activate your account.",
-    instructionsMessage: "If you don't see the email, check your spam folder or request a new one.",
+    instructionsMessage:
+      "If you don't see the email, check your spam folder or request a new one.",
     currentEmail: "Current Email",
     openEmailApp: "Open Email App",
     checkVerification: "I've Verified My Email",
@@ -262,8 +452,9 @@ const hi: Translations = {
 
     // Status messages
     notVerifiedTitle: "Email Not Yet Verified",
-    notVerifiedMessage: "Please click the verification link in your email first.",
+    notVerifiedMessage:
+      "Please click the verification link in your email first.",
   },
-}
+};
 
-export default hi
+export default hi;

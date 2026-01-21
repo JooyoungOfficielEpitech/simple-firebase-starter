@@ -7,43 +7,43 @@ import {
   View,
   ViewProps,
   ViewStyle,
-} from "react-native"
+} from "react-native";
 
-import GoogleIcon from "@/components/Icons/GoogleIcon"
-import SettingsIcon from "@/components/Icons/SettingsIcon"
-import { useAppTheme } from "@/theme/context"
+import GoogleIcon from "@/components/Icons/GoogleIcon";
+import SettingsIcon from "@/components/Icons/SettingsIcon";
+import { useAppTheme } from "@/theme/context";
 
-export type IconTypes = keyof (typeof pngIconRegistry & typeof svgIconRegistry)
+export type IconTypes = keyof (typeof pngIconRegistry & typeof svgIconRegistry);
 
 type BaseIconProps = {
   /**
    * The name of the icon
    */
-  icon: IconTypes
+  icon: IconTypes;
 
   /**
    * An optional tint color for the icon
    */
-  color?: string
+  color?: string;
 
   /**
    * An optional size for the icon. If not provided, the icon will be sized to the icon's resolution.
    */
-  size?: number
+  size?: number;
 
   /**
    * Style overrides for the icon image (PNG icons only)
    */
-  style?: StyleProp<ImageStyle>
+  style?: StyleProp<ImageStyle>;
 
   /**
    * Style overrides for the icon container
    */
-  containerStyle?: StyleProp<ViewStyle>
-}
+  containerStyle?: StyleProp<ViewStyle>;
+};
 
-type PressableIconProps = Omit<TouchableOpacityProps, "style"> & BaseIconProps
-type IconProps = Omit<ViewProps, "style"> & BaseIconProps
+type PressableIconProps = Omit<TouchableOpacityProps, "style"> & BaseIconProps;
+type IconProps = Omit<ViewProps, "style"> & BaseIconProps;
 
 /**
  * A component to render a registered icon.
@@ -60,33 +60,42 @@ export function PressableIcon(props: PressableIconProps) {
     style: $imageStyleOverride,
     containerStyle: $containerStyleOverride,
     ...pressableProps
-  } = props
+  } = props;
 
-  const { theme } = useAppTheme()
+  const { theme } = useAppTheme();
 
   const $imageStyle: StyleProp<ImageStyle> = [
     $imageStyleBase,
     { tintColor: color ?? theme.colors.text },
     size !== undefined && { width: size, height: size },
     $imageStyleOverride,
-  ]
+  ];
 
   const renderIcon = () => {
     if (icon in svgIconRegistry) {
-      const SvgIcon = svgIconRegistry[icon as keyof typeof svgIconRegistry]
-      return <SvgIcon width={size ?? 24} height={size ?? 24} color={color ?? theme.colors.text} />
+      const SvgIcon = svgIconRegistry[icon as keyof typeof svgIconRegistry];
+      return (
+        <SvgIcon
+          width={size ?? 24}
+          height={size ?? 24}
+          color={color ?? theme.colors.text}
+        />
+      );
     }
 
     return (
-      <Image style={$imageStyle} source={pngIconRegistry[icon as keyof typeof pngIconRegistry]} />
-    )
-  }
+      <Image
+        style={$imageStyle}
+        source={pngIconRegistry[icon as keyof typeof pngIconRegistry]}
+      />
+    );
+  };
 
   return (
     <TouchableOpacity {...pressableProps} style={$containerStyleOverride}>
       {renderIcon()}
     </TouchableOpacity>
-  )
+  );
 }
 
 /**
@@ -104,33 +113,42 @@ export function Icon(props: IconProps) {
     style: $imageStyleOverride,
     containerStyle: $containerStyleOverride,
     ...viewProps
-  } = props
+  } = props;
 
-  const { theme } = useAppTheme()
+  const { theme } = useAppTheme();
 
   const $imageStyle: StyleProp<ImageStyle> = [
     $imageStyleBase,
     { tintColor: color ?? theme.colors.text },
     size !== undefined && { width: size, height: size },
     $imageStyleOverride,
-  ]
+  ];
 
   const renderIcon = () => {
     if (icon in svgIconRegistry) {
-      const SvgIcon = svgIconRegistry[icon as keyof typeof svgIconRegistry]
-      return <SvgIcon width={size ?? 24} height={size ?? 24} color={color ?? theme.colors.text} />
+      const SvgIcon = svgIconRegistry[icon as keyof typeof svgIconRegistry];
+      return (
+        <SvgIcon
+          width={size ?? 24}
+          height={size ?? 24}
+          color={color ?? theme.colors.text}
+        />
+      );
     }
 
     return (
-      <Image style={$imageStyle} source={pngIconRegistry[icon as keyof typeof pngIconRegistry]} />
-    )
-  }
+      <Image
+        style={$imageStyle}
+        source={pngIconRegistry[icon as keyof typeof pngIconRegistry]}
+      />
+    );
+  };
 
   return (
     <View {...viewProps} style={$containerStyleOverride}>
       {renderIcon()}
     </View>
-  )
+  );
 }
 
 export const pngIconRegistry = {
@@ -148,13 +166,13 @@ export const pngIconRegistry = {
   user: require("@assets/icons/user.png"),
   view: require("@assets/icons/view.png"),
   x: require("@assets/icons/x.png"),
-}
+};
 
 export const svgIconRegistry = {
   settings: SettingsIcon,
   google: GoogleIcon,
-} as const
+} as const;
 
 const $imageStyleBase: ImageStyle = {
   resizeMode: "contain",
-}
+};

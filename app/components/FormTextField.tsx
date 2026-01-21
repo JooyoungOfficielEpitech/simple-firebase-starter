@@ -1,7 +1,7 @@
-import { forwardRef, Ref } from "react"
-import { Control, Controller, FieldPath, FieldValues } from "react-hook-form"
+import { forwardRef, Ref } from "react";
+import { Control, Controller, FieldPath, FieldValues } from "react-hook-form";
 
-import { TextField, TextFieldProps } from "./TextField"
+import { TextField, TextFieldProps } from "./TextField";
 
 export interface FormTextFieldProps<
   TFieldValues extends FieldValues = FieldValues,
@@ -10,11 +10,11 @@ export interface FormTextFieldProps<
   /**
    * React Hook Form control object
    */
-  control: Control<TFieldValues>
+  control: Control<TFieldValues>;
   /**
    * Field name for the form
    */
-  name: TName
+  name: TName;
 }
 
 /**
@@ -36,13 +36,16 @@ function FormTextFieldComponent<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
 >(props: FormTextFieldProps<TFieldValues, TName>, ref: Ref<any>) {
-  const { control, name, ...textFieldProps } = props
+  const { control, name, ...textFieldProps } = props;
 
   return (
     <Controller
       control={control}
       name={name}
-      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+      render={({
+        field: { onChange, onBlur, value },
+        fieldState: { error },
+      }) => (
         <TextField
           ref={ref}
           value={value}
@@ -54,7 +57,7 @@ function FormTextFieldComponent<
         />
       )}
     />
-  )
+  );
 }
 
 export const FormTextField = forwardRef(FormTextFieldComponent) as <
@@ -62,7 +65,7 @@ export const FormTextField = forwardRef(FormTextFieldComponent) as <
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >(
   props: FormTextFieldProps<TFieldValues, TName> & { ref?: Ref<any> },
-) => ReturnType<typeof FormTextFieldComponent>
+) => ReturnType<typeof FormTextFieldComponent>;
 
 // Re-export TextFieldAccessoryProps for convenience
-export type { TextFieldAccessoryProps } from "./TextField"
+export type { TextFieldAccessoryProps } from "./TextField";

@@ -1,0 +1,104 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ==========================================
+    // Helper Functions
+    // ==========================================
+
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if user is the owner (based on path)
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Validate image file
+    function isValidImage() {
+      return request.resource.contentType.matches('image/.*') &&
+             request.resource.size < 10 * 1024 * 1024; // Max 10MB
+    }
+
+    // Validate image size (smaller for thumbnails)
+    function isValidThumbnail() {
+      return request.resource.contentType.matches('image/.*') &&
+             request.resource.size < 1 * 1024 * 1024; // Max 1MB
+    }
+
+    // ==========================================
+    // User Profile Images
+    // ==========================================
+    match /users/{userId}/profile/{imageId} {
+      // Anyone authenticated can read profile images
+      allow read: if isAuthenticated();
+
+      // Only owner can upload/update their profile images
+      allow write: if isOwner(userId) && isValidImage();
+
+      // Only owner can delete their profile images
+      allow delete: if isOwner(userId);
+    }
+
+    // User profile thumbnails
+    match /users/{userId}/profile/thumbnails/{imageId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) && isValidThumbnail();
+      allow delete: if isOwner(userId);
+    }
+
+    // ==========================================
+    // Chat Images
+    // ==========================================
+    match /chats/{chatId}/images/{imageId} {
+      // Chat participants can read images
+      // Note: For better security, verify participant status via Firestore
+      allow read: if isAuthenticated();
+
+      // Authenticated users can upload chat images
+      allow write: if isAuthenticated() && isValidImage();
+
+      // Prevent deletion of chat images (or allow via Cloud Functions)
+      allow delete: if false;
+    }
+
+    // Chat image thumbnails
+    match /chats/{chatId}/thumbnails/{imageId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isValidThumbnail();
+      allow delete: if false;
+    }
+
+    // ==========================================
+    // Temporary Upload Folder
+    // ==========================================
+    match /temp/{userId}/{fileName} {
+      // Owner can read/write to their temp folder
+      allow read, write: if isOwner(userId) && isValidImage();
+
+      // Auto-delete after processing (via Cloud Functions)
+      allow delete: if isOwner(userId);
+    }
+
+    // ==========================================
+    // Public Assets (App Icons, etc.)
+    // ==========================================
+    match /public/{allPaths=**} {
+      // Anyone can read public assets
+      allow read: if true;
+
+      // Only admin can write (via Firebase Console)
+      allow write: if false;
+    }
+
+    // ==========================================
+    // Deny all other paths
+    // ==========================================
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

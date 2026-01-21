@@ -1,24 +1,31 @@
-import { StyleProp, ViewStyle, TextStyle, View, TouchableOpacity, Platform } from "react-native"
+import {
+  StyleProp,
+  ViewStyle,
+  TextStyle,
+  View,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
 
-import GoogleIcon from "@/components/Icons/GoogleIcon"
-import { useAppTheme } from "@/theme/context"
-import type { ThemedStyle } from "@/theme/types"
+import GoogleIcon from "@/components/Icons/GoogleIcon";
+import { useAppTheme } from "@/theme/context";
+import type { ThemedStyle } from "@/theme/types";
 
-import { Text } from "./Text"
+import { Text } from "./Text";
 
 export interface GoogleSignInButtonProps {
   /**
    * Called when the button is pressed.
    */
-  onPress?: () => void
+  onPress?: () => void;
   /**
    * Whether the button is disabled.
    */
-  disabled?: boolean
+  disabled?: boolean;
   /**
    * An optional style override for the button.
    */
-  style?: StyleProp<ViewStyle>
+  style?: StyleProp<ViewStyle>;
 }
 
 /**
@@ -26,8 +33,8 @@ export interface GoogleSignInButtonProps {
  * Matches the exact CSS styles from Google's Material Design button.
  */
 export function GoogleSignInButton(props: GoogleSignInButtonProps) {
-  const { onPress, disabled, style } = props
-  const { themed } = useAppTheme()
+  const { onPress, disabled, style } = props;
+  const { themed } = useAppTheme();
 
   return (
     <TouchableOpacity
@@ -46,7 +53,7 @@ export function GoogleSignInButton(props: GoogleSignInButtonProps) {
         />
       </View>
     </TouchableOpacity>
-  )
+  );
 }
 
 // Google Material Button styles - matches CSS exactly
@@ -67,12 +74,12 @@ const $googleSignInButton: ThemedStyle<ViewStyle> = () => ({
   shadowOpacity: 0.3,
   shadowRadius: 2,
   elevation: 2,
-})
+});
 
 const $disabledButton: ThemedStyle<ViewStyle> = () => ({
   backgroundColor: "#ffffff61",
   borderColor: "#1f1f1f1f",
-})
+});
 
 const $contentWrapper: ThemedStyle<ViewStyle> = () => ({
   alignItems: "center",
@@ -82,7 +89,7 @@ const $contentWrapper: ThemedStyle<ViewStyle> = () => ({
   justifyContent: "center",
   position: "relative",
   width: "100%",
-})
+});
 
 const $iconContainer: ThemedStyle<ViewStyle> = () => ({
   height: 20,
@@ -90,7 +97,7 @@ const $iconContainer: ThemedStyle<ViewStyle> = () => ({
   marginLeft: Platform.OS === "ios" ? 16 : 12,
   minWidth: 20,
   width: 20,
-})
+});
 
 const $buttonContents: ThemedStyle<TextStyle> = () => ({
   fontFamily: "Roboto",
@@ -102,8 +109,8 @@ const $buttonContents: ThemedStyle<TextStyle> = () => ({
   textAlign: "center",
   verticalAlign: "top",
   flexGrow: 0,
-})
+});
 
 const $disabledText: ThemedStyle<TextStyle> = () => ({
   opacity: 0.38,
-})
+});

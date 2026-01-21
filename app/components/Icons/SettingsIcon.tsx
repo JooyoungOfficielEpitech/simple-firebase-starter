@@ -1,4 +1,4 @@
-import Svg, { SvgProps, G, Path } from "react-native-svg"
+import Svg, { SvgProps, G, Path } from "react-native-svg";
 
 const SettingsIcon = (props: SvgProps) => (
   <Svg width={72} height={72} viewBox="0 0 24 24" {...props}>
@@ -13,6 +13,6 @@ const SettingsIcon = (props: SvgProps) => (
       <Path d="M9 12a3 3 0 1 0 6 0 3 3 0 0 0-6 0" />
     </G>
   </Svg>
-)
+);
 
-export default SettingsIcon
+export default SettingsIcon;

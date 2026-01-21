@@ -1,0 +1,65 @@
+name: Cloud Functions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'functions/**'
+      - '.github/workflows/functions.yml'
+
+jobs:
+  lint-and-build:
+    name: Lint & Build Functions
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: ./functions
+        run: yarn install --frozen-lockfile
+
+      - name: Lint
+        working-directory: ./functions
+        run: yarn lint || true
+
+      - name: Build
+        working-directory: ./functions
+        run: yarn build
+
+  deploy:
+    name: Deploy Functions
+    runs-on: ubuntu-latest
+    needs: lint-and-build
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Install dependencies
+        working-directory: ./functions
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        working-directory: ./functions
+        run: yarn build
+
+      - name: Deploy to Firebase
+        run: firebase deploy --only functions --force
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}

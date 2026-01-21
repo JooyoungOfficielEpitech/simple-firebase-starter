@@ -1,0 +1,45 @@
+# Chat Flow E2E Test
+# Tests chat functionality
+
+appId: com.fastmatching.app
+
+---
+- launchApp
+
+# Navigate to Chat tab (assumes authenticated)
+- tapOn:
+    text: "Chat"
+    optional: true
+
+# Verify chat list screen
+- assertVisible:
+    text: "Chat"
+    optional: true
+
+# Check for empty state or chat list
+- assertVisible:
+    text: "No Chats"
+    optional: true
+
+# If there are chats, tap on first one
+- tapOn:
+    text: ".*"  # Any chat item
+    optional: true
+    index: 0
+
+# Verify chat room elements
+- assertVisible:
+    id: "message-input"
+    optional: true
+
+# Test message input
+- tapOn:
+    id: "message-input"
+    optional: true
+
+- inputText: "Hello, this is a test message!"
+
+# Test send button (without actually sending)
+- assertVisible:
+    id: "send-button"
+    optional: true

@@ -11,8 +11,80 @@ const en = {
     exciting: "(ohh, this is exciting!)",
   },
   mainNavigator: {
-    welcomeTab: "Home",
+    homeTab: "Home",
+    componentsTab: "Components",
+    featuresTab: "Features",
+    chatTab: "Chat",
     settingsTab: "Settings",
+  },
+  homeScreen: {
+    hero: {
+      title: "React Native Firebase Boilerplate",
+      subtitle: "Production-ready starter template with Firebase, Expo SDK 53, and TypeScript",
+      welcome: "Welcome back, {{name}}!",
+    },
+    sections: {
+      features: "Key Features",
+      quickStart: "Quick Start",
+      techStack: "Tech Stack",
+    },
+    features: {
+      firebase: {
+        title: "Firebase Integration",
+        description: "Auth, Firestore, Storage, and FCM fully integrated",
+      },
+      auth: {
+        title: "Authentication",
+        description: "Email and Google sign-in with secure token management",
+      },
+      chat: {
+        title: "Real-time Chat",
+        description: "Full-featured chat system with typing indicators",
+      },
+      offline: {
+        title: "Offline Support",
+        description: "Seamless offline experience with automatic sync",
+      },
+    },
+    quickStart: {
+      step1: {
+        title: "Clone & Install",
+        description: "Clone the repo and run yarn install to get started",
+      },
+      step2: {
+        title: "Configure Firebase",
+        description: "Add your Firebase config and set up authentication",
+      },
+      step3: {
+        title: "Start Building",
+        description: "Run expo start and begin developing your app",
+      },
+    },
+    stats: {
+      components: "Components",
+      features: "Features",
+      languages: "Languages",
+      typescript: "TypeScript",
+    },
+    cta: {
+      viewDocs: "View Documentation",
+      viewGithub: "View on GitHub",
+    },
+    footer: {
+      madeWith: "Made with ❤️ using React Native & Expo",
+    },
+  },
+  chatScreen: {
+    title: "Chat",
+    emptyTitle: "No Chats",
+    emptyDescription: "Start a new conversation!",
+    newChat: "New Chat",
+    chatCount: "{{count}} conversations",
+    loadingChats: "Loading chats...",
+    loadingMessages: "Loading messages...",
+    loadingMoreMessages: "Loading more messages...",
+    sendMessagePlaceholder: "Send message to {{name}}...",
+    unknown: "Unknown",
   },
   matchingScreen: {
     matchingButton: "Start Matching",
@@ -47,7 +119,8 @@ const en = {
   },
   forgotPasswordScreen: {
     title: "Reset Password",
-    subtitle: "Enter your email address and we'll send you a link to reset your password.",
+    subtitle:
+      "Enter your email address and we'll send you a link to reset your password.",
     subtitleSent: "We've sent you a password reset link!",
     emailPlaceholder: "Email",
     sendButton: "Send Reset Link",
@@ -69,7 +142,8 @@ const en = {
       emailInvalid: "Please enter a valid email address",
       passwordRequired: "Please enter your password",
       passwordMinLength: "Password must be at least 6 characters long",
-      passwordPattern: "Password must contain letters, numbers, and special characters",
+      passwordPattern:
+        "Password must contain letters, numbers, and special characters",
       passwordMismatch: "Passwords do not match",
       nameRequired: "Please enter your name",
       nameMinLength: "Name must be at least 2 characters long",
@@ -82,7 +156,8 @@ const en = {
       signUpFailed: "Sign up failed",
       googleSignInFailed: "Google sign in failed",
       signInInProgress: "Sign in operation is already in progress",
-      playServicesNotAvailable: "Google Play Services not available or outdated",
+      playServicesNotAvailable:
+        "Google Play Services not available or outdated",
       logoutFailed: "Logout failed",
       userNotFound: "User not found",
       emailVerificationFailed: "Failed to send verification email",
@@ -99,7 +174,8 @@ const en = {
   emptyStateComponent: {
     generic: {
       heading: "So empty... so sad",
-      content: "No data found yet. Try clicking the button to refresh or reload the app.",
+      content:
+        "No data found yet. Try clicking the button to refresh or reload the app.",
       button: "Let's try this again",
     },
   },
@@ -131,8 +207,10 @@ const en = {
     },
     warnings: {
       bioEmpty: "Adding a bio will increase your matching probability.",
-      bioShort: "Writing a more detailed bio will increase your matching probability.",
-      interestsEmpty: "Setting interests will increase your matching probability.",
+      bioShort:
+        "Writing a more detailed bio will increase your matching probability.",
+      interestsEmpty:
+        "Setting interests will increase your matching probability.",
     },
   },
   matching: {
@@ -225,12 +303,128 @@ const en = {
       monthlyMatches: "Monthly Matches",
     },
   },
+  notifications: {
+    title: "Notifications",
+    emptyTitle: "No Notifications",
+    emptyDescription: "You don't have any notifications yet",
+    markAllRead: "Mark All Read",
+    settings: "Notification Settings",
+    enablePush: "Enable Push Notifications",
+    enablePushDescription:
+      "Receive notifications about matches, messages, and more",
+    chatNotifications: "Chat Notifications",
+    chatNotificationsDescription: "Get notified about new messages",
+    matchNotifications: "Match Notifications",
+    matchNotificationsDescription: "Get notified about new matches",
+    likeNotifications: "Like Notifications",
+    likeNotificationsDescription: "Get notified when someone likes you",
+    systemNotifications: "System Notifications",
+    systemNotificationsDescription: "Important updates and announcements",
+    permissionRequired: "Permission Required",
+    permissionDescription: "Please enable notifications to stay updated",
+    enableButton: "Enable Notifications",
+    permissionPrompt: {
+      title: "Allow Notifications",
+      description:
+        "Enable notifications to receive important updates and messages in real time.",
+      allow: "Allow",
+      later: "Later",
+    },
+    types: {
+      chat_message: "New Message",
+      new_match: "New Match",
+      new_like: "New Like",
+      match_expiring: "Match Expiring",
+      system: "System",
+    },
+  },
+  payment: {
+    title: "Premium",
+    subscribe: "Subscribe Now",
+    restore: "Restore Purchases",
+    restoring: "Restoring...",
+    processing: "Processing...",
+    currentPlan: "Current Plan",
+    changePlan: "Change Plan",
+    cancelSubscription: "Cancel Subscription",
+    cancelConfirmTitle: "Cancel Subscription",
+    cancelConfirmMessage:
+      "Are you sure you want to cancel? You will continue to have access until the end of your billing period.",
+    keepSubscription: "Keep Subscription",
+    cancelled: "Subscription Cancelled",
+    cancelledMessage:
+      "Your subscription has been cancelled. You will have access until the end of your current billing period.",
+    noPurchases: "No Purchases Found",
+    noPurchasesMessage: "No previous purchases were found to restore.",
+    restoreSuccess: "Purchases Restored",
+    restoreSuccessMessage: "Your purchases have been restored.",
+    purchaseFailed: "Purchase Failed",
+    purchaseFailedMessage:
+      "An error occurred during purchase. Please try again.",
+    features: {
+      unlimitedMatches: "Unlimited Matches",
+      seeWhoLikes: "See Who Likes You",
+      advancedFilters: "Advanced Filters",
+      noAds: "No Ads",
+      prioritySupport: "Priority Support",
+      boosts: "Profile Boosts",
+    },
+    plans: {
+      monthly: "Monthly",
+      yearly: "Yearly",
+      lifetime: "Lifetime",
+      bestValue: "Best Value",
+      mostPopular: "Most Popular",
+    },
+    terms:
+      "By subscribing, you agree to our Terms of Service and Privacy Policy. Subscriptions automatically renew unless cancelled at least 24 hours before the end of the current period.",
+    success: {
+      title: "Welcome to Premium!",
+      message: "You now have access to all premium features.",
+      continueButton: "Continue",
+    },
+    status: {
+      active: "Active",
+      trialing: "Trial",
+      cancelled: "Cancelled",
+      expired: "Expired",
+    },
+    daysRemaining: "{{days}} days remaining",
+    willRenew: "Auto-renew",
+    willNotRenew: "Will not renew",
+  },
+  offline: {
+    banner: "You're offline",
+    bannerMessage: "Some features may be limited",
+    reconnecting: "Reconnecting...",
+    syncPending: "Sync pending",
+    syncComplete: "Sync complete",
+    syncFailed: "Sync failed",
+    retrySync: "Retry",
+    offlineMode: "Offline Mode",
+    offlineModeDescription: "Data will sync when you're back online",
+  },
+  imageUpload: {
+    selectImage: "Select Image",
+    takePhoto: "Take Photo",
+    chooseFromGallery: "Choose from Gallery",
+    uploading: "Uploading...",
+    uploadComplete: "Upload Complete",
+    uploadFailed: "Upload Failed",
+    retryUpload: "Retry Upload",
+    removeImage: "Remove Image",
+    imageTooLarge: "Image is too large. Maximum size is {{maxSize}}MB.",
+    unsupportedFormat: "Unsupported image format",
+    permissionDenied: "Permission denied. Please allow access in settings.",
+    compressing: "Compressing image...",
+  },
   emailVerificationScreen: {
     title: "Verify Your Email",
     subtitle: "We've sent a verification link to {{email}}",
     checkEmailMessage:
       "Please check your email and click the verification link to activate your account.",
-    instructionsMessage: "If you don't see the email, check your spam folder or request a new one.",
+    instructionsMessage:
+      "If you don't see the email, check your spam folder or request a new one.",
     currentEmail: "Current Email",
     openEmailApp: "Open Email App",
     checkVerification: "I've Verified My Email",
@@ -265,9 +459,10 @@ const en = {
 
     // Status messages
     notVerifiedTitle: "Email Not Yet Verified",
-    notVerifiedMessage: "Please click the verification link in your email first.",
+    notVerifiedMessage:
+      "Please click the verification link in your email first.",
   },
-}
+};
 
-export default en
-export type Translations = typeof en
+export default en;
+export type Translations = typeof en;

@@ -6,131 +6,146 @@ import {
   useContext,
   useEffect,
   useState,
-} from "react"
-import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth"
+} from "react";
+import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
 import {
   GoogleSignin,
   statusCodes,
   isErrorWithCode,
   isSuccessResponse,
   isCancelledResponse,
-} from "@react-native-google-signin/google-signin"
+} from "@react-native-google-signin/google-signin";
 
-import { translate } from "@/i18n/translate"
-import { userService } from "@/services/firestore"
-import { type CreateUserProfile } from "@/types/user"
+import { translate } from "@/i18n/translate";
+import { userService } from "@/services/firestore";
+import { type CreateUserProfile } from "@/types/user";
 
 export type AuthContextType = {
-  isAuthenticated: boolean
-  isLoading: boolean
-  user: FirebaseAuthTypes.User | null
-  isEmailVerified: boolean
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  user: FirebaseAuthTypes.User | null;
+  isEmailVerified: boolean;
 
-  signInWithEmail: (email: string, password: string) => Promise<void>
-  signUpWithEmail: (email: string, password: string) => Promise<void>
+  signInWithEmail: (email: string, password: string) => Promise<void>;
+  signUpWithEmail: (email: string, password: string) => Promise<void>;
 
-  signInWithGoogle: () => Promise<void>
+  signInWithGoogle: () => Promise<void>;
 
-  logout: () => Promise<void>
+  logout: () => Promise<void>;
 
   // Email verification functions
-  sendEmailVerification: () => Promise<void>
-  reloadUser: () => Promise<FirebaseAuthTypes.User | null>
-  updateUserEmail: (newEmail: string) => Promise<void>
+  sendEmailVerification: () => Promise<void>;
+  reloadUser: () => Promise<FirebaseAuthTypes.User | null>;
+  updateUserEmail: (newEmail: string) => Promise<void>;
 
-  authError: string | null
-  clearAuthError: () => void
-}
+  authError: string | null;
+  clearAuthError: () => void;
+};
 
-export const AuthContext = createContext<AuthContextType | null>(null)
+export const AuthContext = createContext<AuthContextType | null>(null);
 
 export interface AuthProviderProps {}
 
-export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({ children }) => {
-  const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [authError, setAuthError] = useState<string | null>(null)
-  const [isEmailVerified, setIsEmailVerified] = useState(false)
+export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
+  children,
+}) => {
+  const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
 
   useEffect(() => {
     GoogleSignin.configure({
       webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
       offlineAccess: true,
       scopes: ["email", "profile"],
-    })
-  }, [])
+    });
+  }, []);
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged((user) => {
-      setUser(user)
-      setIsEmailVerified(user?.emailVerified || false)
-      setIsLoading(false)
-    })
+      setUser(user);
+      setIsEmailVerified(user?.emailVerified || false);
+      setIsLoading(false);
+    });
 
-    return unsubscribe
-  }, [])
+    return unsubscribe;
+  }, []);
 
-  const signInWithEmail = useCallback(async (email: string, password: string) => {
-    try {
-      setIsLoading(true)
-      setAuthError(null)
+  const signInWithEmail = useCallback(
+    async (email: string, password: string) => {
+      try {
+        setIsLoading(true);
+        setAuthError(null);
 
-      await auth().signInWithEmailAndPassword(email, password)
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : translate("auth:errors.signInFailed")
-      setAuthError(errorMessage)
-      throw error
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
-
-  const signUpWithEmail = useCallback(async (email: string, password: string) => {
-    try {
-      setIsLoading(true)
-      setAuthError(null)
-
-      const userCredential = await auth().createUserWithEmailAndPassword(email, password)
-
-      // 회원가입 후 즉시 이메일 검증 메일 발송
-      if (userCredential.user && !userCredential.user.emailVerified) {
-        await userCredential.user.sendEmailVerification()
+        await auth().signInWithEmailAndPassword(email, password);
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : translate("auth:errors.signInFailed");
+        setAuthError(errorMessage);
+        throw error;
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : translate("auth:errors.signUpFailed")
-      setAuthError(errorMessage)
-      throw error
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
+    },
+    [],
+  );
+
+  const signUpWithEmail = useCallback(
+    async (email: string, password: string) => {
+      try {
+        setIsLoading(true);
+        setAuthError(null);
+
+        const userCredential = await auth().createUserWithEmailAndPassword(
+          email,
+          password,
+        );
+
+        // 회원가입 후 즉시 이메일 검증 메일 발송
+        if (userCredential.user && !userCredential.user.emailVerified) {
+          await userCredential.user.sendEmailVerification();
+        }
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : translate("auth:errors.signUpFailed");
+        setAuthError(errorMessage);
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [],
+  );
 
   const signInWithGoogle = useCallback(async () => {
     try {
-      setIsLoading(true)
-      setAuthError(null)
+      setIsLoading(true);
+      setAuthError(null);
 
       // Check if Play Services are available (Android only)
-      await GoogleSignin.hasPlayServices()
+      await GoogleSignin.hasPlayServices();
 
       // Attempt to sign in
-      const response = await GoogleSignin.signIn()
+      const response = await GoogleSignin.signIn();
 
       if (isCancelledResponse(response)) {
-        return
+        return;
       }
 
       if (isSuccessResponse(response)) {
-        const { idToken } = response.data
+        const { idToken } = response.data;
 
         if (!idToken) {
-          throw new Error(translate("auth:errors.googleSignInFailed"))
+          throw new Error(translate("auth:errors.googleSignInFailed"));
         }
 
-        const googleCredential = auth.GoogleAuthProvider.credential(idToken)
-        await auth().signInWithCredential(googleCredential)
+        const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+        await auth().signInWithCredential(googleCredential);
       }
     } catch (error) {
       // Handle specific Google Sign-in errors
@@ -138,140 +153,150 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({ childre
         switch (error.code) {
           case statusCodes.IN_PROGRESS:
             // Sign in operation is already in progress
-            setAuthError(translate("auth:errors.signInInProgress"))
-            break
+            setAuthError(translate("auth:errors.signInInProgress"));
+            break;
           case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
             // Android only - Play Services not available or outdated
-            setAuthError(translate("auth:errors.playServicesNotAvailable"))
-            break
+            setAuthError(translate("auth:errors.playServicesNotAvailable"));
+            break;
           default:
-            setAuthError(translate("auth:errors.googleSignInFailed"))
+            setAuthError(translate("auth:errors.googleSignInFailed"));
         }
       } else {
         // General error
         const errorMessage =
-          error instanceof Error ? error.message : translate("auth:errors.googleSignInFailed")
-        setAuthError(errorMessage)
+          error instanceof Error
+            ? error.message
+            : translate("auth:errors.googleSignInFailed");
+        setAuthError(errorMessage);
       }
-      throw error
+      throw error;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [])
+  }, []);
 
   const logout = useCallback(async () => {
     try {
-      setIsLoading(true)
-      setAuthError(null)
+      setIsLoading(true);
+      setAuthError(null);
 
       // 즉시 사용자 상태를 null로 설정하여 UI가 즉시 업데이트되도록 함
-      setUser(null)
+      setUser(null);
 
       // Sign out from Google
-      await GoogleSignin.signOut()
+      await GoogleSignin.signOut();
 
       // Sign out from Firebase
-      await auth().signOut()
+      await auth().signOut();
     } catch (error) {
       // 에러가 발생해도 사용자는 로그아웃된 상태로 유지
-      console.warn("Logout error:", error)
+      console.warn("Logout error:", error);
 
       const errorMessage =
-        error instanceof Error ? error.message : translate("auth:errors.logoutFailed")
-      setAuthError(errorMessage)
+        error instanceof Error
+          ? error.message
+          : translate("auth:errors.logoutFailed");
+      setAuthError(errorMessage);
 
       // 에러가 발생해도 사용자 상태는 null로 유지
-      setUser(null)
+      setUser(null);
 
-      throw error
+      throw error;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [])
+  }, []);
 
   const clearAuthError = useCallback(() => {
-    setAuthError(null)
-  }, [])
+    setAuthError(null);
+  }, []);
 
   // 이메일 검증 메일 발송
   const sendEmailVerification = useCallback(async () => {
     try {
-      setIsLoading(true)
-      setAuthError(null)
+      setIsLoading(true);
+      setAuthError(null);
 
-      const currentUser = auth().currentUser
+      const currentUser = auth().currentUser;
       if (!currentUser) {
-        throw new Error(translate("auth:errors.userNotFound"))
+        throw new Error(translate("auth:errors.userNotFound"));
       }
 
-      await currentUser.sendEmailVerification()
+      await currentUser.sendEmailVerification();
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : translate("auth:errors.emailVerificationFailed")
-      setAuthError(errorMessage)
-      throw error
+        error instanceof Error
+          ? error.message
+          : translate("auth:errors.emailVerificationFailed");
+      setAuthError(errorMessage);
+      throw error;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [])
+  }, []);
 
   // 사용자 정보 새로고침 (이메일 검증 상태 확인)
   const reloadUser = useCallback(async () => {
     try {
-      setIsLoading(true)
-      setAuthError(null)
+      setIsLoading(true);
+      setAuthError(null);
 
-      const currentUser = auth().currentUser
+      const currentUser = auth().currentUser;
       if (!currentUser) {
-        throw new Error(translate("auth:errors.userNotFound"))
+        throw new Error(translate("auth:errors.userNotFound"));
       }
 
-      await currentUser.reload()
-      const updatedUser = auth().currentUser
-      setUser(updatedUser)
-      setIsEmailVerified(updatedUser?.emailVerified || false)
+      await currentUser.reload();
+      const updatedUser = auth().currentUser;
+      setUser(updatedUser);
+      setIsEmailVerified(updatedUser?.emailVerified || false);
 
-      return updatedUser
+      return updatedUser;
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : translate("auth:errors.reloadFailed")
-      setAuthError(errorMessage)
-      throw error
+        error instanceof Error
+          ? error.message
+          : translate("auth:errors.reloadFailed");
+      setAuthError(errorMessage);
+      throw error;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [])
+  }, []);
 
   // 이메일 주소 변경
   const updateUserEmail = useCallback(async (newEmail: string) => {
     try {
-      setIsLoading(true)
-      setAuthError(null)
+      setIsLoading(true);
+      setAuthError(null);
 
-      const currentUser = auth().currentUser
+      const currentUser = auth().currentUser;
       if (!currentUser) {
-        throw new Error(translate("auth:errors.userNotFound"))
+        throw new Error(translate("auth:errors.userNotFound"));
       }
 
-      await currentUser.updateEmail(newEmail)
+      await currentUser.updateEmail(newEmail);
 
       // 이메일 변경 후 새로운 이메일로 검증 메일 발송
-      await currentUser.sendEmailVerification()
+      await currentUser.sendEmailVerification();
 
       // 사용자 정보 새로고침
-      await currentUser.reload()
-      const updatedUser = auth().currentUser
-      setUser(updatedUser)
-      setIsEmailVerified(false) // 새 이메일은 미검증 상태
+      await currentUser.reload();
+      const updatedUser = auth().currentUser;
+      setUser(updatedUser);
+      setIsEmailVerified(false); // 새 이메일은 미검증 상태
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : translate("auth:errors.emailUpdateFailed")
-      setAuthError(errorMessage)
-      throw error
+        error instanceof Error
+          ? error.message
+          : translate("auth:errors.emailUpdateFailed");
+      setAuthError(errorMessage);
+      throw error;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [])
+  }, []);
 
   const value = {
     isAuthenticated: !!user,
@@ -287,13 +312,13 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({ childre
     updateUserEmail,
     authError,
     clearAuthError,
-  }
+  };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-}
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
 
 export const useAuth = () => {
-  const context = useContext(AuthContext)
-  if (!context) throw new Error("useAuth must be used within an AuthProvider")
-  return context
-}
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
+  return context;
+};
